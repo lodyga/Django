@@ -1,0 +1,521 @@
+<img src="{{ item.image.url }}" class="rounded-xl">
+<img src="{% static 'images/chair.jpg' %}" class="center">
+<img src="/static/images/chair.jpg">
+<!-- template.html -->
+<img src="{{ STATIC_URL }}images/chair.jpg" class="rounded-xl" alt="Chair">
+
+<img src="{{ STATIC_URL }}'images/chair.jpg'" class="center">
+<img src="{{ STATIC_URL }}{{ item.image.url }}">
+<img src="{{ STATIC_URL }}'images/chair.jpg'">
+
+
+Intrduction to Dynamic Web Content
+HyperText Trantfer Protocol
+
+URL = Universal Resource Procotol
+protocol    host(domain name)server   document
+http://     youtube.com               page1.html
+
+HTTP = HyperText Transfer Protocol
+
+telnet data.pr4e.org 80
+GET http://data.pr4e.org/page1.htm HTTP/1.0 <Enter> # without headers
+<Headers>
+
+Netwok Sockets
+Sockets = computer phone calls
+port determines the application
+
+
+HTTP
+encode(unicoed) -> utf-8
+decode(ute-8) -> unicode
+simple_browser.py
+
+
+In the server
+simple_server.py
+$ python3 simple_server.py
+Access http://localhost:9000
+GET / HTTP/1.1
+GET /favicon.ico HTTP/1.1
+
+
+A Simple Web Client
+$ python3 simple_server.py
+$ python3 simple_WebClient.py
+
+
+The Structure of a Djanog Application
+
+MVC = Model View Controller
+Diagram: https://youtu.be/o0XbHvKxw7Y?si=7jN17OsbjLzIbLuo&t=4508
+DOM = Document Object Model
+Parse Response -> DOM
+
+
+
+
+Virtlal Hosting
+https://www.dj4e.com/assn/dj4e_install.md
+
+pythonanywhere terminal:
+$ mkvirtualenv django42 --python=/usr/bin/python3.9
+$ pip install django==4.2.7
+$ workon django42
+$ python --version
+$ python -m django --version
+$ which python3
+
+cat /home/(your-account)/.bashrc
+# Auto switch into django42 virtual environment
+workon django42
+/home/ukasz/.virtualenvs/django42 # patch to venv
+
+sampl code:
+$ cd ~
+$ git clone https://github.com/csev/dj4e-samples
+$ cd ~/dj4e-samples
+$ pip install -r requirements42.txt
+python manage.py check  # sanity check for dj4e-samples
+python manage.py makemigrations
+python manage.py migrate
+
+
+ALLOWED_HOSTS = []  # which systems can talk to server
+Source code: /home/ukasz/django_projects/mysite
+Working directory: /home/ukasz/django_projects/mysite
+WSGI configuration file: Web Server Gateway Interface
+Virtlalenv: /home/ukasz/.virtualenvs/django42
+
+
+
+
+
+HTML
+
+html special characters
+<a href> = anchor, HyperText reference
+
+<pre></pre>: tag seves formating
+
+&gt;&amp
+
+target="_blank" : opens tab in new window
+
+<table>
+   <tr>
+     <th>
+   <tr>
+     <td>
+
+
+
+CSS Cascading Style Sheets
+
+https://chrispederick.com/work/web-developer/
+
+selector {
+  properties: values;
+}
+
+body {
+  font-family: arial, sans-serif;
+}
+
+<head>
+  <link type="text/css" rel="stylesheet" href="rules.css">
+</head>
+
+<span></span> : css inline tag
+<div></div> : css block tag
+
+https://www.wa4e.com/code/css/classid.htm
+
+# find id to apply
+. find class to apply
+
+
+
+
+
+Images, Colors, and Fonts
+https://www.wa4e.com/code/css/images.htm
+
+1em = 5pix = len("m")
+<br clear="all"/> clear all floats
+https://www.w3schools.com/html/html_colors_rgb.asp
+https://www.wa4e.com/code/css/inherit.htm
+
+<!-- html comment -->
+/* css comment */ 
+
+
+navbar 
+https://www.wa4e.com/code/css/navstyle.htm
+
+
+
+# tunnel
+$ ngrok http 8000
+
+
+
+Single Table SQL
+SQL Structured Query Language
+
+
+
+
+Simiple Django Models
+
+ORM Object Rational Mapping  # map between database table and object with column names
+$ python3 manage.py shell  # run Django in Python Interpreter (in terminal)
+    
+    
+makemigrations  # Django reads through all models.py and creates migrations
+migrate  # read migrations and crate the database and tables
+
+changing data in database
+
+python manage.py shell
+
+.objects.values()  # list of objects from a database
+.objects.values().order_by('-name')
+
+.objects.all()  # list of objects
+.objects.all().delete()  # delete all entires
+
+.objects.get(pk=1)  # object with primary key = 1
+.objects.get(id=1)  # object with id = 1
+.objects.get(pk=2).person.name
+
+.objects.filter(name='<some_name>').values()
+.objects.filter(name='<some_name>').delete()
+
+.objects.get_or_create(name=cat["Breed"])
+
+.objects.create(name="<some_name>")  # creating an database element directly
+.objects.create(nickname=cat["Name"], breed=b, weight=cat["Weight"])
+
+x = Horse(name='Bravo')  # == Horse.objects.create(name="Bravo")
+x.save()
+
+
+from users.models import User
+
+CRUD in ORM
+
+u = User(name='Kristen', email='kf@umich.edu')
+u.save()
+u = User(name='Chuck', email='csev@umich.edu')
+u.save()
+u = User(name='Colleen', email='cvl@umich.edu')
+u.save()
+u = User(name='Ted', email='ted@umich.edu')
+u.save()
+u = User(name='Sally', email='a2@umich.edu')
+u.save()
+
+User.objects.values()  # list of objects from a database
+User is model name which is a class
+objects is an atribute
+values() is a method
+queryset = Product.objects.all()  # list of objects
+Product.objects.get(pk=1)  # object with primary key = 1
+Product.objects.get(id=1)
+
+
+User.objects.filter(email='csev@umich.edu').values()
+
+User.objects.filter(email='ted@umich.edu').delete()
+User.objects.values()
+
+User.objects.filter(email='csev@umich.edu').update(name='Charles')
+User.objects.values()
+
+User.objects.values().order_by('email')
+User.objects.values().order_by('-name')
+
+quit()
+
+Django Models - Many-To-One Relationships - Music Database
+
+
+rm */migrations/*00  # remeove all migrations
+
+print(first.genre)  # Rock; object.class; generated wity def __str__(self):
+print(first.genre.name)  # Rock; object.class.atribute
+
+
+
+
+MVC Model View Controller
+Controller: abstact, what should be done; controlls Browser, Model, Session, Cookies, Ajax, View
+View: html, css, looks
+Model: the data
+
+
+
+Request and Response
+
+The Application Programming Interfaces (APIs) for HttpRequest and HttpResponse objects, are defined in the django.http module.
+
+
+https://samples.dj4e.com/views/danger?guess=%3Cb%3EBold%3C%2Fb%3E
+
+%3C b %3E Bold  %3C %2F b  %3E
+<   b >   Bold  <   /   b  >
+
+https://samples.dj4e.com/views/danger?guess=%3Cscript%3Ealert%28%27Owned%27%29%3B%3C%2Fscript%3E
+http://127.0.0.1:8000/views/danger?guess=%3Cscript%3Ealert%28%27Owned%27%29%3B%3C%2Fscript%3E
+
+<html><body>
+<p>Your guess was <script>alert('Owned');</script></p>
+</body></html>
+
+
+
+Templates
+https://youtu.be/o0XbHvKxw7Y?si=EM9_HNgDSrXiMAIh&t=21264
+
+DTL Django Template Language
+
+{{}} Substitution
+{%%} Calling code, Logic, Blocks
+
+Template Inheritance
+
+www.py4e.com/lessons/Objects Python
+
+
+
+URL Mapping / Reversing
+Mapping functtions to read urls.py, link to a view; reverse gnerating the path; reversed URL lookup 
+name = "some-view"; appplication_name = view_name; in urls.py when defining the view
+path('route/', include('route.urls', namespace='nsroute')), in urls.py main app when importing the view
+
+Reversing
+u = reverse('gview:cats') -> "/gview/cats"
+
+
+
+Generic Views
+List / Detail
+
+
+
+
+
+
+Form Processing
+
+Two ways the browser can send parameters to the web server:
+GET - Parameters are placed on the URL which is retrieved.
+POST - The URL is retrieved and parameters are appended to the request in the the HTTP connection.
+
+
+
+
+Forms in HTML
+
+
+
+CSRF Cross-Site-Request-Forgery
+When the legitimate site generates a POST form, it includes the CSRF Token as a hidden input field
+When the form is submitted the CSRF Token is sent as well as the cookie
+
+
+POST-Refresh
+POST-Redirect-GET-Refresh
+
+
+
+
+
+Cookies Sesions
+Cookies(Browser concept) Sessions(server concept)
+
+Cookies looks for session to use.
+Cookies establish and maintain sessions.
+Server distinguth browsers based on Cookies
+
+
+
+Data Modelin: Many to many.
+
+in Django shell
+>>> Lang.objects.create(name="pl")  # creating an database element directly
+>>> x = Book(title="Newsweek", isbn="879", lang=z)  # creating an object and saving
+>>> x.save()
+
+
+
+
+Loading data to Django from CSV
+django-extensions needed with django_extensions in settings.py
+python3 manage.py runscript cats_load
+scritp in: scritp/cats_load.py
+data in: cats/meow.csv
+
+
+
+
+Logging Users into Our Application
+path('accounts/', include('django.contrib.auth.urls')),  # for users logging
+
+reverse: give the url of the argument
+<p>You can <a href="{% url 'login' %}?next={{ request.path }}">Login</a> if you like.</p>
+<p>You can <a href="/accounts/login/?next=authz/open">Login</a> if you like.</p>
+
+
+
+
+
+Forms in Django
+autos
+
+
+
+Virtlal Hosting
+: Many domains on one system
+
+
+
+
+Django Owned Rows
+owned rows can be updated/deleted by the owner
+OwnerListView means ListView fror owned rows
+
+
+
+Inside a Geneic Edit View
+template_name = None # so we can override in urls.py
+path('awesome', views.MyView.as_view(template_name='crispy/awesome.html')),
+{% load crispy_forms_tags %}
+
+
+
+
+
+Bootstrap Navigation Bar
+navbar
+<a href="{% url 'menu:page1' %}" class="nav-link {% if request.get_full_path == abc1 %}active{% endif %}">Page 1</a>
+<a href="{% url 'menu:main' %}"  {% if request.get_full_path == xyz %}class= "nav-link" {% else %}class="nav-item"{% endif %}>
+
+
+
+
+Many to many connections
+Connection table, joion table, junction table, through table
+Splits many-to-many connection to two one-to-many connections.
+
+from bookmany.models import Author, Book, Authored
+b1 = Book(title="Networking")
+b1.save()
+b2 = Book(title="Raspberry")
+b2.save()
+a1 = Author(name="Fontichiaro")
+a1.save()
+a2 = Author(name="Severance")
+a2.save()
+
+Book.objects.values()  # list of objects from a database
+
+Authored(book=b1, author=a2).save()
+Authored(book=b2, author=a1).save()
+Authored(book=b2, author=a2).save()
+
+b1.authors.values()
+b2.authors.values()
+a2.books.values()
+
+
+
+from many.models import Person, Course, Membership
+p = Person(email="ted@umich.edu")
+p.save()
+c = Course(title="Woodcraft")
+c.save()
+c.id  # 1
+c.title  # "Woodcraft"
+c.members.values()  # empty members
+m = Membership(role=Membership.INSTRUCTOR, person=p, course=c)
+m.save()
+m.id
+m.course_id  # 1
+c.members.values()
+p.courses.values()
+
+
+To run a script neeed pip3 install django-extensions and add to settings
+shell
+Person.objects.values()  # get all values
+x = Person.objects.get(pk=1)
+x.email
+x.courses  # many-to-many object; magic set
+x.courses.values()  # <QuerySet [{'id': 2, 'title': 'Python'}, {'id': 4, 'title': 'SQL'}]>
+Person.objects.get(pk=1).courses.values()  # same
+
+y = Course.objects.get(pk=1)
+y.title  # Python
+y.members.values()  # <QuerySet [{'id': 2, 'email': 'jane@tsugi.org', 'name': None}, {'id': 3, 'email': 'ed@tsugi.org', 'name': None}, {'id': 4, 'email': 'sue@tsugi.org', 'name': None}]>
+
+Membership.objects.get(pk=1)  # <Membership: Person 2 <--> Course 2>
+>>> Membership.objects.get(pk=2).course  # <Course: Python>
+>>> Membership.objects.get(pk=2).course.title  # Python
+>>> Membership.objects.get(pk=2).person  # <Person: jane@tsugi.org>
+>>> Membership.objects.get(pk=2).person.email # 'jane@tsugi.org'
+>>> Membership.objects.get(pk=2).role  # 5000
+
+>>> y.membership_set.all().values()
+<QuerySet [{'id': 2, 'person_id': 2, 'course_id': 2, 'role': 5000}, {'id': 3, 'person_id': 3, 'course_id': 2, 'role': 1}, {'id': 4, 'person_id': 4, 'course_id': 2, 'role': 1}]>
+y.membership_set.get(pk=2)
+
+
+
+
+
+
+
+
+JavaScript
+Augment HTML - JQuery
+MVC - VUE, React
+Server - Node, Express
+j = 0
+j == 0 j is equal to 0 with cenversion
+j === 0 comparison type and value with no type conversion
+NaN Not a Number
+
+Definite loop is looping through an object.
+Counted loop is looping through a list, array.
+
+Object Oriented Programming
+The set of values of the atributes of a particular object is called its state.
+Object == Instance
+
+A constructor in a class is a block of statements called when an object is created.
+
+
+User, Forum, Comment
+https://youtu.be/o0XbHvKxw7Y?si=v6gCErk04ry8IMAK&t=52924
+
+
+
+
+JQuerry simple JS is like DOM
+
+
+
+AJAX / JSON
+
+Simple Http request/response
+key is atribute
+
+
+
+
+
+
+
