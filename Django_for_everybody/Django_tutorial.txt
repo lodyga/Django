@@ -190,8 +190,14 @@ python manage.py shell
 .objects.get(id=1)  # object with id = 1
 .objects.get(pk=2).person.name
 
+
 .objects.filter(name='<some_name>').values()
 .objects.filter(name='<some_name>').delete()
+.objects.filter(pk=1)
+.objects.filter(attrbiute__startswith="What")
+.objects.filter(pub_date__lte=timezone.now())
+
+.objects.order_by("col_name")
 
 .objects.get_or_create(name=cat["Breed"])
 

@@ -1,0 +1,22 @@
+{% extends "core/base.html" %}
+{% block title %}
+    Tag
+{% endblock title %}
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'python_problems/style.css' %}">
+    <h1>Python tag list</h1>
+    <a href="create/">Create a tag</a>
+    {% if tag_list %}
+        <ul>
+            {% for tag in tag_list %}
+                <li>
+                    <a href="#">{{ tag.name }}</a>
+                    <hr>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No python problems available.</p>
+    {% endif %}
+{% endblock content %}

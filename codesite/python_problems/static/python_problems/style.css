@@ -1,0 +1,8 @@
+.problem-container {
+  display: flex;
+  align-items: center; /* Vertically center the content */
+}
+
+.problem-container a {
+  margin-right: 0px; /* Add some space between the title and the tags */
+}
