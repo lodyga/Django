@@ -3,20 +3,97 @@
     <head>
         <meta charset="ute-8">
         <meta name="viewport" content="width=dewice-width, initial-scale=1.0">
-        <script src="https://cdn.tailwindcss.com"></script>
+        {% comment %}<script src="https://cdn.tailwindcss.com"></script>{% endcomment %}
         <title>
             | {{ settings.APP_NAME }}
             {% block title %}
             {% endblock title %}
         </title>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" />
+    
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/v4-shims.css" />
+
+        {% comment %}<script src="https://cdn.tailwindcss.com"></script>{% endcomment %}
     </head>
     <body>
         
-        {% include "core/header.html" %}
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="border-radius:10px !important">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="{% url 'python_problems:index' %}">{{ settings.APP_NAME }} {{ request.username }}</a>
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                {% url 'python_problems:index' as xyz %}
+                <li class="nav-item">
+                  <a href="{% url 'python_problems:index' %}" class="nav-link {% if request.get_full_path == xyz %}active{% endif %}">Python</a>
+                </li>
+        
+                {% url 'python_problems:conversion' as abc1 %}
+                <li class="nav-item">
+                  <a href="{% url 'python_problems:conversion' %}" class="nav-link {% if request.get_full_path == abc1 %}active{% endif %}">Conversion</a>
+                </li>
+      
+                {% url 'python_problems:page2' as abc2 %}
+                <li class="nav-item">
+                  <a href="{% url 'python_problems:tag-create' %}" class="nav-link {% if request.get_full_path == abc2 %}active{% endif %}">Tag create</a>
+                </li>
+  
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
+                  <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <li>
+                      <a class="dropdown-item" href="{% url 'python_problems:problem-create' %}">Problem create</a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="{% url 'python_problems:tag-create' %}">Tag create</a>
+                    </li>
+                    <li>
+                      <hr class="dropdown-divider" />
+                    </li>
+                    {% if user.is_authenticated %}
+                  <li>
+                    <a class="dropdown-item" href="{% url 'logout' %}?next={% url 'core:index' %}">Logout</a>
+                  </li>
+                {% else %}
+                  <li>
+                    <a class="dropdown-item" href="{% url 'login' %}?next={% url 'core:index' %}">Login</a>
+                  </li>
+                {% endif %}
+                  </ul>
+                </li>
+              </ul>
+              <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}?next={% url 'core:index' %}">Logout</a>
+                  </li>
+                {% else %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}?next={% url 'core:index' %}">Login</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </div>
+        </nav>
+
+
+        {% comment %}{% include "core/header.html" %}{% endcomment %}
         <div class="px-6 py-6">
             {% block content %}
             {% endblock content %}
         </div>
-        {% include "core/footer.html" %}
+        {% comment %}{% include "core/footer.html" %}{% endcomment %}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="border-radius:10px !important">
+          <div class="container-fluid">
+          <ul class="navbar-nav">
+            <a class="nav-link" href="{% url 'login' %}?next={% url 'core:index' %}">Łukasz Łodożyński</a>
+          </ul>
+          </div>
+        </nav>
     </body>
 </html>

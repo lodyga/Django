@@ -11,8 +11,8 @@
       <a href="{% url "python_problems:index" %}" class="px-6 py-3 text-lg font-semibold bg-teal-500 text-white rounded-xl hover:bg-teal-700">Inbox</a>
       <a href="{% url "python_problems:index" %}" class="px-6 py-3 text-lg font-semibold bg-gray-500 text-white rounded-xl hover:bg-gray-700">Dasbhoard</a>
       {% else %}
-        <a href="{% url "core:signup-view" %}" class="px-6 py-3 text-lg font-semibold bg-teal-500 text-white rounded-xl hover:bg-teal-700">Sign up</a>
-        <a href="{% url "core:login-view" %}" class="px-6 py-3 text-lg font-semibold bg-gray-500 text-white rounded-xl hover:bg-gray-700">Login</a>
+        {% comment %}<a href="{% url "core:signup-view" %}" class="px-6 py-3 text-lg font-semibold bg-teal-500 text-white rounded-xl hover:bg-teal-700">Sign up</a>
+        <a href="{% url "core:login-view" %}" class="px-6 py-3 text-lg font-semibold bg-gray-500 text-white rounded-xl hover:bg-gray-700">Login</a>{% endcomment %}
       {% endif %}
     </div>
 </nav>

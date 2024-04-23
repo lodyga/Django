@@ -19,6 +19,7 @@ class DetailView(generic.DetailView):
         context["tags"] = problem.tags.values_list("name", flat=True)
         return context
 
+
 class TagIndexView(generic.ListView):
     model = Tag
 
@@ -33,3 +34,7 @@ class ProblemCreate(LoginRequiredMixin, generic.edit.CreateView):
     model = Problem
     fields = "__all__"
     success_url = reverse_lazy('python_problems:index')
+
+
+def conversion_view(request):
+    return render(request, "python_problems/conversion.html")

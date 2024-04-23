@@ -39,10 +39,22 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Extensions - installed with requirements.txt
+    'crispy_forms',
+    'crispy_bootstrap5',
+
     "core",
     "python_problems",
     
 ]
+
+# When we get to tagging
+
+# When we get to crispy forms :)
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+TAGGIT_CASE_INSENSITIVE = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
