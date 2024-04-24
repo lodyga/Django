@@ -3,15 +3,20 @@
     Tag
 {% endblock title %}
 {% block content %}
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'python_problems/style.css' %}">
-    <h1>Python tag list</h1>
-    <a href="create/">Create a tag</a>
+    <h2>Python problems tag list</h2>
+    <p>
+        <a href="{% url 'python_problems:index' %}" class="ms-4">Back</a>
+    </p>
+    <p>
+        <a href="create/" class="ms-4">Add a tag</a>
+    </p>
     {% if tag_list %}
         <ul>
             {% for tag in tag_list %}
                 <li>
-                    <a href="#">{{ tag.name }}</a>
+                    {{ tag.name }}
+                    (<a href="{% url 'python_problems:tag-update' tag.id %}">Update</a> |
+                    <a href="{% url 'python_problems:tag-delete' tag.id %}">Delete</a>)
                     <hr>
                 </li>
             {% endfor %}

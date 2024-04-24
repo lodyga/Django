@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=dewice-width, initial-scale=1.0">
         {% comment %}<script src="https://cdn.tailwindcss.com"></script>{% endcomment %}
         <title>
-            | {{ settings.APP_NAME }}
+            {{ settings.APP_NAME }} |
             {% block title %}
             {% endblock title %}
         </title>
@@ -24,7 +24,7 @@
 
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="border-radius:10px !important">
             <div class="container-fluid">
-              <a class="navbar-brand" href="{% url 'python_problems:index' %}">{{ settings.APP_NAME }} {{ request.username }}</a>
+              <a class="navbar-brand" href="{% url 'python_problems:index' %}">Hello {{ request.user }}</a>
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 {% url 'python_problems:index' as xyz %}
@@ -39,17 +39,17 @@
       
                 {% url 'python_problems:page2' as abc2 %}
                 <li class="nav-item">
-                  <a href="{% url 'python_problems:tag-create' %}" class="nav-link {% if request.get_full_path == abc2 %}active{% endif %}">Tag create</a>
+                  <a href="{% url 'python_problems:tag-index' %}" class="nav-link {% if request.get_full_path == abc2 %}active{% endif %}">Tag index</a>
                 </li>
   
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin</a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <li>
-                      <a class="dropdown-item" href="{% url 'python_problems:problem-create' %}">Problem create</a>
+                      <a class="dropdown-item" href="{% url 'python_problems:problem-create' %}">Create a problem</a>
                     </li>
                     <li>
-                      <a class="dropdown-item" href="{% url 'python_problems:tag-create' %}">Tag create</a>
+                      <a class="dropdown-item" href="{% url 'python_problems:tag-create' %}">Add a tag</a>
                     </li>
                     <li>
                       <hr class="dropdown-divider" />
@@ -90,7 +90,7 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="border-radius:10px !important">
           <div class="container-fluid">
           <ul class="navbar-nav">
-            <a class="nav-link" href="{% url 'login' %}?next={% url 'core:index' %}">Łukasz Łodożyński</a>
+            <a class="nav-link" href="{% url 'login' %}?next={% url 'core:index' %}">{{ settings.APP_NAME }} project by Łukasz Łodożyński</a>
           </ul>
           </div>
         </nav>

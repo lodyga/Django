@@ -3,66 +3,66 @@
     Python
 {% endblock title %}
 {% block content %}
-<div class="ms-4">
-    <h1>{{ problem.title }}</h1>
-    <a href="{% url "python_problems:index" %}">Back</a>
-    <br>
-    <br>
-    <hr>
-    <p>
-        <b>Tags</b>:
-    </p>
-    <p>{{ tags|join:", " }}</p>
-    {% comment %}
-Tags within problem object, but might be problem with 'all' when tags have description.
-    <p>{{ problem.tags.all|join:", " }}</p>{% endcomment %}
-    <br>
-    <hr>
-    <p>
-        <b>URL</b>:
-    </p>
-    <a href="{{ problem.url }}">{{ problem.url }}</a>
-    <br>
-    <hr>
-    <p>
-        <b>Problem description</b>:
-    </p>
-    <pre>{{ problem.description }}</pre>
-    <br>
-    <hr>
-    <form action="#">
-        <p>
-            <label for="code_area">
-                <b>Write a solution</b>:
-            </label>
-        </p>
-        <textarea id="code_area" name="code_area" rows="20" cols="80">
-class Solution:
-    def meth_name():
-    </textarea>
+    <div class="ms-4">
+        <h1>{{ problem.title }}</h1>
+        <a href="{% url "python_problems:index" %}">Back</a>
         <br>
-        <input type="submit" value="UnSubmit (dummy buton)">
-    </form>
-    <br>
-    <hr>
-    <p>
-        <b>Test Cases</b>:
-    </p>
-    <pre>{{ problem.testcase }}</pre>
-    <br>
-    <hr>
-    <button onclick="showSolution()">Show solution</button>
-    <div id="buttonId" style="display: none;">
-        <p>
-            <b>Solution</b>:
-        </p>
-        <div class="box">
-            <pre>{{ problem.solution }}</pre>
-        </div>
         <br>
         <hr>
-    </div>
-    <script>
+        <p>
+            <b>Tags</b>:
+        </p>
+        <p>{{ tags|join:", " }}</p>
+        {% comment %}
+Tags within problem object, but might be problem with 'all' when tags have description.
+        <p>{{ problem.tags.all|join:", " }}</p>{% endcomment %}
+        <br>
+        <hr>
+        <p>
+            <b>URL</b>:
+        </p>
+        <a href="{{ problem.url }}">{{ problem.url }}</a>
+        <br>
+        <hr>
+        <p>
+            <b>Problem description</b>:
+        </p>
+        <pre>{{ problem.description }}</pre>
+        <br>
+        <hr>
+        <form action="#">
+            <p>
+                <label for="code_area">
+                    <b>Write a solution</b>:
+                </label>
+            </p>
+            <textarea id="code_area" name="code_area" rows="20" cols="80">
+class Solution:
+    def method_name():
+    </textarea>
+            <br>
+            <input type="submit" value="UnSubmit (dummy buton)">
+        </form>
+        <br>
+        <hr>
+        <p>
+            <b>Test Cases</b>:
+        </p>
+        <pre>{{ problem.testcase }}</pre>
+        <br>
+        <hr>
+        <button onclick="showSolution()">Show solution</button>
+        <div id="buttonId" style="display: none;">
+            <p>
+                <b>Solution</b>:
+            </p>
+            <div class="box">
+                <pre>{{ problem.solution }}</pre>
+            </div>
+            <br>
+            <hr>
+        </div>
+        <script>
 function showSolution() {
     var x = document.getElementById("buttonId");
   var button = document.querySelector("button");
@@ -75,8 +75,8 @@ function showSolution() {
     button.textContent = "Show solution";
   }
 }
-    </script>
-    <br>
-    <hr>
-</div>
+        </script>
+        <br>
+        <hr>
+    </div>
 {% endblock content %}

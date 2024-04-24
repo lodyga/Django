@@ -1,32 +1,38 @@
 {% extends "core/base.html" %}
 {% block title %}
-    Python
+  Python
 {% endblock title %}
 {% block content %}
-{% load static %}
-<link rel="stylesheet" href="{% static 'python_problems/style.css' %}">
-<h1>Python problems list</h1>
-<a href="tag/">Tag list</a>
-<a href="tag/create/">Create a tag</a>
-<a href="create/">Create a problem</a>
-<hr>
-<button onclick="toggleTags()">Tags</button>
-{% if problem_list %}
-  <ul>
-    {% for problem in problem_list %}
-      <li>
-        <div class="problem-container flex">
-          <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>
-          <p class="tags" style="display: none;">, Tags: ({{ problem.tags.all|join:', ' }})</p>
-        </div>
-        <hr>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No python problems available.</p>
-{% endif %}
-<script>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'python_problems/style.css' %}">
+  <h2>Python problems list</h2>
+  <a href="/" class="ms-4">Back</a>
+  <br>
+  <a href="create/" class="ms-4">Create a problem</a> |
+  <a href="tag/">Tag list</a> |
+  <a href="tag/create/">Add a tag</a>
+  <hr>
+  <button onclick="toggleTags()" class="ms-4">Tags</button>
+  {% if problem_list %}
+    <ul>
+      {% for problem in problem_list %}
+        <li>
+          <div class="problem-container flex">
+            <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>, 
+            (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
+                    <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
+            <a href="{% url 'python_problems:detail' problem.id %}"
+               class="tags"
+               style="display: none">, ({{ problem.tags.all|join:', ' }})</a>
+          </div>
+          <hr>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No python problems available.</p>
+  {% endif %}
+  <script>
   function toggleTags() {
     var tags = document.querySelectorAll(".tags");
     for (var i = 0; i < tags.length; i++) {
@@ -37,7 +43,7 @@
       }
     }
   }
-</script>
+  </script>
 {% endblock content %}
 {% comment %}With button in each row
 {% if problem_list %}

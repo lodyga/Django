@@ -1,3 +1,8 @@
 {% extends "core/base.html" %}
-{% block title %}Contact{% endblock title %}
-<h1>Contact</h1>
+{% block title %}
+    Contact
+{% endblock title %}
+{% block content %}
+    <h1>Contact</h1>
+    <p>{{ request.user }}</p>
+{% endblock content %}
