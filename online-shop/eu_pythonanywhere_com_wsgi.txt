@@ -1,3 +1,7 @@
+ALLOWED_HOSTS = ['ukasz.eu.pythonanywhere.com']
+
+
+
 import os
 import sys
 #
