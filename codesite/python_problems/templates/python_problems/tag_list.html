@@ -15,7 +15,8 @@
             {% for tag in tag_list %}
                 <li>
                     {{ tag.name }}
-                    (<a href="{% url 'python_problems:tag-update' tag.id %}">Update</a> |
+                    (<a href="{% url 'python_problems:index' %}?query={{ tag.name }}">Search problems</a> |
+                    <a href="{% url 'python_problems:tag-update' tag.id %}">Update</a> |
                     <a href="{% url 'python_problems:tag-delete' tag.id %}">Delete</a>)
                     <hr>
                 </li>

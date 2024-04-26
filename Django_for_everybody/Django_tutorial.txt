@@ -101,8 +101,14 @@ python manage.py check  # sanity check for dj4e-samples
 python manage.py makemigrations
 python manage.py migrate
 
+# check Django modules
+python3 manage.py shell
+pip freeze | grep bootstrap
 
-ALLOWED_HOSTS = []  # which systems can talk to server
+
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "ukasz.eu.pythonanywhere.com"]  # which systems can talk to server
 Source code: /home/ukasz/django_projects/mysite
 Working directory: /home/ukasz/django_projects/mysite
 WSGI configuration file: Web Server Gateway Interface

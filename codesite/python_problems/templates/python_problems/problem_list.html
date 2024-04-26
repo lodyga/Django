@@ -12,26 +12,43 @@
   <a href="tag/">Tag list</a> |
   <a href="tag/create/">Add a tag</a>
   <hr>
-  <button onclick="toggleTags()" class="ms-4">Tags</button>
-  {% if problem_list %}
-    <ul>
-      {% for problem in problem_list %}
-        <li>
-          <div class="problem-container flex">
-            <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>, 
-            (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
-                    <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
-            <a href="{% url 'python_problems:detail' problem.id %}"
-               class="tags"
-               style="display: none">, ({{ problem.tags.all|join:', ' }})</a>
-          </div>
-          <hr>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No python problems available.</p>
-  {% endif %}
+  <div class="container-fluid pb-6">
+    <div class="row">
+      <div class="col-md-2">
+
+        <p>Sidebar</p>
+        <form method="get" action="{% url 'python_problems:index' %}">
+          <input name="query" class="px-2 py-2 mb-2" type="text" value="{{ query }}" placeholder="Search by tags or title">
+
+          <button class="mb-2 py-1 px-1">Search</button>
+      </form>
+        <a class="btn btn-secondary mb-2" href="{% url 'python_problems:index' %}" role="button">Clear search</a>
+      </div>
+      <div class="col-md-9">
+
+        {% if problem_list %}
+          <button onclick="toggleTags()" class="ms-4">Tags</button>
+          <ul>
+            {% for problem in problem_list %}
+              <li>
+                <div class="problem-container flex">
+                  <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>,
+                  (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
+                  <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
+                  <a href="{% url 'python_problems:detail' problem.id %}"
+                     class="tags"
+                     style="display: none">, ({{ problem.tags.all|join:', ' }})</a>
+                </div>
+                <hr>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No python problems available.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
   <script>
   function toggleTags() {
     var tags = document.querySelectorAll(".tags");

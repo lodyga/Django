@@ -5,17 +5,38 @@
 {% block content %}
     <div class="ms-4">
         <h1>{{ problem.title }}</h1>
-        <a href="{% url "python_problems:index" %}">Back</a>
-        <br>
+        <a href="{% url 'python_problems:index' %}">Back</a>
         <br>
         <hr>
         <p>
             <b>Tags</b>:
         </p>
-        <p>{{ tags|join:", " }}</p>
+        {% comment %}<p>{{ tags|join:", " }}</p>{% endcomment %}
+        {% for tag in tags %}
+            <a href="{% url 'python_problems:index' %}?query={{ tag }}">{{ tag }}</a>
+            {% if not forloop.last %},{% endif %}
+        {% endfor %}
         {% comment %}
 Tags within problem object, but might be problem with 'all' when tags have description.
         <p>{{ problem.tags.all|join:", " }}</p>{% endcomment %}
+        <br>
+        <hr>
+        <button onclick="showRelated(this)">Show related problems</button>
+        <div id="buttonRelated" style="display: none;">
+            <p>
+                <b>Related Problems</b>:
+            </p>
+            <div class="box">
+                <ul>
+                    {% for related in related_problems %}
+                        <li>
+                            <a href="{% url 'python_problems:detail' related.id %}">{{ related.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <br>
         <br>
         <hr>
         <p>
@@ -39,7 +60,7 @@ Tags within problem object, but might be problem with 'all' when tags have descr
             <textarea id="code_area" name="code_area" rows="20" cols="80">
 class Solution:
     def method_name():
-    </textarea>
+</textarea>
             <br>
             <input type="submit" value="UnSubmit (dummy buton)">
         </form>
@@ -51,32 +72,42 @@ class Solution:
         <pre>{{ problem.testcase }}</pre>
         <br>
         <hr>
-        <button onclick="showSolution()">Show solution</button>
-        <div id="buttonId" style="display: none;">
+        <button onclick="showSolution(this)">Show solution</button>
+        <div id="buttonSolution" style="display: none;">
             <p>
                 <b>Solution</b>:
             </p>
             <div class="box">
                 <pre>{{ problem.solution }}</pre>
             </div>
-            <br>
-            <hr>
         </div>
-        <script>
-function showSolution() {
-    var x = document.getElementById("buttonId");
-  var button = document.querySelector("button");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-    button.textContent = "Hide solution";
-    window.scrollBy(0, 100);
-  } else {
-    x.style.display = "none";
-    button.textContent = "Show solution";
-  }
-}
-        </script>
         <br>
         <hr>
+        <script>
+            function showSolution(button) {
+                var x = document.getElementById("buttonSolution");
+            // var button = document.querySelector("button"); // This was messing eacho other button name
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            button.textContent = "Hide solution";
+            window.scrollBy(0, 200);
+        } else {
+                x.style.display = "none";
+            button.textContent = "Show solution";
+        }
+        }
+        </script>
+        <script>
+            function showRelated(button) {
+            var y = document.getElementById("buttonRelated");
+            if (y.style.display === "none") {
+                y.style.display = "block";
+            button.textContent = "Hide related problems";
+        } else {
+                y.style.display = "none";
+            button.textContent = "Show related problems";
+        }
+        }
+        </script>
     </div>
 {% endblock content %}
