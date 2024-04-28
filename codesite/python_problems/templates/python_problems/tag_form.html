@@ -1,12 +1,18 @@
 {% extends "core/base.html" %}
 {% block title %}
-    Tag
+  Tag
 {% endblock title %}
 {% block content %}
+  <a href="{% url 'python_problems:index' %}"
+     class="btn btn-secondary px-3 py-0 m-1">Back</a>
   <form action="" method="post">
     {% csrf_token %}
-    <table>{{ form.as_table }}</table>
+    <table>
+      {{ form.as_table }}
+    </table>
     <input type="submit" value="Submit" />
-    <input type="submit" onclick="window.location='{% url 'python_problems:tag-index' %}' ; return false;" value="Cancel" />
+    <input type="submit"
+           onclick="window.location='{% url 'python_problems:tag-index' %}' ; return false;"
+           value="Cancel" />
   </form>
-  {% endblock content %}
+{% endblock content %}

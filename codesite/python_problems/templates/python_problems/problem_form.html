@@ -3,6 +3,7 @@
     Problem
 {% endblock title %}
 {% block content %}
+<a href="{% url 'python_problems:index' %}" class="btn btn-secondary px-3 py-0 m-1">Back</a>
 <form action="" method="post">
   {% csrf_token %}
   <table>{{ form.as_table }}</table>

@@ -1,6 +1,7 @@
 {% extends "core/base.html" %}
 
 {% block content %}
+  <a href="{% url 'python_problems:index' %}" class="btn btn-secondary px-3 py-0 m-1">Back</a>
   <h1>Delete a Tag</h1>
 
   <p>Are you sure you want to delete the tag: {{ tag }}?</p>

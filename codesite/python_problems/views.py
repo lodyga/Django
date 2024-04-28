@@ -11,13 +11,27 @@ from .models import Tag, Problem
 class ProblemIndexView(ListView):
     model = Problem
 
+    def get_context_data(self, **kwargs):
+        context = super(ProblemIndexView, self).get_context_data(**kwargs)
+        query = self.request.GET.get("query", "")
+        problem_list = self.model.objects.all()
+
+        if query:
+            problem_list = problem_list.filter(
+                Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
+
+        context["problem_list"] = problem_list
+        context["query"] = query
+        return context
+
 
 def problem_index_view(request):
     query = request.GET.get("query", "")
     problem_list = Problem.objects.all()
 
     if query:
-        problem_list = problem_list.filter(Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
+        problem_list = problem_list.filter(
+            Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
 
     context = {
         "problem_list": problem_list,

@@ -5,7 +5,8 @@
 {% block content %}
     <div class="ms-4">
         <h1>{{ problem.title }}</h1>
-        <a href="{% url 'python_problems:index' %}">Back</a>
+        <a href="{% url 'python_problems:index' %}"
+           class="btn btn-secondary px-3 py-0 m-1">Back</a>
         <br>
         <hr>
         <p>
@@ -16,9 +17,6 @@
             <a href="{% url 'python_problems:index' %}?query={{ tag }}">{{ tag }}</a>
             {% if not forloop.last %},{% endif %}
         {% endfor %}
-        {% comment %}
-Tags within problem object, but might be problem with 'all' when tags have description.
-        <p>{{ problem.tags.all|join:", " }}</p>{% endcomment %}
         <br>
         <hr>
         <button onclick="showRelated(this)">Show related problems</button>
