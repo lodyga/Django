@@ -1,6 +1,7 @@
 {% extends "core/base.html" %}
 {% block content %}
-    <a href="{% url 'python_problems:tag-index' %}" class="btn btn-secondary px-3 py-0 m-1">Back</a>
+    <a href="{% url 'python_problems:tag-index' %}"
+       class="btn btn-secondary px-3 py-0 m-1">Back</a>
     <canvas id="tagChart" width="300" height="100"></canvas>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>

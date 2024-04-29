@@ -33,14 +33,23 @@
                class="nav-link {% if request.get_full_path == xyz %}active{% endif %}">Python</a>
           </li>
           {% url 'python_problems:conversion' as abc1 %}
-          <li class="nav-item">
-            <a href="{% url 'python_problems:conversion' %}"
-               class="nav-link {% if request.get_full_path == abc1 %}active{% endif %}">Conversion</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+               href="#"
+               id="navbarDropdown"
+               role="button"
+               data-bs-toggle="dropdown"
+               aria-expanded="false">SQL</a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li>
+                <a class="nav-item" href="{% url 'python_problems:conversion' %}">Conversion</a>
+              </li>
+            </ul>
           </li>
-          {% url 'python_problems:page2' as abc2 %}
+          {% url 'python_problems:tag-graph' as abc2 %}
           <li class="nav-item">
-            <a href="{% url 'python_problems:tag-index' %}"
-               class="nav-link {% if request.get_full_path == abc2 %}active{% endif %}">Tag index</a>
+            <a href="{% url 'python_problems:tag-graph' %}"
+               class="nav-link {% if request.get_full_path == abc2 %}active{% endif %}">Statistics</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle"
@@ -73,7 +82,6 @@
               {% endif %}
             </ul>
           </li>
-          
         </ul>
         {% comment %}<ul class="navbar-nav mb-lg-0">
           <li>
