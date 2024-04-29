@@ -4,17 +4,26 @@
 {% endblock title %}
 {% block content %}
     <h2>Python problems tag list</h2>
-        <a href="{% url 'python_problems:index' %}" class="btn btn-secondary px-3 py-0 m-1">Back</a>
+    <a href="{% url 'python_problems:index' %}"
+       class="btn btn-secondary px-3 py-0 m-1">Back</a>
     <p>
         <a href="create/" class="ms-4">Add a tag</a>
+    </p>
+    <p>
+        <a href="{% url 'python_problems:tag-graph' %}" class="ms-4">Statistics</a>
     </p>
     {% if tag_list %}
         <ul>
             {% for tag in tag_list %}
                 <li>
-                    {{ tag.name }}
-                    (<a href="{% url 'python_problems:index' %}?query={{ tag.name }}">Search problems</a> |
-                    <a href="{% url 'python_problems:tag-update' tag.id %}">Update</a> |
+                    {{ tag.name }} (
+                    {% if tag.problem_set.count == 1 %}
+                        1 Problem - <a href="{% url 'python_problems:index' %}?query={{ tag.name }}">Search</a>
+                    {% else %}
+                        {{ tag.problem_set.count }} Problems - <a href="{% url 'python_problems:index' %}?query={{ tag.name }}">Search</a>
+                    {% endif %}
+                    ) |
+                    (<a href="{% url 'python_problems:tag-update' tag.id %}">Update</a> |
                     <a href="{% url 'python_problems:tag-delete' tag.id %}">Delete</a>)
                     <hr>
                 </li>

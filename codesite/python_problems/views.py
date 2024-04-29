@@ -8,6 +8,14 @@ from django.db.models import Q
 from .models import Tag, Problem
 
 
+def tag_graph_view(request):
+    tags = Tag.objects.all()
+    data = [{'tag': tag.name, 'count': tag.problem_set.count()}
+            for tag in tags]
+    sorted_data = sorted(data, key=lambda x: x['count'], reverse=True)
+    return render(request, 'python_problems/tag_graph.html', {'data': sorted_data})
+
+
 class ProblemIndexView(ListView):
     model = Problem
 

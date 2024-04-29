@@ -1,0 +1,32 @@
+{% extends "core/base.html" %}
+{% block content %}
+    <a href="{% url 'python_problems:tag-index' %}" class="btn btn-secondary px-3 py-0 m-1">Back</a>
+    <canvas id="tagChart" width="300" height="100"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('tagChart').getContext('2d');
+        var data = {{ data|safe }};
+        var labels = data.map(function(d) { return d.tag; });
+        var counts = data.map(function(d) { return d.count; });
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Number of Problems',
+                    data: counts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                      ticks: { precision: 0 },
+                    },
+                  }
+            }
+        });
+    </script>
+{% endblock %}
