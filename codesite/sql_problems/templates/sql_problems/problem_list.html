@@ -1,0 +1,95 @@
+{% extends "core/base.html" %}
+{% block title %}
+  SQL
+{% endblock title %}
+{% block content %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'sql_problems/style.css' %}">
+  <h2>SQL problems list</h2>
+  <a href="/" class="btn btn-secondary px-3 py-0 m-1">Back</a>
+  <br>
+  <a href="create/" class="ms-4">Create a problem</a>
+  <hr>
+  <div class="container-fluid pb-6">
+    <div class="row">
+      <div class="col-md-2">
+        <p>Sidebar</p>
+        <form method="get" action="{% url 'sql_problems:index' %}">
+          <input name="query"
+                 class="px-2 py-2 mb-2"
+                 type="text"
+                 value="{{ query }}"
+                 placeholder="Search by tag or title">
+          <div class="btn-group btn-group-horizontal gap-2">
+            <button class="btn btn-primary mb-2 px-2">Search</button>
+            <a class="btn btn-warning mb-2 p-1"
+               href="{% url 'sql_problems:index' %}"
+               role="button">Clear search</a>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-9">
+        {% if problem_list %}
+          {% comment %}<button onclick="toggleTags()" class="ms-4">Tags</button>{% endcomment %}
+          <ul>
+            {% for problem in problem_list %}
+              <li>
+                <div class="problem-container flex">
+                  <a href="{% url 'sql_problems:detail' problem.id %}">{{ problem.title }}</a>,
+                  (<a href="{% url 'sql_problems:problem-update' problem.id %}">Update</a> |
+                  <a href="{% url 'sql_problems:problem-delete' problem.id %}">Delete</a>)
+                  <a href="{% url 'sql_problems:detail' problem.id %}"
+                     class="tags"
+                     style="display: none">, ({{ problem.tags.all|join:', ' }})</a>
+                </div>
+                <hr>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No SQL problems available.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <script>
+  function toggleTags() {
+    var tags = document.querySelectorAll(".tags");
+    for (var i = 0; i < tags.length; i++) {
+      if (tags[i].style.display === "none") {
+        tags[i].style.display = "block";
+      } else {
+        tags[i].style.display = "none";
+      }
+    }
+  }
+  </script>
+{% endblock content %}
+{% comment %}With button in each row
+{% if problem_list %}
+  <ul>
+    {% for problem in problem_list %}
+      <li>
+        <a href="{% url 'sql_problems:detail' problem.id %}">{{ problem.title }}</a>,
+        <button onclick="showTags('tags_{{ problem.id }}')">Show tags</button>
+        <p id="tags_{{ problem.id }}" style="display: none;">Tags: ({{ problem.tags.all|join:', ' }})</p>
+        <br>
+        <hr>
+        <br>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No SQL problems available.</p>
+{% endif %}
+<script>
+  function showTags(id) {
+    var x = document.getElementById(id);
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
+    }
+  }
+</script>
+{% endcomment %}

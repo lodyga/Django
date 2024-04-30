@@ -1,0 +1,122 @@
+{% extends "core/base.html" %}
+{% block title %}
+    SQL
+{% endblock title %}
+{% block content %}
+    <div class="ms-4">
+        <h1>{{ problem.title }}</h1>
+        <a href="{% url 'sql_problems:index' %}"
+           class="btn btn-secondary px-3 py-0 m-1">Back</a>
+        <br>
+        <hr>
+        <p>
+            <b>Difficulty</b>:
+        </p>
+        <p>{{ problem.difficulty }}</p>
+        <br>
+        <hr>
+        <p>
+            <b>Tags</b>:
+        </p>
+        {% comment %}<p>{{ tags|join:", " }}</p>{% endcomment %}
+        {% for tag in tags %}
+            <a href="{% url 'sql_problems:index' %}?query={{ tag }}">{{ tag }}</a>
+            {% if not forloop.last %},{% endif %}
+        {% endfor %}
+        <br>
+        <hr>
+        <button onclick="showRelated(this)">Show related problems</button>
+        <div id="buttonRelated" style="display: none;">
+            <p>
+                <b>Related Problems</b>:
+            </p>
+            <div class="box">
+                <ul>
+                    {% for related in related_problems %}
+                        <li>
+                            <a href="{% url 'sql_problems:detail' related.id %}">{{ related.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <br>
+        <br>
+        <hr>
+        <p>
+            <b>URL</b>:
+        </p>
+        <a href="{{ problem.url }}">{{ problem.url }}</a>
+        <br>
+        <hr>
+        <p>
+            <b>Problem description</b>:
+        </p>
+        <pre>{{ problem.description }}</pre>
+        <br>
+        <hr>
+        <form action="#">
+            <p>
+                <label for="code_area">
+                    <b>Write a solution</b>:
+                </label>
+            </p>
+            <textarea id="code_area" name="code_area" rows="20" cols="80">
+# Write a solution.
+</textarea>
+            <br>
+            <input type="submit" value="UnSubmit (dummy buton)">
+        </form>
+        <br>
+        <hr>
+        <p>
+            <b>Test Cases</b>:
+        </p>
+        <pre>{{ problem.testcase }}</pre>
+        <br>
+        <hr>
+        <button onclick="showSolution(this)">Show solution</button>
+        <div id="buttonSolution" style="display: none;">
+            <p>
+                <b>Solution</b>:
+            </p>
+            <div class="box">
+                <p>MySQL</p>
+                <pre>{{ problem.solution_my }}</pre>
+            </div>
+            <hr>
+            <p>Pandas</p>
+            <div class="box">
+                <pre>{{ problem.solution_pd }}</pre>
+            </div>
+        </div>
+        <br>
+        <hr>
+        <script>
+            function showSolution(button) {
+                var x = document.getElementById("buttonSolution");
+            // var button = document.querySelector("button"); // This was messing eacho other button name
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            button.textContent = "Hide solution";
+            window.scrollBy(0, 200);
+        } else {
+                x.style.display = "none";
+            button.textContent = "Show solution";
+        }
+        }
+        </script>
+        <script>
+            function showRelated(button) {
+            var y = document.getElementById("buttonRelated");
+            if (y.style.display === "none") {
+                y.style.display = "block";
+            button.textContent = "Hide related problems";
+        } else {
+                y.style.display = "none";
+            button.textContent = "Show related problems";
+        }
+        }
+        </script>
+    </div>
+{% endblock content %}

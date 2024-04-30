@@ -20,7 +20,8 @@ class Problem(models.Model):
     url = models.CharField(max_length=200)
     description = models.TextField(blank=False, null=False)
     is_solved = models.BooleanField(default=False)
-    solution = models.TextField(blank=True, null=True)
+    solution_my = models.TextField(blank=True, null=True)
+    solution_pd = models.TextField(blank=True, null=True)
     testcase = models.TextField(blank=True, null=True)
 
     def __str__(self):

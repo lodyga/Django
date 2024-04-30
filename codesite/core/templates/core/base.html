@@ -27,14 +27,33 @@
       <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'python_problems:index' %}">Hello {{ request.user }}</a>
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          {% url 'python_problems:index' as xyz %}
-          <li class="nav-item">
-            <a href="{% url 'python_problems:index' %}"
-               class="nav-link {% if request.get_full_path == xyz %}active{% endif %}">Python</a>
-          </li>
-          {% url 'python_problems:conversion' as abc1 %}
+          {% url 'python_problems:index' as python_index_url %}
+          {% url 'python_problems:tag-graph' as python_tag_graph %}
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle"
+            <a class="nav-link dropdown-toggle {% if request.get_full_path in python_index_url or request.get_full_path in python_tag_graph %}active{% endif %}"
+               href="#"
+               id="navbarDropdown"
+               role="button"
+               data-bs-toggle="dropdown"
+               aria-expanded="false">Python</a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <li>
+                <a class="dropdown-item {% if request.get_full_path == python_index_url %}active{% endif %}"
+                   href="{{ python_index_url }}">Python Problems</a>
+              </li>
+              <li>
+                <a class="dropdown-item {% if request.get_full_path == python_tag_graph %}active{% endif %}"
+                   href="{{ python_tag_graph }}">Statistics</a>
+              </li>
+            </ul>
+          </li>
+
+          
+
+          {% url 'sql_problems:conversion' as sql_conversion_url %}
+          {% url 'sql_problems:index' as sql_index_url %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {% if request.get_full_path in sql_conversion_url or request.get_full_path in sql_index_url %}active{% endif %}"
                href="#"
                id="navbarDropdown"
                role="button"
@@ -42,7 +61,12 @@
                aria-expanded="false">SQL</a>
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
               <li>
-                <a class="nav-item" href="{% url 'python_problems:conversion' %}">Conversion</a>
+                <a class="dropdown-item {% if request.get_full_path == sql_index_url %}active{% endif %}"
+                   href="{{ sql_index_url }}">SQL Problems</a>
+              </li>
+              <li>
+                <a class="dropdown-item {% if request.get_full_path == sql_conversion_url %}active{% endif %}"
+                   href="{{ sql_conversion_url }}">Conversion</a>
               </li>
             </ul>
           </li>

@@ -1,0 +1,14 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+  <a href="{% url 'sql_problems:index' %}" class="btn btn-secondary px-3 py-0 m-1">Back</a>
+  <h1>Delete a Problem</h1>
+
+  <p>Are you sure you want to delete the problem: {{ problem }}?</p>
+
+  <form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Yes, delete." />
+    <input type="submit" onclick="window.location='{% url 'python_problems:index' %}' ; return false;" value="Cancel" />
+  </form>
+{% endblock %}

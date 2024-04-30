@@ -39,6 +39,7 @@ INSTALLED_APPS = [
 
     "core",
     "python_problems",
+    "sql_problems",
     
 ]
 
