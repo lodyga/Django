@@ -7,6 +7,7 @@ from django.db.models import Q
 
 from .models import Tag, Problem
 
+
 class ProblemIndexView(ListView):
     model = Problem
 
@@ -23,6 +24,7 @@ class ProblemIndexView(ListView):
         context["query"] = query
         return context
 
+
 class ProblemDetailView(DetailView):
     model = Problem
 
@@ -33,6 +35,7 @@ class ProblemDetailView(DetailView):
         context["related_problems"] = Problem.objects.filter(
             tags__in=problem.tags.all()).exclude(pk=problem.pk).distinct()
         return context
+
 
 class ProblemCreate(LoginRequiredMixin, CreateView):
     model = Problem
@@ -51,5 +54,10 @@ class ProblemDelete(LoginRequiredMixin, DeleteView):
     fields = "__all__"
     success_url = reverse_lazy('python_problems:index')
 
+
 def conversion_view(request):
     return render(request, "sql_problems/conversion.html")
+
+
+def ascii_view(request):
+    return render(request, "sql_problems/ascii.html")

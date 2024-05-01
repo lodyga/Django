@@ -14,4 +14,5 @@ urlpatterns = [
     path("problem/<int:pk>/delete/", views.ProblemDelete.as_view(), name="problem-delete"),
 
     path("conversion/", views.conversion_view, name="conversion"),
+    path("ascii/", views.ascii_view, name="ascii"),
 ]
