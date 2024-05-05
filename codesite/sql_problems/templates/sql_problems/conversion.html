@@ -3,9 +3,91 @@
     Conversion
 {% endblock title %}
 {% block content %}
-<a href="{% url 'sql_problems:index' %}" class="btn btn-secondary px-3 py-0 m-1">Back</a>
-<pre>
-
+    <div class="container">
+        <div class="row">
+            <div class="col-auto mb-2">
+                <a href="{% url 'sql_problems:index' %}"
+                   class="btn btn-secondary px-3 py-0 m-1">Back</a>
+                <h1>database conversion</h1>
+                <pre>
+                # Conversion type
+                # sql -> df : pd.read_sql()
+                # csv -> df : pd.read_csv(".csv")
+                # json -> df : pd.read_json(".json")
+                # df -> csv : df.to_csv(".csv", index=False)
+                # df -> sql : df.to_sql("<table_name>", sqlite_connection, if_exists="replace", index_label="index")
+                # df -> json : df.to_json(".json", indent=4, orient="records")
+                # dict -> df : pd.DataFrame(<dict>)
+                # df -> dict : df.to_dict()            
+</pre>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-auto mb-2">
+                            <p>Converts mtcars scv to mtcars db.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="container mb-2">
+                    <div class="row">
+                        <div class="col-auto">
+                            <pre>{{ mtcars_pd|slice:":4" }}</pre>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-auto mb-2">
+                            <p>mtcars to dict variants</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="container mb-2">
+                    <div class="row">
+                        <div class="col-auto">
+                            <p>dict</p>
+                            <pre>{{ mtcars_pd_dict }}</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="container mb-2">
+                    <div class="row">
+                        <div class="col-auto">
+                            <p>dict list</p>
+                            <pre>{{ mtcars_pd_dict_list }}</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="container mb-2">
+                    <div class="row">
+                        <div class="col-auto">
+                            <p>dict record</p>
+                            <pre>{{ mtcars_pd_dict_rec }}</pre>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <button type="button"
+                        class="btn btn-primary"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#button1">Show snippet</button>
+                <div id="button1" class="collapse">
+                    <p>Code snippet:</p>
+                    <pre>
+        {{ code_content }}
+    </pre>
+                </div>
+                <dir class="container">
+                </dir>
+            </div>
+        </div>
+    {% endblock content %}
+    <a href="{% url 'sql_problems:index' %}"
+       class="btn btn-secondary px-3 py-0 m-1">Back</a>
+    <div class="container">
+        <div class="row">
+            <div class="col-auto mb-2">
+                <pre>
     # Conversion between different data types
     # sql -> df : pd.read_sql()
     # csv -> df : pd.read_csv(".csv")
@@ -138,4 +220,6 @@
     
 
 </pre>
-{% endblock content %}
+            </div>
+        </div>
+    </div>

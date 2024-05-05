@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="container">
+  <div class="row">
+      <div class="col-auto">
+        {% if form.errors %}<p>Your username and password didn't match. Please try again.</p>{% endif %}
+        {% load crispy_forms_tags %}
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <input type="submit" class="btn btn-primary mb-3" value="Login Locally" />
+          <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-auto">
+        {% if settings.SOCIAL_AUTH_GITHUB_KEY %}
+          <a class="btn btn-info mb-3"
+             role="button"
+             href="{% url 'social:begin' 'github' %}?next={{ next }}">
+            <i class="fa fa-github" aria-hidden="true"></i>
+            Login with GitHub
+          </a>
+        {% endif %}
+      </div>
+  </div>
+</div>
+
+
+
+{% endblock %}

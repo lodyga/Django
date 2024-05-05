@@ -36,11 +36,12 @@ INSTALLED_APPS = [
     # Extensions - installed with requirements.txt
     'crispy_forms',
     'crispy_bootstrap5',
+    'social_django',  # social login
 
     "core",
     "python_problems",
     "sql_problems",
-    
+
 ]
 
 # When we get to tagging
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',   # social login
 ]
 
 ROOT_URLCONF = 'codesite.urls'
@@ -75,6 +77,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.settings',      # Add context_processors.py to core dir
+                'social_django.context_processors.backends',  # Social
+                'social_django.context_processors.login_redirect',  # Social
             ],
         },
     },
@@ -130,7 +134,35 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+
+# Configure the social login
+try:
+    from . import github_settings
+    SOCIAL_AUTH_GITHUB_KEY = github_settings.SOCIAL_AUTH_GITHUB_KEY
+    SOCIAL_AUTH_GITHUB_SECRET = github_settings.SOCIAL_AUTH_GITHUB_SECRET
+except:
+    print('When you want to use social login, please see code/github_settings.py')
+
+
+# Social
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+    # 'social_core.backends.twitter.TwitterOAuth',
+    # 'social_core.backends.facebook.FacebookOAuth2',
+
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# SOCIAL_AUTH_GITHUB_CALLBACK = 'https://ukasz.pythonanywhere.com/oauth/complete/github/'  # Replace with your actual URL
+
+
+# LOGIN_URL = 'login' # view name
+# LOGIN_REDIRECT_URL = 'home'
+# LOGOUT_URL = 'logout'
+# LOGOUT_REDIRECT_URL = 'login'
+
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

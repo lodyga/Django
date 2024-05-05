@@ -4,8 +4,13 @@ from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.conf import settings
 
 from .models import Tag, Problem
+from . import utils
+from . import urls
+
+import pandas as pd
 
 
 class ProblemIndexView(ListView):
@@ -56,8 +61,60 @@ class ProblemDelete(LoginRequiredMixin, DeleteView):
 
 
 def conversion_view(request):
-    return render(request, "sql_problems/conversion.html")
+    mtcars_pd = pd.read_csv(settings.BASE_DIR / urls.app_name /
+                             'static' / urls.app_name / "mtcars.csv").head(4)
+    file_path = settings.BASE_DIR / urls.app_name / \
+        'static' / urls.app_name / 'convert_pd.py'
+    with open(file_path, 'r') as file:
+        code_content = file.read()
+
+
+    context = {
+        "mtcars_pd": mtcars_pd,
+        "mtcars_pd_dict": mtcars_pd.to_dict(),
+        "mtcars_pd_dict_list": mtcars_pd.to_dict("list"),
+        "mtcars_pd_dict_rec": mtcars_pd.to_dict("records"),
+        "code_content": code_content,
+    }
+    return render(request, "sql_problems/conversion.html", context)
 
 
 def ascii_view(request):
-    return render(request, "sql_problems/ascii.html")
+
+    ascii_object_table = """
+| personId | lastName | firstName |
+| -------- | -------- | --------- |
+| 1        | Wang     | Allen     |
+| 2        | Alice    | Bob       |
+"""
+
+    ascii_type_table = """
++-------------+---------+
+| Column Name | Type    |
++-------------+---------+
+| personId    | int     |
+| lastName    | varchar |
+| firstName   | varchar |
++-------------+---------+
+"""
+
+    object_table = utils.ascii_table_to_dict(ascii_object_table)
+    type_table = utils.ascii_type_to_dict(ascii_type_table)
+    object_df = pd.DataFrame(object_table)
+    object_df = utils.change_dtype(object_df, type_table)
+
+    # file_path = os.path.join(settings.BASE_DIR, urls.app_name, 'static', urls.app_name, 'create_db.py')
+    file_path = settings.BASE_DIR / urls.app_name / \
+        'static' / urls.app_name / 'create_db.py'
+    with open(file_path, 'r') as file:
+        code_content = file.read()
+
+    context = {
+        "ascii_object_table": ascii_object_table,
+        "ascii_type_table": ascii_type_table,
+        "object_df": object_df.to_dict,
+        "object_df_dtypes": object_df.dtypes,
+        "code_content": code_content,
+    }
+
+    return render(request, "sql_problems/ascii.html", context)
