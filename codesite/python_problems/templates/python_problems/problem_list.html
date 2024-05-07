@@ -15,7 +15,10 @@
   <div class="container-fluid pb-6">
     <div class="row">
       <div class="col-md-2">
-        <p>Sidebar</p>
+        <h3>
+          <b>Sidebar</b>
+        </h3>
+        <button onclick="toggleTags()" class="btn-secondary ms-0 mb-3">Tags</button>
         <form method="get" action="{% url 'python_problems:index' %}">
           <input name="query"
                  class="px-2 py-2 mb-2"
@@ -32,7 +35,6 @@
       </div>
       <div class="col-md-9">
         {% if problem_list %}
-          <button onclick="toggleTags()" class="ms-4">Tags</button>
           <ul>
             {% for problem in problem_list %}
               <li>
@@ -40,9 +42,12 @@
                   <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>,
                   (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
                   <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
-                  <a href="{% url 'python_problems:detail' problem.id %}"
-                     class="tags"
-                     style="display: none">, ({{ problem.tags.all|join:', ' }})</a>
+                  {% comment %}<a href="{% url 'python_problems:detail' problem.id %}" class="tags" style="display: none">, ({{ problem.tags.all|join:', ' }})</a>{% endcomment %}
+                  {% for tag in problem.tags.all %}
+                    <a href="{% url 'python_problems:index' %}?query={{ tag }}"
+                       class="tags"
+                       style="display: none">, {{ tag }}</a>
+                  {% endfor %}
                 </div>
                 <hr>
               </li>
@@ -67,31 +72,3 @@
   }
   </script>
 {% endblock content %}
-{% comment %}With button in each row
-{% if problem_list %}
-  <ul>
-    {% for problem in problem_list %}
-      <li>
-        <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>,
-        <button onclick="showTags('tags_{{ problem.id }}')">Show tags</button>
-        <p id="tags_{{ problem.id }}" style="display: none;">Tags: ({{ problem.tags.all|join:', ' }})</p>
-        <br>
-        <hr>
-        <br>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No python problems available.</p>
-{% endif %}
-<script>
-  function showTags(id) {
-    var x = document.getElementById(id);
-    if (x.style.display === "none") {
-      x.style.display = "block";
-    } else {
-      x.style.display = "none";
-    }
-  }
-</script>
-{% endcomment %}

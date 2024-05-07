@@ -153,8 +153,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-# SOCIAL_AUTH_GITHUB_CALLBACK = 'https://ukasz.pythonanywhere.com/oauth/complete/github/'  # Replace with your actual URL
-
 
 # LOGIN_URL = 'login' # view name
 # LOGIN_REDIRECT_URL = 'home'

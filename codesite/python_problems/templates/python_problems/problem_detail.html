@@ -6,27 +6,13 @@
     <div class="ms-4">
         <h1>{{ problem.title }}</h1>
         <a href="{% url 'python_problems:index' %}"
-           class="btn btn-secondary px-3 py-0 m-1">Back</a>
+           class="btn btn-secondary px-3 py-0 m-1 mb-2">Back</a>
         <br>
-        <hr>
-        <p>
-            <b>Difficulty</b>:
-        </p>
-        <p>{{ problem.difficulty }}</p>
-        <br>
-        <hr>
-        <p>
-            <b>Tags</b>:
-        </p>
-        {% comment %}<p>{{ tags|join:", " }}</p>{% endcomment %}
-        {% for tag in tags %}
-            <a href="{% url 'python_problems:index' %}?query={{ tag }}">{{ tag }}</a>
-            {% if not forloop.last %},{% endif %}
-        {% endfor %}
-        <br>
-        <hr>
-        <button onclick="showRelated(this)">Show related problems</button>
-        <div id="buttonRelated" style="display: none;">
+        <button type="button"
+                class="btn btn-primary"
+                data-bs-toggle="collapse"
+                data-bs-target="#related">Show related problems</button>
+        <div id="related" class="collapse">
             <p>
                 <b>Related Problems</b>:
             </p>
@@ -41,6 +27,48 @@
             </div>
         </div>
         <br>
+        <hr>
+        <div class="container">
+            <div class="row">
+                <div class="col-auto mb-2">
+                    <p>
+                        <b>Difficulty</b>:
+                        <p>{{ problem.difficulty }}</p>
+                    </p>
+                </div>
+                <div class="col-auto mb-2">
+                    <p>
+                        <b>Tags</b>:
+                        {% comment %}<p>{{ tags|join:", " }}</p>{% endcomment %}
+                        <p>
+                            {% for tag in tags %}
+                                <a href="{% url 'python_problems:index' %}?query={{ tag }}">{{ tag }}</a>
+                                {% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </p>
+                    </p>
+                </div>
+                <div class="col-auto mb-2">
+                    <p>
+                        <b>URL</b>:
+                    </p>
+                    <a href="{{ problem.url }}">{{ problem.url }}</a>
+                </div>
+            </div>
+        </div>
+        <hr>
+        {% comment %}<p>
+            <b>Difficulty</b>:
+        </p>
+        <p>{{ problem.difficulty }}</p>
+        <hr>
+        <p>
+            <b>Tags</b>:
+        </p>
+        {% for tag in tags %}
+            <a href="{% url 'python_problems:index' %}?query={{ tag }}">{{ tag }}</a>
+            {% if not forloop.last %},{% endif %}
+        {% endfor %}
         <br>
         <hr>
         <p>
@@ -48,7 +76,7 @@
         </p>
         <a href="{{ problem.url }}">{{ problem.url }}</a>
         <br>
-        <hr>
+        <hr>{% endcomment %}
         <p>
             <b>Problem description</b>:
         </p>
@@ -61,7 +89,7 @@
                     <b>Write a solution</b>:
                 </label>
             </p>
-            <textarea id="code_area" name="code_area" rows="20" cols="80">
+            <textarea id="code_area" name="code_area" rows="10" cols="80">
 class Solution:
     def method_name():
 </textarea>
@@ -76,8 +104,11 @@ class Solution:
         <pre>{{ problem.testcase }}</pre>
         <br>
         <hr>
-        <button onclick="showSolution(this)">Show solution</button>
-        <div id="buttonSolution" style="display: none;">
+        <button type="button"
+                class="btn btn-primary"
+                data-bs-toggle="collapse"
+                data-bs-target="#solution">Show solution</button>
+        <div id="solution" class="collapse">
             <p>
                 <b>Solution</b>:
             </p>
@@ -85,33 +116,5 @@ class Solution:
                 <pre>{{ problem.solution }}</pre>
             </div>
         </div>
-        <br>
-        <hr>
-        <script>
-            function showSolution(button) {
-                var x = document.getElementById("buttonSolution");
-            // var button = document.querySelector("button"); // This was messing eacho other button name
-            if (x.style.display === "none") {
-                x.style.display = "block";
-            button.textContent = "Hide solution";
-            window.scrollBy(0, 200);
-        } else {
-                x.style.display = "none";
-            button.textContent = "Show solution";
-        }
-        }
-        </script>
-        <script>
-            function showRelated(button) {
-            var y = document.getElementById("buttonRelated");
-            if (y.style.display === "none") {
-                y.style.display = "block";
-            button.textContent = "Hide related problems";
-        } else {
-                y.style.display = "none";
-            button.textContent = "Show related problems";
-        }
-        }
-        </script>
     </div>
 {% endblock content %}
