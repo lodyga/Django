@@ -50,6 +50,14 @@
                 </div>
                 <div class="col-auto mb-2">
                     <p>
+                        <b>Complexity</b>:
+                    </p>
+                    {% comment %}<a href="{{ problem.time_complexity }}">Time {{ problem.time_complexity }}</a>
+                    <a href="{{ problem.space_complexity }}">Space: {{ problem.space_complexity }}</a>{% endcomment %}
+                    <p>Time: {{ problem.time_complexity }}, Space: {{ problem.space_complexity }}</p>
+                </div>
+                <div class="col-auto mb-2">
+                    <p>
                         <b>URL</b>:
                     </p>
                     <a href="{{ problem.url }}">{{ problem.url }}</a>
@@ -105,7 +113,7 @@ class Solution:
         <br>
         <hr>
         <button type="button"
-                class="btn btn-primary"
+                class="btn btn-primary mb-2"
                 data-bs-toggle="collapse"
                 data-bs-target="#solution">Show solution</button>
         <div id="solution" class="collapse">
@@ -116,5 +124,7 @@ class Solution:
                 <pre>{{ problem.solution }}</pre>
             </div>
         </div>
+        <br>
+        <hr>
     </div>
 {% endblock content %}

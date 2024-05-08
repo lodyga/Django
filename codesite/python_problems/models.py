@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Difficulty(models.Model):
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=16)
 
     class Meta:
         verbose_name_plural = "Difficulties"
@@ -12,11 +12,25 @@ class Difficulty(models.Model):
         return self.name
 
 
+class Complexity(models.Model):
+    name = models.CharField(max_length=10)
+
+    class Meta:
+        verbose_name_plural = "Complexities"
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Problem(models.Model):
     tags = models.ManyToManyField("Tag")
     title = models.CharField(max_length=200)
     difficulty = models.ForeignKey(
-        Difficulty, related_name="co_to", on_delete=models.DO_NOTHING)
+        Difficulty, related_name="co_to1", on_delete=models.DO_NOTHING)
+    time_complexity = models.ForeignKey(
+        Complexity, related_name="co_to2", on_delete=models.DO_NOTHING)
+    space_complexity = models.ForeignKey(
+        Complexity, related_name="co_to3", on_delete=models.DO_NOTHING)
     url = models.CharField(max_length=200)
     description = models.TextField(blank=False, null=False)
     is_solved = models.BooleanField(default=False)
