@@ -111,5 +111,3 @@ class ProblemDelete(LoginRequiredMixin, DeleteView):
     model = Problem
     fields = "__all__"
     success_url = reverse_lazy('python_problems:index')
-
-
