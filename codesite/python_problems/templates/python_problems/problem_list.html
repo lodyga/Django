@@ -3,8 +3,8 @@
   Python
 {% endblock title %}
 {% block content %}
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'python_problems/style.css' %}">
+{% comment %}  {% load static %}
+  <link rel="stylesheet" href="{% static 'python_problems/style.css' %}">{% endcomment %}
   <h2>Python problems list</h2>
   <a href="/" class="btn btn-secondary px-3 py-0 m-1">Back</a>
   <br>
@@ -38,7 +38,7 @@
           <ul>
             {% for problem in problem_list %}
               <li>
-                <div class="problem-container flex">
+                <div {color: green} class="problem-container flex ">
                   <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>,
                   (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
                   <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)

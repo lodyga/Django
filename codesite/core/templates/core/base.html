@@ -193,25 +193,36 @@
         var darkModeLabel = document.getElementById("darkModeLabel");
         var htmlElement = document.querySelector('html');
         
+        // Function to toggle dark mode
+        function toggleDarkMode() {
+          var isChecked = darkModeToggle.checked;
+          var darkMode = isChecked;
+          
+          darkModeLabel.textContent = isChecked ? "Light Mode" : "Dark Mode";
+          
+          // Update the data-bs-theme attribute of the html element
+          if (darkMode) {
+              htmlElement.setAttribute('data-bs-theme', 'dark');
+          } else {
+              htmlElement.removeAttribute('data-bs-theme');
+          }
+          
+          // Store the dark mode state in local storage
+          localStorage.setItem('darkMode', darkMode ? 'enabled' : 'disabled');
+        }
+        
+        // Check if dark mode is enabled in local storage
+        var storedDarkMode = localStorage.getItem('darkMode');
+        if (storedDarkMode === 'enabled') {
+          darkModeToggle.checked = true;
+          toggleDarkMode();
+        }
+        
+        // Event listener for dark mode toggle
         darkModeToggle.addEventListener("change", function() {
-            var isChecked = darkModeToggle.checked;
-            var darkMode = isChecked;
-            
-            darkModeLabel.textContent = isChecked ? "Light Mode" : "Dark Mode";
-            
-            // Update the data-bs-theme attribute of the html element
-            if (darkMode) {
-                htmlElement.setAttribute('data-bs-theme', 'dark');
-            } else {
-                htmlElement.removeAttribute('data-bs-theme');
-            }
-            
-            // Redirect or send an AJAX request to update the dark mode setting on the server
-            // For example:
-            // window.location.href = "/update_dark_mode?dark_mode=" + darkMode;
+          toggleDarkMode();
         });
-    });
-    
-    </script>
+      });
+    </script>    
   </body>
 </html>

@@ -131,7 +131,12 @@ class Solution:
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="sticky-top">Right sidebar</div>
+                    <div class="row">
+                        <a href="#">Sidebar</a>
+                    </div>
+                    <div class="row">
+                            <a href="{% url 'python_problems:index' %}"
+                               class="btn btn-secondary px-3 py-1 mb-2 mt-2">Back</a>
                 </div>
             </div>
         {% endblock content %}

@@ -5,5 +5,7 @@
 
 .problem-container a {
   margin-right: 0px; /* Add some space between the title and the tags */
+  color: green;
+  background-color: brown;
 }
 
