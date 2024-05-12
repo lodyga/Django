@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" {% if dark_mode %}data-bs-theme="dark"{% endif %}>
+<html lang="en">
+{% comment %}<html lang="en" {% if dark_mode %}data-bs-theme="dark"{% endif %}>{% endcomment %}
   {#<html lang="en" data-bs-theme="dark">#}
   <head>
 
@@ -148,11 +149,7 @@
                          id="darkModeToggle"
                          {% if dark_mode %}checked{% endif %}>
                   <label class="form-check-label" for="darkModeToggle" id="darkModeLabel">
-                    {% if dark_mode %}
-                      Light Mode
-                    {% else %}
                       Dark Mode
-                    {% endif %}
                   </label>
                 </div>
               </li>
