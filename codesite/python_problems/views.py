@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
-from .models import Tag, Problem
+from .models import Tag, Problem, Difficulty
 
 
 def tag_graph_view(request):
@@ -23,6 +23,11 @@ class ProblemIndexView(ListView):
         context = super(ProblemIndexView, self).get_context_data(**kwargs)
         query = self.request.GET.get("query", "")
         problem_list = self.model.objects.all()
+        difficulty_list = Difficulty.objects.all()
+        difficulty_id = self.request.GET.get('difficulty', 0)
+
+        if difficulty_id:
+            problem_list = problem_list.filter(difficulty__id=difficulty_id)
 
         if query:
             problem_list = problem_list.filter(
@@ -30,12 +35,18 @@ class ProblemIndexView(ListView):
 
         context["problem_list"] = problem_list
         context["query"] = query
+        context["difficulty_list"] = difficulty_list
         return context
 
 
 def problem_index_view(request):
     query = request.GET.get("query", "")
     problem_list = Problem.objects.all()
+    difficulty_list = Difficulty.objects.all()
+    difficulty_id = request.GET.get('difficulty', 0)
+
+    if difficulty_id:
+        problem_list = problem_list.filter(difficulty__id=difficulty_id)
 
     if query:
         problem_list = problem_list.filter(
@@ -44,6 +55,7 @@ def problem_index_view(request):
     context = {
         "problem_list": problem_list,
         "query": query,
+        "difficulty_list": difficulty_list,
     }
     return render(request, "python_problems/problem_list.html", context)
 

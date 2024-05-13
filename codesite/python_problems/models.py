@@ -26,11 +26,11 @@ class Problem(models.Model):
     tags = models.ManyToManyField("Tag")
     title = models.CharField(max_length=200)
     difficulty = models.ForeignKey(
-        Difficulty, related_name="co_to1", on_delete=models.DO_NOTHING)
+        Difficulty, related_name="problems_difficulty", on_delete=models.DO_NOTHING)
     time_complexity = models.ForeignKey(
-        Complexity, related_name="co_to2", on_delete=models.DO_NOTHING)
+        Complexity, related_name="problems_time_complexity", on_delete=models.DO_NOTHING)
     space_complexity = models.ForeignKey(
-        Complexity, related_name="co_to3", on_delete=models.DO_NOTHING)
+        Complexity, related_name="problems_space_complexity", on_delete=models.DO_NOTHING)
     url = models.CharField(max_length=200)
     description = models.TextField(blank=False, null=False)
     is_solved = models.BooleanField(default=False)

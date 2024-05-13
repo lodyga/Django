@@ -3,37 +3,41 @@
   Python
 {% endblock title %}
 {% block content %}
-{% comment %}  {% load static %}
+  {% comment %}  {% load static %}
   <link rel="stylesheet" href="{% static 'python_problems/style.css' %}">{% endcomment %}
-  <h2>Python problems list</h2>
-  <a href="/" class="btn btn-secondary px-3 py-0 m-1">Back</a>
-  <br>
-  <a href="create/" class="ms-4">Create a problem</a> |
-  <a href="tag/">Tag list</a> |
-  <a href="tag/create/">Add a tag</a>
-  <hr>
-  <div class="container-fluid">
+  <div class="container-fluid m-2">
     <div class="row">
       <div class="col-md-2">
-        <h3>
-          <b>Sidebar</b>
-        </h3>
-        <button onclick="toggleTags()" class="btn-secondary ms-0 mb-3">Tags</button>
+        <a href="/" class="btn btn-secondary px-3 py-0 mb-5">Back</a>
         <form method="get" action="{% url 'python_problems:index' %}">
           <input name="query"
                  class="px-2 py-2 mb-2"
                  type="text"
                  value="{{ query }}"
                  placeholder="Search by tag or title">
-          <div class="btn-group btn-group-horizontal gap-2">
-            <button class="btn btn-primary mb-2 px-2">Search</button>
+          {% comment %}<div class="btn-group btn-group-horizontal gap-2">{% endcomment %}
+          <div class="">
+            <button class="btn btn-primary mb-2 px-2 mb-5">Search</button>
+            <div>
+              <b>Difficulty</b>
+            </div>
+            <ul>
+              {% for difficulty in difficulty_list %}
+                <li class="py-1 px-2">
+                  <a href="{% url 'python_problems:index' %}?query={{ query }}&difficulty={{ difficulty.id }}" class="btn btn-primary py-0">{{ difficulty.name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
             <a class="btn btn-warning mb-2 p-1"
                href="{% url 'python_problems:index' %}"
-               role="button">Clear search</a>
+               role="button">Clear filters</a>
           </div>
         </form>
       </div>
-      <div class="col-md-9">
+      <div class="col-md-8">
+        <div class="mb-5">
+          <h2>Python problems list</h2>
+        </div>
         {% if problem_list %}
           <ul>
             {% for problem in problem_list %}
@@ -57,9 +61,22 @@
           <p>No python problems available.</p>
         {% endif %}
       </div>
+      <div class="col-md-2">
+        <div class="row">
+          <div>
+            <button onclick="toggleTags()" class="btn-secondary ms-0 mb-3">Show Tags</button>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <a href="create/">Create a problem</a> |
+            <a href="tag/">Tag list</a> |
+            <a href="tag/create/">Add a tag</a>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-  <script>
+    <script>
   function toggleTags() {
     var tags = document.querySelectorAll(".tags");
     for (var i = 0; i < tags.length; i++) {
@@ -70,5 +87,5 @@
       }
     }
   }
-  </script>
-{% endblock content %}
+    </script>
+  {% endblock content %}

@@ -1,142 +1,145 @@
 {% extends "core/base.html" %}
 {% block title %}
-    Python
+  Python
 {% endblock title %}
 {% block content %}
-    <div class="ms-4">
-        <div class="container-fluid">
+  <div class="container-fluid m-2">
+      <div class="row">
+        <div class="col-md-2">
+          <div class="col sticky-top">
             <div class="row">
-                <div class="col-md-2">
-                    <div class="col sticky-top">
-                        <div class="row">
-                            <div>
-                                <a href="{% url 'python_problems:index' %}"
-                                   class="btn btn-secondary px-3 py-1 mb-2 mt-2">Back</a>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div>
-                                <button type="button"
-                                        class="btn btn-primary px-3 py-1 mb-2"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#related">Show related problems</button>
-                                <div id="related" class="collapse">
-                                    <p>
-                                        <b>Related Problems</b>:
-                                    </p>
-                                    <div class="box">
-                                        <ul>
-                                            {% for related in related_problems %}
-                                                <li>
-                                                    <a href="{% url 'python_problems:detail' related.id %}">
-                                                        {% if related.title|length > 30 %}
-                                                            {{ related.title|slice:":27" }} ...
-                                                        {% else %}
-                                                            {{ related.title }}
-                                                        {% endif %}
-                                                    </a>
-                                                </li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+              <div>
+                <a href="{% url 'python_problems:index' %}"
+                   class="btn btn-secondary px-3 py-0 mb-2">Back</a>
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <button type="button"
+                        class="btn btn-primary px-3 py-1 mb-2"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#related">Show related problems</button>
+                <div id="related" class="collapse">
+                  <p>
+                    <b>Related Problems</b>:
+                  </p>
+                  <div class="box">
+                    <ul>
+                      {% for related in related_problems %}
+                        <li>
+                          <a href="{% url 'python_problems:detail' related.id %}">
+                            {% if related.title|length > 30 %}
+                              {{ related.title|slice:":27" }} ...
+                            {% else %}
+                              {{ related.title }}
+                            {% endif %}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
                 </div>
-                <div class="col-md-8">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-auto mb-5 mt-5">
-                                <h1>{{ problem.title }}</h1>
-                                <hr>
-                            </div>
-                            <div class="row">
-                                <div class="col-auto mb-2">
-                                    <p>
-                                        <b>Difficulty</b>:
-                                        <p>{{ problem.difficulty }}</p>
-                                    </p>
-                                </div>
-                                <div class="col-auto mb-2">
-                                    <p>
-                                        <b>Tags</b>:
-                                        {% comment %}<p>{{ tags|join:", " }}</p>{% endcomment %}
-                                        <p>
-                                            {% for tag in tags %}
-                                                <a href="{% url 'python_problems:index' %}?query={{ tag }}">{{ tag }}</a>
-                                                {% if not forloop.last %},{% endif %}
-                                            {% endfor %}
-                                        </p>
-                                    </p>
-                                </div>
-                                <div class="col-auto mb-2">
-                                    <p>
-                                        <b>Complexity</b>:
-                                    </p>
-                                    {% comment %}<a href="{{ problem.time_complexity }}">Time {{ problem.time_complexity }}</a>
-                                    <a href="{{ problem.space_complexity }}">Space: {{ problem.space_complexity }}</a>{% endcomment %}
-                                    <p>Time: {{ problem.time_complexity }}, Space: {{ problem.space_complexity }}</p>
-                                </div>
-                                <div class="col-auto mb-2">
-                                    <p>
-                                        <b>URL</b>:
-                                    </p>
-                                    <a href="{{ problem.url }}">{{ problem.url|slice:"8:20" }}</a>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <p>
-                            <b>Problem description</b>:
-                        </p>
-                        <pre>{{ problem.description }}</pre>
-                        <br>
-                        <hr>
-                        <form action="#">
-                            <p>
-                                <label for="code_area">
-                                    <b>Write a solution</b>:
-                                </label>
-                            </p>
-                            <textarea id="code_area" name="code_area" rows="10" cols="80">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="container">
+            <div class="row">
+              <div class="col-auto mb-5 mt-5">
+                <h1>{{ problem.title }}</h1>
+                <hr>
+              </div>
+              <div class="row">
+                <div class="col-auto mb-2">
+                  <p>
+                    <b>Difficulty</b>:
+                    <p>{{ problem.difficulty }}</p>
+                  </p>
+                </div>
+                <div class="col-auto mb-2">
+                  <p>
+                    <b>Tags</b>:
+                    {% comment %}<p>{{ tags|join:", " }}</p>{% endcomment %}
+                    <p>
+                      {% for tag in tags %}
+                        <a href="{% url 'python_problems:index' %}?query={{ tag }}">{{ tag }}</a>
+                        {% if not forloop.last %},{% endif %}
+                      {% endfor %}
+                    </p>
+                  </p>
+                </div>
+                <div class="col-auto mb-2">
+                  <p>
+                    <b>Complexity</b>:
+                  </p>
+                  {% comment %}<a href="{{ problem.time_complexity }}">Time {{ problem.time_complexity }}</a>
+                  <a href="{{ problem.space_complexity }}">Space: {{ problem.space_complexity }}</a>{% endcomment %}
+                  <p>Time: {{ problem.time_complexity }}, Space: {{ problem.space_complexity }}</p>
+                </div>
+                <div class="col-auto mb-2">
+                  <p>
+                    <b>URL</b>:
+                  </p>
+                  <a href="{{ problem.url }}">{{ problem.url|slice:"8:20" }}</a>
+                </div>
+              </div>
+            </div>
+            <hr>
+            <p>
+              <b>Problem description</b>:
+            </p>
+            <pre style="white-space: pre-wrap">{{ problem.description }}</pre>
+            <br>
+            <hr>
+            <form action="#">
+              <p>
+                <label for="code_area">
+                  <b>Write a solution</b>:
+                </label>
+              </p>
+              <textarea id="code_area" name="code_area" rows="10" cols="80">
 class Solution:
     def method_name():
 </textarea>
-                            <br>
-                            <input type="submit" value="UnSubmit (dummy buton)">
-                        </form>
-                        <br>
-                        <hr>
-                        <p>
-                            <b>Test Cases</b>:
-                        </p>
-                        <pre>{{ problem.testcase }}</pre>
-                        <br>
-                        <hr>
-                        <button type="button"
-                                class="btn btn-primary mb-2"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#solution">Show solution</button>
-                        <div id="solution" class="collapse">
-                            <p>
-                                <b>Solution</b>:
-                            </p>
-                            <div class="box">
-                                <pre>{{ problem.solution }}</pre>
-                            </div>
-                        </div>
-                        <br>
-                        <hr>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="row">
-                        <a href="#">Sidebar</a>
-                    </div>
-                    <div class="row">
-                            <a href="{% url 'python_problems:index' %}"
-                               class="btn btn-secondary px-3 py-1 mb-2 mt-2">Back</a>
-                </div>
+              <br>
+              <input type="submit" value="UnSubmit (dummy buton)">
+            </form>
+            <br>
+            <hr>
+            <p>
+              <b>Test Cases</b>:
+            </p>
+            <pre>{{ problem.testcase }}</pre>
+            <br>
+            <hr>
+            <button type="button"
+                    class="btn btn-primary mb-2"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#solution">Show solution</button>
+            <div id="solution" class="collapse">
+              <p>
+                <b>Solution</b>:
+              </p>
+              <div class="box">
+                <pre>{{ problem.solution }}</pre>
+              </div>
             </div>
-        {% endblock content %}
+            <br>
+            <hr>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="row">
+          </div>
+          <div class="row">
+            <div>
+            <a href="{% url 'python_problems:index' %}"
+               class="btn btn-secondary px-3 py-1 mb-2">Back</a>
+              </div>
+          </div>
+        </div>
+      </div>
+
+  </div>
+{% endblock content %}
