@@ -10,33 +10,31 @@
       <div class="col-md-2">
         <a href="/" class="btn btn-secondary px-3 py-0 mb-5">Back</a>
         <form method="get" action="{% url 'python_problems:index' %}">
-          <input name="query"
-                 class="px-2 py-2 mb-2"
-                 type="text"
-                 value="{{ query }}"
-                 placeholder="Search by tag or title">
-          {% comment %}<div class="btn-group btn-group-horizontal gap-2">{% endcomment %}
-          <div class="">
-            <button class="btn btn-primary mb-2 px-2 mb-5">Search</button>
-            <div>
-              <b>Difficulty</b>
-            </div>
-            <ul>
-              {% for difficulty in difficulty_list %}
-                <li class="py-1 px-2 {% if difficulty.id == difficulty_id %}text-warning{% endif %}">
-                  <a href="{% url 'python_problems:index' %}?query={{ query }}&difficulty={{ difficulty.id }}"
-                     class="btn btn-primary py-0 {% if difficulty.id == difficulty_id %}text-warning{% endif %}">{{ difficulty.name }}</a>
-                </li>
-              {% endfor %}
-            </ul>
-            <a class="btn btn-warning mb-2 mt-2 p-1"
-               href="{% url 'python_problems:index' %}"
-               role="button">Clear filters</a>
+          <div class="input-group mb-5">
+            <input name="query"
+                   class="px-2 py-2 mb-2"
+                   type="text"
+                   value="{{ query }}"
+                   placeholder="Search by tag or title">
+            <button class="btn btn-primary mb-2 px-2" type="submit">Search</button>
+            {% if difficulty_id %}<input type="hidden" name="difficulty" value="{{ difficulty_id }}">{% endif %}
           </div>
         </form>
+        <b>Difficulty</b>
+        <ul>
+          {% for difficulty in difficulty_list %}
+            <li class="py-1 px-2 {% if difficulty.id == difficulty_id %}text-warning{% endif %}">
+              <a href="{% url 'python_problems:index' %}?query={{ query }}&difficulty={{ difficulty.id }}"
+                 class="btn btn-secondary py-0 {% if difficulty.id == difficulty_id %}text-warning{% endif %}">{{ difficulty.name }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+        <a class="btn btn-warning mb-2 mt-2 p-1"
+           href="{% url 'python_problems:index' %}"
+           role="button">Clear filters</a>
       </div>
       <div class="col-md-8">
-        <div class="mb-5">
+        <div class="mb-5 mt-5">
           <h2>Python problems list</h2>
         </div>
         {% if problem_list %}
