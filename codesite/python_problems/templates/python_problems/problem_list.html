@@ -23,12 +23,13 @@
             </div>
             <ul>
               {% for difficulty in difficulty_list %}
-                <li class="py-1 px-2">
-                  <a href="{% url 'python_problems:index' %}?query={{ query }}&difficulty={{ difficulty.id }}" class="btn btn-primary py-0">{{ difficulty.name }}</a>
+                <li class="py-1 px-2 {% if difficulty.id == difficulty_id %}text-warning{% endif %}">
+                  <a href="{% url 'python_problems:index' %}?query={{ query }}&difficulty={{ difficulty.id }}"
+                     class="btn btn-primary py-0 {% if difficulty.id == difficulty_id %}text-warning{% endif %}">{{ difficulty.name }}</a>
                 </li>
               {% endfor %}
             </ul>
-            <a class="btn btn-warning mb-2 p-1"
+            <a class="btn btn-warning mb-2 mt-2 p-1"
                href="{% url 'python_problems:index' %}"
                role="button">Clear filters</a>
           </div>

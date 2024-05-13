@@ -36,6 +36,7 @@ class ProblemIndexView(ListView):
         context["problem_list"] = problem_list
         context["query"] = query
         context["difficulty_list"] = difficulty_list
+        context["difficulty_id"] = int(difficulty_id)
         return context
 
 
@@ -56,6 +57,7 @@ def problem_index_view(request):
         "problem_list": problem_list,
         "query": query,
         "difficulty_list": difficulty_list,
+        "difficulty_id": int(difficulty_id),
     }
     return render(request, "python_problems/problem_list.html", context)
 
