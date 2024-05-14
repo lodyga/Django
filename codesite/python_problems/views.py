@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
 from .models import Tag, Problem, Difficulty
+from .forms import CodeForm
 
 
 def tag_graph_view(request):
@@ -83,7 +84,49 @@ def problem_detail_view(request, pk):
     context = {
         "problem": problem,
         "tags": problem.tags.values_list("name", flat=True),
-        "related_problems": related_problems}
+        "related_problems": related_problems,
+        "form": CodeForm(),
+    }
+
+    if request.method == 'POST':
+        # context["is_code_area"] = True
+        code = request.POST.get('code_area')
+
+        # keep the code in form after submiting
+        form = CodeForm(initial={'code_area': code})
+        context["form"] = form
+
+        # context["code_area_flow"] = code
+        print(code)
+
+        # try:
+        #     # Use exec to execute the code block
+        #     namespace = {}
+        #     exec(code, namespace)
+        #     # Retrieve the result from the namespace
+        #     result = namespace.get("some", None)
+        #     print(result)
+        #     context["processed_code"] = result
+        # except Exception as e:
+        #     context["processed_code"] = f"Error: {str(e)}"
+
+        try:
+            # Extract function body (assuming function is defined at the beginning)
+            # Extract function body components
+            function_body = code.splitlines()[0].split()[1:]
+            function_body = " ".join(function_body)  # Join back into a string
+
+            # Directly evaluate the function body (risky, replace with safe execution)
+            # Dangerous, replace with safe execution
+            result = eval(f"def fun(x): {function_body}")
+            result = result(1)  # Call the function with argument
+
+            # context = {'processed_code': result}
+            context["processed_code"] = result
+        except Exception as e:
+            # context = {'processed_code': f"Error: {str(e)}"}
+            context["processed_code"] = f"Error: {str(e)}"
+
     return render(request, "python_problems/problem_detail.html", context)
 
 
