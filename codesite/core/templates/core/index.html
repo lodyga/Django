@@ -1,10 +1,58 @@
 {% extends "core/base.html" %}
 {% block title %}
-    Main
+  Main
 {% endblock title %}
 {% block content %}
-<div class="container-fluid m-2">
-    <p><a href="{% url "python_problems:index" %}"class="text-lg font-semibold hover:text-gray-500">Python</a></p>
-    <p><a href="{% url "sql_problems:index" %}"class="text-lg font-semibold hovenr:text-gray-500">SQL</a></p>
-</div>
+  <div class="container-fluid m-2">
+    <div class="row">
+      <div class="col-2"></div>
+      <div class="col-auto">
+        <h1 class="mb-5">Site Index</h1>
+        <ul>
+          <li>
+            <a href="accounts/login/">Login</a>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a href="python/">Python</a>
+          </li>
+          <ul>
+            <li>
+              <a href="python/create/">Create a problem</a>
+            </li>
+            <li>
+              <a href="python/tag/">Tag</a>
+            </li>
+            <ul>
+              <li>
+                <a href="python/tag/create/">Add a tag</a>
+              </li>
+              <li>
+                <a href="python/tag/graph/">Statistics</a>
+              </li>
+            </ul>
+          </ul>
+        </ul>
+        <ul>
+          <li>
+            <a href="sql/">SQL</a>
+          </li>
+          <ul>
+            <li>
+              <a href="sql/conversion/">database conversion</a>
+            </li>
+            <li>
+              <a href="sql/ascii/">database from ASCII</a>
+            </li>
+          </ul>
+        </ul>
+        <ul>
+          <li>
+            <a href="">Settings</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
 {% endblock content %}

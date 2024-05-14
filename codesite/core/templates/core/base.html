@@ -51,7 +51,7 @@
           {% url 'python_problems:index' as python_index_url %}
           {% url 'python_problems:tag-graph' as python_tag_graph %}
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {% if request.get_full_path in python_index_url or request.get_full_path in python_tag_graph %}active{% endif %}"
+            <a class="nav-link dropdown-toggle {% if request.get_full_path == python_index_url or request.get_full_path == python_tag_graph %}active{% endif %}"
                href="#"
                id="navbarDropdown"
                role="button"
@@ -72,7 +72,7 @@
           {% url 'sql_problems:conversion' as sql_conversion_url %}
           {% url 'sql_problems:ascii' as sql_ascii_url %}
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {% if request.get_full_path in sql_conversion_url or request.get_full_path in sql_index_url or request.get_full_path in sql_ascii_url %}active{% endif %}"
+            <a class="nav-link dropdown-toggle {% if request.get_full_path == sql_conversion_url or request.get_full_path == sql_index_url or request.get_full_path == sql_ascii_url %}active{% endif %}"
                href="#"
                id="navbarDropdown"
                role="button"

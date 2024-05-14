@@ -20,7 +20,7 @@
             {% if difficulty_id %}<input type="hidden" name="difficulty" value="{{ difficulty_id }}">{% endif %}
           </div>
         </form>
-        <b>Difficulty</b>
+        <strong>Difficulty</strong>
         <ul>
           {% for difficulty in difficulty_list %}
             <li class="py-1 px-2 {% if difficulty.id == difficulty_id %}text-warning{% endif %}">
