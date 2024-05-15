@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
 from .models import Tag, Problem, Difficulty
-from .forms import CodeForm
+from .forms import CodeForm, OutputForm
 
 
 def tag_graph_view(request):
@@ -85,47 +85,76 @@ def problem_detail_view(request, pk):
         "problem": problem,
         "tags": problem.tags.values_list("name", flat=True),
         "related_problems": related_problems,
-        "form": CodeForm(),
+        "code_form": CodeForm(),
+        "output_form": OutputForm(),
     }
-
+    
     if request.method == 'POST':
         # context["is_code_area"] = True
         code = request.POST.get('code_area')
 
-        # keep the code in form after submiting
-        form = CodeForm(initial={'code_area': code})
-        context["form"] = form
+        # keep the code in code_form after submiting
+        code_form = CodeForm(initial={'code_area': code})
+        context["code_form"] = code_form
 
-        # context["code_area_flow"] = code
-        print(code)
+
+        try:
+            local_vars = {}
+            global_vars = {}
+            # Execute the code
+            exec(code, global_vars, local_vars)
+            print(local_vars)
+            # Get the result from the local variables dictionary
+            result = local_vars.get("output", "non")
+
+            # context["processed_code"] = result
+            output_form = OutputForm(initial={"output_area": result})
+            context["output_form"] = output_form
+        except Exception as e:
+            output_form = OutputForm(initial={"output_area": f"Error: {str(e)}"})
+            context["output_form"] = output_form
+
+
+        # output = None
+        # local_vars = {'output': output}  # Pre-populate local_vars
+        # try:
+        #     exec(code, globals(), local_vars)
+        #     output = local_vars['output']  # Capture output from local variable
+        #     print(local_vars)
+        #     context["processed_code"] = output
+        # except Exception as e:
+        #     output = f"Error: {str(e)}"
+
 
         # try:
         #     # Use exec to execute the code block
         #     namespace = {}
-        #     exec(code, namespace)
+        #     # exec(code, namespace)
         #     # Retrieve the result from the namespace
-        #     result = namespace.get("some", None)
+        #     # result = namespace.get("some", None)
+        #     # result = exec(code)
+        #     result = exec(print("udpa"))
         #     print(result)
         #     context["processed_code"] = result
         # except Exception as e:
         #     context["processed_code"] = f"Error: {str(e)}"
 
-        try:
-            # Extract function body (assuming function is defined at the beginning)
-            # Extract function body components
-            function_body = code.splitlines()[0].split()[1:]
-            function_body = " ".join(function_body)  # Join back into a string
-
-            # Directly evaluate the function body (risky, replace with safe execution)
-            # Dangerous, replace with safe execution
-            result = eval(f"def fun(x): {function_body}")
-            result = result(1)  # Call the function with argument
-
-            # context = {'processed_code': result}
-            context["processed_code"] = result
-        except Exception as e:
-            # context = {'processed_code': f"Error: {str(e)}"}
-            context["processed_code"] = f"Error: {str(e)}"
+#         try:
+#             # Extract function body (assuming function is defined at the beginning)
+#             # Extract function body components
+#             function_body = code.splitlines()[0].split()[1:]
+#             function_body = " ".join(function_body)  # Join back into a string
+# 
+#             # Directly evaluate the function body (risky, replace with safe execution)
+#             # Dangerous, replace with safe execution
+#             result = eval(f"def fun(x): {function_body}")
+#             result = result(1)  # Call the function with argument
+# 
+#             # context = {'processed_code': result}
+#             context["processed_code"] = result
+#         except Exception as e:
+#             # context = {'processed_code': f"Error: {str(e)}"}
+#             context["processed_code"] = f"Error: {str(e)}"
 
     return render(request, "python_problems/problem_detail.html", context)
 

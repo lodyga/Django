@@ -1,8 +1,10 @@
 {% extends "core/base.html" %}
 {% block title %}
-  Python
+Python
 {% endblock title %}
 {% block content %}
+{% comment %} {% load static %}
+<link rel="stylesheet" href="{% static 'python_problems/style.css' %}"> {% endcomment %}
   <div class="container-fluid m-2">
     <div class="row">
       <div class="col-md-2">
@@ -93,19 +95,20 @@
           <br>
           <hr>
           {% load crispy_forms_tags %}
-          <form action="{% url 'python_problems:detail' problem.id %}" method="POST">
+          <form action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
             {% csrf_token %}
-            {{ form|crispy }}
-            <input type="submit" value="Submit">
+            {{ code_form|crispy }}
+            <input type="submit" value="Run" class="btn btn-warning px-3">
           </form>
-          {% comment %} <textarea id="code_area" name="code_area" rows="10" cols="80">{% if is_code_area %} {{ code_area_flow }} {% else %}
-  class Solution:
-      def method_name():{% endif %}
-          </textarea> {% endcomment %}
-          {% if processed_code %}
-            {% comment %} <b>redirected code</b>: {% endcomment %}
-            <pre>{{ processed_code }}</pre>
-          {% endif %}
+
+          <form action="" class="mb-3">
+            {{ output_form|crispy }}
+          </form>
+
+
+          
+
+          {% comment %} <pre>{{ processed_code }}</pre> {% endcomment %}
           <br>
           <hr>
           <p>

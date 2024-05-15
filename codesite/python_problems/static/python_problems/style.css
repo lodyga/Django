@@ -9,3 +9,8 @@
   background-color: brown;
 }
 
+.python-code {
+  font-family: 'Courier New', Courier, monospace; /* Use a monospaced font */
+  font-size: 14px; /* Adjust font size as needed */
+  /* Add any other styling properties you want */
+}
