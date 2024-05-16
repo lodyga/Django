@@ -96,29 +96,40 @@ Python
           <hr>
 
 
+
+
+
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
+          
           {% load crispy_forms_tags %}
           <form id="code_form_id" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
               {% csrf_token %}
-              {{ code_form|crispy }}
-              <button id="submitButton" type="submit" class="btn btn-warning">
-                  <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
+              <div class="code-area-container mb-2">
+                <label for="id_code_area">Code Area</label>
+                {{ code_form.code_area }}
+              </div>
+                <button id="submitButton" type="submit" class="btn btn-warning">
                   Run
-              </button>
+                </button>
           </form>
 
           <script>
-              document.getElementById('code_form_id').addEventListener('submit', function () {
-                  document.getElementById('submitButton').disabled = true; // Disable the submit button
-                  document.getElementById('spinner').classList.remove('d-none'); // Show the spinner
-                  document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running';
-              });
+            var editor = CodeMirror.fromTextArea(document.getElementById("id_code_area"), {
+                mode: "python",
+                lineNumbers: true, // Enable line numbers
+                autofocus: true // Automatically focus on the editor
+            });
           </script>
 
-      
 
 
 
 
+
+          {% load crispy_forms_tags %}
           <form action="" class="mb-3">
             {{ output_form|crispy }}
           </form>
