@@ -94,12 +94,30 @@ Python
           <pre style="white-space: pre-wrap">{{ problem.description }}</pre>
           <br>
           <hr>
+
+
           {% load crispy_forms_tags %}
-          <form action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
-            {% csrf_token %}
-            {{ code_form|crispy }}
-            <input type="submit" value="Run" class="btn btn-warning px-3">
+          <form id="code_form_id" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
+              {% csrf_token %}
+              {{ code_form|crispy }}
+              <button id="submitButton" type="submit" class="btn btn-warning">
+                  <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
+                  Run
+              </button>
           </form>
+
+          <script>
+              document.getElementById('code_form_id').addEventListener('submit', function () {
+                  document.getElementById('submitButton').disabled = true; // Disable the submit button
+                  document.getElementById('spinner').classList.remove('d-none'); // Show the spinner
+                  document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running';
+              });
+          </script>
+
+      
+
+
+
 
           <form action="" class="mb-3">
             {{ output_form|crispy }}

@@ -1,3 +1,5 @@
+import multiprocessing
+
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
@@ -75,6 +77,51 @@ class ProblemDetailView(DetailView):
         return context
 
 
+def execute_code(code):
+    # Define a function to execute the code
+    def code_execution(code, result_queue):
+        local_vars = {}
+        global_vars = {}
+        try:
+            exec(code, global_vars, local_vars)
+            result_queue.put(local_vars.get("output"))
+        except Exception as e:
+            result_queue.put(f"Error: {str(e)}")
+
+    # Create a multiprocessing Queue to receive the result from the child process
+    result_queue = multiprocessing.Queue()
+
+    # Create a child process to execute the code
+    process = multiprocessing.Process(
+        target=code_execution, args=(code, result_queue))
+
+    try:
+        # Start the child process
+        process.start()
+
+        # Wait for the process to finish or timeout after 10 seconds
+        process.join(timeout=5)
+
+        # Check if the process is still alive (i.e., if it timed out)
+        if process.is_alive():
+            # Terminate the process if it's still running
+            process.terminate()
+            process.join()
+
+            # Return an error message indicating timeout
+            return "Error: Execution timed out"
+
+        # Retrieve the result from the Queue
+        result = result_queue.get()
+
+        return result
+    finally:
+        # Ensure that the child process is terminated
+        if process.is_alive():
+            process.terminate()
+            process.join()
+
+
 # same as ProblemDetailView
 def problem_detail_view(request, pk):
     problem = get_object_or_404(Problem, pk=pk)
@@ -88,73 +135,22 @@ def problem_detail_view(request, pk):
         "code_form": CodeForm(),
         "output_form": OutputForm(),
     }
-    
+
     if request.method == 'POST':
-        # context["is_code_area"] = True
         code = request.POST.get('code_area')
 
         # keep the code in code_form after submiting
         code_form = CodeForm(initial={'code_area': code})
         context["code_form"] = code_form
 
-
         try:
-            local_vars = {}
-            global_vars = {}
-            # Execute the code
-            exec(code, global_vars, local_vars)
-            print(local_vars)
-            # Get the result from the local variables dictionary
-            result = local_vars.get("output", "non")
-
-            # context["processed_code"] = result
+            result = execute_code(code)
             output_form = OutputForm(initial={"output_area": result})
             context["output_form"] = output_form
         except Exception as e:
-            output_form = OutputForm(initial={"output_area": f"Error: {str(e)}"})
+            output_form = OutputForm(
+                initial={"output_area": f"Error: {str(e)}"})
             context["output_form"] = output_form
-
-
-        # output = None
-        # local_vars = {'output': output}  # Pre-populate local_vars
-        # try:
-        #     exec(code, globals(), local_vars)
-        #     output = local_vars['output']  # Capture output from local variable
-        #     print(local_vars)
-        #     context["processed_code"] = output
-        # except Exception as e:
-        #     output = f"Error: {str(e)}"
-
-
-        # try:
-        #     # Use exec to execute the code block
-        #     namespace = {}
-        #     # exec(code, namespace)
-        #     # Retrieve the result from the namespace
-        #     # result = namespace.get("some", None)
-        #     # result = exec(code)
-        #     result = exec(print("udpa"))
-        #     print(result)
-        #     context["processed_code"] = result
-        # except Exception as e:
-        #     context["processed_code"] = f"Error: {str(e)}"
-
-#         try:
-#             # Extract function body (assuming function is defined at the beginning)
-#             # Extract function body components
-#             function_body = code.splitlines()[0].split()[1:]
-#             function_body = " ".join(function_body)  # Join back into a string
-# 
-#             # Directly evaluate the function body (risky, replace with safe execution)
-#             # Dangerous, replace with safe execution
-#             result = eval(f"def fun(x): {function_body}")
-#             result = result(1)  # Call the function with argument
-# 
-#             # context = {'processed_code': result}
-#             context["processed_code"] = result
-#         except Exception as e:
-#             # context = {'processed_code': f"Error: {str(e)}"}
-#             context["processed_code"] = f"Error: {str(e)}"
 
     return render(request, "python_problems/problem_detail.html", context)
 
