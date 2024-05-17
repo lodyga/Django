@@ -99,36 +99,62 @@ Python
 
 
 
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
-          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
+          
+          
           
           
 
-
-
-
-<form action="#" class="text-warning">
+<form action="#" class="text-primary">
   <pre>
 # Write in Code Area.
 # Remember to pass a solution to an <strong class="text-danger">ouput</strong>.
-# Sorry for 
 
 def fun(x):
     return x
     <strong class="text-danger">ouput</strong> = fun(1)
-
+    
   </pre></form>
 
   
- <form id="code_form_id" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
-  {% csrf_token %}
-  <div class="code-area-container mb-2">
+ <form id="id_code_form" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
+   {% csrf_token %}
+  <div class="code-area-container mb-2 border border-primary">
     <label for="id_code_area">Code Area</label>
-    <textarea name="code_area" id="id_code_area" cols="80" rows="10" class="python-code">{{ code_text }}</textarea>
+    <textarea name="code_area" id="id_code_area" cols="80" rows="10" class="python-code  border border-primary">{{ code_text }}</textarea>
   </div>
-  <button id="submitButton" type="submit" class="btn btn-warning">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var storedDarkMode = localStorage.getItem('darkMode');
+        var theme = storedDarkMode === "enabled" ? "monokai" : "default";
+        var editor = CodeMirror.fromTextArea(document.getElementById("id_code_area"), {
+            mode: "python",
+            theme: theme,
+            lineNumbers: true, // Enable line numbers
+            autofocus: true, // Automatically focus on the editor
+            placeholder: "Enter your Python code here..." // Placeholder text
+        });
+    });
+</script>
+<button id="submitButton" type="submit" class="btn btn-warning ">
+    <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
+    Run
+</button>
+</form>
+<script>
+document.getElementById('id_code_form').addEventListener('submit', function () {
+    document.getElementById('submitButton').disabled = true; // Disable the submit button
+    document.getElementById('spinner').classList.remove('d-none'); // Show the spinner
+    document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running';
+});
+</script>
+
+  {% comment %}   
+Code without theme sync, spinner and timeout
+<button id="submitButton" type="submit" class="btn btn-warning">
     Run
   </button>
 </form>
@@ -151,7 +177,7 @@ def fun(x):
     initializeCodeMirror();
   });
 </script>
-
+ {% endcomment %}
 
 
 
