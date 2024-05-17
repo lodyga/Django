@@ -104,39 +104,29 @@ Python
           <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
           
-          {% load crispy_forms_tags %}
-{% comment %}           <form id="code_form_id" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
-              {% csrf_token %}
-              <div class="code-area-container mb-2">
-                <label for="id_code_area">Code Area</label>
-                {{ code_form.code_area }}
-              </div>
-                <button id="submitButton" type="submit" class="btn btn-warning">
-                  Run
-                </button>
-                
-                
-          </form>
-
-          <script>
-            var editor = CodeMirror.fromTextArea(document.getElementById("id_code_area"), {
-                mode: "python",
-                
-                lineNumbers: true, // Enable line numbers
-                autofocus: true // Automatically focus on the editor
-            });
-          </script>
- {% endcomment %}
+          
 
 
 
 
+<form action="#" class="text-warning">
+  <pre>
+# Write in Code Area.
+# Remember to pass a solution to an <strong class="text-danger">ouput</strong>.
+# Sorry for 
 
+def fun(x):
+    return x
+    <strong class="text-danger">ouput</strong> = fun(1)
+
+  </pre></form>
+
+  
  <form id="code_form_id" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
   {% csrf_token %}
   <div class="code-area-container mb-2">
     <label for="id_code_area">Code Area</label>
-    <textarea name="code_area" id="id_code_area" cols="80" rows="10" class="python-code" required>{{ code_form.code_area.field.widget.attrs.placeholder  }}</textarea>
+    <textarea name="code_area" id="id_code_area" cols="80" rows="10" class="python-code">{{ code_text }}</textarea>
   </div>
   <button id="submitButton" type="submit" class="btn btn-warning">
     Run
@@ -149,11 +139,11 @@ Python
     var editor = CodeMirror.fromTextArea(document.getElementById("id_code_area"), {
       mode: "python",
       lineNumbers: true,
-      autofocus: true
+      autofocus: true,
     });
 
     // Hide the original textarea after CodeMirror initialization
-    document.getElementById("id_code_area").style.display = "none";
+    // document.getElementById("id_code_area").style.display = "none";
   }
 
   // Initialize CodeMirror when DOM content is loaded

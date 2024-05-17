@@ -132,17 +132,15 @@ def problem_detail_view(request, pk):
         "problem": problem,
         "tags": problem.tags.values_list("name", flat=True),
         "related_problems": related_problems,
-        "code_form": CodeForm(),
         "output_form": OutputForm(),
     }
 
     if request.method == 'POST':
         code = request.POST.get('code_area')
-
-        # keep the code in code_form after submiting
+        # print(code) # output = 20
         code_form = CodeForm(initial={'code_area': code})
-        context["code_form"] = code_form
-
+        # print(code_form) # <tr>
+        
         try:
             result = execute_code(code)
             output_form = OutputForm(initial={"output_area": result})
@@ -151,7 +149,11 @@ def problem_detail_view(request, pk):
             output_form = OutputForm(
                 initial={"output_area": f"Error: {str(e)}"})
             context["output_form"] = output_form
-
+    else:
+        code = ""
+        
+    context["code_form"] = code
+    context["code_text"] = code
     return render(request, "python_problems/problem_detail.html", context)
 
 
