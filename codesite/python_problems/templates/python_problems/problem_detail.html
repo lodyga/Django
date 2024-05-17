@@ -105,7 +105,7 @@ Python
           <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
           
           {% load crispy_forms_tags %}
-          <form id="code_form_id" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
+{% comment %}           <form id="code_form_id" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
               {% csrf_token %}
               <div class="code-area-container mb-2">
                 <label for="id_code_area">Code Area</label>
@@ -114,15 +114,53 @@ Python
                 <button id="submitButton" type="submit" class="btn btn-warning">
                   Run
                 </button>
+                
+                
           </form>
 
           <script>
             var editor = CodeMirror.fromTextArea(document.getElementById("id_code_area"), {
                 mode: "python",
+                
                 lineNumbers: true, // Enable line numbers
                 autofocus: true // Automatically focus on the editor
             });
           </script>
+ {% endcomment %}
+
+
+
+
+
+ <form id="code_form_id" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
+  {% csrf_token %}
+  <div class="code-area-container mb-2">
+    <label for="id_code_area">Code Area</label>
+    <textarea name="code_area" id="id_code_area" cols="80" rows="10" class="python-code" required>{{ code_form.code_area.field.widget.attrs.placeholder  }}</textarea>
+  </div>
+  <button id="submitButton" type="submit" class="btn btn-warning">
+    Run
+  </button>
+</form>
+
+<script>
+  // Function to initialize CodeMirror
+  function initializeCodeMirror() {
+    var editor = CodeMirror.fromTextArea(document.getElementById("id_code_area"), {
+      mode: "python",
+      lineNumbers: true,
+      autofocus: true
+    });
+
+    // Hide the original textarea after CodeMirror initialization
+    document.getElementById("id_code_area").style.display = "none";
+  }
+
+  // Initialize CodeMirror when DOM content is loaded
+  document.addEventListener("DOMContentLoaded", function() {
+    initializeCodeMirror();
+  });
+</script>
 
 
 
@@ -173,4 +211,6 @@ Python
       </div>
     </div>
   </div>
+
+  
 {% endblock content %}
