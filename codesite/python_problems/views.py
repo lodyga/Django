@@ -84,7 +84,8 @@ def execute_code(code):
         global_vars = {}
         try:
             exec(code, global_vars, local_vars)
-            result_queue.put(local_vars.get("output"))
+            # result_queue.put(local_vars.get("output"))
+            result_queue.put(local_vars["output"])
         except Exception as e:
             result_queue.put(f"Error: {str(e)}")
 
@@ -127,12 +128,13 @@ def problem_detail_view(request, pk):
     problem = get_object_or_404(Problem, pk=pk)
     related_problems = Problem.objects.filter(
         tags__in=problem.tags.all()).exclude(pk=pk).distinct()
+    output_form = OutputForm(initial={"output_area": "None"})
 
     context = {
         "problem": problem,
         "tags": problem.tags.values_list("name", flat=True),
         "related_problems": related_problems,
-        "output_form": OutputForm(),
+        "output_form": output_form,
     }
 
     if request.method == 'POST':
@@ -154,6 +156,8 @@ def problem_detail_view(request, pk):
         
     context["code_form"] = code
     context["code_text"] = code
+    # print(output_form.initial.get("output_area"))
+    # print(output_form["output_area"].value())
     return render(request, "python_problems/problem_detail.html", context)
 
 

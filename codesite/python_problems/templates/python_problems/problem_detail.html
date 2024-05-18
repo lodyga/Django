@@ -182,9 +182,12 @@ Code without theme sync, spinner and timeout
  {% endcomment %}
 
 
-
-
-
+ {% if output_form.output_area.value == "Error: 'output'" %}
+  {% comment %} {{ output_form.output_area.value }} {% endcomment %}
+  <div class="alert alert-warning">    <strong>Warning!</strong> No <em>output</em> variable in Code Area.
+  </div>
+ {% endif %} 
+ 
           {% load crispy_forms_tags %}
           <form action="" class="mb-3">
             {{ output_form|crispy }}
