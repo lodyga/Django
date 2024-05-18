@@ -1,10 +1,10 @@
 {% extends "core/base.html" %}
 {% block title %}
-Python
+  Python
 {% endblock title %}
 {% block content %}
-{% comment %} {% load static %}
-<link rel="stylesheet" href="{% static 'python_problems/style.css' %}"> {% endcomment %}
+  {% comment %} {% load static %}
+  <link rel="stylesheet" href="{% static 'python_problems/style.css' %}"> {% endcomment %}
   <div class="container-fluid m-2">
     <div class="row">
       <div class="col-md-2">
@@ -94,67 +94,63 @@ Python
           <pre style="white-space: pre-wrap">{{ problem.description }}</pre>
           <br>
           <hr>
-
-
-
-
-
-          
-          
-          
-          
-<div class="alert alert-info">Info</div>
-<form action="#">
-  
-  <pre>
+          <div class="alert alert-info">Info</div>
+          <form action="#">
+            <pre>
 # Write in Code Area.
 # Remember to pass the solution to the <em>output</em>.
 
 def fun(x):
     return x
 
-ouput = fun(1)
-    
-  </pre></form>
-
-  
- <form id="id_code_form" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
-   {% csrf_token %}
-  <div class="code-area-container mb-2 border border-primary">
-    <label for="id_code_area">Code Area</label>
-    <textarea name="code_area" id="id_code_area" cols="80" rows="10" class="python-code  border border-primary">{{ code_text }}</textarea>
-  </div>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var storedDarkMode = localStorage.getItem('darkMode');
-        var theme = storedDarkMode === "enabled" ? "monokai" : "default";
-        var editor = CodeMirror.fromTextArea(document.getElementById("id_code_area"), {
-            mode: "python",
-            theme: theme,
-            lineNumbers: true, // Enable line numbers
-            autofocus: true, // Automatically focus on the editor
-            placeholder: "Enter your Python code here..." // Placeholder text
-        });
-    });
-</script>
-<button id="submitButton" type="submit" class="btn btn-warning ">
-    <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
-    Run
-</button>
-</form>
-<script>
-document.getElementById('id_code_form').addEventListener('submit', function () {
-    document.getElementById('submitButton').disabled = true; // Disable the submit button
-    document.getElementById('spinner').classList.remove('d-none'); // Show the spinner
-    document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running';
-});
-</script>
-
-  {% comment %}   
+ouput = fun(1)    
+  </pre>
+          </form>
+          <form id="codeForm"
+                action="{% url 'python_problems:detail' problem.id %}"
+                method="POST"
+                class="mb-5">
+            {% csrf_token %}
+            <div class="code-area-container mb-2 border border-primary">
+              <label for="id_code_area">Code Area</label>
+              <textarea name="code_area"
+                        id="id_code_area"
+                        cols="80"
+                        rows="10"
+                        class="python-code  border border-primary">{{ code_text }}</textarea>
+            </div>
+            <link rel="stylesheet"
+                  href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
+            <link rel="stylesheet"
+                  href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                  var storedDarkMode = localStorage.getItem('darkMode');
+                  var theme = storedDarkMode === "enabled" ? "monokai" : "default";
+                  var editor = CodeMirror.fromTextArea(document.getElementById("id_code_area"), {
+                      mode: "python",
+                      theme: theme,
+                      lineNumbers: true, // Enable line numbers
+                      autofocus: true, // Automatically focus on the editor
+                      placeholder: "Enter your Python code here..." // Placeholder text
+                  });
+              });
+            </script>
+            <button id="submitButton" type="submit" class="btn btn-warning ">
+              <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
+              Run
+            </button>
+          </form>
+          <script>
+            document.getElementById('codeForm').addEventListener('submit', function () {
+                document.getElementById('submitButton').disabled = true; // Disable the submit button
+                document.getElementById('spinner').classList.remove('d-none'); // Show the spinner
+                document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running';
+            });
+          </script>
+          {% comment %}
 Code without theme sync, spinner and timeout
 <button id="submitButton" type="submit" class="btn btn-warning">
     Run
@@ -179,23 +175,27 @@ Code without theme sync, spinner and timeout
     initializeCodeMirror();
   });
 </script>
- {% endcomment %}
-
-
- {% if output_form.output_area.value == "Error: 'output'" %}
-  {% comment %} {{ output_form.output_area.value }} {% endcomment %}
-  <div class="alert alert-warning">    <strong>Warning!</strong> No <em>output</em> variable in Code Area.
-  </div>
- {% endif %} 
- 
+          {% endcomment %}
+          {% if output_form.output_area.value == "Error: 'output'" %}
+            {% comment %} {{ output_form.output_area.value }} {% endcomment %}
+            <div class="alert alert-warning">
+              <strong>Warning!</strong> No <em>output</em> variable in Code Area.
+            </div>
+          {% elif "Error" in output_form.output_area.value %}
+            <div>
+              <div class="alert alert-warning">
+                <strong>Warning!</strong> Error detected.
+              </div>
+            </div>
+          {% else %}
+            <div>
+              <div class="alert alert-info">No errors in code.</div>
+            </div>
+          {% endif %}
           {% load crispy_forms_tags %}
           <form action="" class="mb-3">
             {{ output_form|crispy }}
           </form>
-
-
-          
-
           {% comment %} <pre>{{ processed_code }}</pre> {% endcomment %}
           <br>
           <hr>
@@ -232,6 +232,4 @@ Code without theme sync, spinner and timeout
       </div>
     </div>
   </div>
-
-  
 {% endblock content %}
