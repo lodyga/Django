@@ -6,6 +6,7 @@ from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 from .models import Tag, Problem, Difficulty
 from .forms import CodeForm, OutputForm
@@ -56,11 +57,26 @@ def problem_index_view(request):
         problem_list = problem_list.filter(
             Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
 
+    problems_per_page = request.GET.get("problems_per_page", "10")
+    print(problems_per_page)
+      # Ensure problems_per_page is a valid integer
+    try:
+        problems_per_page = int(problems_per_page)
+    except ValueError:
+        problems_per_page = 10
+    
+    paginator = Paginator(problem_list, problems_per_page)  # Show 10 problems per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
         "problem_list": problem_list,
         "query": query,
         "difficulty_list": difficulty_list,
         "difficulty_id": int(difficulty_id),
+        'page_obj': page_obj,
+        'problems_per_page': problems_per_page,
+
     }
     return render(request, "python_problems/problem_list.html", context)
 

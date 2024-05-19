@@ -11,8 +11,8 @@ urlpatterns = [
     path("tag/<int:pk>/delete/", views.TagDelete.as_view(), name="tag-delete"),
     path("tag/graph/", views.tag_graph_view, name="tag-graph"),
 
-    path("", views.ProblemIndexView.as_view(), name="index"),
-    # path("", views.problem_index_view, name="index"),
+    # path("", views.ProblemIndexView.as_view(), name="index"),
+    path("", views.problem_index_view, name="index"),
     # path("<int:pk>/", views.ProblemDetailView.as_view(), name="detail"),
     path("<int:pk>/", views.problem_detail_view, name="detail"),
     path("create/", views.ProblemCreate.as_view(), name="problem-create"),

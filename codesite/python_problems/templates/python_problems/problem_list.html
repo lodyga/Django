@@ -35,35 +35,71 @@
       </div>
 
 
-      {{ problem_list|length }}
+
+
+
       <div class="col-md-8">
         <div class="mb-5 mt-5">
           <h2>Python problems list</h2>
         </div>
-        {% if problem_list %}
+        {% if page_obj %}
           <ul>
-            {% for problem in problem_list %}
-              <li>
-                <div {color: green} class="problem-container flex ">
-                  <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>,
-                  (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
-                  <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
-                  {% comment %}<a href="{% url 'python_problems:detail' problem.id %}" class="tags" style="display: none">, ({{ problem.tags.all|join:', ' }})</a>{% endcomment %}
-                  {% for tag in problem.tags.all %}
-                    <a href="{% url 'python_problems:index' %}?query={{ tag }}"
-                       class="tags"
-                       style="display: none">, {{ tag }}</a>
-                  {% endfor %}
-                </div>
-                <hr>
-              </li>
+            {% for problem in page_obj %}
+            <li>
+              <div class="problem-container flex ">
+                <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>,
+                (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
+                <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
+                {% comment %}<a href="{% url 'python_problems:detail' problem.id %}" class="tags" style="display: none">, ({{ problem.tags.all|join:', ' }})</a>{% endcomment %}
+                {% for tag in problem.tags.all %}
+                  <a href="{% url 'python_problems:index' %}?query={{ tag }}" class="tags" style="display: none">, {{ tag }}</a>
+                {% endfor %}
+              </div>
+              <hr>
+            </li>
             {% endfor %}
           </ul>
+          
+          <nav>
+            <ul class="pagination">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <span class="page-link">Previous</span>
+                </li>
+              {% endif %}
+    
+              {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                  <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                  </li>
+                {% else %}
+                  <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                  </li>
+                {% endif %}
+              {% endfor %}
+    
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <span class="page-link">Next</span>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
         {% else %}
           <p>No python problems available.</p>
         {% endif %}
-      </div>
-
+    </div>
+    
 
 
 
@@ -73,12 +109,31 @@
             <button onclick="toggleTags()" class="btn-secondary ms-0 mb-3">Show Tags</button>
           </div>
         </div>
-        <div class="row">
+        <div class="row mb-2">
           <div>
             <a href="create/">Create a problem</a> |
             <a href="tag/">Tag list</a> |
             <a href="tag/create/">Add a tag</a>
           </div>
+        </div>
+        <div class="row m-3">
+          {% comment %} <label for="problems_per_page" class="form-label">Items per page:</label>
+            <select class="form-select" id="problems_per_page" name="problems_per_page">
+              <option>10</option>
+              <option>15</option>
+              <option>20</option>
+              <option>{{ problem_list|length }}</option>
+            </select>
+            <br> {% endcomment %}
+            <form method="get" class="mb-3">
+              <label for="problemsPerPage">Problems per page:</label>
+              <select name="problems_per_page" id="problemsPerPage" onchange="this.form.submit()">
+                <option value=10 {% if problems_per_page == 10 %}selected{% endif %}>10</option>
+                <option value=15 {% if problems_per_page == 15 %}selected{% endif %}>15</option>
+                {% comment %} <option value="{{ problem_list|length }}" {% if problems_per_page == {{ problem_list|length }} %}selected{% endif %}>All</option> {% endcomment %}
+              </select>
+            </form>
+            
         </div>
       </div>
     </div>
