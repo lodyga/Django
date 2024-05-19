@@ -28,7 +28,7 @@ class ProblemIndexView(ListView):
         query = self.request.GET.get("query", "")
         problem_list = self.model.objects.all()
         difficulty_list = Difficulty.objects.all()
-        difficulty_id = self.request.GET.get('difficulty', 0)
+        difficulty_id = self.request.GET.get('difficulty', '')
 
         if difficulty_id:
             problem_list = problem_list.filter(difficulty__id=difficulty_id)
@@ -48,7 +48,7 @@ def problem_index_view(request):
     query = request.GET.get("query", "")
     problem_list = Problem.objects.all()
     difficulty_list = Difficulty.objects.all()
-    difficulty_id = request.GET.get('difficulty', 0)
+    difficulty_id = request.GET.get('difficulty', "")
 
     if difficulty_id:
         problem_list = problem_list.filter(difficulty__id=difficulty_id)
@@ -57,27 +57,23 @@ def problem_index_view(request):
         problem_list = problem_list.filter(
             Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
 
-    problems_per_page = request.GET.get("problems_per_page", "10")
-    print(problems_per_page)
-      # Ensure problems_per_page is a valid integer
+    problems_per_page = request.GET.get("problems_per_page", "100")
     try:
         problems_per_page = int(problems_per_page)
     except ValueError:
         problems_per_page = 10
-    
 
-    paginator = Paginator(problem_list, problems_per_page)  # Show 10 problems per page
-    page_number = request.GET.get('page')
+    paginator = Paginator(problem_list, problems_per_page)
+    page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
     
     context = {
         "problem_list": problem_list,
         "query": query,
         "difficulty_list": difficulty_list,
-        "difficulty_id": int(difficulty_id),
+        "difficulty_id": difficulty_id,
         'page_obj': page_obj,
         'problems_per_page': problems_per_page,
-
     }
     return render(request, "python_problems/problem_list.html", context)
 
