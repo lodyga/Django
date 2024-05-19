@@ -65,6 +65,7 @@ def problem_index_view(request):
     except ValueError:
         problems_per_page = 10
     
+
     paginator = Paginator(problem_list, problems_per_page)  # Show 10 problems per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
