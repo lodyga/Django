@@ -488,6 +488,7 @@ x.email
 x.courses  # many-to-many object; magic set
 x.courses.values()  # <QuerySet [{'id': 2, 'title': 'Python'}, {'id': 4, 'title': 'SQL'}]>
 Person.objects.get(pk=1).courses.values()  # same
+Tag.objects.values().get(id=2)
 
 y = Course.objects.get(pk=1)
 y.title  # Python

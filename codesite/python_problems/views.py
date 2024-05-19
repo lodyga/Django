@@ -142,7 +142,7 @@ def problem_detail_view(request, pk):
         # print(code) # output = 20
         code_form = CodeForm(initial={'code_area': code})
         # print(code_form) # <tr>
-        
+
         try:
             result = execute_code(code)
             output_form = OutputForm(initial={"output_area": result})
@@ -153,12 +153,26 @@ def problem_detail_view(request, pk):
             context["output_form"] = output_form
     else:
         code = ""
-        
+
     context["code_form"] = code
     context["code_text"] = code
     # print(output_form.initial.get("output_area"))
+    # print(output_form.initial["output_area"])
     # print(output_form["output_area"].value())
+
+    # print(dir(output_form))
+    # print(output_form.__dict__)
+    # print(output_form.__dict__.get("initial").get("output_area"))
+    print(output_form.fields.get("output_area").widget.attrs.get("placeholder"))
+
     return render(request, "python_problems/problem_detail.html", context)
+
+
+"""
+print(output_form.__dict__):
+{'is_bound': False, 'data': <MultiValueDict: {}>, 'files': <MultiValueDict: {}>, 'auto_id': 'id_%s', 'initial': {'output_area': "Error: 'output'"}, 'error_class': <class 'django.forms.utils.ErrorList'>, 'label_suffix': ':', 'empty_permitted': False, '_errors': None, 'fields': {'output_area': <django.forms.fields.CharField object at 0x7832c705b1f0>}, '_bound_fields_cache': {}, 'renderer': <django.forms.renderers.DjangoTemplates object at 0x7832c701b0a0>}
+
+"""
 
 
 class TagIndexView(ListView):
