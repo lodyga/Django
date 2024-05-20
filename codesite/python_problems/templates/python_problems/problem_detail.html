@@ -94,7 +94,7 @@
           <pre style="white-space: pre-wrap">{{ problem.description }}</pre>
           <br>
           <hr>
-          <div class="alert alert-info">Info</div>
+          {% comment %} <div class="alert alert-info">Info</div>
           <form action="#">
             <pre>
 # Write in Code Area.
@@ -103,8 +103,8 @@
 def fun(x):
     return x
 
-ouput = fun(1)    
-  </pre>
+output = fun(1)    
+  </pre> {% endcomment %}
           </form>
           <form id="codeForm"
                 action="{% url 'python_problems:detail' problem.id %}"

@@ -48,19 +48,25 @@
         {% if page_obj %}
           <ul>
             {% for problem in page_obj %}
-              <li>
-                <div class="problem-container flex">
-                  <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>,
-                  (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
-                  <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
-                  {% for tag in problem.tags.all %}
-                    <a href="?query={{ tag.name }}&difficulty={{ difficulty_id|default_if_none:'' }}&problems_per_page={{ problems_per_page|default_if_none:10 }}"
-                       class="tags"
-                       style="display: none">, {{ tag.name }}</a>
-                  {% endfor %}
-                </div>
-                <hr>
-              </li>
+              <div class="row">
+                <div class="col-md-auto">
+                  <li>
+                    <div class="problem-container flex">
+                      <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>,
+                      (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
+                      <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
+                    </div>
+                  </div>
+                  <div class="col-md-auto">
+                    {% for tag in problem.tags.all %}
+                      <a href="?query={{ tag.name }}&difficulty={{ difficulty_id|default_if_none:'' }}&problems_per_page={{ problems_per_page|default_if_none:10 }}"
+                         class="tags"
+                         style="display: none">, {{ tag.name }}</a>
+                    {% endfor %}
+                  </div>
+                </li>
+              </div>
+              <hr>
             {% endfor %}
           </ul>
           <nav>
@@ -144,15 +150,15 @@
       </div>
     </div>
     <script>
-  function toggleTags() {
-    var tags = document.querySelectorAll(".tags");
-    for (var i = 0; i < tags.length; i++) {
-      if (tags[i].style.display === "none") {
-        tags[i].style.display = "block";
-      } else {
-        tags[i].style.display = "none";
+      function toggleTags() {
+        var tags = document.querySelectorAll(".tags");
+        for (var i = 0; i < tags.length; i++) {
+          if (tags[i].style.display === "none") {
+            tags[i].style.display = "inline-block";
+          } else {
+            tags[i].style.display = "none";
+          }
+        }
       }
-    }
-  }
     </script>
   {% endblock content %}

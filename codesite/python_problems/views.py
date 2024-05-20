@@ -37,10 +37,18 @@ class ProblemIndexView(ListView):
             problem_list = problem_list.filter(
                 Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
 
+        problems_per_page = self.request.GET.get("problems_per_page", "10")
+
+        paginator = Paginator(problem_list, problems_per_page)
+        page_number = self.request.GET.get('page', 1)
+        page_obj = paginator.get_page(page_number)
+
         context["problem_list"] = problem_list
         context["query"] = query
         context["difficulty_list"] = difficulty_list
-        context["difficulty_id"] = int(difficulty_id)
+        context["difficulty_id"] = difficulty_id
+        context["page_obj"] = page_obj
+        context["problems_per_page"] = problems_per_page
         return context
 
 
@@ -57,11 +65,11 @@ def problem_index_view(request):
         problem_list = problem_list.filter(
             Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
 
-    problems_per_page = request.GET.get("problems_per_page", "100")
-    try:
-        problems_per_page = int(problems_per_page)
-    except ValueError:
-        problems_per_page = 10
+    problems_per_page = request.GET.get("problems_per_page", "10")
+    # try:
+    #     problems_per_page = int(problems_per_page)
+    # except ValueError:
+    #     problems_per_page = 10
 
     paginator = Paginator(problem_list, problems_per_page)
     page_number = request.GET.get('page', 1)
@@ -80,14 +88,46 @@ def problem_index_view(request):
 
 class ProblemDetailView(DetailView):
     model = Problem
-
+    template_name = "python_problems/problem_detail.html"
+    
     def get_context_data(self, **kwargs):
-        context = super(ProblemDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         problem = self.get_object()
-        context["tags"] = problem.tags.values_list("name", flat=True)
-        context["related_problems"] = Problem.objects.filter(
+        related_problems = Problem.objects.filter(
             tags__in=problem.tags.all()).exclude(pk=problem.pk).distinct()
+        
+        code = """# Write code here.
+# Remember to pass the solution to the output.
+
+def fun(x):
+    return x
+
+output = fun(1)"""
+
+        output_form = OutputForm(initial={"output_area": "None"})
+
+        context["tags"] = problem.tags.values_list("name", flat=True)
+        context["related_problems"] = related_problems
+        context["output_form"] = output_form
+        context["code_text"] = code
+        
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()  # Ensure self.object is set
+        context = self.get_context_data(**kwargs)
+
+        code = request.POST.get('code_area')
+        try:
+            result = execute_code(code)
+            output_form = OutputForm(initial={"output_area": result})
+        except Exception as e:
+            output_form = OutputForm(initial={"output_area": f"Error: {str(e)}"})
+
+        context["output_form"] = output_form
+        context["code_text"] = code
+        
+        return self.render_to_response(context)
 
 
 def execute_code(code):
@@ -141,6 +181,7 @@ def problem_detail_view(request, pk):
     problem = get_object_or_404(Problem, pk=pk)
     related_problems = Problem.objects.filter(
         tags__in=problem.tags.all()).exclude(pk=pk).distinct()
+    # code_form = CodeForm(initial={"code_area": "Some"})
     output_form = OutputForm(initial={"output_area": "None"})
 
     context = {
@@ -150,24 +191,27 @@ def problem_detail_view(request, pk):
         "output_form": output_form,
     }
 
+    code = """# Write code here.
+# Remember to pass the solution to the output.
+
+def fun(x):
+    return x
+
+output = fun(1)"""
+
     if request.method == 'POST':
         code = request.POST.get('code_area')
-        # print(code) # output = 20
-        code_form = CodeForm(initial={'code_area': code})
-        # print(code_form) # <tr>
+        # code_form = CodeForm(initial={'code_area': code})
 
         try:
             result = execute_code(code)
             output_form = OutputForm(initial={"output_area": result})
-            context["output_form"] = output_form
         except Exception as e:
             output_form = OutputForm(
                 initial={"output_area": f"Error: {str(e)}"})
-            context["output_form"] = output_form
-    else:
-        code = ""
 
-    context["code_form"] = code
+    # context["code_form"] = code_form
+    context["output_form"] = output_form
     context["code_text"] = code
     # print(output_form.initial.get("output_area"))
     # print(output_form.initial["output_area"])
@@ -176,7 +220,7 @@ def problem_detail_view(request, pk):
     # print(dir(output_form))
     # print(output_form.__dict__)
     # print(output_form.__dict__.get("initial").get("output_area"))
-    print(output_form.fields.get("output_area").widget.attrs.get("placeholder"))
+    # print(output_form.fields.get("output_area").widget.attrs.get("placeholder"))
 
     return render(request, "python_problems/problem_detail.html", context)
 
