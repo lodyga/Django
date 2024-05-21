@@ -88,12 +88,12 @@ def problem_index_view(request):
 
 class ProblemDetailView(DetailView):
     model = Problem
-    template_name = "python_problems/problem_detail.html"
+    # template_name = "python_problems/problem_detail.html"
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         problem = self.get_object()
-        related_problems = Problem.objects.filter(
+        related_problems = self.model.objects.filter(
             tags__in=problem.tags.all()).exclude(pk=problem.pk).distinct()
         
         code = """# Write code here.

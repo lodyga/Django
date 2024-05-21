@@ -74,11 +74,21 @@
               {% if page_obj.has_previous %}
                 <li class="page-item">
                   <a class="page-link"
-                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.previous_page_number }}&problems_per_page={{ problems_per_page|default_if_none:10 }}">Previous</a>
+                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page=1&problems_per_page={{ problems_per_page|default_if_none:10 }}"><<</a>
                 </li>
               {% else %}
                 <li class="page-item disabled">
-                  <span class="page-link">Previous</span>
+                  <span class="page-link"><<</span>
+                </li>
+              {% endif %}
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link"
+                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.previous_page_number }}&problems_per_page={{ problems_per_page|default_if_none:10 }}"><</a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <span class="page-link"><</span>
                 </li>
               {% endif %}
               {% for num in page_obj.paginator.page_range %}
@@ -96,13 +106,24 @@
               {% if page_obj.has_next %}
                 <li class="page-item">
                   <a class="page-link"
-                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.next_page_number }}&problems_per_page={{ problems_per_page|default_if_none:10 }}">Next</a>
+                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.next_page_number }}&problems_per_page={{ problems_per_page|default_if_none:10 }}">></a>
                 </li>
               {% else %}
                 <li class="page-item disabled">
-                  <span class="page-link">Next</span>
+                  <span class="page-link">></span>
                 </li>
               {% endif %}
+              {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link"
+                   href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.paginator.num_pages }}&problems_per_page={{ problems_per_page|default_if_none:10 }}">>></a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">>></span>
+              </li>
+            {% endif %}
+
             </ul>
           </nav>
         {% else %}
