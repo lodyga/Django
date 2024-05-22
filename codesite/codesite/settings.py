@@ -16,7 +16,8 @@ APP_NAME = "Codesite"
 SECRET_KEY = 'django-insecure-(rb%k$#$!2p!)_!ob^=zjhj+48mbcxf9rx)i0vo4igx=txwb5r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# When False encable static files handler
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -61,6 +62,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',   # social login
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # static files handler
+
 ]
 
 ROOT_URLCONF = 'codesite.urls'
@@ -133,6 +136,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'productionfiles'  # for static files
+# for global files, The search starts in the directories listed in STATICFILES_DIRS, using the order you have provided. Then, if the file is not found, the search continues in the static folder of each application.
+STATICFILES_DIRS = [
+    BASE_DIR / 'mystaticfiles'
+]
+
 
 
 # Configure the social login
@@ -161,6 +170,8 @@ AUTHENTICATION_BACKENDS = (
 
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/'
+# Don't set default LOGIN_URL - let django.contrib.auth set it when it is loaded
+# LOGIN_URL = '/accounts/login'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

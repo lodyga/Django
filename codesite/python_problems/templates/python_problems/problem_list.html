@@ -3,8 +3,10 @@
   Python
 {% endblock title %}
 {% block content %}
-  {% comment %}  {% load static %}
-  <link rel="stylesheet" href="{% static 'python_problems/style.css' %}">{% endcomment %}
+  {# From app static filies, only for this app https://www.w3schools.com/django/django_collect_static_files.php #}
+  {# {% load static %} <link rel="stylesheet" href="{% static 'python_problems/style_local.css' %}"> #}
+  {# For global static files, for all apps https://www.w3schools.com/django/django_add_global_static_files.php #}
+  {# {% load static %} <link rel="stylesheet" href="{% static 'style_global.css' %}"> #}
   <div class="container-fluid m-2">
     <div class="row">
       <div class="col-md-2">

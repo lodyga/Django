@@ -5,7 +5,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.core.paginator import Paginator
 
 from .models import Tag, Problem, Difficulty
@@ -93,8 +93,12 @@ class ProblemDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         problem = self.get_object()
-        related_problems = self.model.objects.filter(
-            tags__in=problem.tags.all()).exclude(pk=problem.pk).distinct()
+        # related_problems = self.model.objects.filter(
+        #     tags__in=problem.tags.all()).exclude(pk=problem.pk).distinct()
+        # Find related problems that share at least two tags with the current problem
+        related_problems = Problem.objects.annotate(
+            common_tags=Count('tags', filter=Q(tags__in=problem.tags.all()))
+        ).filter(common_tags__gte=2).exclude(pk=problem.pk).distinct()
         
         code = """# Write code here.
 # Remember to pass the solution to the output.
