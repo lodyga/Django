@@ -2,6 +2,9 @@
 {% block title %}
   Python
 {% endblock title %}
+{% block head %}
+{% endblock head %}
+
 {% block content %}
   {# {% load static %} <link rel="stylesheet" href="{% static 'python_problems/style.css' %}"> #}
   <div class="container-fluid m-2">
@@ -149,32 +152,10 @@ output = fun(1)
                 document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running';
             });
           </script>
-          {% comment %}
-Code without theme sync, spinner and timeout
-<button id="submitButton" type="submit" class="btn btn-warning">
-    Run
-  </button>
-</form>
 
-<script>
-  // Function to initialize CodeMirror
-  function initializeCodeMirror() {
-    var editor = CodeMirror.fromTextArea(document.getElementById("id_code_area"), {
-      mode: "python",
-      lineNumbers: true,
-      autofocus: true,
-    });
 
-    // Hide the original textarea after CodeMirror initialization
-    // document.getElementById("id_code_area").style.display = "none";
-  }
 
-  // Initialize CodeMirror when DOM content is loaded
-  document.addEventListener("DOMContentLoaded", function() {
-    initializeCodeMirror();
-  });
-</script>
-          {% endcomment %}
+
           {% if output_form.output_area.value == "Error: 'output'" %}
             {% comment %} {{ output_form.output_area.value }} {% endcomment %}
             <div class="alert alert-warning">
@@ -191,19 +172,58 @@ Code without theme sync, spinner and timeout
               <div class="alert alert-info">No errors in code.</div>
             </div>
           {% endif %}
+
+
           {% load crispy_forms_tags %}
           <form action="" class="mb-3">
             {{ output_form|crispy }}
           </form>
-          {% comment %} <pre>{{ processed_code }}</pre> {% endcomment %}
           <br>
           <hr>
-          <p>
-            <b>Test Cases</b>:
-          </p>
-          <pre>{{ problem.testcase }}</pre>
+
+
+
+
+
+
+
+
+          
+          <div class="container mt-5">
+            <p><b>Test Cases</b>:</p>
+            <div id="buttons" class="mb-3">
+                <!-- Buttons will be inserted here by JavaScript -->
+            </div>
+            <div id="testcases">
+                {% for testcase in testcases %}
+                    <pre id="testcase-{{ forloop.counter }}">{{ testcase }}</pre>
+                {% endfor %}
+            </div>
+            </div>
+    
+            <div class="mb-3">
+              {% comment %} <label for="testcase_form">Test Case:</label> {% endcomment %}
+              <form action="" class="form-inline" id="testcase-form">
+                {{ testcase_form|crispy }}
+              </form>
+            </div>
+
+            <div class="mb-3">
+              <form action="">
+                {{ testcase_input_form|crispy }}
+              </form>
+            </div>
+            <div class="mb-3">
+                <form action="">
+                  {{ testcase_output_form|crispy }}
+                </form>
+            </div>
           <br>
           <hr>
+
+
+
+          
           <button type="button"
                   class="btn btn-primary mb-2"
                   data-bs-toggle="collapse"
@@ -231,4 +251,51 @@ Code without theme sync, spinner and timeout
       </div>
     </div>
   </div>
+
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const testCases = {{ testcases|safe }};
+        
+        const buttonsContainer = document.getElementById('buttons');
+        const testcasesContainer = document.getElementById('testcases');
+        const testcaseForm = document.getElementById('testcase-form');
+        const formTextarea = testcaseForm.querySelector('textarea[name="testcase"]');
+        
+        
+
+        testCases.forEach((testCase, index) => {
+            // Create button
+            const button = document.createElement('button');
+            button.className = 'btn btn-secondary mr-2';
+            button.textContent = index + 1;
+            button.onclick = (event) => {
+                event.preventDefault();
+                showTestCase(index + 1);
+            };
+            buttonsContainer.appendChild(button);
+        });
+
+        function showTestCase(index) {
+            // Hide all test cases
+            const preElements = testcasesContainer.getElementsByTagName('pre');
+            for (let pre of preElements) {
+                pre.style.display = 'none';
+            }
+
+            // Show the selected test case
+            const selectedPre = document.getElementById(`testcase-${index}`);
+            if (selectedPre) {
+                selectedPre.style.display = 'block';
+                formTextarea.value = selectedPre.textContent.trim();
+            }
+        }
+
+        // Optionally, show the first test case by default
+        if (testCases.length > 0) {
+            showTestCase(1);
+        }
+    });
+</script>
 {% endblock content %}

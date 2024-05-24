@@ -1,5 +1,3 @@
-import multiprocessing
-
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
@@ -9,7 +7,8 @@ from django.db.models import Q, Count
 from django.core.paginator import Paginator
 
 from .models import Tag, Problem, Difficulty
-from .forms import CodeForm, OutputForm
+from .forms import CodeForm, OutputForm, TestCaseForm, TestCaseInputForm, TestCaseOutputForm
+from .static.python_problems.scripts import execute_code
 
 
 def tag_graph_view(request):
@@ -88,32 +87,53 @@ def problem_index_view(request):
 
 class ProblemDetailView(DetailView):
     model = Problem
-    # template_name = "python_problems/problem_detail.html"
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         problem = self.get_object()
-        # related_problems = self.model.objects.filter(
-        #     tags__in=problem.tags.all()).exclude(pk=problem.pk).distinct()
-        # Find related problems that share at least two tags with the current problem
         related_problems = Problem.objects.annotate(
             common_tags=Count('tags', filter=Q(tags__in=problem.tags.all()))
         ).filter(common_tags__gte=2).exclude(pk=problem.pk).distinct()
         
-        code = """# Write code here.
-# Remember to pass the solution to the output.
-
-def fun(x):
-    return x
-
-output = fun(1)"""
+        code = """# Write code here.\n# Remember to pass the solution to the output.\n\ndef fun(x):\n    return x\n\noutput = fun(1)"""
 
         output_form = OutputForm(initial={"output_area": "None"})
+        testcase_form = TestCaseForm()
+
+        # testcases parsing
+        testcases = problem.testcase.split('\r\n')  # Split the test cases by newline characters
+        testcases_split = []
+        testcases_input = []
+        testcases_output = []
+        for testcase in testcases:
+            if testcase:
+                input_part, output_part = testcase.split('), ')
+                input_part = (input_part + ')').strip()[1:]  # Add the closing parenthesis back
+                output_part = output_part.strip()[:-1]  # Strip any extra whitespace
+                testcases_split.append((input_part, output_part))
+                testcases_input.append(input_part)
+                testcases_output.append(output_part)
+        print(testcases_input)
+        print(testcases_output)
+
+
+
+        testcase_input_form = TestCaseInputForm(initial={"testcase_input": testcases_input[0]})
+        testcase_output_form = TestCaseOutputForm(initial={"testcase_output": testcases_output[0]})
+
+
 
         context["tags"] = problem.tags.values_list("name", flat=True)
         context["related_problems"] = related_problems
         context["output_form"] = output_form
         context["code_text"] = code
+        
+        context["testcase_form"] = testcase_form
+        context["testcase_input_form"] = testcase_input_form
+        context["testcase_output_form"] = testcase_output_form
+        context["testcases"] = testcases
+        context["testcases_input"] = testcases_input
+        context["testcases_output"] = testcases_output
         
         return context
 
@@ -133,51 +153,6 @@ output = fun(1)"""
         
         return self.render_to_response(context)
 
-
-def execute_code(code):
-    # Define a function to execute the code
-    def code_execution(code, result_queue):
-        local_vars = {}
-        global_vars = {}
-        try:
-            exec(code, global_vars, local_vars)
-            # result_queue.put(local_vars.get("output"))
-            result_queue.put(local_vars["output"])
-        except Exception as e:
-            result_queue.put(f"Error: {str(e)}")
-
-    # Create a multiprocessing Queue to receive the result from the child process
-    result_queue = multiprocessing.Queue()
-
-    # Create a child process to execute the code
-    process = multiprocessing.Process(
-        target=code_execution, args=(code, result_queue))
-
-    try:
-        # Start the child process
-        process.start()
-
-        # Wait for the process to finish or timeout after 10 seconds
-        process.join(timeout=5)
-
-        # Check if the process is still alive (i.e., if it timed out)
-        if process.is_alive():
-            # Terminate the process if it's still running
-            process.terminate()
-            process.join()
-
-            # Return an error message indicating timeout
-            return "Error: Execution timed out"
-
-        # Retrieve the result from the Queue
-        result = result_queue.get()
-
-        return result
-    finally:
-        # Ensure that the child process is terminated
-        if process.is_alive():
-            process.terminate()
-            process.join()
 
 
 # same as ProblemDetailView
