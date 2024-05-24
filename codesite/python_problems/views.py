@@ -101,16 +101,16 @@ class ProblemDetailView(DetailView):
         testcase_form = TestCaseForm()
 
         # testcases parsing
-        testcases = problem.testcase.split('\r\n')  # Split the test cases by newline characters
-        testcases_split = []
+        raw_testcases = problem.testcase.split('\r\n')  # Split the test cases by newline characters
+        testcases = []
         testcases_input = []
         testcases_output = []
-        for testcase in testcases:
-            if testcase:
-                input_part, output_part = testcase.split('), ')
-                input_part = (input_part + ')').strip()[1:]  # Add the closing parenthesis back
-                output_part = output_part.strip()[:-1]  # Strip any extra whitespace
-                testcases_split.append((input_part, output_part))
+        for raw_testcase in raw_testcases:
+            if raw_testcase:
+                input_part, output_part = raw_testcase.split('), ')
+                input_part = (input_part + ')').strip()[1:]  # Add the closing parenthesis back and remove opening parenthetis
+                output_part = output_part.strip()[:-1]  # Strip any extra whitespace and closing parenthensi
+                testcases.append((input_part, output_part))
                 testcases_input.append(input_part)
                 testcases_output.append(output_part)
         print(testcases_input)
@@ -128,10 +128,10 @@ class ProblemDetailView(DetailView):
         context["output_form"] = output_form
         context["code_text"] = code
         
+        context["testcases"] = testcases
         context["testcase_form"] = testcase_form
         context["testcase_input_form"] = testcase_input_form
         context["testcase_output_form"] = testcase_output_form
-        context["testcases"] = testcases
         context["testcases_input"] = testcases_input
         context["testcases_output"] = testcases_output
         

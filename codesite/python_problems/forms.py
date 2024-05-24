@@ -15,7 +15,7 @@ class OutputForm(forms.Form):
 
 class TestCaseForm(forms.Form):
     testcase = forms.CharField(widget=forms.Textarea(
-        attrs={"placeholder": "None", 'rows': 1}))
+        attrs={"placeholder": "None", 'rows': 6}))
 
 class TestCaseInputForm(forms.Form):
     testcase_input = forms.CharField(widget=forms.Textarea(

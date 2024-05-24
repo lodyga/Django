@@ -4,7 +4,6 @@
 {% endblock title %}
 {% block head %}
 {% endblock head %}
-
 {% block content %}
   {# {% load static %} <link rel="stylesheet" href="{% static 'python_problems/style.css' %}"> #}
   <div class="container-fluid m-2">
@@ -106,28 +105,21 @@ def fun(x):
     return x
 
 output = fun(1)    
-  </pre> {% endcomment %}
-          </form>
-          <form id="codeForm"
-                action="{% url 'python_problems:detail' problem.id %}"
-                method="POST"
-                class="mb-5">
-            {% csrf_token %}
-            <div class="code-area-container mb-2 border border-primary">
-              <label for="id_code_area">Code Area</label>
-              <textarea name="code_area"
-                        id="id_code_area"
-                        cols="80"
-                        rows="10"
-                        class="python-code  border border-primary">{{ code_text }}</textarea>
-            </div>
-            <link rel="stylesheet"
-                  href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
-            <link rel="stylesheet"
-                  href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
-            <script>
+</pre> {% endcomment %}
+</form>
+<form id="codeForm" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
+{% csrf_token %}
+<div class="code-area-container mb-2 border border-primary">
+<label for="id_code_area">Code Area</label>
+<textarea name="code_area" id="id_code_area" cols="80" rows="10" class="python-code  border border-primary">{{ code_text }}</textarea>
+        </div>
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
+        <script>
               document.addEventListener('DOMContentLoaded', function () {
                   var storedDarkMode = localStorage.getItem('darkMode');
                   var theme = storedDarkMode === "enabled" ? "monokai" : "default";
@@ -139,136 +131,126 @@ output = fun(1)
                       placeholder: "Enter your Python code here..." // Placeholder text
                   });
               });
-            </script>
-            <button id="submitButton" type="submit" class="btn btn-warning ">
-              <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
-              Run
-            </button>
-          </form>
-          <script>
+        </script>
+        <button id="submitButton" type="submit" class="btn btn-warning ">
+          <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
+          Run
+        </button>
+      </form>
+      <script>
             document.getElementById('codeForm').addEventListener('submit', function () {
                 document.getElementById('submitButton').disabled = true; // Disable the submit button
                 document.getElementById('spinner').classList.remove('d-none'); // Show the spinner
                 document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running';
             });
-          </script>
+      </script>
+      {% if output_form.output_area.value == "Error: 'output'" %}
+        {% comment %} {{ output_form.output_area.value }} {% endcomment %}
+        <div class="alert alert-warning">
+          <strong>Warning!</strong> No <em>output</em> variable in Code Area.
+        </div>
+      {% elif "Error" in output_form.output_area.value %}
+        <div>
+          <div class="alert alert-warning">
+            <strong>Warning!</strong> Error detected.
+          </div>
+        </div>
+      {% else %}
+        <div>
+          <div class="alert alert-info">No errors in code.</div>
+        </div>
+      {% endif %}
+      {% load crispy_forms_tags %}
+      <form action="" class="mb-3">
+        {{ output_form|crispy }}
+      </form>
+      <div class="container mt-5">
+        <p>
+          <b>Test Cases</b>:
+        </p>
+        <div id="buttons" class="">
+          <!-- Buttons will be inserted here by JavaScript -->
+        </div>
 
 
-
-
-          {% if output_form.output_area.value == "Error: 'output'" %}
-            {% comment %} {{ output_form.output_area.value }} {% endcomment %}
-            <div class="alert alert-warning">
-              <strong>Warning!</strong> No <em>output</em> variable in Code Area.
-            </div>
-          {% elif "Error" in output_form.output_area.value %}
-            <div>
-              <div class="alert alert-warning">
-                <strong>Warning!</strong> Error detected.
+        <div id="testcases">
+          {% for testcase in testcases %}
+          <div id="testcase-{{ forloop.counter }}" class="testcase-content">
+              <div class="">
+                {% comment %} <label for="inpt">Input:</label> {% endcomment %}
+                <textarea class="form-control mb-1" rows="1" id="inpt" name="text">Input: {{ testcase.0 }}</textarea>
+              </div>
+              <div class="">
+                {% comment %} <label for="oupt">Output:</label> {% endcomment %}
+                <textarea class="form-control" rows="1" id="oupt" name="text">Output: {{ testcase.1 }}</textarea>
               </div>
             </div>
-          {% else %}
-            <div>
-              <div class="alert alert-info">No errors in code.</div>
-            </div>
-          {% endif %}
-
-
-          {% load crispy_forms_tags %}
-          <form action="" class="mb-3">
-            {{ output_form|crispy }}
-          </form>
-          <br>
-          <hr>
-
-
-
-
-
-
-
-
-          
-          <div class="container mt-5">
-            <p><b>Test Cases</b>:</p>
-            <div id="buttons" class="mb-3">
-                <!-- Buttons will be inserted here by JavaScript -->
-            </div>
-            <div id="testcases">
-                {% for testcase in testcases %}
-                    <pre id="testcase-{{ forloop.counter }}">{{ testcase }}</pre>
-                {% endfor %}
-            </div>
-            </div>
-    
-            <div class="mb-3">
-              {% comment %} <label for="testcase_form">Test Case:</label> {% endcomment %}
-              <form action="" class="form-inline" id="testcase-form">
-                {{ testcase_form|crispy }}
-              </form>
-            </div>
-
-            <div class="mb-3">
-              <form action="">
-                {{ testcase_input_form|crispy }}
-              </form>
-            </div>
-            <div class="mb-3">
-                <form action="">
-                  {{ testcase_output_form|crispy }}
-                </form>
-            </div>
-          <br>
-          <hr>
-
-
-
-          
-          <button type="button"
-                  class="btn btn-primary mb-2"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#solution">Show solution</button>
-          <div id="solution" class="collapse">
-            <p>
-              <b>Solution</b>:
-            </p>
-            <div class="box">
-              <pre>{{ problem.solution }}</pre>
-            </div>
-          </div>
-          <br>
-          <hr>
+          {% endfor %}
         </div>
-      </div>
-      <div class="col-md-2">
-        <div class="row"></div>
-        <div class="row">
-          <div>
-            <a href="{% url 'python_problems:index' %}"
-               class="btn btn-secondary px-3 py-1 mb-2">Back</a>
+
+
+        {% comment %} <div class="mb-3">
+          <form action="" class="form-inline" id="testcase-form">
+            {{ testcase_form.as_p }}
+          </form>
+        </div>
+        <div class="mb-3">
+          <form action="" id="testcase-input-form">
+            {{ testcase_input_form|crispy }}
+          </form>
+        </div>
+        <div class="mb-3">
+          <form action="" id="testcase-output-form">
+            {{ testcase_output_form.as_p }}
+          </form>
+        </div>
+        </div> {% endcomment %}
+        <br>
+        <hr>
+        <button type="button"
+                class="btn btn-primary mb-2"
+                data-bs-toggle="collapse"
+                data-bs-target="#solution">Show solution</button>
+        <div id="solution" class="collapse">
+          <p>
+            <b>Solution</b>:
+          </p>
+          <div class="box">
+            <pre>{{ problem.solution }}</pre>
           </div>
+        </div>
+        <br>
+        <hr>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="row"></div>
+      <div class="row">
+        <div>
+          <a href="{% url 'python_problems:index' %}"
+             class="btn btn-secondary px-3 py-1 mb-2">Back</a>
         </div>
       </div>
     </div>
   </div>
-
-
-
-  <script>
+</div>
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         const testCases = {{ testcases|safe }};
         
         const buttonsContainer = document.getElementById('buttons');
         const testcasesContainer = document.getElementById('testcases');
-        const testcaseForm = document.getElementById('testcase-form');
-        const formTextarea = testcaseForm.querySelector('textarea[name="testcase"]');
-        
-        
+        // const testcaseForm = document.getElementById('testcase-form');
+        // const formTextarea = testcaseForm.querySelector('textarea[name="testcase"]');
+        // const testcaseInputForm = document.getElementById('testcase-input-form');
+        // const testcaseOutputForm = document.getElementById('testcase-output-form');
+        // const inputTextarea = testcaseInputForm.querySelector('textarea[name="testcase_input"]');
+        // const outputTextarea = testcaseOutputForm.querySelector('textarea[name="testcase_output"]');
 
         testCases.forEach((testCase, index) => {
             // Create button
             const button = document.createElement('button');
-            button.className = 'btn btn-secondary mr-2';
+            button.className = 'btn btn-secondary btn-sm me-2 py-0 px-3';
             button.textContent = index + 1;
             button.onclick = (event) => {
                 event.preventDefault();
@@ -279,16 +261,19 @@ output = fun(1)
 
         function showTestCase(index) {
             // Hide all test cases
-            const preElements = testcasesContainer.getElementsByTagName('pre');
-            for (let pre of preElements) {
-                pre.style.display = 'none';
+                const testcaseElements = testcasesContainer.getElementsByClassName('testcase-content');
+                for (let testcase of testcaseElements) {
+                    testcase.style.display = 'none';
             }
 
             // Show the selected test case
-            const selectedPre = document.getElementById(`testcase-${index}`);
-            if (selectedPre) {
-                selectedPre.style.display = 'block';
+                const selectedTestcase = document.getElementById(`testcase-${index}`);
+                if (selectedTestcase) {
+                    selectedTestcase.style.display = 'block';
+                const [inputPart, outputPart] = testCases[index - 1];
                 formTextarea.value = selectedPre.textContent.trim();
+                inputTextarea.value = "inputPart.trim();"
+                outputTextarea.value = outputPart.trim();
             }
         }
 
