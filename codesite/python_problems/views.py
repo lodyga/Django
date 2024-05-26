@@ -7,7 +7,7 @@ from django.db.models import Q, Count
 from django.core.paginator import Paginator
 
 from .models import Tag, Problem, Difficulty
-from .forms import CodeForm, OutputForm, TestCaseForm, TestCaseInputForm, TestCaseOutputForm
+from .forms import CodeForm, OutputForm, TestCaseForm, TestCaseInputForm, TestCaseOutputForm, ProblemForm
 from .static.python_problems.scripts import execute_code
 
 
@@ -235,7 +235,7 @@ class TagDelete(LoginRequiredMixin, DeleteView):
 
 class ProblemCreate(LoginRequiredMixin, CreateView):
     model = Problem
-    fields = "__all__"
+    form_class = ProblemForm  # Custom form to remove 'slug' field
     success_url = reverse_lazy('python_problems:index')
 
 

@@ -1,0 +1,6 @@
+# generate empty migration
+python3 manage.py makemigrations --empty python_problems --name populate_slugs
+
+
+
+

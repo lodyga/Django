@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 
 
 class Difficulty(models.Model):
@@ -23,8 +24,9 @@ class Complexity(models.Model):
 
 
 class Problem(models.Model):
-    tags = models.ManyToManyField("Tag")
     title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    tags = models.ManyToManyField("Tag")
     difficulty = models.ForeignKey(
         Difficulty, related_name="problems_difficulty", on_delete=models.DO_NOTHING)
     time_complexity = models.ForeignKey(
@@ -36,6 +38,11 @@ class Problem(models.Model):
     is_solved = models.BooleanField(default=False)
     solution = models.TextField(blank=True, null=True)
     testcase = models.TextField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title

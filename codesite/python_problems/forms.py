@@ -1,4 +1,11 @@
 from django import forms
+from python_problems.models import Problem
+
+
+class ProblemForm(forms.ModelForm):
+    class Meta:
+        model = Problem
+        exclude = ['slug']
 
 
 class CodeForm(forms.Form):
@@ -17,11 +24,12 @@ class TestCaseForm(forms.Form):
     testcase = forms.CharField(widget=forms.Textarea(
         attrs={"placeholder": "None", 'rows': 6}))
 
+
 class TestCaseInputForm(forms.Form):
     testcase_input = forms.CharField(widget=forms.Textarea(
         attrs={"placeholder": "None", 'rows': 1}))
 
+
 class TestCaseOutputForm(forms.Form):
     testcase_output = forms.CharField(widget=forms.Textarea(
         attrs={"placeholder": "None", 'rows': 1}))
-
