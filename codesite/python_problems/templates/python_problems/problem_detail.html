@@ -30,7 +30,7 @@
                   <ul>
                     {% for related in related_problems %}
                       <li>
-                        <a href="{% url 'python_problems:detail' related.id %}">
+                        <a href="{% url 'python_problems:detail' related.slug %}">
                           {% if related.title|length > 30 %}
                             {{ related.title|slice:":27" }} ...
                           {% else %}
@@ -107,7 +107,7 @@ def fun(x):
 output = fun(1)    
 </pre> {% endcomment %}
 </form>
-<form id="codeForm" action="{% url 'python_problems:detail' problem.id %}" method="POST" class="mb-5">
+<form id="codeForm" action="{% url 'python_problems:detail' problem.slug %}" method="POST" class="mb-5">
 {% csrf_token %}
 <div class="code-area-container mb-2 border border-primary">
 <label for="id_code_area">Code Area</label>
