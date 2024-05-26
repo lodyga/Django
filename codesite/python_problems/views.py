@@ -73,7 +73,7 @@ def problem_index_view(request):
     paginator = Paginator(problem_list, problems_per_page)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
         "problem_list": problem_list,
         "query": query,
@@ -87,54 +87,53 @@ def problem_index_view(request):
 
 class ProblemDetailView(DetailView):
     model = Problem
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         problem = self.get_object()
         related_problems = Problem.objects.annotate(
             common_tags=Count('tags', filter=Q(tags__in=problem.tags.all()))
         ).filter(common_tags__gte=2).exclude(pk=problem.pk).distinct()
-        
+
         code = """# Write code here.\n# Remember to pass the solution to the output.\n\ndef fun(x):\n    return x\n\noutput = fun(1)"""
 
         output_form = OutputForm(initial={"output_area": "None"})
         testcase_form = TestCaseForm()
 
         # testcases parsing
-        raw_testcases = problem.testcase.split('\r\n')  # Split the test cases by newline characters
+        # Split the test cases by newline characters
+        raw_testcases = problem.testcase.split('\r\n')
         testcases = []
         testcases_input = []
         testcases_output = []
         for raw_testcase in raw_testcases:
             if raw_testcase:
                 input_part, output_part = raw_testcase.split('), ')
-                input_part = (input_part + ')').strip()[1:]  # Add the closing parenthesis back and remove opening parenthetis
-                output_part = output_part.strip()[:-1]  # Strip any extra whitespace and closing parenthensi
+                # Add the closing parenthesis back and remove opening parenthetis
+                input_part = (input_part + ')').strip()[1:]
+                # Strip any extra whitespace and closing parenthensi
+                output_part = output_part.strip()[:-1]
                 testcases.append((input_part, output_part))
                 testcases_input.append(input_part)
                 testcases_output.append(output_part)
-        print(testcases_input)
-        print(testcases_output)
 
-
-
-        testcase_input_form = TestCaseInputForm(initial={"testcase_input": testcases_input[0]})
-        testcase_output_form = TestCaseOutputForm(initial={"testcase_output": testcases_output[0]})
-
-
+        testcase_input_form = TestCaseInputForm(
+            initial={"testcase_input": testcases_input[0]})
+        testcase_output_form = TestCaseOutputForm(
+            initial={"testcase_output": testcases_output[0]})
 
         context["tags"] = problem.tags.values_list("name", flat=True)
         context["related_problems"] = related_problems
         context["output_form"] = output_form
         context["code_text"] = code
-        
+
         context["testcases"] = testcases
         context["testcase_form"] = testcase_form
         context["testcase_input_form"] = testcase_input_form
         context["testcase_output_form"] = testcase_output_form
         context["testcases_input"] = testcases_input
         context["testcases_output"] = testcases_output
-        
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -146,13 +145,13 @@ class ProblemDetailView(DetailView):
             result = execute_code(code)
             output_form = OutputForm(initial={"output_area": result})
         except Exception as e:
-            output_form = OutputForm(initial={"output_area": f"Error: {str(e)}"})
+            output_form = OutputForm(
+                initial={"output_area": f"Error: {str(e)}"})
 
         context["output_form"] = output_form
         context["code_text"] = code
-        
-        return self.render_to_response(context)
 
+        return self.render_to_response(context)
 
 
 # same as ProblemDetailView

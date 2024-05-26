@@ -54,7 +54,7 @@
                 <div class="col-md-auto">
                   <li>
                     <div class="problem-container flex">
-                      <a href="{% url 'python_problems:detail' problem.id %}">{{ problem.title }}</a>,
+                      <a href="{% url 'python_problems:detail' problem.slug %}">{{ problem.title }}</a>,
                       (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
                       <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
                     </div>
