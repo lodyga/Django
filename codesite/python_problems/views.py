@@ -36,6 +36,9 @@ class ProblemIndexView(ListView):
             problem_list = problem_list.filter(
                 Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
 
+        
+        # problem_list = problem_list.order_by("title")
+
         problems_per_page = self.request.GET.get("problems_per_page", "10")
 
         paginator = Paginator(problem_list, problems_per_page)
@@ -155,10 +158,10 @@ class ProblemDetailView(DetailView):
 
 
 # same as ProblemDetailView
-def problem_detail_view(request, pk):
-    problem = get_object_or_404(Problem, pk=pk)
+def problem_detail_view(request, slug):
+    problem = get_object_or_404(Problem, slug=slug)
     related_problems = Problem.objects.filter(
-        tags__in=problem.tags.all()).exclude(pk=pk).distinct()
+        tags__in=problem.tags.all()).exclude(slug=slug).distinct()
     # code_form = CodeForm(initial={"code_area": "Some"})
     output_form = OutputForm(initial={"output_area": "None"})
 
@@ -169,13 +172,7 @@ def problem_detail_view(request, pk):
         "output_form": output_form,
     }
 
-    code = """# Write code here.
-# Remember to pass the solution to the output.
-
-def fun(x):
-    return x
-
-output = fun(1)"""
+    code = """# Write code here.\n# Remember to pass the solution to the output.\n\ndef fun(x):\n    return x\n\noutput = fun(1)"""
 
     if request.method == 'POST':
         code = request.POST.get('code_area')
