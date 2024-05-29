@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-(rb%k$#$!2p!)_!ob^=zjhj+48mbcxf9rx)i0vo4igx=txwb5r
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # When False encable static files handler
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "127.0.0.1",

@@ -2,5 +2,10 @@
 python3 manage.py makemigrations --empty python_problems --name populate_slugs
 
 
+# backup db.sqlite3
+python manage.py dumpdata > fixtures/db_data.json
+
+
+
 
 

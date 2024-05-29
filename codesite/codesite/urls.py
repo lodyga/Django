@@ -38,6 +38,6 @@ try:
                        path(
                            'accounts/login/', auth_views.LoginView.as_view(template_name=social_login))
                        )
-    print('Using', social_login, 'as the login template')
+    pass
 except:
-    print('Using registration/login.html as the login template')
+    pass
