@@ -31,11 +31,12 @@
                     {% for related in related_problems %}
                       <li>
                         <a href="{% url 'python_problems:detail' related.slug %}">
-                          {% if related.title|length > 30 %}
+                          {% comment %} {% if related.title|length > 30 %}
                             {{ related.title|slice:":27" }} ...
                           {% else %}
                             {{ related.title }}
-                          {% endif %}
+                          {% endif %} {% endcomment %}
+                          {{ related.title|truncatechars:30 }}
                         </a>
                       </li>
                     {% endfor %}

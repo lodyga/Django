@@ -116,16 +116,39 @@
                 </li>
               {% endif %}
               {% if page_obj.has_next %}
-              <li class="page-item">
-                <a class="page-link"
-                   href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.paginator.num_pages }}&problems_per_page={{ problems_per_page|default_if_none:10 }}">>></a>
-              </li>
-            {% else %}
-              <li class="page-item disabled">
-                <span class="page-link">>></span>
-              </li>
-            {% endif %}
-
+                <li class="page-item">
+                  <a class="page-link"
+                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.paginator.num_pages }}&problems_per_page={{ problems_per_page|default_if_none:10 }}">>></a>
+                </li>
+              {% else %}
+                <li class="page-item disabled">
+                  <span class="page-link">>></span>
+                </li>
+              {% endif %}
+              <div class="">
+                <form method="get" class="">
+                  <select name="problems_per_page"
+                          id="problemsPerPage"
+                          class="form-control ms-3"
+                          onchange="this.form.submit()">
+                    <option value="10"
+                            {% if problems_per_page|stringformat:"s" == "10" %}selected{% endif %}>10 / page</option>
+                    <option value="5"
+                            {% if problems_per_page|stringformat:"s" == "5" %}selected{% endif %}>5 / page</option>
+                    <option value="{{ problem_list|length }}"
+                            {% if problems_per_page == problem_list|length|stringformat:"s" %}selected{% endif %}>
+                      All
+                    </option>
+                  </select>
+                  {% comment "" %}retaions query and difficulty after prob per page {% endcomment %}
+                  {% if query %}<input type="hidden" name="query" value="{{ query|default_if_none:'' }}">{% endif %}
+                  {% if difficulty_id %}
+                    <input type="hidden"
+                           name="difficulty"
+                           value="{{ difficulty_id|default_if_none:'' }}">
+                  {% endif %}
+                </form>
+              </div>
             </ul>
           </nav>
         {% else %}
@@ -145,30 +168,6 @@
             <a href="tag/">Tag list</a> |
             <a href="tag/create/">Add a tag</a>
           </div>
-        </div>
-        <div class="row m-3">
-          <form method="get" class="mb-3">
-            <label for="problemsPerPage">Problems per page:</label>
-            <select name="problems_per_page"
-                    id="problemsPerPage"
-                    onchange="this.form.submit()">
-              <option value="10"
-                      {% if problems_per_page|stringformat:"s" == "10" %}selected{% endif %}>10</option>
-              <option value="5"
-                      {% if problems_per_page|stringformat:"s" == "5" %}selected{% endif %}>5</option>
-              <option value="{{ problem_list|length }}"
-                      {% if problems_per_page == problem_list|length|stringformat:"s" %}selected{% endif %}>
-                All
-              </option>
-            </select>
-            {% comment "" %}retaions query i difficulty after prob per page {% endcomment %}
-            {% if query %}<input type="hidden" name="query" value="{{ query|default_if_none:'' }}">{% endif %}
-            {% if difficulty_id %}
-              <input type="hidden"
-                     name="difficulty"
-                     value="{{ difficulty_id|default_if_none:'' }}">
-            {% endif %}
-          </form>
         </div>
       </div>
     </div>
