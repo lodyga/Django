@@ -110,15 +110,20 @@ class ProblemDetailView(DetailView):
         testcases_input = []
         testcases_output = []
         for raw_testcase in raw_testcases:
-            if raw_testcase:
+            try:
                 input_part, output_part = raw_testcase.split('), ')
                 # Add the closing parenthesis back and remove opening parenthetis
                 input_part = (input_part + ')').strip()[1:]
                 # Strip any extra whitespace and closing parenthensi
                 output_part = output_part.strip()[:-1]
+            except:
+                input_part = "Invalid testcase"
+                output_part = "Invalid testcase"
+            finally:
                 testcases.append((input_part, output_part))
                 testcases_input.append(input_part)
                 testcases_output.append(output_part)
+
 
         testcase_input_form = TestCaseInputForm(
             initial={"testcase_input": testcases_input[0]})

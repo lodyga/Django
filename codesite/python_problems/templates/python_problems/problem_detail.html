@@ -179,11 +179,11 @@ output = fun(1)
           <div id="testcase-{{ forloop.counter }}" class="testcase-content">
               <div class="">
                 {% comment %} <label for="inpt">Input:</label> {% endcomment %}
-                <textarea class="form-control mb-1" rows="1" id="inpt" name="text">Input: {{ testcase.0 }}</textarea>
+                <textarea class="form-control mb-1" style="font-family:'Courier New', Courier, monospace" rows="1" id="inpt" name="text">Input: {{ testcase.0 }}</textarea>
               </div>
               <div class="">
                 {% comment %} <label for="oupt">Output:</label> {% endcomment %}
-                <textarea class="form-control" rows="1" id="oupt" name="text">Output: {{ testcase.1 }}</textarea>
+                <textarea class="form-control" style="font-family:'Courier New', Courier, monospace" rows="1" id="oupt" name="text">Output: {{ testcase.1 }}</textarea>
               </div>
             </div>
           {% endfor %}
@@ -217,7 +217,7 @@ output = fun(1)
             <b>Solution</b>:
           </p>
           <div class="box">
-            <pre>{{ problem.solution }}</pre>
+            <pre style="font-family:'Courier New', Courier, monospace">{{ problem.solution }}</pre>
           </div>
         </div>
         <br>

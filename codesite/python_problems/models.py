@@ -23,6 +23,15 @@ class Complexity(models.Model):
         return self.name
 
 
+class NonStrippingTextField(models.TextField):
+    """A TextField that does not strip whitespace at the beginning/end of
+    it's value.  Might be important for markup/code."""
+
+    def formfield(self, **kwargs):
+        kwargs['strip'] = False
+        return super(NonStrippingTextField, self).formfield(**kwargs)
+
+
 class Problem(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
@@ -34,9 +43,9 @@ class Problem(models.Model):
     space_complexity = models.ForeignKey(
         Complexity, related_name="problems_space_complexity", on_delete=models.DO_NOTHING)
     url = models.CharField(max_length=200)
-    description = models.TextField(blank=False, null=False)
+    description = NonStrippingTextField(blank=False, null=False)
     is_solved = models.BooleanField(default=False)
-    solution = models.TextField(blank=True, null=True)
+    solution = NonStrippingTextField(blank=True, null=True)
     testcase = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
