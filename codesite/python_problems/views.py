@@ -105,7 +105,10 @@ class ProblemDetailView(DetailView):
 
         # testcases parsing
         # Split the test cases by newline characters
-        raw_testcases = problem.testcase.split('\r\n')
+        if problem.testcase:
+            raw_testcases = problem.testcase.split('\r\n')
+        else:
+            raw_testcases = "'), '"
         testcases = []
         testcases_input = []
         testcases_output = []
