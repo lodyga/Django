@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from django.urls import reverse
 
 
 class Difficulty(models.Model):
@@ -52,6 +53,9 @@ class Problem(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("python_problems:detail", kwargs={"slug": self.slug})
 
     def __str__(self):
         return self.title

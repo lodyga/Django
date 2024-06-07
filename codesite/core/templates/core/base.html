@@ -37,7 +37,7 @@
     {% endblock head %}
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark m-2"
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary m-2"
          style="border-radius:10px !important">
       <div class="container-fluid">
         {% comment %}<a class="navbar-brand" href="{% url 'login' %}?next={% url 'core:index' %}">Hello {{ request.user }}</a>{% endcomment %}
@@ -174,7 +174,7 @@
       {% endblock content %}
     </div>
     {% comment %}{% include "core/footer.html" %}{% endcomment %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark"
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary m-2"
          style="border-radius:10px !important">
       <div class="container-fluid">
         <ul class="navbar-nav">

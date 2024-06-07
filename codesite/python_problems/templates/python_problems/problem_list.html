@@ -12,8 +12,10 @@
       <div class="col-md-2">
         <a href="/" class="btn btn-secondary px-3 py-0 mb-5">Back</a>
         <br>
-        <div>Search tab</div>
-        <form method="get" action="{% url 'python_problems:index' %}">
+        <label for="searchForm" class="form-label">Search tab</label>
+        <form method="get"
+              action="{% url 'python_problems:index' %}"
+              id="searchForm">
           <div class="input-group mb-5">
             <input name="query"
                    id="query"
@@ -21,7 +23,9 @@
                    type="text"
                    value="{{ query|default_if_none:'' }}"
                    placeholder="Search by tag or title">
-            <button class="btn btn-primary mb-2 px-2" type="submit">Search</button>
+            <button class="btn btn-primary mb-2 px-2"
+                    type="submit"
+                    style="border-radius: 0.35rem">Search</button>
             {% if difficulty_id %}<input type="hidden" name="difficulty" value="{{ difficulty_id }}">{% endif %}
             {% if problems_per_page %}
               <input type="hidden"
