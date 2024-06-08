@@ -169,7 +169,8 @@
       </div>
     </nav>
     {% comment %}{% include "core/header.html" %}{% endcomment %}
-    <div class="px-6 py-6">
+    {% comment %} <div class="px-6 py-6"> {% endcomment %}
+    <div>
       {% block content %}
       {% endblock content %}
     </div>
@@ -185,6 +186,8 @@
         <ul class="navbar-nav">
         <li><a class="nav-link" href="https://www.linkedin.com/in/%C5%82ukasz-%C5%82odo%C5%BCy%C5%84ski-687528205/" target="_blank">LinkedIn</a></li>
         <li><a class="nav-link" href="https://github.com/lodyga/Django/tree/master/codesite" target="_blank">Git repo</a></li>
+        <li><a class="nav-link" href="{% url 'forums:bug-forum' %}">Report a bug</a></li>
+        <li><a class="nav-link" href="{% url 'forums:feature-forum' %}">Request a feature</a></li>
         </ul>
       </div>
     </nav>

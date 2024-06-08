@@ -27,6 +27,7 @@ urlpatterns = [
     path("", include("core.urls")),
     path("python/", include("python_problems.urls")),
     path("sql/", include("sql_problems.urls")),
+    path("forums/", include("forums.urls")),
 ]
 
 

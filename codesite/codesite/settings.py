@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 
     # Extensions - installed with requirements.txt
     'crispy_forms',
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     "core",
     "python_problems",
     "sql_problems",
+    "forums",
 
 ]
 

@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+{% load humanize %}
+{% block content %}
+  <div class="container-fluid m-2">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+        <h1>
+          {% comment %} {% if forum.owner == user %}
+      <span style="float: right;">
+        <a href="{% url 'forums:forum_update' forum.id %}"><i class="fa fa-pencil"></i></a>
+        <a href="{% url 'forums:forum_delete' forum.id %}"><i class="fa fa-trash"></i></a>
+      </span>
+          {% endif %} {% endcomment %}
+          {{ forum.title }}
+        </h1>
+        <p>{{ forum.text }}</p>
+        <p>by {{ forum.owner }} ({{ forum.updated_at|naturaltime }})</p>
+        {% if user.is_authenticated %}
+          <br clear="all" />
+          <p>
+            {% load crispy_forms_tags %}
+            <form method="post"
+                  action="{% url 'forums:bug-forum-comment-create' forum.id %}">
+              {% csrf_token %}
+              {{ comment_form|crispy }}
+              <input type="submit" value="Submit" />
+              <input type="submit"
+                     value="Back"
+                     onclick="window.location.href='{% url 'forums:bug-forum' %}';return false;" />
+            </form>
+          </p>
+        {% else %}
+          <a href="{% url 'login' %}?next={% url 'forums:bug-forum-detail' forum.id %}">Login</a>
+          to comment.
+        {% endif %}
+        {% for comment in comments %}
+          <p>
+            {{ comment.text }}
+            (by {{ forum.owner }} {{ comment.updated_at|naturaltime }})
+            {% comment %} {% if user == comment.owner %}
+              <a href="{% url 'forums:forum_comment_delete' comment.id %}"><i class="fa fa-trash"></i></a>
+            {% endif %} {% endcomment %}
+          </p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "core/base.html" %}
+{% block title %}
+  Feature forum
+{% endblock title %}
+{% block content %}
+  <div class="container-fluid m-2">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-8">
+        <h1>Feature forum</h1>
+        <p>
+          {% if featureforum_list %}
+            <ul>
+              {% for forum in featureforum_list %}
+                <li>
+                  <a href="{% url 'forums:feature-forum-detail' forum.id %}">{{ forum.title }}</a>  by {{ forum.owner }}
+                  {% comment %} {% if forum.owner == user %}
+                    (<a href="{% url 'forums:forum_update' forum.id %}">Edit</a> |
+                    <a href="{% url 'forums:forum_delete' forum.id %}">Delete</a>)
+                  {% endif %} {% endcomment %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>There are no forums in the database.</p>
+          {% endif %}
+        </p>
+        <p>
+          {% if user.is_authenticated %}
+            <a href="{% url 'forums:feature-forum-create' %}">Request a feature</a> |
+            <a href="{% url 'logout' %}?next={% url 'forums:feature-forum' %}">Logout</a>
+          {% else %}
+            <a href="{% url 'login' %}?next={% url 'forums:feature-forum' %}">Login</a>
+            to request a feature.
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock %}
