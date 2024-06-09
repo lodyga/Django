@@ -15,57 +15,44 @@
         </ul>
         <ul>
           <li>
-            <div>
-              <a href="python/">Python</a> <-- Most features here
-              </div>
+            <div><a href="python/">Python</a> <-- Most features here</div>
+          </li>
+          <ul>
+            <li>
+              <a href="python/create/">Create a problem</a>
+            </li>
+            <li>
+              <a href="python/tag/">Tag</a>
             </li>
             <ul>
               <li>
-                <a href="python/create/">Create a problem</a>
+                <a href="python/tag/create/">Add a tag</a>
               </li>
               <li>
-                <a href="python/tag/">Tag</a>
-              </li>
-              <ul>
-                <li>
-                  <a href="python/tag/create/">Add a tag</a>
-                </li>
-                <li>
-                  <a href="python/tag/graph/">Statistics</a>
-                </li>
-              </ul>
-            </ul>
-          </ul>
-          <ul>
-            <li>
-              <a href="sql/">SQL</a>
-            </li>
-            <ul>
-              <li>
-                <a href="sql/conversion/">database conversion</a>
-              </li>
-              <li>
-                <a href="sql/ascii/">database from ASCII</a>
+                <a href="python/tag/graph/">Statistics</a>
               </li>
             </ul>
           </ul>
+        </ul>
+        <ul>
+          <li>
+            <a href="sql/">SQL</a>
+          </li>
           <ul>
             <li>
-              Forums
-              <ul>
-                <li>
-                  <a href="{% url 'forums:bug-forum' %}">Report a bug</a>
-                </li>
-                <li>
-                  <a href="{% url 'forums:feature-forum' %}">Request a fuature</a>
-                </li>
-              </ul>
+              <a href="sql/conversion/">database conversion</a>
+            </li>
+            <li>
+              <a href="sql/ascii/">database from ASCII</a>
             </li>
           </ul>
-          <ul>
-            <li>Blank</li>
-          </ul>
-        </div>
+        </ul>
+        <ul>
+          <li>
+            <a href="">Settings</a>
+          </li>
+        </ul>
       </div>
     </div>
-  {% endblock content %}
+  </div>
+{% endblock content %}
