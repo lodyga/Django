@@ -49,9 +49,18 @@
         </ul>
         <ul>
           <li>
-            <a href="">Settings</a>
+            Forums
+            <ul>
+              <li>
+                <a href="{% url 'forums:bug-forum' %}">Report a bug</a>
+              </li>
+              <li>
+                <a href="{% url 'forums:feature-forum' %}">Request a fuature</a>
+              </li>
+            </ul>
           </li>
         </ul>
+
       </div>
     </div>
   </div>
