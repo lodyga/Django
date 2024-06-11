@@ -37,7 +37,7 @@
         {% for comment in comments %}
           <p>
             {{ comment.text }}
-            (by {{ forum.owner }} {{ comment.updated_at|naturaltime }})
+            (by {{ comment.owner }} {{ comment.updated_at|naturaltime }})
             {% comment %} {% if user == comment.owner %}
               <a href="{% url 'forums:forum_comment_delete' comment.id %}"><i class="fa fa-trash"></i></a>
             {% endif %} {% endcomment %}
