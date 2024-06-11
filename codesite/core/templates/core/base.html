@@ -41,7 +41,9 @@
          style="border-radius:10px !important">
       <div class="container-fluid">
         {% comment %}<a class="navbar-brand" href="{% url 'login' %}?next={% url 'core:index' %}">Hello {{ request.user }}</a>{% endcomment %}
-        <a class="navbar-brand" href="{% url 'login' %}?next={{ request.path }}">Hello {{ request.user }}</a>
+        <a class="navbar-brand" href="{% url 'login' %}?next={{ request.path }}">Hello {{ request.user  }}</a>
+        
+
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           {% url 'core:index' as home_url %}
           <li class="nav-item">

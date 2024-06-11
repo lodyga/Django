@@ -34,7 +34,7 @@ class NonStrippingTextField(models.TextField):
 
 
 class Problem(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(unique=True, max_length=200)
     slug = models.SlugField(unique=True, blank=True)
     tags = models.ManyToManyField("Tag")
     difficulty = models.ForeignKey(
@@ -62,7 +62,7 @@ class Problem(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=20)
+    name = models.CharField(unique=True, max_length=20)
 
     class Meta:
         ordering = ("name", )
