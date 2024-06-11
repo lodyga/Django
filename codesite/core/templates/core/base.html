@@ -41,10 +41,24 @@
          style="border-radius:10px !important">
       <div class="container-fluid">
         {% comment %}<a class="navbar-brand" href="{% url 'login' %}?next={% url 'core:index' %}">Hello {{ request.user }}</a>{% endcomment %}
-        <a class="navbar-brand" href="{% url 'login' %}?next={{ request.path }}">Hello {{ request.user  }}</a>
-        
-
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <a class="navbar-brand">Codesite |</a>
+        <ul class="navbar-nav">
+          <li>
+            <a class="navbar-brand" href="{% url 'login' %}?next={{ request.path }}">Hello {{ request.user }}</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav me-5">
+          {% if request.user.social_auth.first %}
+            <li>
+              <img src="https://github.com/{{ request.user.social_auth.first }}.png"
+                   width="30"
+                   height="30"
+                   class="rounded-circle"
+                   alt="github img">
+            </li>
+          {% endif %}
+        </ul>
+        <ul class="navbar-nav me-auto">
           {% url 'core:index' as home_url %}
           <li class="nav-item">
             <a href="{{ home_url }}"
@@ -186,10 +200,22 @@
       </div>
       <div class="container-fluid">
         <ul class="navbar-nav">
-        <li><a class="nav-link" href="https://www.linkedin.com/in/%C5%82ukasz-%C5%82odo%C5%BCy%C5%84ski-687528205/" target="_blank">LinkedIn</a></li>
-        <li><a class="nav-link" href="https://github.com/lodyga/Django/tree/master/codesite" target="_blank">Git repo</a></li>
-        <li><a class="nav-link" href="{% url 'forums:bug-forum' %}">Report a bug</a></li>
-        <li><a class="nav-link" href="{% url 'forums:feature-forum' %}">Request a feature</a></li>
+          <li>
+            <a class="nav-link"
+               href="https://www.linkedin.com/in/%C5%82ukasz-%C5%82odo%C5%BCy%C5%84ski-687528205/"
+               target="_blank">LinkedIn</a>
+          </li>
+          <li>
+            <a class="nav-link"
+               href="https://github.com/lodyga/Django/tree/master/codesite"
+               target="_blank">Git repo</a>
+          </li>
+          <li>
+            <a class="nav-link" href="{% url 'forums:bug-forum' %}">Report a bug</a>
+          </li>
+          <li>
+            <a class="nav-link" href="{% url 'forums:feature-forum' %}">Request a feature</a>
+          </li>
         </ul>
       </div>
     </nav>
