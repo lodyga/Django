@@ -14,6 +14,9 @@
               {% for forum in featureforum_list %}
                 <li>
                   <a href="{% url 'forums:feature-forum-detail' forum.id %}">{{ forum.title }}</a>  by {{ forum.owner }}
+                  {% if forum.owner == user %}
+                    (<a href="{% url 'forums:feature-forum-update' forum.id %}">Edit</a>)
+                  {% endif %}
                   {% comment %} {% if forum.owner == user %}
                     (<a href="{% url 'forums:forum_update' forum.id %}">Edit</a> |
                     <a href="{% url 'forums:forum_delete' forum.id %}">Delete</a>)

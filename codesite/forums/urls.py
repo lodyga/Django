@@ -13,6 +13,12 @@ urlpatterns = [
     path('feature_forum/create',
          views.FeatureForumCreateView.as_view(success_url=reverse_lazy('forums:feature-forum')), name='feature-forum-create'),
 
+     path('bug_forum/<int:pk>/update',
+         views.BugForumUpdateView.as_view(success_url=reverse_lazy('forums:bug-forum')), name='bug-forum-update'),
+     path('feature_forum/<int:pk>/update',
+         views.FeatureForumUpdateView.as_view(success_url=reverse_lazy('forums:feature-forum')), name='feature-forum-update'),
+
+
     path('bug_forum/<int:pk>', views.BugForumDetailView.as_view(), name='bug-forum-detail'),
     path('feature_forum/<int:pk>', views.FeatureForumDetailView.as_view(), name='feature-forum-detail'),
 
@@ -20,6 +26,12 @@ urlpatterns = [
          views.BugCommentCreateView.as_view(), name='bug-forum-comment-create'),
     path('feature_forum/<int:pk>/comment',
          views.FeatureCommentCreateView.as_view(), name='feature-forum-comment-create'),
+
+     path('bug_forum/<int:pk>/comment/update',
+         views.BugCommentUpdateView.as_view(), name='bug-forum-comment-udpate'),
+     path('feature_forum/<int:pk>/comment/update',
+         views.FeatureCommentUpdateView.as_view(), name='feature-forum-comment-udpate'),
+
 
     # path('', views.ForumListView.as_view(), name='all'),
     # path('forum/<int:pk>', views.ForumDetailView.as_view(), name='forum_detail'),

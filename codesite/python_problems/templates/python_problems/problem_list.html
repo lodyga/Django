@@ -135,10 +135,12 @@
                           id="problemsPerPage"
                           class="form-control ms-3"
                           onchange="this.form.submit()">
-                    <option value="10"
-                            {% if problems_per_page|stringformat:"s" == "10" %}selected{% endif %}>10 / page</option>
                     <option value="5"
                             {% if problems_per_page|stringformat:"s" == "5" %}selected{% endif %}>5 / page</option>
+                    <option value="10"
+                            {% if problems_per_page|stringformat:"s" == "10" %}selected{% endif %}>10 / page</option>
+                    <option value="20"
+                            {% if problems_per_page|stringformat:"s" == "20" %}selected{% endif %}>20 / page</option>
                     <option value="{{ problem_list|length }}"
                             {% if problems_per_page == problem_list|length|stringformat:"s" %}selected{% endif %}>
                       All

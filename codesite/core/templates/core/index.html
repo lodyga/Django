@@ -12,61 +12,57 @@
           <li>
             <a href="accounts/login/">Login</a>
           </li>
-          </ul>
-        {% comment %} <img src="https://avatars.githubusercontent.com/u/76163659" alt="Example Image">
-        <img src="https://avatars.githubusercontent.com/u/76163659?s=200&v=4" alt="Example Image">
-        <img src="https://avatars.githubusercontent.com/lodyga" alt="Example Image">
-        <img src="https://github.com/lodyga.png" alt="Example Image"> {% endcomment %}
-
+        </ul>
         <ul>
           <li>
-            <div><a href="python/">Python</a> <-- Most features here</div>
-          </li>
-          <ul>
-            <li>
-              <a href="python/create/">Create a problem</a>
-            </li>
-            <li>
-              <a href="python/tag/">Tag</a>
+            <div>
+              <a href="python/">Python</a> <-- Most features here
+              </div>
             </li>
             <ul>
               <li>
-                <a href="python/tag/create/">Add a tag</a>
+                <a href="python/create/">Create a problem</a>
               </li>
               <li>
-                <a href="python/tag/graph/">Statistics</a>
+                <a href="python/tag/">Tag</a>
               </li>
+              <ul>
+                <li>
+                  <a href="python/tag/create/">Add a tag</a>
+                </li>
+                <li>
+                  <a href="python/tag/graph/">Statistics</a>
+                </li>
+              </ul>
             </ul>
           </ul>
-        </ul>
-        <ul>
-          <li>
-            <a href="sql/">SQL</a>
-          </li>
           <ul>
             <li>
-              <a href="sql/conversion/">database conversion</a>
+              <a href="sql/">SQL</a>
             </li>
-            <li>
-              <a href="sql/ascii/">database from ASCII</a>
-            </li>
-          </ul>
-        </ul>
-        <ul>
-          <li>
-            Forums
             <ul>
               <li>
-                <a href="{% url 'forums:bug-forum' %}">Report a bug</a>
+                <a href="sql/conversion/">database conversion</a>
               </li>
               <li>
-                <a href="{% url 'forums:feature-forum' %}">Request a fuature</a>
+                <a href="sql/ascii/">database from ASCII</a>
               </li>
             </ul>
-          </li>
-        </ul>
-
+          </ul>
+          <ul>
+            <li>
+              Forums
+              <ul>
+                <li>
+                  <a href="{% url 'forums:bug-forum' %}">Report a bug</a>
+                </li>
+                <li>
+                  <a href="{% url 'forums:feature-forum' %}">Request a fuature</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
-{% endblock content %}
+  {% endblock content %}

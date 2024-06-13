@@ -14,8 +14,11 @@
               {% for forum in bugforum_list %}
                 <li>
                   <a href="{% url 'forums:bug-forum-detail' forum.id %}">{{ forum.title }}</a> by {{ forum.owner }}
+                  {% if forum.owner == user %}
+                    (<a href="{% url 'forums:bug-forum-update' forum.id %}">Edit</a>)
+                  {% endif %}
                   {% comment %} {% if forum.owner == user %}
-                    (<a href="{% url 'forums:forum_update' forum.id %}">Edit</a> |
+                    (<a href="{% url 'forums:bug-forum-update' forum.id %}">Edit</a> |
                     <a href="{% url 'forums:forum_delete' forum.id %}">Delete</a>)
                   {% endif %} {% endcomment %}
                 </li>

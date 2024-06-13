@@ -6,6 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from forums.forms import CommentForm
 from django.views import View
 
+
 class BugForumListView(ListView):
     model = BugForum
     template_name = "forums/bug_forum_list.html"
@@ -40,6 +41,26 @@ class FeatureForumCreateView(LoginRequiredMixin, CreateView):
         object.owner = self.request.user
         object.save()
         return super(FeatureForumCreateView, self).form_valid(form)
+
+
+class BugForumUpdateView(LoginRequiredMixin, UpdateView):
+    model = BugForum
+    fields = ['title', 'text']
+    template_name = "forums/bug_form.html"
+
+    def get_queryset(self):
+        qs = super(BugForumUpdateView, self).get_queryset()
+        return qs.filter(owner=self.request.user)
+
+
+class FeatureForumUpdateView(LoginRequiredMixin, UpdateView):
+    model = FeatureForum
+    fields = ['title', 'text']
+    template_name = "forums/feature_form.html"
+
+    def get_queryset(self):
+        qs = super(FeatureForumUpdateView, self).get_queryset()
+        return qs.filter(owner=self.request.user)
 
 
 class BugForumDetailView(DetailView):
@@ -88,3 +109,52 @@ class FeatureCommentCreateView(LoginRequiredMixin, View):
             text=request.POST['comment'], owner=request.user, forum=f)
         comment.save()
         return redirect(reverse('forums:feature-forum-detail', args=[pk]))
+
+# when class CommentForm(forms.ModelForm):
+# class BugCommentUpdateView(LoginRequiredMixin, View):
+#     def get(self, request, pk):
+#         comment = get_object_or_404(BugComment, pk=pk, owner=request.user)
+#         form = CommentForm()
+#         # form = CommentForm(instance=comment)
+#         return render(request, 'forums/bug_comment_form.html', {'form': form})
+#
+#     def post(self, request, pk):
+#         comment = get_object_or_404(BugComment, pk=pk, owner=request.user)
+#         form = CommentForm(request.POST, instance=comment)
+#         if form.is_valid():
+#             form.save()
+#             return redirect(reverse('forums:bug-forum-detail', args=[comment.forum.pk]))
+#         return render(request, 'forums/bug_comment_form.html', {'form': form})
+
+
+# when class CommentForm(forms.Form):
+class BugCommentUpdateView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        comment = get_object_or_404(BugComment, pk=pk, owner=request.user)
+        form = CommentForm(initial={'comment': comment.text})
+        return render(request, 'forums/bug_comment_form.html', {'form': form, 'forum': comment.forum})
+
+    def post(self, request, pk):
+        comment = get_object_or_404(BugComment, pk=pk, owner=request.user)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment.text = form.cleaned_data['comment']
+            comment.save()
+            return redirect(reverse('forums:bug-forum-detail', args=[comment.forum.pk]))
+        return render(request, 'forums/bug_comment_form.html', {'form': form, 'forum': comment.forum})
+
+
+class FeatureCommentUpdateView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        comment = get_object_or_404(FeatureComment, pk=pk, owner=request.user)
+        form = CommentForm(initial={'comment': comment.text})
+        return render(request, 'forums/feature_comment_form.html', {'form': form, 'forum': comment.forum})
+
+    def post(self, request, pk):
+        comment = get_object_or_404(FeatureComment, pk=pk, owner=request.user)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment.text = form.cleaned_data['comment']
+            comment.save()
+            return redirect(reverse('forums:feature-forum-detail', args=[comment.forum.pk]))
+        return render(request, 'forums/feature_comment_form.html', {'form': form, 'forum': comment.forum})
