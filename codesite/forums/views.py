@@ -17,144 +17,114 @@ class FeatureForumListView(ListView):
     template_name = "forums/feature_forum_list.html"
 
 
-class BugForumCreateView(LoginRequiredMixin, CreateView):
-    model = BugForum
+class ForumCreateView(LoginRequiredMixin, CreateView):
     fields = ['title', 'text']
-    template_name = "forums/bug_form.html"
 
     def form_valid(self, form):
-        # print('form_valid called')
         object = form.save(commit=False)
         object.owner = self.request.user
         object.save()
-        return super(BugForumCreateView, self).form_valid(form)
+        return super(ForumCreateView, self).form_valid(form)
 
 
-class FeatureForumCreateView(LoginRequiredMixin, CreateView):
-    model = FeatureForum
-    fields = ['title', 'text']
-    template_name = "forums/feature_form.html"
-
-    def form_valid(self, form):
-        # print('form_valid called')
-        object = form.save(commit=False)
-        object.owner = self.request.user
-        object.save()
-        return super(FeatureForumCreateView, self).form_valid(form)
-
-
-class BugForumUpdateView(LoginRequiredMixin, UpdateView):
+class BugForumCreateView(ForumCreateView):
     model = BugForum
-    fields = ['title', 'text']
     template_name = "forums/bug_form.html"
 
-    def get_queryset(self):
-        qs = super(BugForumUpdateView, self).get_queryset()
-        return qs.filter(owner=self.request.user)
 
-
-class FeatureForumUpdateView(LoginRequiredMixin, UpdateView):
+class FeatureForumCreateView(ForumCreateView):
     model = FeatureForum
-    fields = ['title', 'text']
     template_name = "forums/feature_form.html"
 
+
+class ForumUpdateView(LoginRequiredMixin, UpdateView):
+    fields = ['title', 'text']
+
     def get_queryset(self):
-        qs = super(FeatureForumUpdateView, self).get_queryset()
+        qs = super(ForumUpdateView, self).get_queryset()
         return qs.filter(owner=self.request.user)
 
 
-class BugForumDetailView(DetailView):
+class BugForumUpdateView(ForumUpdateView):
     model = BugForum
+    template_name = "forums/bug_form.html"
+
+
+class FeatureForumUpdateView(ForumUpdateView):
+    model = FeatureForum
+    template_name = "forums/feature_form.html"
+
+
+class ForumDetailView(DetailView):
+    def get(self, request, pk):
+        forum = get_object_or_404(self.model_forum, pk=pk)
+        comments = self.model_comment.objects.filter(
+            forum=forum).order_by('-updated_at')
+        comment_form = CommentForm()
+        context = {'forum': forum,
+                   'comments': comments,
+                   'comment_form': comment_form}
+        return render(request, self.template_name, context)
+
+
+class BugForumDetailView(ForumDetailView):
+    model_forum = BugForum
+    model_comment = BugComment
     template_name = "forums/bug_detail.html"
 
-    def get(self, request, pk):
-        forum = get_object_or_404(BugForum, pk=pk)
-        comments = BugComment.objects.filter(
-            forum=forum).order_by('-updated_at')
-        comment_form = CommentForm()
-        context = {'forum': forum,
-                   'comments': comments,
-                   'comment_form': comment_form}
-        return render(request, self.template_name, context)
 
-
-class FeatureForumDetailView(DetailView):
-    model = FeatureForum
+class FeatureForumDetailView(ForumDetailView):
+    model_forum = FeatureForum
+    model_comment = FeatureComment
     template_name = "forums/feature_detail.html"
 
-    def get(self, request, pk):
-        forum = get_object_or_404(FeatureForum, pk=pk)
-        comments = FeatureComment.objects.filter(
-            forum=forum).order_by('-updated_at')
-        comment_form = CommentForm()
-        context = {'forum': forum,
-                   'comments': comments,
-                   'comment_form': comment_form}
-        return render(request, self.template_name, context)
 
-
-class BugCommentCreateView(LoginRequiredMixin, View):
+class CommentCreateView(LoginRequiredMixin, View):
     def post(self, request, pk):
-        f = get_object_or_404(BugForum, pk=pk)
-        comment = BugComment(
-            text=request.POST['comment'], owner=request.user, forum=f)
+        forum = get_object_or_404(self.model_forum, pk=pk)
+        comment = self.model_comment(
+            text=request.POST['comment'], owner=request.user, forum=forum)
         comment.save()
-        return redirect(reverse('forums:bug-forum-detail', args=[pk]))
+        return redirect(reverse(self.forum_detail_url_name, args=[pk]))
+
+
+class BugCommentCreateView(CommentCreateView, View):
+    model_forum = BugForum
+    model_comment = BugComment
+    forum_detail_url_name = 'forums:bug-forum-detail'
 
 
 class FeatureCommentCreateView(LoginRequiredMixin, View):
-    def post(self, request, pk):
-        f = get_object_or_404(FeatureForum, pk=pk)
-        comment = FeatureComment(
-            text=request.POST['comment'], owner=request.user, forum=f)
-        comment.save()
-        return redirect(reverse('forums:feature-forum-detail', args=[pk]))
-
-# when class CommentForm(forms.ModelForm):
-# class BugCommentUpdateView(LoginRequiredMixin, View):
-#     def get(self, request, pk):
-#         comment = get_object_or_404(BugComment, pk=pk, owner=request.user)
-#         form = CommentForm()
-#         # form = CommentForm(instance=comment)
-#         return render(request, 'forums/bug_comment_form.html', {'form': form})
-#
-#     def post(self, request, pk):
-#         comment = get_object_or_404(BugComment, pk=pk, owner=request.user)
-#         form = CommentForm(request.POST, instance=comment)
-#         if form.is_valid():
-#             form.save()
-#             return redirect(reverse('forums:bug-forum-detail', args=[comment.forum.pk]))
-#         return render(request, 'forums/bug_comment_form.html', {'form': form})
+    model_forum = FeatureForum
+    model_comment = FeatureComment
+    forum_detail_url_name = 'forums:feature-forum-detail'
 
 
-# when class CommentForm(forms.Form):
-class BugCommentUpdateView(LoginRequiredMixin, View):
+class CommentUpdateView(LoginRequiredMixin, View):
     def get(self, request, pk):
-        comment = get_object_or_404(BugComment, pk=pk, owner=request.user)
+        comment = get_object_or_404(
+            self.model_comment, pk=pk, owner=request.user)
         form = CommentForm(initial={'comment': comment.text})
-        return render(request, 'forums/bug_comment_form.html', {'form': form, 'forum': comment.forum})
+        return render(request, self.template_name, {'form': form, 'forum': comment.forum})
 
     def post(self, request, pk):
-        comment = get_object_or_404(BugComment, pk=pk, owner=request.user)
+        comment = get_object_or_404(
+            self.model_comment, pk=pk, owner=request.user)
         form = CommentForm(request.POST)
         if form.is_valid():
             comment.text = form.cleaned_data['comment']
             comment.save()
-            return redirect(reverse('forums:bug-forum-detail', args=[comment.forum.pk]))
-        return render(request, 'forums/bug_comment_form.html', {'form': form, 'forum': comment.forum})
+            return redirect(reverse(self.forum_comment_udpate_url_name, args=[comment.forum.pk]))
+        return render(request, self.template_name, {'form': form, 'forum': comment.forum})
 
 
-class FeatureCommentUpdateView(LoginRequiredMixin, View):
-    def get(self, request, pk):
-        comment = get_object_or_404(FeatureComment, pk=pk, owner=request.user)
-        form = CommentForm(initial={'comment': comment.text})
-        return render(request, 'forums/feature_comment_form.html', {'form': form, 'forum': comment.forum})
+class BugCommentUpdateView(CommentUpdateView):
+    model_comment = BugComment
+    template_name = 'forums/bug_comment_form.html'
+    forum_comment_udpate_url_name = 'forums:bug-forum-detail'
 
-    def post(self, request, pk):
-        comment = get_object_or_404(FeatureComment, pk=pk, owner=request.user)
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment.text = form.cleaned_data['comment']
-            comment.save()
-            return redirect(reverse('forums:feature-forum-detail', args=[comment.forum.pk]))
-        return render(request, 'forums/feature_comment_form.html', {'form': form, 'forum': comment.forum})
+
+class FeatureCommentUpdateView(CommentUpdateView):
+    model_comment = FeatureComment
+    template_name = 'forums/feature_comment_form.html'
+    forum_comment_udpate_url_name = 'forums:feature-forum-detail'

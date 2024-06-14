@@ -20,7 +20,7 @@
           <br clear="all" />
           <p>
             {% load crispy_forms_tags %}
-            <form method="post"
+            <form method="POST"
                   action="{% url 'forums:feature-forum-comment-create' forum.id %}">
               {% csrf_token %}
               {{ comment_form|crispy }}

@@ -28,9 +28,9 @@ urlpatterns = [
          name='feature-forum-detail'),
 
     # Comment create view
-    path('bug_forum/<int:pk>/comment',
+    path('bug_forum/<int:pk>/create',
          views.BugCommentCreateView.as_view(), name='bug-forum-comment-create'),
-    path('feature_forum/<int:pk>/comment',
+    path('feature_forum/<int:pk>/create',
          views.FeatureCommentCreateView.as_view(), name='feature-forum-comment-create'),
 
     # Comment update view
