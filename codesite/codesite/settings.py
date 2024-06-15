@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    "debug_toolbar",
 
     # Extensions - installed with requirements.txt
     'crispy_forms',
@@ -56,6 +57,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 TAGGIT_CASE_INSENSITIVE = True
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",  # Debug Toolbar
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,6 +67,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',   # social login
     'whitenoise.middleware.WhiteNoiseMiddleware',  # static files handler
+
 
 ]
 
@@ -177,3 +180,7 @@ LOGIN_REDIRECT_URL = '/'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]

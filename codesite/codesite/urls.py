@@ -20,6 +20,7 @@ from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("__debug__/", include("debug_toolbar.urls")),
     # path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login_social.html')),
     path('accounts/', include('django.contrib.auth.urls')),
     # path('social_auth/', include('social_django.urls', namespace='social')), # social_auth
