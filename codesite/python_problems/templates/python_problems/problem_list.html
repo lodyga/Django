@@ -38,11 +38,39 @@
         <ul>
           {% for difficulty in difficulty_list %}
             <li class="py-1 px-2 {% if difficulty.id|stringformat:"s" == difficulty_id|stringformat:"s" %}text-warning{% endif %}">
-              <a href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty.id }}&problems_per_page={{ problems_per_page|default_if_none:10 }}"
+              <a href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty.id }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}"
                  class="btn btn-secondary py-0 {% if difficulty.id|stringformat:"s" == difficulty_id|stringformat:"s" %}text-warning{% endif %}">{{ difficulty.name }}</a>
             </li>
           {% endfor %}
         </ul>
+        <div class="">
+          <form method="get" action="">
+            <label for="order_by">
+              <strong>Order by:</strong>
+            </label>
+            <select class="form-select"
+                    name="order_by"
+                    id="order_by"
+                    onchange="this.form.submit()">
+              <option value="created_at"
+                      {% if order_by == 'created_at' %}selected{% endif %}>Creation Date</option>
+              <option value="title" {% if order_by == 'title' %}selected{% endif %}>Title</option>
+            </select>
+            <!-- Retain other query parameters -->
+            {% if query %}<input type="hidden" name="query" value="{{ query|default_if_none:'' }}">{% endif %}
+            {% if difficulty_id %}
+              <input type="hidden"
+                     name="difficulty"
+                     value="{{ difficulty_id|default_if_none:'' }}">
+            {% endif %}
+            {% if problems_per_page %}
+              <input type="hidden"
+                     name="problems_per_page"
+                     value="{{ problems_per_page|default_if_none:10 }}">
+            {% endif %}
+            {% if page_obj.has_other_pages %}<input type="hidden" name="page" value="{{ page_obj.number }}">{% endif %}
+          </form>
+        </div>
         <a class="btn btn-warning mb-2 mt-2 p-1"
            href="{% url 'python_problems:index' %}"
            role="button">Clear filters</a>
@@ -65,7 +93,7 @@
                   </div>
                   <div class="col-md-auto">
                     {% for tag in problem.tags.all %}
-                      <a href="?query={{ tag.name }}&difficulty={{ difficulty_id|default_if_none:'' }}&problems_per_page={{ problems_per_page|default_if_none:10 }}"
+                      <a href="?query={{ tag.name }}&difficulty={{ difficulty_id|default_if_none:'' }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}"
                          class="tags"
                          style="display: none">, {{ tag.name }}</a>
                     {% endfor %}
@@ -80,7 +108,7 @@
               {% if page_obj.has_previous %}
                 <li class="page-item">
                   <a class="page-link"
-                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page=1&problems_per_page={{ problems_per_page|default_if_none:10 }}"><<</a>
+                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page=1&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}"><<</a>
                 </li>
               {% else %}
                 <li class="page-item disabled">
@@ -90,7 +118,7 @@
               {% if page_obj.has_previous %}
                 <li class="page-item">
                   <a class="page-link"
-                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.previous_page_number }}&problems_per_page={{ problems_per_page|default_if_none:10 }}"><</a>
+                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.previous_page_number }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}"><</a>
                 </li>
               {% else %}
                 <li class="page-item disabled">
@@ -105,14 +133,14 @@
                 {% else %}
                   <li class="page-item">
                     <a class="page-link"
-                       href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ num }}&problems_per_page={{ problems_per_page|default_if_none:10 }}">{{ num }}</a>
+                       href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ num }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}">{{ num }}</a>
                   </li>
                 {% endif %}
               {% endfor %}
               {% if page_obj.has_next %}
                 <li class="page-item">
                   <a class="page-link"
-                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.next_page_number }}&problems_per_page={{ problems_per_page|default_if_none:10 }}">></a>
+                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.next_page_number }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}">></a>
                 </li>
               {% else %}
                 <li class="page-item disabled">
@@ -122,7 +150,7 @@
               {% if page_obj.has_next %}
                 <li class="page-item">
                   <a class="page-link"
-                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.paginator.num_pages }}&problems_per_page={{ problems_per_page|default_if_none:10 }}">>></a>
+                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.paginator.num_pages }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}">>></a>
                 </li>
               {% else %}
                 <li class="page-item disabled">
@@ -153,6 +181,7 @@
                            name="difficulty"
                            value="{{ difficulty_id|default_if_none:'' }}">
                   {% endif %}
+                  {% if order_by %}<input type="hidden" name="order_by" value="{{ order_by }}">{% endif %}
                 </form>
               </div>
             </ul>

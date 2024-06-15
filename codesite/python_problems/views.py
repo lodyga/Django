@@ -28,6 +28,7 @@ class ProblemIndexView(ListView):
         problem_list = self.model.objects.all()
         difficulty_list = Difficulty.objects.all()
         difficulty_id = self.request.GET.get('difficulty', '')
+        order_by = self.request.GET.get('order_by', 'created_at')
 
         if difficulty_id:
             problem_list = problem_list.filter(difficulty__id=difficulty_id)
@@ -36,21 +37,24 @@ class ProblemIndexView(ListView):
             problem_list = problem_list.filter(
                 Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
 
-        
-        # problem_list = problem_list.order_by("title")
+        problem_list = problem_list.order_by(order_by)
 
+        # pagination
         problems_per_page = self.request.GET.get("problems_per_page", "10")
 
         paginator = Paginator(problem_list, problems_per_page)
         page_number = self.request.GET.get('page', 1)
         page_obj = paginator.get_page(page_number)
 
+        # context
         context["problem_list"] = problem_list
         context["query"] = query
         context["difficulty_list"] = difficulty_list
         context["difficulty_id"] = difficulty_id
         context["page_obj"] = page_obj
         context["problems_per_page"] = problems_per_page
+        context["order_by"] = order_by
+
         return context
 
 
