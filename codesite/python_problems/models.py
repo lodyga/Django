@@ -37,17 +37,21 @@ class Problem(models.Model):
     title = models.CharField(unique=True, max_length=200)
     slug = models.SlugField(unique=True, blank=True)
     tags = models.ManyToManyField("Tag")
+    # is_solved = models.BooleanField(default=False)
     difficulty = models.ForeignKey(
         Difficulty, related_name="problems_difficulty", on_delete=models.DO_NOTHING)
+    url = models.CharField(max_length=200)
+    description = NonStrippingTextField(blank=False, null=False)
+    # created_at = models.DateTimeField(auto_now_add=True)
+    # updated_at = models.DateTimeField(auto_now=True)
+    
+    # language relateg attributes
+    solution = NonStrippingTextField(blank=True, null=True)
+    testcase = models.TextField(blank=True, null=True)
     time_complexity = models.ForeignKey(
         Complexity, related_name="problems_time_complexity", on_delete=models.DO_NOTHING)
     space_complexity = models.ForeignKey(
         Complexity, related_name="problems_space_complexity", on_delete=models.DO_NOTHING)
-    url = models.CharField(max_length=200)
-    description = NonStrippingTextField(blank=False, null=False)
-    is_solved = models.BooleanField(default=False)
-    solution = NonStrippingTextField(blank=True, null=True)
-    testcase = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
