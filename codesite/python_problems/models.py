@@ -1,6 +1,17 @@
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
+from django.conf import settings
+
+
+class Tag(models.Model):
+    name = models.CharField(unique=True, max_length=20)
+
+    class Meta:
+        ordering = ("name", )
+
+    def __str__(self):
+        return self.name
 
 
 class Difficulty(models.Model):
@@ -33,7 +44,15 @@ class NonStrippingTextField(models.TextField):
         return super(NonStrippingTextField, self).formfield(**kwargs)
 
 
+class Language(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Problem(models.Model):
+    # Problem-related attributes
     title = models.CharField(unique=True, max_length=200)
     slug = models.SlugField(unique=True, blank=True)
     tags = models.ManyToManyField("Tag")
@@ -43,8 +62,10 @@ class Problem(models.Model):
     description = NonStrippingTextField(blank=False, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    # language relateg attributes
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                              on_delete=models.CASCADE)
+
+    # Language-specific attributes
     solution = NonStrippingTextField(blank=True, null=True)
     testcase = models.TextField(blank=True, null=True)
     time_complexity = models.ForeignKey(
@@ -64,11 +85,21 @@ class Problem(models.Model):
         return self.title
 
 
-class Tag(models.Model):
-    name = models.CharField(unique=True, max_length=20)
-
-    class Meta:
-        ordering = ("name", )
+class Solution(models.Model):
+    problem = models.ForeignKey(
+        Problem, related_name="solutions_problem", on_delete=models.CASCADE)
+    language = models.ForeignKey(
+        Language, related_name="solutions_language", on_delete=models.CASCADE)
+    solution = models.TextField(blank=True, null=True)
+    testcase = models.TextField(blank=True, null=True)
+    time_complexity = models.ForeignKey(
+        "Complexity", related_name="solutions_time_complexity", on_delete=models.DO_NOTHING)
+    space_complexity = models.ForeignKey(
+        "Complexity", related_name="solutions_space_complexity", on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                              on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return f"{self.problem.title} ({self.language.name})"
