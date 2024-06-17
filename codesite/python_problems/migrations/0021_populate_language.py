@@ -14,7 +14,7 @@ def create_languages(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('python_problems', '0019_language_solution'),
+        ('python_problems', '0020_language_solution'),
     ]
 
     operations = [
