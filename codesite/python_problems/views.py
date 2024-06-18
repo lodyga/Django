@@ -250,14 +250,14 @@ class TagDelete(LoginRequiredMixin, DeleteView):
 
 class ProblemCreate(LoginRequiredMixin, CreateView):
     model = Problem
-    form_class = ProblemForm  # Custom form to remove "slug", "owner" fields
+    form_class = ProblemForm # Custom form to remove "slug", "owner" fields
     success_url = reverse_lazy('python_problems:index')
 
 
 class ProblemUpdate(LoginRequiredMixin, UpdateView):
     model = Problem
     # fields = "__all__"
-    form_class = ProblemForm
+    form_class = ProblemForm # Custom form to remove "slug", "owner" fields
     success_url = reverse_lazy('python_problems:index')
 
 
