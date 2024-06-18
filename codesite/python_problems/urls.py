@@ -7,8 +7,11 @@ app_name = "python_problems"
 urlpatterns = [
     path("tag/", views.TagIndexView.as_view(), name="tag-index"),
     path("tag/create/", views.TagCreate.as_view(), name="tag-create"),
-    path("tag/<int:pk>/update/", views.TagUpdate.as_view(), name="tag-update"),
-    path("tag/<int:pk>/delete/", views.TagDelete.as_view(), name="tag-delete"),
+    
+    # Tag update/delete
+    # path("tag/<int:pk>/update/", views.TagUpdate.as_view(), name="tag-update"),
+    # path("tag/<int:pk>/delete/", views.TagDelete.as_view(), name="tag-delete"),
+
     path("tag/graph/", views.tag_graph_view, name="tag-graph"),
 
     path("", views.ProblemIndexView.as_view(), name="index"),

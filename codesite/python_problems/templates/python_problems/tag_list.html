@@ -22,10 +22,11 @@
                   1 Problem - <a href="{% url 'python_problems:index' %}?query={{ tag.name }}">Search</a>
                 {% else %}
                   {{ tag.problem_set.count }} Problems - <a href="{% url 'python_problems:index' %}?query={{ tag.name }}">Search</a>
-                {% endif %}
-                ) |
+                  {% endif %}
+                {# Tag update/delete #}
+                ) {% comment %} |
                 (<a href="{% url 'python_problems:tag-update' tag.id %}">Update</a> |
-                <a href="{% url 'python_problems:tag-delete' tag.id %}">Delete</a>)
+                <a href="{% url 'python_problems:tag-delete' tag.id %}">Delete</a>) {% endcomment %}
                 <hr>
               </li>
               {% endfor %}
