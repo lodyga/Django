@@ -1,13 +1,27 @@
 {% extends "core/base.html" %}
 {% block title %}
-    Problem
+  Problem
 {% endblock title %}
 {% block content %}
-<a href="{% url 'python_problems:index' %}" class="btn btn-secondary px-3 py-0 m-1">Back</a>
-<form action="" method="POST">
-  {% csrf_token %}
-  <table>{{ form.as_table }}</table>
-  <input type="submit" value="Submit" />
-  <input type="submit" onclick="window.location='{% url 'python_problems:index' %}' ; return false;" value="Cancel" />
-</form>
-{% endblock content %}
+  <div class="container-fluid m-2">
+    <div class="row">
+      <div class="col-md-2">
+        <a href="{% url 'python_problems:index' %}"
+           class="btn btn-secondary px-3 py-0 m-1">Back</a>
+      </div>
+      <div class="col-md-8">
+        <form action="" method="POST">
+          {% csrf_token %}
+          {% load crispy_forms_tags %}
+          <table>
+            {{ form|crispy }}
+          </table>
+          <input type="submit" value="Submit" />
+          <input type="submit"
+                 onclick="window.location='{% url 'python_problems:index' %}' ; return false;"
+                 value="Cancel" />
+        </form>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+  {% endblock content %}

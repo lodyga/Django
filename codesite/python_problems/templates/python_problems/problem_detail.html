@@ -90,37 +90,33 @@
             </div>
           </div>
           <hr>
-          <p>
+          <label for="problemDescription" class="form-label">
             <b>Problem description</b>:
-          </p>
-          <pre style="white-space: pre-wrap">{{ problem.description }}</pre>
+          </label>
+          <pre style="white-space: pre-wrap" id="problemDescription">{{ problem.description }}</pre>
           <br>
           <hr>
-          {% comment %} <div class="alert alert-info">Info</div>
-          <form action="#">
-            <pre>
-# Write in Code Area.
-# Remember to pass the solution to the <em>output</em>.
-
-def fun(x):
-    return x
-
-output = fun(1)    
-</pre> {% endcomment %}
-</form>
-<form id="codeForm" action="{% url 'python_problems:detail' problem.slug %}" method="POST" class="mb-5">
-{% csrf_token %}
-<div class="code-area-container mb-2 border border-primary">
-<label for="id_code_area">Code Area</label>
-<textarea name="code_area" id="id_code_area" cols="80" rows="10" class="python-code  border border-primary">{{ code_text }}</textarea>
-        </div>
-        <link rel="stylesheet"
-              href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
-        <link rel="stylesheet"
-              href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
-        <script>
+        </form>
+        <form id="codeForm"
+              action="{% url 'python_problems:detail' problem.slug %}"
+              method="POST"
+              class="mb-5">
+          {% csrf_token %}
+          <div class="code-area-container mb-2 border border-primary">
+            <label for="id_code_area">Code Area</label>
+            <textarea name="code_area"
+                      id="id_code_area"
+                      cols="80"
+                      rows="10"
+                      class="python-code  border border-primary">{{ code_text }}</textarea>
+          </div>
+          <link rel="stylesheet"
+                href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
+          <link rel="stylesheet"
+                href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
+          <script>
               document.addEventListener('DOMContentLoaded', function () {
                   var storedDarkMode = localStorage.getItem('darkMode');
                   var theme = storedDarkMode === "enabled" ? "monokai" : "default";
@@ -132,65 +128,69 @@ output = fun(1)
                       placeholder: "Enter your Python code here..." // Placeholder text
                   });
               });
-        </script>
-        <button id="submitButton" type="submit" class="btn btn-warning ">
-          <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
-          Run
-        </button>
-      </form>
-      <script>
+          </script>
+          <button id="submitButton" type="submit" class="btn btn-warning ">
+            <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
+            Run
+          </button>
+        </form>
+        <script>
             document.getElementById('codeForm').addEventListener('submit', function () {
                 document.getElementById('submitButton').disabled = true; // Disable the submit button
                 document.getElementById('spinner').classList.remove('d-none'); // Show the spinner
                 document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running';
             });
-      </script>
-      {% if output_form.output_area.value == "Error: 'output'" %}
-        {% comment %} {{ output_form.output_area.value }} {% endcomment %}
-        <div class="alert alert-warning">
-          <strong>Warning!</strong> No <em>output</em> variable in Code Area.
-        </div>
-      {% elif "Error" in output_form.output_area.value %}
-        <div>
+        </script>
+        {% if output_form.output_area.value == "Error: 'output'" %}
+          {% comment %} {{ output_form.output_area.value }} {% endcomment %}
           <div class="alert alert-warning">
-            <strong>Warning!</strong> Error detected.
+            <strong>Warning!</strong> No <em>output</em> variable in Code Area.
           </div>
-        </div>
-      {% else %}
-        <div>
-          <div class="alert alert-info">No errors in code.</div>
-        </div>
-      {% endif %}
-      {% load crispy_forms_tags %}
-      <form action="" class="mb-3">
-        {{ output_form|crispy }}
-      </form>
-      <div class="container mt-5">
-        <p>
-          <b>Test Cases</b>:
-        </p>
-        <div id="buttons" class="">
-          <!-- Buttons will be inserted here by JavaScript -->
-        </div>
-
-
-        <div id="testcases">
-          {% for testcase in testcases %}
-          <div id="testcase-{{ forloop.counter }}" class="testcase-content">
-              <div class="">
-                {% comment %} <label for="inpt">Input:</label> {% endcomment %}
-                <textarea class="form-control mb-1" style="font-family:'Courier New', Courier, monospace" rows="1" id="inpt" name="text">Input: {{ testcase.0 }}</textarea>
-              </div>
-              <div class="">
-                {% comment %} <label for="oupt">Output:</label> {% endcomment %}
-                <textarea class="form-control" style="font-family:'Courier New', Courier, monospace" rows="1" id="oupt" name="text">Output: {{ testcase.1 }}</textarea>
-              </div>
+        {% elif "Error" in output_form.output_area.value %}
+          <div>
+            <div class="alert alert-warning">
+              <strong>Warning!</strong> Error detected.
             </div>
-          {% endfor %}
-        </div>
-
-
-        {% comment %} <div class="mb-3">
+          </div>
+        {% else %}
+          <div>
+            <div class="alert alert-info">No errors in code.</div>
+          </div>
+        {% endif %}
+        {% load crispy_forms_tags %}
+        <form action="" class="mb-3">
+          {{ output_form|crispy }}
+        </form>
+        <div class="container mt-5">
+          <p>
+            <b>Test Cases</b>:
+          </p>
+          <div id="buttons" class="">
+            <!-- Buttons will be inserted here by JavaScript -->
+          </div>
+          <div id="testcases">
+            {% for testcase in testcases %}
+              <div id="testcase-{{ forloop.counter }}" class="testcase-content">
+                <div class="">
+                  {% comment %} <label for="inpt">Input:</label> {% endcomment %}
+                  <textarea class="form-control mb-1"
+                            style="font-family:'Courier New', Courier, monospace"
+                            rows="1"
+                            id="inpt"
+                            name="text">Input: {{ testcase.0 }}</textarea>
+                </div>
+                <div class="">
+                  {% comment %} <label for="oupt">Output:</label> {% endcomment %}
+                  <textarea class="form-control"
+                            style="font-family:'Courier New', Courier, monospace"
+                            rows="1"
+                            id="oupt"
+                            name="text">Output: {{ testcase.1 }}</textarea>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          {% comment %} <div class="mb-3">
           <form action="" class="form-inline" id="testcase-form">
             {{ testcase_form.as_p }}
           </form>
@@ -205,37 +205,40 @@ output = fun(1)
             {{ testcase_output_form.as_p }}
           </form>
         </div>
-        </div> {% endcomment %}
-        <br>
-        <hr>
-        <button type="button"
-                class="btn btn-primary mb-2"
-                data-bs-toggle="collapse"
-                data-bs-target="#solution">Show solution</button>
-        <div id="solution" class="collapse">
-          <p>
-            <b>Solution</b>:
-          </p>
-          <div class="box">
-            <pre style="font-family:'Courier New', Courier, monospace">{{ problem.solution }}</pre>
+          </div> {% endcomment %}
+          <br>
+          <hr>
+          <button type="button"
+                  class="btn btn-primary mb-2"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#solution">Show solution</button>
+          <div id="solution" class="collapse">
+            <p>
+              <b>Solution</b>:
+            </p>
+            <div class="box">
+              {% comment %}
+            Problem –> Solution
+              <pre style="font-family:'Courier New', Courier, monospace">{{ problem.solution }}</pre> {% endcomment %}
+              <pre style="font-family:'Courier New', Courier, monospace">{{ solution.solution }}</pre>
+            </div>
           </div>
+          <br>
+          <hr>
         </div>
-        <br>
-        <hr>
       </div>
-    </div>
-    <div class="col-md-2">
-      <div class="row"></div>
-      <div class="row">
-        <div>
-          <a href="{% url 'python_problems:index' %}"
-             class="btn btn-secondary px-3 py-1 mb-2">Back</a>
+      <div class="col-md-2">
+        <div class="row"></div>
+        <div class="row">
+          <div>
+            <a href="{% url 'python_problems:index' %}"
+               class="btn btn-secondary px-3 py-1 mb-2">Back</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-<script>
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
         const testCases = {{ testcases|safe }};
         
@@ -283,5 +286,5 @@ output = fun(1)
             showTestCase(1);
         }
     });
-</script>
+  </script>
 {% endblock content %}

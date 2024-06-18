@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
 
-from .models import Tag, Problem, Difficulty
+from .models import Tag, Difficulty, Language, Problem, Solution
 from .forms import CodeForm, OutputForm, TestCaseForm, TestCaseInputForm, TestCaseOutputForm, ProblemForm
 from .static.python_problems.scripts import execute_code
 
@@ -23,7 +23,8 @@ class ProblemIndexView(ListView):
     model = Problem
 
     def get_context_data(self, **kwargs):
-        context = super(ProblemIndexView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
+
         query = self.request.GET.get("query", "")
         problem_list = self.model.objects.all()
         difficulty_list = Difficulty.objects.all()
@@ -97,6 +98,13 @@ class ProblemDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # Solution
+        # language = get_object_or_404(Language, name='Python')
+        # context['solution'] = get_object_or_404(Solution, problem=self.object, language=language)
+        solution = get_object_or_404(Solution, problem=self.object)
+        context['solution'] = solution
+
         problem = self.get_object()
         related_problems = Problem.objects.annotate(
             common_tags=Count('tags', filter=Q(tags__in=problem.tags.all()))
@@ -109,8 +117,8 @@ class ProblemDetailView(DetailView):
 
         # testcases parsing
         # Split the test cases by newline characters
-        if problem.testcase:
-            raw_testcases = problem.testcase.split('\r\n')
+        if solution.testcase:
+            raw_testcases = solution.testcase.split('\r\n')
         else:
             raw_testcases = "'), '"
         testcases = []
@@ -130,7 +138,6 @@ class ProblemDetailView(DetailView):
                 testcases.append((input_part, output_part))
                 testcases_input.append(input_part)
                 testcases_output.append(output_part)
-
 
         testcase_input_form = TestCaseInputForm(
             initial={"testcase_input": testcases_input[0]})
@@ -243,13 +250,14 @@ class TagDelete(LoginRequiredMixin, DeleteView):
 
 class ProblemCreate(LoginRequiredMixin, CreateView):
     model = Problem
-    form_class = ProblemForm  # Custom form to remove 'slug' field
+    form_class = ProblemForm  # Custom form to remove "slug", "owner" fields
     success_url = reverse_lazy('python_problems:index')
 
 
 class ProblemUpdate(LoginRequiredMixin, UpdateView):
     model = Problem
-    fields = "__all__"
+    # fields = "__all__"
+    form_class = ProblemForm
     success_url = reverse_lazy('python_problems:index')
 
 
