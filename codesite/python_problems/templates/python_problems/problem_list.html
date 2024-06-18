@@ -12,42 +12,50 @@
       <div class="col-md-2">
         <a href="/" class="btn btn-secondary px-3 py-0 mb-5">Back</a>
         <br>
-        <label for="searchForm" class="form-label">Search tab</label>
-        <form method="get"
-              action="{% url 'python_problems:index' %}"
-              id="searchForm">
-          <div class="input-group mb-5">
-            <input name="query"
-                   id="query"
-                   class="px-2 py-2 mb-2"
-                   type="text"
-                   value="{{ query|default_if_none:'' }}"
-                   placeholder="Search by tag or title">
-            <button class="btn btn-primary mb-2 px-2"
-                    type="submit"
-                    style="border-radius: 0.35rem">Search</button>
-            {% if difficulty_id %}<input type="hidden" name="difficulty" value="{{ difficulty_id }}">{% endif %}
-            {% if problems_per_page %}
-              <input type="hidden"
-                     name="problems_per_page"
-                     value="{{ problems_per_page }}">
-            {% endif %}
-          </div>
-        </form>
-        <strong>Difficulty</strong>
-        <ul>
-          {% for difficulty in difficulty_list %}
-            <li class="py-1 px-2 {% if difficulty.id|stringformat:"s" == difficulty_id|stringformat:"s" %}text-warning{% endif %}">
-              <a href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty.id }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}"
-                 class="btn btn-secondary py-0 {% if difficulty.id|stringformat:"s" == difficulty_id|stringformat:"s" %}text-warning{% endif %}">{{ difficulty.name }}</a>
-            </li>
-          {% endfor %}
-        </ul>
-        <div class="">
+        <div class="mb-3">
+          <label for="searchForm" class="form-label">
+            <strong>Search bar</strong>
+          </label>
+          <form method="get"
+                action="{% url 'python_problems:index' %}"
+                id="searchForm">
+            <div class="input-group">
+              <input name="query"
+                     id="query"
+                     class="px-2 py-2 mb-2"
+                     type="text"
+                     value="{{ query|default_if_none:'' }}"
+                     placeholder="Search by tag or title">
+              <button class="btn btn-primary mb-2 px-2"
+                      type="submit"
+                      style="border-radius: 0.35rem">Search</button>
+              {% if difficulty_id %}<input type="hidden" name="difficulty" value="{{ difficulty_id }}">{% endif %}
+              {% if problems_per_page %}
+                <input type="hidden"
+                       name="problems_per_page"
+                       value="{{ problems_per_page }}">
+              {% endif %}
+            </div>
+          </form>
+        </div>
+        <label for="difficulty">
+          <strong>Difficulty</strong>
+        </label>
+        <div id="difficulty">
+          <ul>
+            {% for difficulty in difficulty_list %}
+              <li class="py-1 px-2 {% if difficulty.id|stringformat:"s" == difficulty_id|stringformat:"s" %}text-warning{% endif %}">
+                <a href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty.id }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}"
+                   class="btn btn-secondary py-0 {% if difficulty.id|stringformat:"s" == difficulty_id|stringformat:"s" %}text-warning{% endif %}">{{ difficulty.name }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="mb-2">
+          <label for="order_by" class="form-label">
+            <strong>Order by:</strong>
+          </label>
           <form method="get" action="">
-            <label for="order_by">
-              <strong>Order by:</strong>
-            </label>
             <select class="form-select"
                     name="order_by"
                     id="order_by"
@@ -191,8 +199,10 @@
         {% endif %}
       </div>
       <div class="col-md-2">
-        <div>Settings tab</div>
-        <div class="row">
+        <label for="settingsTab">
+          <strong>Settings tab</strong>
+        </label>
+        <div class="row" id="settingsTab">
           <div>
             <button onclick="toggleTags()" class="btn-secondary ms-0 mb-3">Show Tags</button>
           </div>
