@@ -46,19 +46,19 @@ class NonStrippingTextField(models.TextField):
 
 
 class Language(models.Model):
+    name = models.CharField(max_length=20, unique=True)
     problems = models.ManyToManyField(
         "Problem", through="Solution", related_name="languages_problem")
-    name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
         return self.name
 
 
 class Problem(models.Model):
-    languages = models.ManyToManyField(
-        Language, through="Solution", related_name="problems_laguage")
     solutions = models.ManyToManyField(
         'Solution', related_name='problem_solutions')
+    languages = models.ManyToManyField(
+        Language, through="Solution", related_name="problems_laguage")
 
     # Problem-related attributes
     title = models.CharField(unique=True, max_length=200)
@@ -74,8 +74,8 @@ class Problem(models.Model):
                               on_delete=models.CASCADE)
 
     # Language-specific attributes
-    solution = NonStrippingTextField(blank=True, null=True)
-    testcase = models.TextField(blank=True, null=True)
+    # solution = NonStrippingTextField(blank=True, null=True)
+    # testcase = models.TextField(blank=True, null=True)
     time_complexity = models.ForeignKey(
         Complexity, related_name="problems_time_complexity", on_delete=models.DO_NOTHING)
     space_complexity = models.ForeignKey(

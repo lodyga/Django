@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Prefetch
 from django.core.paginator import Paginator
 
 from .models import Tag, Difficulty, Language, Problem, Solution
@@ -21,6 +21,13 @@ def tag_graph_view(request):
 
 class ProblemIndexView(ListView):
     model = Problem
+
+    # Pass lagnuages in Problem context
+    # def get_queryset(self):
+    #     return Problem.objects.prefetch_related(
+    #         Prefetch('solutions_problem', queryset=Solution.objects.select_related('language'))
+    #     )
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -59,40 +66,6 @@ class ProblemIndexView(ListView):
         return context
 
 
-def problem_index_view(request):
-    query = request.GET.get("query", "")
-    problem_list = Problem.objects.all()
-    difficulty_list = Difficulty.objects.all()
-    difficulty_id = request.GET.get('difficulty', "")
-
-    if difficulty_id:
-        problem_list = problem_list.filter(difficulty__id=difficulty_id)
-
-    if query:
-        problem_list = problem_list.filter(
-            Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
-
-    problems_per_page = request.GET.get("problems_per_page", "10")
-    # try:
-    #     problems_per_page = int(problems_per_page)
-    # except ValueError:
-    #     problems_per_page = 10
-
-    paginator = Paginator(problem_list, problems_per_page)
-    page_number = request.GET.get('page', 1)
-    page_obj = paginator.get_page(page_number)
-
-    context = {
-        "problem_list": problem_list,
-        "query": query,
-        "difficulty_list": difficulty_list,
-        "difficulty_id": difficulty_id,
-        'page_obj': page_obj,
-        'problems_per_page': problems_per_page,
-    }
-    return render(request, "python_problems/problem_list.html", context)
-
-
 class ProblemDetailView(DetailView):
     model = Problem
 
@@ -102,13 +75,12 @@ class ProblemDetailView(DetailView):
         # context['solution'] = get_object_or_404(Solution, problem=self.object, language=language)
         # solution = get_object_or_404(Solution, problem=self.object)
 
-        language = get_object_or_404(Language, name='JavaScript')
 
-
+        language_name = self.kwargs.get('language')
+        language = get_object_or_404(Language, name=language_name)
         solutions = Solution.objects.filter(problem=self.object, language=language)
-        # Takes the first language specific solution
+        # Takes the first language specific solution, but that's OK because solutions are unique.
         solution = solutions.first()
-        print(solution)
         context['solution'] = solution
 
         problem = self.get_object()

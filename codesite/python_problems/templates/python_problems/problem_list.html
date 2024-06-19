@@ -17,7 +17,7 @@
             <strong>Search bar</strong>
           </label>
           <form method="get"
-                action="{% url 'python_problems:index' %}"
+                action="{% url 'python_problems:problem-index' %}"
                 id="searchForm">
             <div class="input-group">
               <input name="query"
@@ -80,12 +80,12 @@
           </form>
         </div>
         <a class="btn btn-warning mb-2 mt-2 p-1"
-           href="{% url 'python_problems:index' %}"
+           href="{% url 'python_problems:problem-index' %}"
            role="button">Clear filters</a>
       </div>
       <div class="col-md-8">
         <div class="mb-5 mt-5">
-          <h2>Python problems list</h2>
+          <h2>Problem list</h2>
         </div>
         {% if page_obj %}
           <ul>
@@ -94,9 +94,21 @@
                 <div class="col-md-auto">
                   <li>
                     <div class="problem-container flex">
-                      <a href="{% url 'python_problems:detail' problem.slug %}">{{ problem.title }}</a>,
-                      (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
-                      <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
+                      {% comment %} <a href="{% url 'python_problems:problem-detail' problem.slug %}">{{ problem.title }}</a> {% endcomment %}
+                      {{ problem.title }}
+                      {# List languages through Solutions related to Problem #}
+                      {% for solution in problem.solutions_problem.all %}
+                      , <a href="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}">{{ solution.language }}</a>
+                      {% endfor %}
+                      {# List languages form Languages related to Problem. #}
+                      {% comment %} {% for language in problem.languages.all %}
+                        , {{ language }}
+                      {% endfor %} {% endcomment %}
+                      {% if user == problem.owner %}
+                        ,
+                        (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
+                        <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
+                      {% endif %}
                     </div>
                   </div>
                   <div class="col-md-auto">
