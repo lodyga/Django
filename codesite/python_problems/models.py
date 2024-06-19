@@ -76,10 +76,10 @@ class Problem(models.Model):
     # Language-specific attributes
     # solution = NonStrippingTextField(blank=True, null=True)
     # testcase = models.TextField(blank=True, null=True)
-    time_complexity = models.ForeignKey(
-        Complexity, related_name="problems_time_complexity", on_delete=models.DO_NOTHING)
-    space_complexity = models.ForeignKey(
-        Complexity, related_name="problems_space_complexity", on_delete=models.DO_NOTHING)
+    # time_complexity = models.ForeignKey(
+    #     Complexity, related_name="problems_time_complexity", on_delete=models.DO_NOTHING)
+    # space_complexity = models.ForeignKey(
+    #     Complexity, related_name="problems_space_complexity", on_delete=models.DO_NOTHING)
 
     def save(self, *args, **kwargs):
         if not self.slug:
