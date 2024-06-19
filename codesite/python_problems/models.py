@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
 from django.conf import settings
+from django.db.models import UniqueConstraint
 
 
 class Tag(models.Model):
@@ -56,7 +57,8 @@ class Language(models.Model):
 class Problem(models.Model):
     languages = models.ManyToManyField(
         Language, through="Solution", related_name="problems_laguage")
-    solutions = models.ManyToManyField('Solution', related_name='problem_solutions')
+    solutions = models.ManyToManyField(
+        'Solution', related_name='problem_solutions')
 
     # Problem-related attributes
     title = models.CharField(unique=True, max_length=200)
@@ -106,6 +108,12 @@ class Solution(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['problem', 'language'],
+                             name='unique_solution_per_problem_language')
+        ]
 
     def __str__(self):
         return f"{self.problem.title} ({self.language.name})"
