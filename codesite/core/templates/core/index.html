@@ -21,17 +21,17 @@
             </li>
             <ul>
               <li>
-                <a href="python/create/">Create a problem</a>
+                <a href="{% url 'python_problems:problem-create' %}">Create a problem</a>
               </li>
               <li>
-                <a href="python/tag/">Tag</a>
+                <a href="{% url 'python_problems:tag-index' %}">Tag</a>
               </li>
               <ul>
                 <li>
-                  <a href="python/tag/create/">Add a tag</a>
+                  <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
                 </li>
                 <li>
-                  <a href="python/tag/graph/">Statistics</a>
+                  <a href="{% url 'python_problems:tag-graph' %}">Statistics</a>
                 </li>
               </ul>
             </ul>

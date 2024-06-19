@@ -16,10 +16,13 @@ urlpatterns = [
 
     path("", views.ProblemIndexView.as_view(), name="problem-index"),
     # path("", views.problem_index_view, name="index"),
-    path("create/", views.ProblemCreate.as_view(), name="problem-create"), # create have to be befre slug
+    path("problem_create/", views.ProblemCreate.as_view(), name="problem-create"), # create have to be befre slug
+    path("solution_create/", views.SolutionCreate.as_view(), name="solution-create"), # create have to be befre slug
+
     path("<slug:slug>/<str:language>/", views.ProblemDetailView.as_view(), name="problem-detail"),
     # path("<slug:slug>/", views.problem_detail_view, name="detail"),
     path("problem/<int:pk>/update/", views.ProblemUpdate.as_view(), name="problem-update"),
     path("problem/<int:pk>/delete/", views.ProblemDelete.as_view(), name="problem-delete"),
     
+
 ]

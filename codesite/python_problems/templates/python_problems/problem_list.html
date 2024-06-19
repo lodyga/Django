@@ -221,9 +221,10 @@
         </div>
         <div class="row mb-2">
           <div>
-            <a href="create/">Create a problem</a> |
-            <a href="tag/">Tag list</a> |
-            <a href="tag/create/">Add a tag</a>
+            <a href="{% url 'python_problems:problem-create' %}">Create a problem</a> |
+            <a href="{% url 'python_problems:solution-create' %}">Create a solution</a> |
+            <a href="{% url 'python_problems:tag-index' %}">Tag list</a> |
+            <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
           </div>
         </div>
       </div>

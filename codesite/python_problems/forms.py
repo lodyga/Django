@@ -9,6 +9,12 @@ class ProblemForm(forms.ModelForm):
         exclude = ["slug", "owner", "solutions", "languages"]
 
 
+class SolutionForm(forms.ModelForm):
+    class Meta:
+        model = Problem
+        exclude = ["owner"]
+
+
 class CodeForm(forms.Form):
     code_area = forms.CharField(widget=forms.Textarea())
 

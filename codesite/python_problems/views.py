@@ -7,7 +7,7 @@ from django.db.models import Q, Count, Prefetch
 from django.core.paginator import Paginator
 
 from .models import Tag, Difficulty, Language, Problem, Solution
-from .forms import CodeForm, OutputForm, TestCaseForm, TestCaseInputForm, TestCaseOutputForm, ProblemForm
+from .forms import CodeForm, OutputForm, TestCaseForm, TestCaseInputForm, TestCaseOutputForm, ProblemForm, SolutionForm
 from .static.python_problems.scripts import execute_code
 
 
@@ -230,17 +230,23 @@ class TagDelete(LoginRequiredMixin, DeleteView):
 class ProblemCreate(LoginRequiredMixin, CreateView):
     model = Problem
     form_class = ProblemForm # Custom form to remove "slug", "owner" fields
-    success_url = reverse_lazy('python_problems:index')
+    success_url = reverse_lazy('python_problems:problem-index')
 
 
 class ProblemUpdate(LoginRequiredMixin, UpdateView):
     model = Problem
     # fields = "__all__"
     form_class = ProblemForm # Custom form to remove "slug", "owner" fields
-    success_url = reverse_lazy('python_problems:index')
+    success_url = reverse_lazy('python_problems:problem-index')
 
 
 class ProblemDelete(LoginRequiredMixin, DeleteView):
     model = Problem
     fields = "__all__"
-    success_url = reverse_lazy('python_problems:index')
+    success_url = reverse_lazy('python_problems:problem-index')
+
+
+class SolutionCreate(LoginRequiredMixin, CreateView):
+    model = Solution
+    form_class = SolutionForm # Custom form to remove "slug", "owner" fields
+    success_url = reverse_lazy('python_problems:problem-index')
