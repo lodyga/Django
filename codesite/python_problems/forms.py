@@ -6,7 +6,7 @@ from python_problems.models import Problem
 class ProblemForm(forms.ModelForm):
     class Meta:
         model = Problem
-        exclude = ["slug", "owner"]
+        exclude = ["slug", "owner", "solutions", "languages"]
 
 
 class CodeForm(forms.Form):

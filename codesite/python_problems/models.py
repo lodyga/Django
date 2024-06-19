@@ -66,7 +66,7 @@ class Problem(models.Model):
     tags = models.ManyToManyField("Tag")
     difficulty = models.ForeignKey(
         Difficulty, related_name="problems_difficulty", on_delete=models.DO_NOTHING)
-    url = models.CharField(max_length=200)
+    url = models.URLField()
     description = NonStrippingTextField(blank=False, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

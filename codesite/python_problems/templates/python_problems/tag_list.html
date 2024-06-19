@@ -6,7 +6,7 @@
   <div class="container-fluid m-2">
     <div class="row">
       <div class="col-md-2">
-        <a href="{% url 'python_problems:index' %}"
+        <a href="{% url 'python_problems:problem-index' %}"
            class="btn btn-secondary px-3 py-0 mb-5">Back</a>
       </div>
       <div class="col-md-8">
@@ -19,9 +19,9 @@
               <li>
                 {{ tag.name }} (
                 {% if tag.problem_set.count == 1 %}
-                  1 Problem - <a href="{% url 'python_problems:index' %}?query={{ tag.name }}">Search</a>
+                  1 Problem - <a href="{% url 'python_problems:problem-index' %}?query={{ tag.name }}">Search</a>
                 {% else %}
-                  {{ tag.problem_set.count }} Problems - <a href="{% url 'python_problems:index' %}?query={{ tag.name }}">Search</a>
+                  {{ tag.problem_set.count }} Problems - <a href="{% url 'python_problems:problem-index' %}?query={{ tag.name }}">Search</a>
                   {% endif %}
                 {# Tag update/delete #}
                 ) {% comment %} |
