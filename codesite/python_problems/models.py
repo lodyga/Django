@@ -46,7 +46,7 @@ class NonStrippingTextField(models.TextField):
 
 class Language(models.Model):
     problems = models.ManyToManyField(
-        "Problem", through="Solution", related_name="languages")
+        "Problem", through="Solution", related_name="languages_problem")
     name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
@@ -55,7 +55,8 @@ class Language(models.Model):
 
 class Problem(models.Model):
     languages = models.ManyToManyField(
-        Language, through="Solution", related_name="problems")
+        Language, through="Solution", related_name="problems_laguage")
+    solutions = models.ManyToManyField('Solution', related_name='problem_solutions')
 
     # Problem-related attributes
     title = models.CharField(unique=True, max_length=200)

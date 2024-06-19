@@ -98,11 +98,17 @@ class ProblemDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         # Solution
-        # language = get_object_or_404(Language, name='Python')
         # context['solution'] = get_object_or_404(Solution, problem=self.object, language=language)
-        solution = get_object_or_404(Solution, problem=self.object)
+        # solution = get_object_or_404(Solution, problem=self.object)
+
+        language = get_object_or_404(Language, name='JavaScript')
+
+
+        solutions = Solution.objects.filter(problem=self.object, language=language)
+        # Takes the first language specific solution
+        solution = solutions.first()
+        print(solution)
         context['solution'] = solution
 
         problem = self.get_object()
@@ -120,6 +126,7 @@ class ProblemDetailView(DetailView):
         if solution.testcase:
             raw_testcases = solution.testcase.split('\r\n')
         else:
+        # if empty testcase
             raw_testcases = "'), '"
         testcases = []
         testcases_input = []
