@@ -64,7 +64,7 @@
             <a href="{{ home_url }}"
                class="nav-link {% if request.get_full_path == home_url %}active{% endif %}">Home</a>
           </li>
-          {% url 'python_problems:index' as python_index_url %}
+          {% url 'python_problems:problem-index' as python_index_url %}
           {% url 'python_problems:tag-graph' as python_tag_graph %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle {% if request.get_full_path == python_index_url or request.get_full_path == python_tag_graph %}active{% endif %}"

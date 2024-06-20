@@ -24,7 +24,7 @@ class ForumCreateView(LoginRequiredMixin, CreateView):
         object = form.save(commit=False)
         object.owner = self.request.user
         object.save()
-        return super(ForumCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class BugForumCreateView(ForumCreateView):

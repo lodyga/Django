@@ -1,17 +1,17 @@
 from django import forms
-from python_problems.models import Problem
+from python_problems.models import Problem, Solution
 
 
 # Custom form to remove "slug", "owner" fields
 class ProblemForm(forms.ModelForm):
     class Meta:
         model = Problem
-        exclude = ["slug", "owner", "solutions", "languages"]
+        exclude = ["slug", "owner"]
 
 
 class SolutionForm(forms.ModelForm):
     class Meta:
-        model = Problem
+        model = Solution
         exclude = ["owner"]
 
 

@@ -28,13 +28,13 @@ class ProblemIndexView(ListView):
     #         Prefetch('solutions_problem', queryset=Solution.objects.select_related('language'))
     #     )
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         query = self.request.GET.get("query", "")
         problem_list = self.model.objects.all()
         difficulty_list = Difficulty.objects.all()
+        tags = Tag.objects.all()
         difficulty_id = self.request.GET.get('difficulty', '')
         order_by = self.request.GET.get('order_by', 'created_at')
 
@@ -62,6 +62,7 @@ class ProblemIndexView(ListView):
         context["page_obj"] = page_obj
         context["problems_per_page"] = problems_per_page
         context["order_by"] = order_by
+        context["tags"] = tags
 
         return context
 
@@ -75,10 +76,10 @@ class ProblemDetailView(DetailView):
         # context['solution'] = get_object_or_404(Solution, problem=self.object, language=language)
         # solution = get_object_or_404(Solution, problem=self.object)
 
-
         language_name = self.kwargs.get('language')
         language = get_object_or_404(Language, name=language_name)
-        solutions = Solution.objects.filter(problem=self.object, language=language)
+        solutions = Solution.objects.filter(
+            problem=self.object, language=language)
         # Takes the first language specific solution, but that's OK because solutions are unique.
         solution = solutions.first()
         context['solution'] = solution
@@ -98,7 +99,7 @@ class ProblemDetailView(DetailView):
         if solution.testcase:
             raw_testcases = solution.testcase.split('\r\n')
         else:
-        # if empty testcase
+            # if empty testcase
             raw_testcases = "'), '"
         testcases = []
         testcases_input = []
@@ -229,14 +230,20 @@ class TagDelete(LoginRequiredMixin, DeleteView):
 
 class ProblemCreate(LoginRequiredMixin, CreateView):
     model = Problem
-    form_class = ProblemForm # Custom form to remove "slug", "owner" fields
+    form_class = ProblemForm  # Custom form to remove "slug", "owner" fields
     success_url = reverse_lazy('python_problems:problem-index')
+
+    def form_valid(self, form):
+        object = form.save(commit=False)
+        object.owner = self.request.user
+        object.save()
+        return super().form_valid(form)
 
 
 class ProblemUpdate(LoginRequiredMixin, UpdateView):
     model = Problem
     # fields = "__all__"
-    form_class = ProblemForm # Custom form to remove "slug", "owner" fields
+    form_class = ProblemForm  # Custom form to remove "slug", "owner" fields
     success_url = reverse_lazy('python_problems:problem-index')
 
 
@@ -248,5 +255,24 @@ class ProblemDelete(LoginRequiredMixin, DeleteView):
 
 class SolutionCreate(LoginRequiredMixin, CreateView):
     model = Solution
-    form_class = SolutionForm # Custom form to remove "slug", "owner" fields
+    form_class = SolutionForm  # Custom form to remove some fields
+    success_url = reverse_lazy('python_problems:problem-index')
+
+    def form_valid(self, form):
+        object = form.save(commit=False)
+        object.owner = self.request.user
+        object.save()
+        return super().form_valid(form)
+
+
+class SolutionUpdate(LoginRequiredMixin, UpdateView):
+    model = Solution
+    # fields = "__all__"
+    form_class = SolutionForm  # Custom form to remove "slug", "owner" fields
+    success_url = reverse_lazy('python_problems:problem-index')
+
+
+class SolutionDelete(LoginRequiredMixin, DeleteView):
+    model = Solution
+    fields = "__all__"
     success_url = reverse_lazy('python_problems:problem-index')

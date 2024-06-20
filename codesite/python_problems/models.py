@@ -55,11 +55,6 @@ class Language(models.Model):
 
 
 class Problem(models.Model):
-    solutions = models.ManyToManyField(
-        'Solution', related_name='problem_solutions')
-    languages = models.ManyToManyField(
-        Language, through="Solution", related_name="problems_laguage")
-
     # Problem-related attributes
     title = models.CharField(unique=True, max_length=200)
     slug = models.SlugField(unique=True, blank=True)

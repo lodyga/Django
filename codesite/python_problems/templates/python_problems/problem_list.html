@@ -86,6 +86,9 @@
       <div class="col-md-8">
         <div class="mb-5 mt-5">
           <h2>Problem list</h2>
+          {% comment %} {% for tag in tags %}
+          {{ tag }}
+          {% endfor %} {% endcomment %}
         </div>
         {% if page_obj %}
           <ul>
@@ -94,21 +97,22 @@
                 <div class="col-md-auto">
                   <li>
                     <div class="problem-container flex">
-                      {% comment %} <a href="{% url 'python_problems:problem-detail' problem.slug %}">{{ problem.title }}</a> {% endcomment %}
                       {{ problem.title }}
-                      {# List languages through Solutions related to Problem #}
-                      {% for solution in problem.solutions_problem.all %}
-                      , <a href="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}">{{ solution.language }}</a>
-                      {% endfor %}
-                      {# List languages form Languages related to Problem. #}
-                      {% comment %} {% for language in problem.languages.all %}
-                        , {{ language }}
-                      {% endfor %} {% endcomment %}
+                      {# If Problem owner show Problem update/delete #}
                       {% if user == problem.owner %}
                         ,
                         (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
                         <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
                       {% endif %}
+                      {% for solution in problem.solutions_problem.all %}
+                        , <a href="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}">{{ solution.language }}</a>
+                        {# If Solution owner show Solution update/delete #}
+                        {% if user == solution.owner %}
+                          ,
+                          (<a href="{% url 'python_problems:solution-update' solution.id %}">Update</a> |
+                          <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>)
+                        {% endif %}
+                      {% endfor %}
                     </div>
                   </div>
                   <div class="col-md-auto">

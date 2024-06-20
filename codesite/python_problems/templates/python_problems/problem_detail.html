@@ -30,7 +30,7 @@
                   <ul>
                     {% for related in related_problems %}
                       <li>
-                        <a href="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}">
+                        <a href="{% url 'python_problems:problem-detail' related.slug solution.language.name %}">
                           {% comment %} {% if related.title|length > 30 %}
                             {{ related.title|slice:":27" }} ...
                           {% else %}
