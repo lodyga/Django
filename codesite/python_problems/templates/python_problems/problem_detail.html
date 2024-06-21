@@ -55,6 +55,40 @@
               <hr>
             </div>
             <div class="row">
+              {% if user == solution.owner %}
+                <div class="col-auto mb-2">
+                  <p>
+                    <a href="{% url 'python_problems:solution-update' solution.id %}">Update</a>
+                  </p>
+                  <p>
+                    <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>
+                  </p>
+                </div>
+              {% endif %}
+              <div class="col-auto mb-2">
+                <form method="get" action="">
+                  <label for="owner" class="mb-2">
+                    <b>Solution Owner:</b>
+                  </label>
+                  <select id="owner"
+                          name="owner"
+                          class="form-select"
+                          onchange="this.form.submit()">
+                    {% for owner in owners %}
+                      <option value="{{ owner.id }}"
+                              {% if owner.id|stringformat:"s" == selected_owner %}selected{% endif %}>
+                        {{ owner.username }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </form>
+              </div>
+              <div class="col-auto mb-2">
+                <p>
+                  <b>Language</b>:
+                  <p>{{ solution.language.name }}</p>
+                </p>
+              </div>
               <div class="col-auto mb-2">
                 <p>
                   <b>Difficulty</b>:
@@ -219,12 +253,14 @@
                   data-bs-target="#solution">Show solution</button>
           <div id="solution" class="collapse">
             <p>
-              <b>Solution</b>:
+              <b>Solution by
+              {{ solution.owner.username }}</b>
+              {% if user == solution.owner %}
+                (<a href="{% url 'python_problems:solution-update' solution.id %}">Update</a> |
+                <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>)
+              {% endif %}
             </p>
             <div class="box">
-              {% comment %}
-            Problem –> Solution
-              <pre style="font-family:'Courier New', Courier, monospace">{{ problem.solution }}</pre> {% endcomment %}
               <pre style="font-family:'Courier New', Courier, monospace">{{ solution.solution }}</pre>
             </div>
           </div>

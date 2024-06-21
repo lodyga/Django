@@ -1,0 +1,29 @@
+{% extends "core/base.html" %}
+{% block title %}
+  Language
+{% endblock title %}
+{% block content %}
+  <div class="container-fluid m-2">
+    <div class="row">
+      <div class="col-md-2">
+        <a href="{% url 'python_problems:problem-index' %}"
+           class="btn btn-secondary px-3 py-0 mb-5">Back</a>
+      </div>
+      <div class="col-md-8">
+        <div class="mb-5 mt-5">
+          <h2>Add a language</h2>
+          <form action="" method="POST"">
+            {% csrf_token %}
+            <table>
+              {{ form.as_table }}
+            </table>
+            <input type="submit" value="Submit" />
+            <input type="submit"
+                   onclick="window.location='{% url 'python_problems:problem-index' %}' ; return false;"
+                   value="Cancel" />
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

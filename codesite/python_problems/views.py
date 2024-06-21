@@ -5,10 +5,12 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
+from django.contrib.auth import get_user_model
 
 from .models import Tag, Difficulty, Language, Problem, Solution
 from .forms import OutputForm, ProblemForm, SolutionForm
 from .static.python_problems.scripts import execute_code, parse_testcases
+from django.conf import settings
 
 
 def tag_graph_view(request):
@@ -44,6 +46,18 @@ class ProblemIndexView(ListView):
             problem_list = problem_list.filter(
                 Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
 
+        # For each problem, get distinct languages from solutions
+        # problem_languages = {
+        #     problem: Solution.objects.filter(problem=problem).values('language').distinct()
+        #     for problem in problem_list
+        # }
+        problem_languages = {
+            problem: Language.objects.filter(id__in=Solution.objects.filter(
+                problem=problem).values_list('language', flat=True).distinct())
+            for problem in problem_list
+        }
+        context["problem_languages"] = problem_languages
+
         # Order problems.
         problem_list = problem_list.order_by(order_by)
 
@@ -77,10 +91,26 @@ class ProblemDetailView(DetailView):
         language = get_object_or_404(Language, name=language_name)
         solutions = Solution.objects.filter(
             problem=self.object, language=language)
-        # Takes the first language specific solution from queryset, but that's OK because solutions are unique.
-        # For mulptile solutions for the same language by different users need to be adjusted
+
+        # Fetch the list of owners who have solutions for this problem and language
+        owners = get_user_model().objects.filter(
+            id__in=Solution.objects.filter(
+                problem=self.object, language=language).values_list('owner', flat=True)
+        )
+
+        # Fetch owenr id
+        selected_owner_id = self.request.GET.get("owner", owners.first().id)
+
+        # Fetch owner
+        selected_owner = get_object_or_404(
+            get_user_model(), id=selected_owner_id)
+
+        # Fetch owner solution
+        solutions = Solution.objects.filter(
+            problem=self.object, language=language, owner=selected_owner)
+
+        # There's only one solution per language per user
         solution = solutions.first()
-        context['solution'] = solution
 
         # Fetch related problems.
         problem = self.get_object()
@@ -99,11 +129,13 @@ class ProblemDetailView(DetailView):
             solution.testcase)
 
         # Context
+        context['owners'] = owners
+        context['selected_owner'] = selected_owner_id
+        context['solution'] = solution
         context["tags"] = problem.tags.values_list("name", flat=True)
         context["related_problems"] = related_problems
         context["code_text"] = code_text
         context["output_form"] = output_form
-
         context["testcases"] = testcases
         context["testcases_input"] = testcases_input
         context["testcases_output"] = testcases_output
@@ -197,4 +229,10 @@ class SolutionUpdate(LoginRequiredMixin, UpdateView):
 class SolutionDelete(LoginRequiredMixin, DeleteView):
     model = Solution
     fields = "__all__"
+    success_url = reverse_lazy('python_problems:problem-index')
+
+
+class LanguageCreate(LoginRequiredMixin, CreateView):
+    model = Language
+    fields = ["name"]
     success_url = reverse_lazy('python_problems:problem-index')

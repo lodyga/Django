@@ -17,6 +17,7 @@ urlpatterns = [
     path("", views.ProblemIndexView.as_view(), name="problem-index"),
     path("problem_create/", views.ProblemCreate.as_view(), name="problem-create"), # create have to be befre slug
     path("solution_create/", views.SolutionCreate.as_view(), name="solution-create"), # create have to be befre slug
+    path("language_add/", views.LanguageCreate.as_view(), name="language-create"),
 
     path("<slug:slug>/<str:language>/", views.ProblemDetailView.as_view(), name="problem-detail"),
     path("problem/<int:pk>/update/", views.ProblemUpdate.as_view(), name="problem-update"),

@@ -68,14 +68,6 @@ class Problem(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.CASCADE)
 
-    # Language-specific attributes
-    # solution = NonStrippingTextField(blank=True, null=True)
-    # testcase = models.TextField(blank=True, null=True)
-    # time_complexity = models.ForeignKey(
-    #     Complexity, related_name="problems_time_complexity", on_delete=models.DO_NOTHING)
-    # space_complexity = models.ForeignKey(
-    #     Complexity, related_name="problems_space_complexity", on_delete=models.DO_NOTHING)
-
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
@@ -93,6 +85,8 @@ class Solution(models.Model):
         Problem, related_name="solutions_problem", on_delete=models.CASCADE)
     language = models.ForeignKey(
         Language, related_name="solutions_language", on_delete=models.CASCADE)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                              on_delete=models.CASCADE)
     solution = models.TextField(blank=True, null=True)
     testcase = models.TextField(blank=True, null=True)
     time_complexity = models.ForeignKey(
@@ -101,13 +95,11 @@ class Solution(models.Model):
         "Complexity", related_name="solutions_space_complexity", on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
-                              on_delete=models.CASCADE)
 
     class Meta:
         constraints = [
-            UniqueConstraint(fields=['problem', 'language'],
-                             name='unique_solution_per_problem_language')
+            models.UniqueConstraint(fields=['problem', 'language', 'owner'],
+                                    name='unique_solution_per_problem_language_owner')
         ]
 
     def __str__(self):

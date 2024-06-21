@@ -86,9 +86,6 @@
       <div class="col-md-8">
         <div class="mb-5 mt-5">
           <h2>Problem list</h2>
-          {% comment %} {% for tag in tag_list %}
-          {{ tag }}
-          {% endfor %} {% endcomment %}
         </div>
         {% if page_obj %}
           <ul>
@@ -100,19 +97,18 @@
                       {{ problem.title }}
                       {# If Problem owner show Problem update/delete #}
                       {% if user == problem.owner %}
-                        ,
                         (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
                         <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
                       {% endif %}
-                      {% for solution in problem.solutions_problem.all %}
-                        , <a href="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}">{{ solution.language }}</a>
-                        {# If Solution owner show Solution update/delete #}
-                        {% if user == solution.owner %}
-                          ,
-                          (<a href="{% url 'python_problems:solution-update' solution.id %}">Update</a> |
-                          <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>)
-                        {% endif %}
-                      {% endfor %}
+                      {# templetags/problem_filters.py#}
+                      {% load problem_filters %}
+                      <ul>
+                        {% for language in problem_languages|dict_key:problem %}
+                          <li>
+                            <a href="{% url 'python_problems:problem-detail' problem.slug language.name %}">{{ language.name }}</a>
+                          </li>
+                        {% endfor %}
+                      </ul>
                     </div>
                   </div>
                   <div class="col-md-auto">
@@ -227,6 +223,7 @@
           <div>
             <a href="{% url 'python_problems:problem-create' %}">Create a problem</a> |
             <a href="{% url 'python_problems:solution-create' %}">Create a solution</a> |
+            <a href="{% url 'python_problems:language-create' %}">Add a language</a> |
             <a href="{% url 'python_problems:tag-index' %}">Tag list</a> |
             <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
           </div>
