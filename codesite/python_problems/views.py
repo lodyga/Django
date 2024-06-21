@@ -3,12 +3,12 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q, Count, Prefetch
+from django.db.models import Q, Count
 from django.core.paginator import Paginator
 
 from .models import Tag, Difficulty, Language, Problem, Solution
-from .forms import CodeForm, OutputForm, TestCaseForm, TestCaseInputForm, TestCaseOutputForm, ProblemForm, SolutionForm
-from .static.python_problems.scripts import execute_code
+from .forms import OutputForm, ProblemForm, SolutionForm
+from .static.python_problems.scripts import execute_code, parse_testcases
 
 
 def tag_graph_view(request):
@@ -22,47 +22,46 @@ def tag_graph_view(request):
 class ProblemIndexView(ListView):
     model = Problem
 
-    # Pass lagnuages in Problem context
-    # def get_queryset(self):
-    #     return Problem.objects.prefetch_related(
-    #         Prefetch('solutions_problem', queryset=Solution.objects.select_related('language'))
-    #     )
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        query = self.request.GET.get("query", "")
+        # Fetch data from database.
         problem_list = self.model.objects.all()
         difficulty_list = Difficulty.objects.all()
-        tags = Tag.objects.all()
-        difficulty_id = self.request.GET.get('difficulty', '')
-        order_by = self.request.GET.get('order_by', 'created_at')
+        tag_list = Tag.objects.all()
 
+        # Fetch data from request.
+        query = self.request.GET.get("query", "")
+        difficulty_id = self.request.GET.get("difficulty", "")
+        order_by = self.request.GET.get("order_by", "created_at")
+
+        # Fileter problems by difficulty.
         if difficulty_id:
             problem_list = problem_list.filter(difficulty__id=difficulty_id)
 
+        # Filter problems by query from search form.
         if query:
             problem_list = problem_list.filter(
                 Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
 
+        # Order problems.
         problem_list = problem_list.order_by(order_by)
 
-        # pagination
+        # Pagination of problems.
         problems_per_page = self.request.GET.get("problems_per_page", "10")
-
         paginator = Paginator(problem_list, problems_per_page)
-        page_number = self.request.GET.get('page', 1)
+        page_number = self.request.GET.get("page", 1)
         page_obj = paginator.get_page(page_number)
 
-        # context
+        # Context
         context["problem_list"] = problem_list
-        context["query"] = query
         context["difficulty_list"] = difficulty_list
+        context["tag_list"] = tag_list
+        context["query"] = query
         context["difficulty_id"] = difficulty_id
-        context["page_obj"] = page_obj
-        context["problems_per_page"] = problems_per_page
         context["order_by"] = order_by
-        context["tags"] = tags
+        context["problems_per_page"] = problems_per_page
+        context["page_obj"] = page_obj
 
         return context
 
@@ -72,138 +71,63 @@ class ProblemDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Solution
-        # context['solution'] = get_object_or_404(Solution, problem=self.object, language=language)
-        # solution = get_object_or_404(Solution, problem=self.object)
 
-        language_name = self.kwargs.get('language')
+        # Fetch a solution.
+        language_name = self.kwargs.get("language")
         language = get_object_or_404(Language, name=language_name)
         solutions = Solution.objects.filter(
             problem=self.object, language=language)
-        # Takes the first language specific solution, but that's OK because solutions are unique.
+        # Takes the first language specific solution from queryset, but that's OK because solutions are unique.
+        # For mulptile solutions for the same language by different users need to be adjusted
         solution = solutions.first()
         context['solution'] = solution
 
+        # Fetch related problems.
         problem = self.get_object()
         related_problems = Problem.objects.annotate(
             common_tags=Count('tags', filter=Q(tags__in=problem.tags.all()))
         ).filter(common_tags__gte=2).exclude(pk=problem.pk).distinct()
 
-        code = """# Write code here.\n# Remember to pass the solution to the output.\n\ndef fun(x):\n    return x\n\noutput = fun(1)"""
+        # Default text for coding form.
+        code_text = """# Write code here.\n# Remember to pass the solution to the output.\n\ndef fun(x):\n    return x\n\noutput = fun(1)"""
 
+        # Output form
         output_form = OutputForm(initial={"output_area": "None"})
-        testcase_form = TestCaseForm()
 
-        # testcases parsing
-        # Split the test cases by newline characters
-        if solution.testcase:
-            raw_testcases = solution.testcase.split('\r\n')
-        else:
-            # if empty testcase
-            raw_testcases = "'), '"
-        testcases = []
-        testcases_input = []
-        testcases_output = []
-        for raw_testcase in raw_testcases:
-            try:
-                input_part, output_part = raw_testcase.split('), ')
-                # Add the closing parenthesis back and remove opening parenthetis
-                input_part = (input_part + ')').strip()[1:]
-                # Strip any extra whitespace and closing parenthensi
-                output_part = output_part.strip()[:-1]
-            except:
-                input_part = "Invalid testcase"
-                output_part = "Invalid testcase"
-            finally:
-                testcases.append((input_part, output_part))
-                testcases_input.append(input_part)
-                testcases_output.append(output_part)
+        # Parse testcases
+        testcases, testcases_input, testcases_output = parse_testcases(
+            solution.testcase)
 
-        testcase_input_form = TestCaseInputForm(
-            initial={"testcase_input": testcases_input[0]})
-        testcase_output_form = TestCaseOutputForm(
-            initial={"testcase_output": testcases_output[0]})
-
+        # Context
         context["tags"] = problem.tags.values_list("name", flat=True)
         context["related_problems"] = related_problems
+        context["code_text"] = code_text
         context["output_form"] = output_form
-        context["code_text"] = code
 
         context["testcases"] = testcases
-        context["testcase_form"] = testcase_form
-        context["testcase_input_form"] = testcase_input_form
-        context["testcase_output_form"] = testcase_output_form
         context["testcases_input"] = testcases_input
         context["testcases_output"] = testcases_output
 
         return context
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()  # Ensure self.object is set
+        self.object = self.get_object()
         context = self.get_context_data(**kwargs)
 
-        code = request.POST.get('code_area')
+        # Fetch code from a code area and execute it.
+        code_text = request.POST.get("code_area")
         try:
-            result = execute_code(code)
+            result = execute_code(code_text)
             output_form = OutputForm(initial={"output_area": result})
         except Exception as e:
             output_form = OutputForm(
                 initial={"output_area": f"Error: {str(e)}"})
 
+        # Context
+        context["code_text"] = code_text
         context["output_form"] = output_form
-        context["code_text"] = code
 
         return self.render_to_response(context)
-
-
-# same as ProblemDetailView
-def problem_detail_view(request, slug):
-    problem = get_object_or_404(Problem, slug=slug)
-    related_problems = Problem.objects.filter(
-        tags__in=problem.tags.all()).exclude(slug=slug).distinct()
-    # code_form = CodeForm(initial={"code_area": "Some"})
-    output_form = OutputForm(initial={"output_area": "None"})
-
-    context = {
-        "problem": problem,
-        "tags": problem.tags.values_list("name", flat=True),
-        "related_problems": related_problems,
-        "output_form": output_form,
-    }
-
-    code = """# Write code here.\n# Remember to pass the solution to the output.\n\ndef fun(x):\n    return x\n\noutput = fun(1)"""
-
-    if request.method == 'POST':
-        code = request.POST.get('code_area')
-        # code_form = CodeForm(initial={'code_area': code})
-
-        try:
-            result = execute_code(code)
-            output_form = OutputForm(initial={"output_area": result})
-        except Exception as e:
-            output_form = OutputForm(
-                initial={"output_area": f"Error: {str(e)}"})
-
-    # context["code_form"] = code_form
-    context["output_form"] = output_form
-    context["code_text"] = code
-    # print(output_form.initial.get("output_area"))
-    # print(output_form.initial["output_area"])
-    # print(output_form["output_area"].value())
-
-    # print(dir(output_form))
-    # print(output_form.__dict__)
-    # print(output_form.__dict__.get("initial").get("output_area"))
-    # print(output_form.fields.get("output_area").widget.attrs.get("placeholder"))
-
-    return render(request, "python_problems/problem_detail.html", context)
-
-
-"""
-print(output_form.__dict__):
-{'is_bound': False, 'data': <MultiValueDict: {}>, 'files': <MultiValueDict: {}>, 'auto_id': 'id_%s', 'initial': {'output_area': "Error: 'output'"}, 'error_class': <class 'django.forms.utils.ErrorList'>, 'label_suffix': ':', 'empty_permitted': False, '_errors': None, 'fields': {'output_area': <django.forms.fields.CharField object at 0x7832c705b1f0>}, '_bound_fields_cache': {}, 'renderer': <django.forms.renderers.DjangoTemplates object at 0x7832c701b0a0>}
-
-"""
 
 
 class TagIndexView(ListView):
@@ -242,8 +166,7 @@ class ProblemCreate(LoginRequiredMixin, CreateView):
 
 class ProblemUpdate(LoginRequiredMixin, UpdateView):
     model = Problem
-    # fields = "__all__"
-    form_class = ProblemForm  # Custom form to remove "slug", "owner" fields
+    form_class = ProblemForm
     success_url = reverse_lazy('python_problems:problem-index')
 
 
@@ -255,7 +178,7 @@ class ProblemDelete(LoginRequiredMixin, DeleteView):
 
 class SolutionCreate(LoginRequiredMixin, CreateView):
     model = Solution
-    form_class = SolutionForm  # Custom form to remove some fields
+    form_class = SolutionForm  # Custom form to remove "owner" field.
     success_url = reverse_lazy('python_problems:problem-index')
 
     def form_valid(self, form):
@@ -267,8 +190,7 @@ class SolutionCreate(LoginRequiredMixin, CreateView):
 
 class SolutionUpdate(LoginRequiredMixin, UpdateView):
     model = Solution
-    # fields = "__all__"
-    form_class = SolutionForm  # Custom form to remove "slug", "owner" fields
+    form_class = SolutionForm  # Custom form to remove "owner" field.
     success_url = reverse_lazy('python_problems:problem-index')
 
 

@@ -46,3 +46,48 @@ def execute_code(code):
             process.terminate()
             process.join()
 
+
+def parse_testcases(solution_testcase):
+    """ testcases parsing """
+
+    if solution_testcase:
+        # Split the test cases by newline characters
+        lines = solution_testcase.split('\r\n')
+    else:
+        # if empty testcase
+        return [], [], []
+
+    testcases = []
+    testcases_input = []
+    testcases_output = []
+    for line in lines:
+        line = line.strip()
+
+        if line.startswith("console.log"):
+            line = line[11:]
+
+        try:
+            input_part = ""
+            output_part = ""
+            seen_brackets = []
+
+            for ind, char in enumerate(line[1:-1], 1):
+                if char == "," and not seen_brackets:
+                    output_part = line[ind + 1:-1].strip()
+                    break
+
+                input_part += char
+                if char in "[(":
+                    seen_brackets.append(char)
+                elif char in "])":
+                    seen_brackets.pop()
+
+        except:
+            input_part = "Invalid testcase"
+            output_part = "Invalid testcase"
+        finally:
+            testcases.append((input_part, output_part))
+            testcases_input.append(input_part)
+            testcases_output.append(output_part)
+
+    return testcases, testcases_input, testcases_output

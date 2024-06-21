@@ -15,7 +15,6 @@ urlpatterns = [
     path("tag/graph/", views.tag_graph_view, name="tag-graph"),
 
     path("", views.ProblemIndexView.as_view(), name="problem-index"),
-    # path("", views.problem_index_view, name="index"),
     path("problem_create/", views.ProblemCreate.as_view(), name="problem-create"), # create have to be befre slug
     path("solution_create/", views.SolutionCreate.as_view(), name="solution-create"), # create have to be befre slug
 
