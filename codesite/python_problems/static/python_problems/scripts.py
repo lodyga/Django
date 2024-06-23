@@ -1,48 +1,94 @@
+import tempfile
+import os
+import subprocess
 import multiprocessing
+from RestrictedPython import compile_restricted
+from RestrictedPython import safe_builtins, limited_builtins, utility_builtins, safe_globals
+from RestrictedPython.Eval import default_guarded_getitem, default_guarded_getiter
+from RestrictedPython.PrintCollector import PrintCollector
+from RestrictedPython.Guards import guarded_unpack_sequence, guarded_iter_unpack_sequence, full_write_guard, safer_getattr
 
 
-SAFE_BUILTINS = {
-    # 'print': print,
-    'abs': abs,
-    'min': min,
-    'max': max,
-    'sum': sum,
-    'len': len,
-    'range': range,
-    'str': str,
-    'int': int,
-    'float': float,
-    'list': list,
-    'dict': dict,
-    'tuple': tuple,
-    'set': set,
-    'bool': bool,
-    '__build_class__': __build_class__,
-    '__name__': __name__,
-    'enumerate': enumerate,
-    'ord': ord,
-    'sorted': sorted,
-}
-
-def execute_code(code):
-    def code_execution(code, result_queue):
+def execute_code(source_code):
+    def code_execution(source_code, result_queue):
         local_vars = {}
-        global_vars = {'__builtins__': SAFE_BUILTINS}
+        # global_vars = {'__builtins__': SAFE_BUILTINS}
         try:
-            exec(code, global_vars, local_vars)
-            result_queue.put(local_vars.get("output", "No output variable found"))
-        except NameError as e:
-            result_queue.put(f"{type(e).__name__}: {str(e)}, not registered for security reasons.")
-        except ImportError as e:
-            result_queue.put(f"{type(e).__name__}: {str(e)}, not registered for security reasons.")
+            byte_code = compile_restricted(
+                source_code, filename='<inline code>', mode='exec')
+
+            # Define the allowed built-ins and globals
+            restricted_globals = {
+                '__builtins__': safe_globals['__builtins__'],
+                '_getiter_': default_guarded_getiter,
+                '_getitem_': default_guarded_getitem,
+                '_print_': PrintCollector,
+                '_unpack_sequence_': guarded_unpack_sequence,
+                '_iter_unpack_sequence_': guarded_iter_unpack_sequence,
+            }
+
+            # Define the allowed built-ins and globals
+            restricted_globals = {
+                '__builtins__': safe_builtins.copy()
+            }
+
+            restricted_globals['__builtins__'].update({
+                'None': None,
+                'False': False,
+                'True': True,
+                'bool': bool,
+                'dict': dict,
+                'list': list,
+                'int': int,
+                'float': float,
+                'str': str,
+                'print': print,
+                'range': range,
+                'len': len,
+                'enumerate': enumerate,
+                'zip': zip,
+                'map': map,
+                'filter': filter,
+                'all': all,
+                'any': any,
+                'sum': sum,
+                'min': min,
+                'max': max,
+                'abs': abs,
+                'round': round,
+                'isinstance': isinstance,
+                'type': type,
+                'sorted': sorted,
+                '__build_class__': __build_class__,  # Allow class creation
+                '__metaclass__': type,  # Allow metaclass
+                '__name__': __name__,
+            })
+
+            restricted_globals.update({
+                '_getiter_': default_guarded_getiter,
+                '_getitem_': default_guarded_getitem,
+                '_getattr_': safer_getattr,
+                '_print_': PrintCollector,
+                '_unpack_sequence_': guarded_unpack_sequence,
+                '_iter_unpack_sequence_': guarded_iter_unpack_sequence,
+                '_write_': full_write_guard,
+            })
+
+            exec(byte_code, restricted_globals, local_vars)
+            result_queue.put(local_vars.get(
+                "output", "No output variable found"))
+        # except NameError as e:
+        #     result_queue.put(f"{type(e).__name__}: {str(e)}, not registered for security reasons.")
+        # except ImportError as e:
+        #     result_queue.put(f"{type(e).__name__}: {str(e)}, not registered for security reasons.")
         except Exception as e:
             result_queue.put(f"Error: {str(e)}")
     # Create a multiprocessing Queue to receive the result from the child process
     result_queue = multiprocessing.Queue()
 
     # Create a child process to execute the code
-    process = multiprocessing.Process(target=code_execution, args=(code, result_queue))
-
+    process = multiprocessing.Process(
+        target=code_execution, args=(source_code, result_queue))
 
     try:
         # Start the child process
@@ -74,27 +120,22 @@ def execute_code(code):
             process.join()
 
 
-
-import multiprocessing
-import subprocess
-import os
-import tempfile
-
 def execute_code_docker(code):
     def code_execution(code, result_queue):
         with tempfile.NamedTemporaryFile(delete=False, suffix='.py') as temp_script:
             temp_script.write(code.encode('utf-8'))
             temp_script_path = temp_script.name
-        
+
         docker_command = [
-            'docker', 'run', '--rm', 
-            '-v', f'{temp_script_path}:/sandbox/temp_script.py:ro', 
-            'sandbox-image', 
+            'docker', 'run', '--rm',
+            '-v', f'{temp_script_path}:/sandbox/temp_script.py:ro',
+            'sandbox-image',
             'python', 'temp_script.py'
         ]
 
         try:
-            result = subprocess.run(docker_command, capture_output=True, text=True, timeout=5)
+            result = subprocess.run(
+                docker_command, capture_output=True, text=True, timeout=5)
             if result.returncode == 0:
                 result_queue.put(result.stdout)
             else:
@@ -105,7 +146,8 @@ def execute_code_docker(code):
             os.remove(temp_script_path)
 
     result_queue = multiprocessing.Queue()
-    process = multiprocessing.Process(target=code_execution, args=(code, result_queue))
+    process = multiprocessing.Process(
+        target=code_execution, args=(code, result_queue))
 
     try:
         process.start()
@@ -122,15 +164,6 @@ def execute_code_docker(code):
         if process.is_alive():
             process.terminate()
             process.join()
-
-# Example usage:
-# code = """
-# output = 'Hello, Docker World!'
-# print(output)
-# """
-# print(execute_code(code))  # Should safely execute the code and return 'Hello, Docker World!'
-
-
 
 
 def parse_testcases(solution_testcase):

@@ -47,6 +47,7 @@ zipp==3.15.0
 
 pandas==2.1.4
 whitenoise==6.6.0
+RestrictedPython==7.1
 
 
 
