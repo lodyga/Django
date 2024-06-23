@@ -21,6 +21,7 @@ SAFE_BUILTINS = {
     '__name__': __name__,
     'enumerate': enumerate,
     'ord': ord,
+    'sorted': sorted,
 }
 
 def execute_code(code):
@@ -31,15 +32,17 @@ def execute_code(code):
             exec(code, global_vars, local_vars)
             result_queue.put(local_vars.get("output", "No output variable found"))
         except NameError as e:
-            result_queue.put(f"{type(e).__name__}: {str(e)}, Name not registered for security reasons.")
+            result_queue.put(f"{type(e).__name__}: {str(e)}, not registered for security reasons.")
+        except ImportError as e:
+            result_queue.put(f"{type(e).__name__}: {str(e)}, not registered for security reasons.")
         except Exception as e:
-            result_queue.put(f"Error: {str(e)} ")
+            result_queue.put(f"Error: {str(e)}")
     # Create a multiprocessing Queue to receive the result from the child process
     result_queue = multiprocessing.Queue()
 
     # Create a child process to execute the code
-    process = multiprocessing.Process(
-        target=code_execution, args=(code, result_queue))
+    process = multiprocessing.Process(target=code_execution, args=(code, result_queue))
+
 
     try:
         # Start the child process
@@ -58,7 +61,10 @@ def execute_code(code):
             return "Error: Execution timed out"
 
         # Retrieve the result from the Queue
-        result = result_queue.get()
+        if not result_queue.empty():
+            result = result_queue.get()
+        else:
+            result = "Error: No result returned"
 
         return result
     finally:
