@@ -15,3 +15,7 @@
   /* Add any other styling properties you want */
 }
 
+.alert {
+  color: green;
+  background-color: brown;
+}

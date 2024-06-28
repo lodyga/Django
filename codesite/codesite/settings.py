@@ -21,6 +21,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
+    "localhost",
     "ukasz.eu.pythonanywhere.com"]
 
 
@@ -141,7 +142,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'productionfiles'  # for static files
+STATIC_ROOT = BASE_DIR / 'productionfiles'  # for static files "STATIC_ROOT = BASE_DIR / 'static_collected'"
 # for global files, The search starts in the directories listed in STATICFILES_DIRS, using the order you have provided. Then, if the file is not found, the search continues in the static folder of each application.
 STATICFILES_DIRS = [
     BASE_DIR / 'mystaticfiles'

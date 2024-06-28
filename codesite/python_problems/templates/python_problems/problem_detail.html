@@ -5,7 +5,8 @@
 {% block head %}
 {% endblock head %}
 {% block content %}
-  {# {% load static %} <link rel="stylesheet" href="{% static 'python_problems/style.css' %}"> #}
+  {% load static %}
+  <link rel="stylesheet" type='text/css' href="{% static 'python_problems/style_local.css' %}"/>
   <div class="container-fluid m-2">
     <div class="row">
       <div class="col-md-2">
