@@ -7,10 +7,14 @@ from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 
-from .models import Tag, Difficulty, Language, Problem, Solution
+from .models import Tag, Difficulty, Complexity, Language, Problem, Solution
 from .forms import OutputForm, ProblemForm, SolutionForm
 from .static.python_problems.scripts import execute_code, parse_testcases
 from django.conf import settings
+
+# REST API
+from rest_framework import viewsets
+from .serializers import TagSerializer, DifficultySerializer, ComplexitySerializer, LanguageSerializer, ProblemSerializer, SolutionSerializer
 
 
 def tag_graph_view(request):
@@ -236,3 +240,34 @@ class LanguageCreate(LoginRequiredMixin, CreateView):
     model = Language
     fields = ["name"]
     success_url = reverse_lazy('python_problems:problem-index')
+
+
+# REST API
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+
+class DifficultyViewSet(viewsets.ModelViewSet):
+    queryset = Difficulty.objects.all()
+    serializer_class = DifficultySerializer
+
+
+class ComplexityViewSet(viewsets.ModelViewSet):
+    queryset = Complexity.objects.all()
+    serializer_class = ComplexitySerializer
+
+
+class LanguageViewSet(viewsets.ModelViewSet):
+    queryset = Language.objects.all()
+    serializer_class = LanguageSerializer
+
+
+class ProblemViewSet(viewsets.ModelViewSet):
+    queryset = Problem.objects.all()
+    serializer_class = ProblemSerializer
+
+
+class SolutionViewSet(viewsets.ModelViewSet):
+    queryset = Solution.objects.all()
+    serializer_class = SolutionSerializer

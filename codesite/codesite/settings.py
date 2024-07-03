@@ -21,7 +21,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
-    "localhost",
+    "localhost",  # for local Docker
     "ukasz.eu.pythonanywhere.com"]
 
 
@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     "debug_toolbar",
+    "rest_framework",
 
     # Extensions - installed with requirements.txt
     'crispy_forms',
