@@ -54,24 +54,24 @@ Appearance hide Text Small Standard Large Width Standard Wide
 
 
 # generate empty migration
-python3 manage.py makemigrations --empty python_problems --name populate_slugs
+py manage.py makemigrations --empty python_problems --name populate_slugs
 
 
 # backup/restore db witm a script
 # backup db.sqlite3
 python manage.py dumpdata > fixtures/db_data.json
 # restore
-./manage.py load_db fixtures/db_data.json 
+py manage.py load_db fixtures/db_data.json 
 
 # backup/restore db without a script
 # backup
-./manage.py dumpdata > db.json
+py manage.py dumpdata > db.json
 # restore
 # To load data without load_db.py first delete ContentType after migrate
 from django.contrib.contenttypes.models import ContentType
 # Delete all content types
 ContentType.objects.all().delete()
-./manage.py loaddata db.json
+py manage.py loaddata db.json
 
 
 # Run and Debug create a lunch.json file, creates .vscode/lunch.json

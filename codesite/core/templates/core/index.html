@@ -1,4 +1,3 @@
-
 {% extends "core/base.html" %}
 {% block title %}
   Main
@@ -21,6 +20,10 @@
               </div>
             </li>
             <ul>
+              <li>
+                {% comment %} <a href="{% url 'python_problems:api' %}">REST API</a> {% endcomment %}
+                <a href="python/api/">REST API</a>
+              </li>
               <li>
                 <a href="{% url 'python_problems:problem-create' %}">Create a problem</a>
               </li>

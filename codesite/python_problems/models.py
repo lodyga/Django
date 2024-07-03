@@ -46,7 +46,7 @@ class NonStrippingTextField(models.TextField):
 
 class Language(models.Model):
     name = models.CharField(max_length=20, unique=True)
-    
+
     def __str__(self):
         return self.name
 
@@ -85,7 +85,8 @@ class Solution(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.CASCADE)
     solution = models.TextField(blank=True, null=True)
-    testcase = models.TextField(blank=True, null=True, help_text="Provide each testcase in `()` in a new like (function(agrs), solution)")
+    testcase = models.TextField(
+        blank=True, null=True, help_text="Provide each testcase in `()` in a new like (function(agrs), solution)")
     time_complexity = models.ForeignKey(
         "Complexity", related_name="solutions_time_complexity", on_delete=models.DO_NOTHING)
     space_complexity = models.ForeignKey(
