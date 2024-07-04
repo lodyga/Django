@@ -1,6 +1,7 @@
 # GET
 >>> import requests
 >>> api_url = "https://jsonplaceholder.typicode.com/todos/1"
+>>> api_url = "https://ukasz.eu.pythonanywhere.com/python/api/solutions/1/"
 >>> response = requests.get(api_url)
 >>> response.json()
 {'userId': 1, 'id': 1, 'title': 'delectus aut autem', 'completed': False}
@@ -41,7 +42,25 @@ response = requests.patch(api_url, json=todo)
 200
 
 
-$ curl -i http://127.0.0.1:8000/python/api/ -w '\n'
+# GET request to Codesite:
 $ curl -i http://127.0.0.1:8000/python/api/languages/ -w '\n'
+$ curl -i https://ukasz.eu.pythonanywhere.com/python/api/languages/ -w '\n'
+
+$ curl -i https://ukasz.eu.pythonanywhere.com/python/api/languages/1/ -w '\n'
+
+# POST
+$ curl -i https://ukasz.eu.pythonanywhere.com/python/api/languages/ \
+-X POST \
+-H 'Content-Type: application/json' \
+-d '{"name":"Java"}' \
+-w '\n'
+
+$ curl -i https://ukasz.eu.pythonanywhere.com/python/api/solutions/ \
+-X POST \
+-H 'Content-Type: application/json' \
+-d '{"problem":"Some"}' \
+-w '\n'
+
+
 
 
