@@ -21,8 +21,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
+    "ukasz.eu.pythonanywhere.com"
     "localhost",  # for local Docker
-    "ukasz.eu.pythonanywhere.com"]
+    "codesite-latest.onrender.com"  # for Docker container on Render
+]
 
 
 # Application definition
