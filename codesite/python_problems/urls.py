@@ -18,15 +18,7 @@ router.register(r'solutions', SolutionViewSet)
 
 urlpatterns = [
     # REST API
-<<<<<<< HEAD
-<<<<<<< HEAD
-    path("api/", include(router.urls), name="api"),
-=======
     path("api/", include(router.urls)),
->>>>>>> 8a22c6adb20938eb68f7c42e0ba9d152d8451bb4
-=======
-    path("api/", include(router.urls)),
->>>>>>> 81bc9fe437319de49ba7357ab7eefa8dbc111f99
 
     path("tag/", views.TagIndexView.as_view(), name="tag-index"),
     path("tag/create/", views.TagCreate.as_view(), name="tag-create"),
