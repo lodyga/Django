@@ -1,0 +1,26 @@
+{% extends "pages/base.html" %}
+
+{% block content %}
+
+{% load crispy_forms_tags %}
+<form action="." method="POST">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" value="Save" />
+</form>
+
+{% endblock content %}
+
+{% comment %}
+        {{ form.as_p }}
+{% endcomment %}
+
+
+{% comment %}
+google search
+<form action="http://www.google.com/search" method="GET">
+    <input type="text" name="q" placeholder="Input search">
+    <input type="submit" value="Save">
+</form>
+{% endcomment %}
+

@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>A loop template</title>
+  </head>
+  <body>
+    <p>Your guess was {{ zap }}</p>
+    <ul>
+      {% for fruit in fruits %}
+        <li>{{ fruit }}</li>
+      {% endfor %}
+    </ul>
+    
+    {% if nuts %}
+      <p>Number of nuts: {{ nuts|length }}</p>
+    {% else %}
+      <p>No nuts.</p>
+    {% endif %}
+  </body>
+</html>

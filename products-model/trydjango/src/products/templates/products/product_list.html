@@ -1,0 +1,22 @@
+{% extends "pages/base.html" %}
+
+{% block content %}
+  {% for product in product_list %}
+  <p>
+    {{ product.id }} - <a href="{% url 'products:product-detail' product.id %}">{{ product.title }}</a>
+  </p>
+  {% endfor %}
+{% endblock %}
+  
+
+  {% comment %}
+  {{ instance.id }} - <a href="{{ instance.get_absolute_url }}">{{ instance.title }}</a>
+  {{ product.id }} - <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+  <a href="{{ product.get_absolute_url }}"> == <a href="{% url 'products:product-detail' product.id %}">
+{% endcomment %}
+{% comment %}
+  <p>
+    <p>{{ instance.id }} - {{ instance.title }}</p>
+    <p>{{ instance.id }} - <a href="/products/{{ instance.id }}/"> {{ instance.title }}</p>
+  </p>
+{% endcomment %}

@@ -1,8 +1,6 @@
 *.swp
 __pycache__
-.DS_Store
 *.sqlite3
+.DS_Store
 github_settings.py
 *.pyc
-djangoenv/
-django42/

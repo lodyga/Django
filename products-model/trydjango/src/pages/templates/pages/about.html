@@ -1,0 +1,26 @@
+{% extends 'pages/base.html' %}
+
+{% block content %}
+  <h1>About page</h1>
+
+  <h3>{{ my_text|upper }}</h3>
+  <p>{{ this_is_true }}</p>
+
+  <p>{{ my_html|striptags }}</p>
+  <p>{{ my_html|safe|title }}</p> {% comment %}mark_safe{% endcomment %}
+
+  <p>{{ my_number }}</p>
+  <p>{{ my_list }}</p>
+
+  <ol>
+    {% for sub_item in my_list %}
+      {% if sub_item == 'kota' %}
+        <li>{{ forloop.counter }} - {{ sub_item|add:'s' }}</li>
+      {% elif sub_item == 'Ala' %}
+        <li>{{ forloop.counter }} Tomek</li>
+      {% else %}
+        <li>{{ forloop.counter }} - {{ sub_item|capfirst }}</li>
+      {% endif %}
+    {% endfor %}
+  </ol>
+{% endblock %}

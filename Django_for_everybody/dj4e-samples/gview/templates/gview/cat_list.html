@@ -1,0 +1,16 @@
+<h1>Cat List</h1>
+<p>
+  {% if cats %}
+    <ul>
+      {% for cat in cats %}
+        <li>
+          <a href="{% url 'gview:cat-view' cat.id %}">{{ cat.name }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>There are no cats in the database.</p>
+  {% endif %}
+</p>
+
+<a href="{% url 'gview:main-view' %}">Go back to gview</a>
