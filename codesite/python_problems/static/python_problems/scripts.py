@@ -12,41 +12,20 @@ from RestrictedPython.Guards import guarded_unpack_sequence, guarded_iter_unpack
 def execute_code(source_code):
     def code_execution(source_code, result_queue):
         local_vars = {}
-        # global_vars = {'__builtins__': SAFE_BUILTINS}
         try:
             byte_code = compile_restricted(
                 source_code, filename='<inline code>', mode='exec')
 
             # Define the allowed built-ins and globals
-            restricted_globals = {
-                '__builtins__': safe_globals['__builtins__'],
-                '_getiter_': default_guarded_getiter,
-                '_getitem_': default_guarded_getitem,
-                '_print_': PrintCollector,
-                '_unpack_sequence_': guarded_unpack_sequence,
-                '_iter_unpack_sequence_': guarded_iter_unpack_sequence,
-            }
+            restricted_globals = safe_globals.copy()
 
-            # Define the allowed built-ins and globals
-            restricted_globals = {
+            restricted_globals.update({
                 '__builtins__': safe_builtins.copy()
-            }
+            })
 
             restricted_globals['__builtins__'].update({
-                'None': None,
-                'False': False,
-                'True': True,
-                'bool': bool,
                 'dict': dict,
                 'list': list,
-                'int': int,
-                'float': float,
-                'str': str,
-                'print': print,
-                'range': range,
-                'len': len,
-                'enumerate': enumerate,
-                'zip': zip,
                 'map': map,
                 'filter': filter,
                 'all': all,
@@ -54,11 +33,8 @@ def execute_code(source_code):
                 'sum': sum,
                 'min': min,
                 'max': max,
-                'abs': abs,
                 'round': round,
-                'isinstance': isinstance,
                 'type': type,
-                'sorted': sorted,
                 '__build_class__': __build_class__,  # Allow class creation
                 '__metaclass__': type,  # Allow metaclass
                 '__name__': __name__,

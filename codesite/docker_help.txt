@@ -12,3 +12,15 @@ docker push lodyga/codesite:latest
 # run a container
 $ docker run --rm -d -p 8000:8000/tcp lodyga/codesite:latest
 
+# remove a container
+docker rmi IMAGE ID
+docker rmi REPOSITORY:TAG
+
+# List the running containers
+docker ps
+
+# Stop the running container:
+docker stop <container_id>
+
+# Remove the stopped container:
+docker rm <container_id>
