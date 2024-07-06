@@ -141,8 +141,8 @@ class ProblemDetailView(DetailView):
         context["code_text"] = code_text
         context["output_form"] = output_form
         context["testcases"] = testcases
-        context["testcases_input"] = testcases_input
-        context["testcases_output"] = testcases_output
+        # context["testcases_input"] = testcases_input
+        # context["testcases_output"] = testcases_output
 
         return context
 

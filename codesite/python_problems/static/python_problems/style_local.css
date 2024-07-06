@@ -1,21 +1,3 @@
-.problem-container {
-  display: flex;
-  align-items: center; /* Vertically center the content */
-}
-
-.problem-container a {
-  margin-right: 0px; /* Add some space between the title and the tags */
-  color: green;
-  background-color: brown;
-}
-
-.python-code {
-  font-family: 'Courier New', Courier, monospace; /* Use a monospaced font */
-  font-size: 14px; /* Adjust font size as needed */
-  /* Add any other styling properties you want */
-}
-
-.alert {
-  color: green;
-  background-color: brown;
+.monospace {
+  font-family: 'Courier New', Courier, monospace;
 }

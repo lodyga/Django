@@ -12,7 +12,7 @@
       <div class="col-md-8">
         <h1>Delete a Problem</h1>
         <p>Are you sure you want to delete the problem: {{ problem }}?</p>
-        <form action="" method="POST">
+        <form action="" method="post">
           {% csrf_token %}
           <input type="submit" value="Yes, delete." />
           <input type="submit"
@@ -22,4 +22,5 @@
       </div>
       <div class="col-md-2"></div>
     </div>
-  {% endblock %}
+  </div>
+{% endblock content %}

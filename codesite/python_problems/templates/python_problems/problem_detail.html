@@ -6,152 +6,140 @@
 {% endblock head %}
 {% block content %}
   {% load static %}
-  {% comment %} <link rel="stylesheet" type='text/css' href="{% static 'python_problems/style_local.css' %}"/> {% endcomment %}
-  <div class="container-fluid m-2">
-    <div class="row">
-      <div class="col-md-2">
-        <div class="col sticky-top">
-          <div class="row">
-            <div>
-              <a href="{% url 'python_problems:problem-index' %}"
-                 class="btn btn-secondary px-3 py-0 mb-2">Back</a>
-            </div>
+  <link rel="stylesheet"
+        type='text/css'
+        href="{% static 'python_problems/style_local.css' %}" />
+  <div class="row">
+    <div class="col-md-2 p-4">
+      <div class="col sticky-top">
+        <div class="row">
+          <div>
+            <a href="{% url 'python_problems:problem-index' %}"
+               class="btn btn-secondary px-3 py-0 mb-2">Back</a>
           </div>
-          <div class="row">
-            <div>
-              <button type="button"
-                      class="btn btn-primary px-3 py-1 mb-2"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#related">Show related problems</button>
-              <div id="related" class="collapse">
-                <p>
-                  <b>Related Problems</b>:
-                </p>
-                <div class="box">
-                  <ul>
-                    {% for related in related_problems %}
-                      <li>
-                        <a href="{% url 'python_problems:problem-detail' related.slug solution.language.name %}">
-                          {% comment %} {% if related.title|length > 30 %}
-                            {{ related.title|slice:":27" }} ...
-                          {% else %}
-                            {{ related.title }}
-                          {% endif %} {% endcomment %}
-                          {{ related.title|truncatechars:30 }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </div>
+        </div>
+        <div class="row">
+          <div>
+            <button type="button"
+                    class="btn btn-primary px-3 py-1 mb-2"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#related">Show related problems</button>
+            <div id="related" class="collapse">
+              <div class="box">
+                <ul>
+                  {% for related in related_problems %}
+                    <li>
+                      <a href="{% url 'python_problems:problem-detail' related.slug solution.language.name %}"
+                         class="btn">{{ related.title|truncatechars:25 }}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-8">
-        <div class="container">
-          <div class="row">
-            <div class="col-auto mb-5 mt-5">
-              <h1>{{ problem.title }}</h1>
-              <hr>
-            </div>
-            <div class="row">
-              {% if user == solution.owner %}
-                <div class="col-auto mb-2">
-                  <p>
-                    <a href="{% url 'python_problems:solution-update' solution.id %}">Update</a>
-                  </p>
-                  <p>
-                    <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>
-                  </p>
-                </div>
-              {% endif %}
-              <div class="col-auto mb-2">
-                <form method="get" action="">
-                  <label for="owner" class="mb-2">
-                    <b>Solution Owner:</b>
-                  </label>
-                  <select id="owner"
-                          name="owner"
-                          class="form-select"
-                          onchange="this.form.submit()">
-                    {% for owner in owners %}
-                      <option value="{{ owner.id }}"
-                              {% if owner.id|stringformat:"s" == selected_owner %}selected{% endif %}>
-                        {{ owner.username }}
-                      </option>
-                    {% endfor %}
-                  </select>
-                </form>
-              </div>
-              <div class="col-auto mb-2">
-                <p>
-                  <b>Language</b>:
-                  <p>{{ solution.language.name }}</p>
-                </p>
-              </div>
-              <div class="col-auto mb-2">
-                <p>
-                  <b>Difficulty</b>:
-                  <p>{{ problem.difficulty }}</p>
-                </p>
-              </div>
-              <div class="col-auto mb-2">
-                <p>
-                  <b>Tags</b>:
-                  {% comment %}<p>{{ tags|join:", " }}</p>{% endcomment %}
-                  <p>
-                    {% for tag in tags %}
-                      <a href="{% url 'python_problems:problem-index' %}?query={{ tag }}">{{ tag }}</a>
-                      {% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                  </p>
-                </p>
-              </div>
-              <div class="col-auto mb-2">
-                <p>
-                  <b>Complexity</b>:
-                </p>
-                {% comment %}<a href="{{ problem.time_complexity }}">Time {{ problem.time_complexity }}</a>
-                <a href="{{ problem.space_complexity }}">Space: {{ problem.space_complexity }}</a>{% endcomment %}
-                <p>Time: {{ solution.time_complexity }}, Space: {{ solution.space_complexity }}</p>
-              </div>
-              <div class="col-auto mb-2">
-                <p>
-                  <b>URL</b>:
-                </p>
-                <a href="{{ problem.url }}" target="_blank">{{ problem.url|slice:"8:20" }}</a>
-              </div>
-            </div>
-          </div>
+    </div>
+    <div class="col-md-8 p-4">
+      <div class="row">
+        <div class="col-auto mb-5 mt-5">
+          <h1>{{ problem.title }}</h1>
           <hr>
-          <label for="problemDescription" class="form-label">
-            <b>Problem description</b>:
-          </label>
-          <pre style="white-space: pre-wrap" id="problemDescription">{{ problem.description }}</pre>
-          <br>
-          <hr>
-        </form>
-        <form id="codeForm"
-              action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
-              method="POST"
-              class="mb-5">
-          {% csrf_token %}
-          <div class="code-area-container mb-2 border border-primary">
-            <label for="id_code_area">Code Area</label>
-            <textarea name="code_area"
-                      id="id_code_area"
-                      cols="80"
-                      rows="10"
-                      class="python-code  border border-primary">{{ code_text }}</textarea>
+        </div>
+        <div class="row mb-2">
+          {% if user == solution.owner %}
+            <div class="col-auto mb-2">
+              <p>
+                <a href="{% url 'python_problems:solution-update' solution.id %}">Update</a>
+              </p>
+              <p>
+                <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>
+              </p>
+            </div>
+          {% endif %}
+          <div class="col-auto mb-2">
+            <form method="get" action="">
+              <label for="owner" class="mb-2">
+                <b>Solution Owner:</b>
+              </label>
+              <select id="owner"
+                      name="owner"
+                      class="form-select"
+                      onchange="this.form.submit()">
+                {% for owner in owners %}
+                  <option value="{{ owner.id }}"
+                          {% if owner.id|stringformat:"s" == selected_owner %}selected{% endif %}>
+                    {{ owner.username }}
+                  </option>
+                {% endfor %}
+              </select>
+            </form>
           </div>
-          <link rel="stylesheet"
-                href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
-          <link rel="stylesheet"
-                href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
-          <script>
+          <div class="col-auto mb-2">
+            <p>
+              <b>Language</b>:
+              <p>{{ solution.language.name }}</p>
+            </p>
+          </div>
+          <div class="col-auto mb-2">
+            <p>
+              <b>Difficulty</b>:
+              <p>{{ problem.difficulty }}</p>
+            </p>
+          </div>
+          <div class="col-auto mb-2">
+            <p>
+              <b>Tags</b>:
+              {% comment %}<p>{{ tags|join:", " }}</p>{% endcomment %}
+              <p>
+                {% for tag in tags %}
+                  <a href="{% url 'python_problems:problem-index' %}?query={{ tag }}">{{ tag }}</a>
+                  {% if not forloop.last %},{% endif %}
+                {% endfor %}
+              </p>
+            </p>
+          </div>
+          <div class="col-auto mb-2">
+            <p>
+              <b>Complexity</b>:
+            </p>
+            <p>Time: {{ solution.time_complexity }}, Space: {{ solution.space_complexity }}</p>
+          </div>
+          <div class="col-auto mb-2">
+            <p>
+              <b>URL</b>:
+            </p>
+            <a href="{{ problem.url }}" target="_blank">{{ problem.url|slice:"8:20" }}</a>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <label for="problemDescription" class="form-label">
+        <b>Problem description</b>:
+      </label>
+      <pre class="mb-5" style="white-space: pre-wrap" id="problemDescription">{{ problem.description }}</pre>
+      <label for="codeForm" class="form-label">
+        <b>Code Area</b>:
+      </label>
+      <form id="codeForm"
+            action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
+            method="POST"
+            class="mb-2">
+        {% csrf_token %}
+        <div class="code-area-container mb-2 border border-primary">
+          <textarea name="code_area"
+                    id="id_code_area"
+                    cols="80"
+                    rows="10"
+                    class="python-code  border border-primary">{{ code_text }}</textarea>
+        </div>
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
+        <script>
               document.addEventListener('DOMContentLoaded', function () {
                   var storedDarkMode = localStorage.getItem('darkMode');
                   var theme = storedDarkMode === "enabled" ? "monokai" : "default";
@@ -163,119 +151,90 @@
                       placeholder: "Enter your Python code here..." // Placeholder text
                   });
               });
-          </script>
-          <div class="d-flex align-items-center">
-            <button id="submitButton" type="submit" class="btn btn-warning ">
-              <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
-              Run
-            </button>
-            <div class="alert alert-info p-2 ms-1 mt-3">
-              <em>Run</em> for python code only.
-            </div>
+        </script>
+        <div class="d-flex align-items-center">
+          <button id="submitButton" type="submit" class="btn btn-warning ">
+            <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
+            Run
+          </button>
+          <div class="alert alert-info p-2 ms-1 mt-3">
+            <em>Run</em> for python code only.
           </div>
-        </form>
-        <script>
+        </div>
+      </form>
+      <script>
             document.getElementById('codeForm').addEventListener('submit', function () {
                 document.getElementById('submitButton').disabled = true; // Disable the submit button
                 document.getElementById('spinner').classList.remove('d-none'); // Show the spinner
                 document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running';
             });
-        </script>
-        {% if output_form.output_area.value == "Error: 'output'" %}
-          {% comment %} {{ output_form.output_area.value }} {% endcomment %}
+      </script>
+      {% if output_form.output_area.value == "Error: 'output'" %}
+        {% comment %} {{ output_form.output_area.value }} {% endcomment %}
+        <div class="alert alert-warning">
+          <strong>Warning!</strong> No <em>output</em> variable in Code Area.
+        </div>
+      {% elif "Error" in output_form.output_area.value %}
+        <div>
           <div class="alert alert-warning">
-            <strong>Warning!</strong> No <em>output</em> variable in Code Area.
+            <strong>Warning!</strong> Error detected.
           </div>
-        {% elif "Error" in output_form.output_area.value %}
-          <div>
-            <div class="alert alert-warning">
-              <strong>Warning!</strong> Error detected.
+        </div>
+      {% else %}
+        <div>
+          <div class="alert alert-info">No errors in code.</div>
+        </div>
+      {% endif %}
+      {% load crispy_forms_tags %}
+      
+      <form action="" class="mb-5">
+        {{ output_form|crispy }}
+      </form>
+      <label for="testcases" class="form-label">
+        <b>Test Cases</b>:
+      </label>
+      <div id="testcases">
+        {% for testcase in testcases %}
+          <div id="testcase-{{ forloop.counter }}" class="testcase-content">
+            <div class="monospace">
+              <span class="badge bg-secondary">Input:</span>
+              <textarea class="form-control mb-1" rows="1" id="inpt" name="text">{{ testcase.0 }}</textarea>
+            </div>
+            <div class="monospace">
+              {% comment %} <label for="oupt">Output:</label> {% endcomment %}
+              <span class="badge bg-secondary">Output:</span>
+              <textarea class="form-control" rows="1" id="oupt" name="text">{{ testcase.1 }}</textarea>
             </div>
           </div>
-        {% else %}
-          <div>
-            <div class="alert alert-info">No errors in code.</div>
-          </div>
-        {% endif %}
-        {% load crispy_forms_tags %}
-        <form action="" class="mb-3">
-          {{ output_form|crispy }}
-        </form>
-        <div class="container mt-5">
-          <p>
-            <b>Test Cases</b>:
-          </p>
-          <div id="buttons" class="">
-            <!-- Buttons will be inserted here by JavaScript -->
-          </div>
-          <div id="testcases">
-            {% for testcase in testcases %}
-              <div id="testcase-{{ forloop.counter }}" class="testcase-content">
-                <div class="">
-                  {% comment %} <label for="inpt">Input:</label> {% endcomment %}
-                  <textarea class="form-control mb-1"
-                            style="font-family:'Courier New', Courier, monospace"
-                            rows="1"
-                            id="inpt"
-                            name="text">Input: {{ testcase.0 }}</textarea>
-                </div>
-                <div class="">
-                  {% comment %} <label for="oupt">Output:</label> {% endcomment %}
-                  <textarea class="form-control"
-                            style="font-family:'Courier New', Courier, monospace"
-                            rows="1"
-                            id="oupt"
-                            name="text">Output: {{ testcase.1 }}</textarea>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-          {% comment %} <div class="mb-3">
-          <form action="" class="form-inline" id="testcase-form">
-            {{ testcase_form.as_p }}
-          </form>
-        </div>
-        <div class="mb-3">
-          <form action="" id="testcase-input-form">
-            {{ testcase_input_form|crispy }}
-          </form>
-        </div>
-        <div class="mb-3">
-          <form action="" id="testcase-output-form">
-            {{ testcase_output_form.as_p }}
-          </form>
-        </div>
-          </div> {% endcomment %}
-          <br>
-          <hr>
-          <button type="button"
-                  class="btn btn-primary mb-2"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#solution">Show solution</button>
-          <div id="solution" class="collapse">
-            <p>
-              <b>Solution by
-              {{ solution.owner.username }}</b>
-              {% if user == solution.owner %}
-                (<a href="{% url 'python_problems:solution-update' solution.id %}">Update</a> |
-                <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>)
-              {% endif %}
-            </p>
-            <div class="box">
-              <pre style="font-family:'Courier New', Courier, monospace">{{ solution.solution }}</pre>
-            </div>
-          </div>
-          <br>
-          <hr>
+        {% endfor %}
+      </div>
+      <div id="buttons" class="mb-5">
+        <!-- Buttons will be inserted here by JavaScript -->
+      </div>
+      <button type="button"
+              class="btn btn-primary mb-2"
+              data-bs-toggle="collapse"
+              data-bs-target="#solution">Show solution</button>
+      <div id="solution" class="collapse">
+        <p>
+          <b>Solution by
+          {{ solution.owner.username }}</b>
+          {% if user == solution.owner %}
+            (<a href="{% url 'python_problems:solution-update' solution.id %}">Update</a> |
+            <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>)
+          {% endif %}
+        </p>
+        <div class="box">
+          <pre style="font-family:'Courier New', Courier, monospace">{{ solution.solution }}</pre>
         </div>
       </div>
-      <div class="col-md-2">
-        <div class="row"></div>
-        <div class="row">
-          <div>
-            <a href="{% url 'python_problems:problem-index' %}"
-               class="btn btn-secondary px-3 py-1 mb-2">Back</a>
-          </div>
+      <hr>
+    </div>
+    <div class="col-md-2 p-4">
+      <div class="row">
+        <div>
+          <a href="{% url 'python_problems:problem-index' %}"
+             class="btn btn-secondary px-3 py-0 mb-2">Back</a>
         </div>
       </div>
     </div>
