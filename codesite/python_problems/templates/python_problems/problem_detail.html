@@ -186,7 +186,6 @@
         </div>
       {% endif %}
       {% load crispy_forms_tags %}
-      
       <form action="" class="mb-5">
         {{ output_form|crispy }}
       </form>
@@ -196,14 +195,15 @@
       <div id="testcases">
         {% for testcase in testcases %}
           <div id="testcase-{{ forloop.counter }}" class="testcase-content">
-            <div class="monospace">
-              <span class="badge bg-secondary">Input:</span>
-              <textarea class="form-control mb-1" rows="1" id="inpt" name="text">{{ testcase.0 }}</textarea>
-            </div>
-            <div class="monospace">
-              {% comment %} <label for="oupt">Output:</label> {% endcomment %}
-              <span class="badge bg-secondary">Output:</span>
-              <textarea class="form-control" rows="1" id="oupt" name="text">{{ testcase.1 }}</textarea>
+            <div class="row">
+              <div class="col-auto monospace">
+                <span class="badge bg-secondary">Input:</span>
+                <div class="form-control mb-1" rows="1">{{ testcase.0 }}</div>
+              </div>
+              <div class="col-auto monospace">
+                <span class="badge bg-secondary">Output:</span>
+                <div class="form-control mb-1" rows="1">{{ testcase.1 }}</div>
+              </div>
             </div>
           </div>
         {% endfor %}

@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     # Extensions - installed with requirements.txt
     'crispy_forms',
     'crispy_bootstrap5',
-    'social_django',  # social login
+    'social_django',  # for social login, social-auth-app-django
 
     "core",
     "python_problems",
