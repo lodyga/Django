@@ -1,21 +1,25 @@
 {% extends 'core/base.html' %}
+{% load crispy_forms_tags %}
 {% block content %}
-  {% if form.errors %}<p>Your username and password didn't match. Please try again.</p>{% endif %}
-  
-  {% load crispy_forms_tags %}
-  <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <input type="submit" class="btn btn-primary" value="Login Locally" />
-    <input type="hidden" name="next" value="{{ next }}" />
-  </form>
-  
-  {% comment %}{% if form.errors %}<p>Your username and password didn't match. Please try again.</p>{% endif %}
-  {% load crispy_forms_tags %}
-  <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <input type="submit" class="btn btn-primary" value="Login" />
-    <input type="hidden" name="next" value="{{ next }}" />
-  </form>{% endcomment %}
+  <div class="container my-5 p-2">
+    <div class="row mb-4">
+      <div class="col-auto">
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <input type="submit" class="btn btn-primary" value="Login Locally" />
+          <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-auto">
+        {% if form.errors %}
+          <div class="alert alert-danger ps-4">
+            <li>Please enter a correct username and password. Note that both fields may be case-sensitive.</li>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 {% endblock %}

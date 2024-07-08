@@ -14,68 +14,73 @@
             <p>It takes about 30 seconds to boot up after inactivity.</p>
           </li>
           <li>
-            <a href="accounts/login/">Login</a>
+            <a href="{% url 'login' %}">Login</a>
           </li>
         </ul>
         <ul>
           <li>
-            <div>
-              <a href="python/">Python</a> <-- Most features here
+            <div class="row">
+              <div class="col-auto">
+                <a href="{% url 'python_problems:problem-index' %}">Python</a>
               </div>
+              <div class="col-auto">
+                <-- Most features here.
+              </div>
+            </div>
+          </li>
+          <ul>
+            <li>
+              <a href="{% url 'python_problems:api-root' %}">REST API</a>
+            </li>
+            <li>
+              <a href="{% url 'python_problems:problem-create' %}">Create a problem</a>
+            </li>
+            <li>
+              <a href="{% url 'python_problems:solution-create' %}">Create a solution</a>
+            </li>
+            <li>
+              <a href="{% url 'python_problems:language-create' %}">Add a language</a>
+            </li>
+            <li>
+              <a href="{% url 'python_problems:tag-index' %}">Tag</a>
             </li>
             <ul>
               <li>
-                <a href="{% url 'python_problems:api-root' %}">REST API</a>
+                <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
               </li>
               <li>
-                <a href="{% url 'python_problems:problem-create' %}">Create a problem</a>
+                <a href="{% url 'python_problems:tag-graph' %}">Statistics</a>
               </li>
-              <li>
-                <a href="{% url 'python_problems:solution-create' %}">Create a solution</a>
-              </li>
-              <li>
-                <a href="{% url 'python_problems:language-create' %}">Add a language</a>
-              </li>
-              <li>
-                <a href="{% url 'python_problems:tag-index' %}">Tag</a>
-              </li>
-              <ul>
-                <li>
-                  <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
-                </li>
-                <li>
-                  <a href="{% url 'python_problems:tag-graph' %}">Statistics</a>
-                </li>
-              </ul>
             </ul>
           </ul>
+        </ul>
+        <ul>
+          <li>
+            <a href="sql/">SQL</a>
+          </li>
           <ul>
             <li>
-              <a href="sql/">SQL</a>
+              <a href="sql/conversion/">database conversion</a>
             </li>
+            <li>
+              <a href="sql/ascii/">database from ASCII</a>
+            </li>
+          </ul>
+        </ul>
+        <ul>
+          <li>
+            Forums
             <ul>
               <li>
-                <a href="sql/conversion/">database conversion</a>
+                <a href="{% url 'forums:bug-forum' %}">Report a bug</a>
               </li>
               <li>
-                <a href="sql/ascii/">database from ASCII</a>
+                <a href="{% url 'forums:feature-forum' %}">Request a fuature</a>
               </li>
             </ul>
-          </ul>
-          <ul>
-            <li>
-              Forums
-              <ul>
-                <li>
-                  <a href="{% url 'forums:bug-forum' %}">Report a bug</a>
-                </li>
-                <li>
-                  <a href="{% url 'forums:feature-forum' %}">Request a fuature</a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
+          </li>
+        </ul>
       </div>
     </div>
-  {% endblock content %}
+  </div>
+{% endblock content %}

@@ -7,7 +7,7 @@ $ docker build -t <name>:<tag> .
 $ docker build -t lodyga/codesite:latest .
 
 # push container to dockerhub
-docker push lodyga/codesite:latest
+# docker push lodyga/codesite:latest
 
 # run a container
 $ docker run --rm -d -p 8000:8000/tcp lodyga/codesite:latest

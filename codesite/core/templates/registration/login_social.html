@@ -1,10 +1,8 @@
-{% extends 'core/base.html' %}
+{% extends "core/base.html" %}
 {% block content %}
-
-<div class="container">
-  <div class="row">
+  <div class="container my-5 p-2">
+    <div class="row mb-5">
       <div class="col-auto">
-        {% if form.errors %}<p>Your username and password didn't match. Please try again.</p>{% endif %}
         {% load crispy_forms_tags %}
         <form method="post" action="{% url 'login' %}">
           {% csrf_token %}
@@ -25,9 +23,15 @@
           </a>
         {% endif %}
       </div>
+    </div>
+    <div class="row">
+      <div class="col-auto">
+        {% if form.errors %}
+          <div class="alert alert-danger ps-4">
+            <li>Please enter a correct username and password. Note that both fields may be case-sensitive.</li>
+          </div>
+        {% endif %}
+      </div>
+    </div>
   </div>
-</div>
-
-
-
-{% endblock %}
+{% endblock content %}
