@@ -7,239 +7,223 @@
   {# {% load static %} <link rel="stylesheet" href="{% static 'python_problems/style_local.css' %}"> #}
   {# For global static files, for all apps https://www.w3schools.com/django/django_add_global_static_files.php #}
   {# {% load static %} <link rel="stylesheet" href="{% static 'style_global.css' %}"> #}
-  <div class="container-fluid m-2">
-    <div class="row">
-      <div class="col-md-2">
-        <a href="/" class="btn btn-secondary px-3 py-0 mb-5">Back</a>
-        <br>
-        <div class="mb-3">
-          <label for="searchForm" class="form-label">
-            <strong>Search bar</strong>
-          </label>
-          <form method="get"
-                action="{% url 'python_problems:problem-index' %}"
-                id="searchForm">
-            <div class="input-group">
-              <input name="query"
-                     id="query"
-                     class="px-2 py-2 mb-2"
-                     type="text"
-                     value="{{ query|default_if_none:'' }}"
-                     placeholder="Search by tag or title">
-              <button class="btn btn-primary mb-2 px-2"
-                      type="submit"
-                      style="border-radius: 0.35rem">Search</button>
-              {% if difficulty_id %}<input type="hidden" name="difficulty" value="{{ difficulty_id }}">{% endif %}
-              {% if problems_per_page %}
-                <input type="hidden"
-                       name="problems_per_page"
-                       value="{{ problems_per_page }}">
-              {% endif %}
-            </div>
-          </form>
-        </div>
-        <label for="difficulty">
-          <strong>Difficulty</strong>
+  <div class="row m-1">
+    <div class="col-md-2">
+      <a href="{% url 'core:index' %}"
+         class="btn btn-secondary px-3 py-0 mt-3 mb-5">Back</a>
+      <div class="mb-3">
+        <label for="search_form" class="form-label">
+          <strong>Search bar</strong>
         </label>
-        <div id="difficulty">
-          <ul>
-            {% for difficulty in difficulty_list %}
-              <li class="py-1 px-2 {% if difficulty.id|stringformat:"s" == difficulty_id|stringformat:"s" %}text-warning{% endif %}">
-                <a href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty.id }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}"
-                   class="btn btn-secondary py-0 {% if difficulty.id|stringformat:"s" == difficulty_id|stringformat:"s" %}text-warning{% endif %}">{{ difficulty.name }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-        <div class="mb-2">
-          <label for="order_by" class="form-label">
-            <strong>Order by:</strong>
-          </label>
-          <form method="get" action="">
-            <select class="form-select"
-                    name="order_by"
-                    id="order_by"
-                    onchange="this.form.submit()">
-              <option value="created_at"
-                      {% if order_by == 'created_at' %}selected{% endif %}>Creation Date</option>
-              <option value="title" {% if order_by == 'title' %}selected{% endif %}>Title</option>
-            </select>
-            <!-- Retain other query parameters -->
-            {% if query %}<input type="hidden" name="query" value="{{ query|default_if_none:'' }}">{% endif %}
-            {% if difficulty_id %}
-              <input type="hidden"
-                     name="difficulty"
-                     value="{{ difficulty_id|default_if_none:'' }}">
-            {% endif %}
+        <form method="get" id="search_form">
+          <div class="input-group">
+            <input name="query"
+                   id="query"
+                   class="p-2"
+                   type="text"
+                   value="{{ query }}"
+                   placeholder="Search by tag or title"
+                   style="border-radius: 0.35rem">
+            <button class="btn btn-primary px-2 my-1"
+                    type="submit"
+                    style="border-radius: 0.35rem">Search</button>
+            {% if difficulty_id %}<input type="hidden" name="difficulty" value="{{ difficulty_id }}">{% endif %}
             {% if problems_per_page %}
               <input type="hidden"
                      name="problems_per_page"
-                     value="{{ problems_per_page|default_if_none:10 }}">
+                     value="{{ problems_per_page }}">
             {% endif %}
-            {% if page_obj.has_other_pages %}<input type="hidden" name="page" value="{{ page_obj.number }}">{% endif %}
-          </form>
-        </div>
-        <a class="btn btn-warning mb-2 mt-2 p-1"
-           href="{% url 'python_problems:problem-index' %}"
-           role="button">Clear filters</a>
+          </div>
+        </form>
       </div>
-      <div class="col-md-8">
-        <div class="mb-5 mt-5">
-          <h2>Problem list</h2>
-        </div>
-        {% if page_obj %}
-          <ul>
-            {% for problem in page_obj %}
-              <div class="row">
-                <div class="col-md-auto">
-                  <li>
-                    <div class="problem-container flex">
-                      {{ problem.title }}
-                      {# If Problem owner show Problem update/delete #}
-                      {% if user == problem.owner %}
-                        (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
-                        <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
-                      {% endif %}
-                      {# templetags/problem_filters.py#}
-                      {% load problem_filters %}
-                      <ul>
-                        {% for language in problem_languages|dict_key:problem %}
-                          <li>
-                            <a href="{% url 'python_problems:problem-detail' problem.slug language.name %}">{{ language.name }}</a>
-                          </li>
-                        {% endfor %}
-                      </ul>
-                    </div>
-                  </div>
-                  <div class="col-md-auto">
-                    {% for tag in problem.tags.all %}
-                      <a href="?query={{ tag.name }}&difficulty={{ difficulty_id|default_if_none:'' }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}"
-                         class="tags"
-                         style="display: none">, {{ tag.name }}</a>
-                    {% endfor %}
-                  </div>
-                </li>
-              </div>
-              <hr>
-            {% endfor %}
-          </ul>
-          <nav>
-            <ul class="pagination">
-              {% if page_obj.has_previous %}
-                <li class="page-item">
-                  <a class="page-link"
-                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page=1&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}"><<</a>
-                </li>
-              {% else %}
-                <li class="page-item disabled">
-                  <span class="page-link"><<</span>
-                </li>
-              {% endif %}
-              {% if page_obj.has_previous %}
-                <li class="page-item">
-                  <a class="page-link"
-                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.previous_page_number }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}"><</a>
-                </li>
-              {% else %}
-                <li class="page-item disabled">
-                  <span class="page-link"><</span>
-                </li>
-              {% endif %}
-              {% for num in page_obj.paginator.page_range %}
-                {% if page_obj.number == num %}
-                  <li class="page-item active">
-                    <span class="page-link">{{ num }}</span>
-                  </li>
-                {% else %}
-                  <li class="page-item">
-                    <a class="page-link"
-                       href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ num }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}">{{ num }}</a>
-                  </li>
-                {% endif %}
-              {% endfor %}
-              {% if page_obj.has_next %}
-                <li class="page-item">
-                  <a class="page-link"
-                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.next_page_number }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}">></a>
-                </li>
-              {% else %}
-                <li class="page-item disabled">
-                  <span class="page-link">></span>
-                </li>
-              {% endif %}
-              {% if page_obj.has_next %}
-                <li class="page-item">
-                  <a class="page-link"
-                     href="?query={{ query|default_if_none:'' }}&difficulty={{ difficulty_id|default_if_none:'' }}&page={{ page_obj.paginator.num_pages }}&problems_per_page={{ problems_per_page|default_if_none:10 }}&order_by={{ order_by|default_if_none:'created_at' }}">>></a>
-                </li>
-              {% else %}
-                <li class="page-item disabled">
-                  <span class="page-link">>></span>
-                </li>
-              {% endif %}
-              <div class="">
-                <form method="get" class="">
-                  <select name="problems_per_page"
-                          id="problemsPerPage"
-                          class="form-control ms-3"
-                          onchange="this.form.submit()">
-                    <option value="5"
-                            {% if problems_per_page|stringformat:"s" == "5" %}selected{% endif %}>5 / page</option>
-                    <option value="10"
-                            {% if problems_per_page|stringformat:"s" == "10" %}selected{% endif %}>10 / page</option>
-                    <option value="20"
-                            {% if problems_per_page|stringformat:"s" == "20" %}selected{% endif %}>20 / page</option>
-                    <option value="{{ problem_list|length }}"
-                            {% if problems_per_page == problem_list|length|stringformat:"s" %}selected{% endif %}>
-                      All
-                    </option>
-                  </select>
-                  {% comment "" %}retaions query and difficulty after prob per page {% endcomment %}
-                  {% if query %}<input type="hidden" name="query" value="{{ query|default_if_none:'' }}">{% endif %}
-                  {% if difficulty_id %}
-                    <input type="hidden"
-                           name="difficulty"
-                           value="{{ difficulty_id|default_if_none:'' }}">
-                  {% endif %}
-                  {% if order_by %}<input type="hidden" name="order_by" value="{{ order_by }}">{% endif %}
-                </form>
-              </div>
-            </ul>
-          </nav>
-        {% else %}
-          <p>No python problems available.</p>
-        {% endif %}
+      <label for="difficulty" class="form-label">
+        <strong>Difficulty</strong>
+      </label>
+      <div id="difficulty">
+        <ul>
+          {% for difficulty in difficulty_list %}
+            <li class="py-1 px-2 {% if difficulty.id == difficulty_id %}text-warning{% endif %}">
+              <a href="?query={{ query }}&difficulty={{ difficulty.id }}&problems_per_page={{ problems_per_page }}&order_by={{ order_by }}"
+                 class="btn btn-secondary py-0 {% if difficulty.id == difficulty_id %}text-warning{% endif %}">{{ difficulty.name }}</a>
+            </li>
+          {% endfor %}
+        </ul>
       </div>
-      <div class="col-md-2">
-        <label for="settingsTab">
-          <strong>Settings tab</strong>
+      <div class="mb-4">
+        <label for="order_by" class="form-label">
+          <strong>Order by:</strong>
         </label>
-        <div class="row" id="settingsTab">
-          <div>
-            <button onclick="toggleTags()" class="btn-secondary ms-0 mb-3">Show Tags</button>
-          </div>
-        </div>
-        <div class="row mb-2">
-          <div>
-            <a href="{% url 'python_problems:problem-create' %}">Create a problem</a> |
-            <a href="{% url 'python_problems:solution-create' %}">Create a solution</a> |
-            <a href="{% url 'python_problems:language-create' %}">Add a language</a> |
-            <a href="{% url 'python_problems:tag-index' %}">Tag list</a> |
-            <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
-          </div>
+        <form method="get">
+          <select class="form-select"
+                  style="width: auto"
+                  name="order_by"
+                  id="order_by"
+                  onchange="this.form.submit()">
+            <option value="created_at"
+                    {% if order_by == 'created_at' %}selected{% endif %}>Creation Date</option>
+            <option value="title" {% if order_by == 'title' %}selected{% endif %}>Title</option>
+          </select>
+          {# Retain other query parameters #}
+          {% if query %}<input type="hidden" name="query" value="{{ query }}">{% endif %}
+          {% if difficulty_id %}<input type="hidden" name="difficulty" value="{{ difficulty_id }}">{% endif %}
+          {% if problems_per_page %}
+            <input type="hidden"
+                   name="problems_per_page"
+                   value="{{ problems_per_page }}">
+          {% endif %}
+          {% if page_obj.has_other_pages %}<input type="hidden" name="page" value="{{ page_obj.number }}">{% endif %}
+          {# Retain page number after changing "Order by" #}
+        </form>
+      </div>
+      <a class="btn btn-warning mb-2 p-1"
+         href="{% url 'python_problems:problem-index' %}"
+         role="button">Clear filters</a>
+    </div>
+    <div class="col-md-8">
+      <div class="my-5 mx-3">
+        <h2>Problem list</h2>
+      </div>
+      {% if page_obj %}
+        <ul>
+          {% for problem in page_obj %}
+            <div class="row">
+              <div class="col-md-auto">
+                <li>
+                  <div class="problem-container">
+                    {# problem-contaier when using style_global.css #}
+                    {{ problem.title }}
+                    {% if user == problem.owner %}
+                      {# If Problem owner show Problem update/delete #}
+                      (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
+                      <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
+                    {% endif %}
+                    {% load problem_filters %}
+                    {# templetags/problem_filters.py #}
+                    <ul>
+                      {% for language in problem_languages|dict_key:problem %}
+                        <li>
+                          <a href="{% url 'python_problems:problem-detail' problem.slug language.name %}">{{ language.name }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </li>
+              </div>
+              <div class="col-md-auto">
+                {% for tag in problem.tags.all %}
+                  <a href="?query={{ tag.name }}&difficulty={{ difficulty_id }}&problems_per_page={{ problems_per_page }}&order_by={{ order_by }}"
+                     class="tags btn btn-secondary py-0 px-1"
+                     style="display: none">{{ tag.name }}</a>
+                {% endfor %}
+              </div>
+            </div>
+            <hr>
+          {% endfor %}
+        </ul>
+        <nav>
+          <ul class="pagination">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link"
+                   href="?query={{ query }}&difficulty={{ difficulty_id }}&page=1&problems_per_page={{ problems_per_page }}&order_by={{ order_by }}"><<</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link"><<</span>
+              </li>
+            {% endif %}
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link"
+                   href="?query={{ query }}&difficulty={{ difficulty_id }}&page={{ page_obj.previous_page_number }}&problems_per_page={{ problems_per_page }}&order_by={{ order_by }}"><</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link"><</span>
+              </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+              {% if page_obj.number == num %}
+                <li class="page-item active">
+                  <span class="page-link">{{ num }}</span>
+                </li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link"
+                     href="?query={{ query }}&difficulty={{ difficulty_id }}&page={{ num }}&problems_per_page={{ problems_per_page }}&order_by={{ order_by }}">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link"
+                   href="?query={{ query }}&difficulty={{ difficulty_id }}&page={{ page_obj.next_page_number }}&problems_per_page={{ problems_per_page }}&order_by={{ order_by }}">></a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">></span>
+              </li>
+            {% endif %}
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link"
+                   href="?query={{ query }}&difficulty={{ difficulty_id }}&page={{ page_obj.paginator.num_pages }}&problems_per_page={{ problems_per_page }}&order_by={{ order_by }}">>></a>
+              </li>
+            {% else %}
+              <li class="page-item disabled">
+                <span class="page-link">>></span>
+              </li>
+            {% endif %}
+            <form method="get">
+              <select name="problems_per_page"
+                      id="problems_per_page"
+                      class="form-control ms-3"
+                      onchange="this.form.submit()">
+                <option value=5 {% if problems_per_page == 5 %}selected{% endif %}>5 / page</option>
+                <option value=10 {% if problems_per_page == 10 %}selected{% endif %}>10 / page</option>
+                <option value=20 {% if problems_per_page == 20 %}selected{% endif %}>20 / page</option>
+                <option value="{{ problem_list|length }}"
+                        {% if problems_per_page == problem_list|length %}selected{% endif %}>All</option>
+              </select>
+              {# Retain other query parameters #}
+              {% if query %}<input type="hidden" name="query" value="{{ query }}">{% endif %}
+              {% if difficulty_id %}<input type="hidden" name="difficulty" value="{{ difficulty_id }}">{% endif %}
+              {% if order_by %}<input type="hidden" name="order_by" value="{{ order_by }}">{% endif %}
+            </form>
+          </ul>
+        </nav>
+      {% else %}
+        <p>No python problems available.</p>
+      {% endif %}
+    </div>
+    <div class="col-md-2">
+      <label>
+        <strong>Settings tab</strong>
+      </label>
+      <div class="mb-3" id="settings_tab">
+        <button onclick="toggleTags()" class="btn btn-secondary px-2 py-0">Show Tags</button>
+      </div>
+      <div class="row mb-2">
+        <div>
+          <a href="{% url 'python_problems:problem-create' %}">Create a problem</a> |
+          <a href="{% url 'python_problems:solution-create' %}">Create a solution</a> |
+          <a href="{% url 'python_problems:language-create' %}">Add a language</a> |
+          <a href="{% url 'python_problems:tag-index' %}">Tag list</a> |
+          <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
         </div>
       </div>
     </div>
-    <script>
-      function toggleTags() {
-        var tags = document.querySelectorAll(".tags");
-        for (var i = 0; i < tags.length; i++) {
-          if (tags[i].style.display === "none") {
-            tags[i].style.display = "inline-block";
-          } else {
-            tags[i].style.display = "none";
-          }
-        }
+  </div>
+  <script>
+  function toggleTags() {
+    var tags = document.querySelectorAll(".tags");
+    for (var i = 0; i < tags.length; i++) {
+      if (tags[i].style.display === "none") {
+        tags[i].style.display = "inline-block";
+      } else {
+        tags[i].style.display = "none";
       }
-    </script>
-  {% endblock content %}
+    }
+  }
+  </script>
+{% endblock content %}
