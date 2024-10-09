@@ -29,7 +29,7 @@ class ProblemIndexView(ListView):
     model = Problem
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)  # fetch get_context_data from parent class
 
         # Fetch data from database.
         problem_list = self.model.objects.all()
@@ -38,7 +38,7 @@ class ProblemIndexView(ListView):
 
         # Fetch data from request.
         query = self.request.GET.get("query", "")
-        difficulty_id = self.request.GET.get("difficulty", "")
+        difficulty_id = int(self.request.GET.get("difficulty")) if self.request.GET.get("difficulty") else 0
         order_by = self.request.GET.get("order_by", "created_at")
 
         # Fileter problems by difficulty.
@@ -50,23 +50,18 @@ class ProblemIndexView(ListView):
             problem_list = problem_list.filter(
                 Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
 
-        # For each problem, get distinct languages from solutions
-        # problem_languages = {
-        #     problem: Solution.objects.filter(problem=problem).values('language').distinct()
-        #     for problem in problem_list
-        # }
+        # For each problem, get distinct language from solutions
         problem_languages = {
-            problem: Language.objects.filter(id__in=Solution.objects.filter(
-                problem=problem).values_list('language', flat=True).distinct())
+            problem: Language.objects.filter(
+                id__in=Solution.objects.filter(problem=problem).values_list('language', flat=True).distinct())
             for problem in problem_list
         }
-        context["problem_languages"] = problem_languages
-
+    
         # Order problems.
         problem_list = problem_list.order_by(order_by)
 
         # Pagination of problems.
-        problems_per_page = self.request.GET.get("problems_per_page", "10")
+        problems_per_page = int(self.request.GET.get("problems_per_page", 10))
         paginator = Paginator(problem_list, problems_per_page)
         page_number = self.request.GET.get("page", 1)
         page_obj = paginator.get_page(page_number)
@@ -80,6 +75,7 @@ class ProblemIndexView(ListView):
         context["order_by"] = order_by
         context["problems_per_page"] = problems_per_page
         context["page_obj"] = page_obj
+        context["problem_languages"] = problem_languages
 
         return context
 
@@ -91,6 +87,7 @@ class ProblemDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         # Fetch a solution.
+        # language_name = context.get("view").kwargs.get("language")
         language_name = self.kwargs.get("language")
         language = get_object_or_404(Language, name=language_name)
         solutions = Solution.objects.filter(
@@ -153,8 +150,8 @@ class ProblemDetailView(DetailView):
         # Fetch code from a code area and execute it.
         code_text = request.POST.get("code_area")
         try:
-            result = execute_code(code_text)
-            output_form = OutputForm(initial={"output_area": result})
+            executed_code = execute_code(code_text)
+            output_form = OutputForm(initial={"output_area": executed_code})
         except Exception as e:
             output_form = OutputForm(
                 initial={"output_area": f"Error: {str(e)}"})

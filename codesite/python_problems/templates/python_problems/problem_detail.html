@@ -122,7 +122,7 @@
         <b>Code Area</b>:
       </label>
       <form id="codeForm"
-            action="{% url 'python_problems:problem-detail' problem.slug solution %}"
+            action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
             method="POST"
             class="mb-2">
         {% csrf_token %}
