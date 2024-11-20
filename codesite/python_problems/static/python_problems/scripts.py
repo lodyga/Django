@@ -160,6 +160,9 @@ def parse_testcases(solution_testcase):
 
         if line.startswith("console.log"):
             line = line[11:]
+        
+        if line.startswith("print"):
+            line = line[5:]
 
         try:
             input_part = ""
