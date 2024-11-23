@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 
 from .models import Tag, Difficulty, Complexity, Language, Problem, Solution
 from .forms import OutputForm, ProblemForm, SolutionForm
-from .static.python_problems.scripts import execute_code, parse_testcases
+from .static.python_problems.scripts import execute_code, parse_testcases, parse_url
 from django.conf import settings
 
 # REST API
@@ -132,6 +132,9 @@ class ProblemDetailView(DetailView):
         # Parse testcases
         testcases, testcases_input, testcases_output = parse_testcases(
             solution.testcase)
+        
+        # Parse URL
+        url = parse_url(problem.url)
 
         # Context
         context['owners'] = owners
@@ -142,6 +145,7 @@ class ProblemDetailView(DetailView):
         context["code_text"] = code_text
         context["output_form"] = output_form
         context["testcases"] = testcases
+        context["url"] = url
 
         return context
 

@@ -2,6 +2,7 @@ import tempfile
 import os
 import subprocess
 import multiprocessing
+import re
 from RestrictedPython import compile_restricted
 from RestrictedPython import safe_builtins, limited_builtins, utility_builtins, safe_globals
 from RestrictedPython.Eval import default_guarded_getitem, default_guarded_getiter
@@ -189,3 +190,8 @@ def parse_testcases(solution_testcase):
             testcases_output.append(output_part)
 
     return testcases, testcases_input, testcases_output
+
+
+def parse_url(raw_url):
+    return re.search(r"((https?)://)?(www\.)?(app\.)?(\w+\.\w+)(/)?", raw_url).group(5)
+
