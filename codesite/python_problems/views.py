@@ -29,7 +29,8 @@ class ProblemIndexView(ListView):
     model = Problem
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)  # fetch get_context_data from parent class
+        # fetch get_context_data from parent class
+        context = super().get_context_data(**kwargs)
 
         # Fetch data from database.
         problem_list = self.model.objects.all()
@@ -38,7 +39,8 @@ class ProblemIndexView(ListView):
 
         # Fetch data from request.
         query = self.request.GET.get("query", "")
-        difficulty_id = int(self.request.GET.get("difficulty")) if self.request.GET.get("difficulty") else 0
+        difficulty_id = int(self.request.GET.get(
+            "difficulty")) if self.request.GET.get("difficulty") else 0
         order_by = self.request.GET.get("order_by", "created_at")
 
         # Fileter problems by difficulty.
@@ -56,7 +58,7 @@ class ProblemIndexView(ListView):
                 id__in=Solution.objects.filter(problem=problem).values_list('language', flat=True).distinct())
             for problem in problem_list
         }
-    
+
         # Order problems.
         problem_list = problem_list.order_by(order_by)
 
@@ -84,39 +86,41 @@ class ProblemDetailView(DetailView):
     model = Problem
 
     def get_context_data(self, **kwargs):
+        # fetch get_context_data() from DetailView
         context = super().get_context_data(**kwargs)
 
-        # Fetch a solution.
-        # language_name = context.get("view").kwargs.get("language")
+        # fetch current problem
+        problem = self.get_object()
+
+        # capture language name from self.kwars which are captured from URL path
         language_name = self.kwargs.get("language")
+        # fetch the language model  # Language.objects.get(name="Python")
         language = get_object_or_404(Language, name=language_name)
+        # fetch solutions from all users based on the problem and the language
         solutions = Solution.objects.filter(
-            problem=self.object, language=language)
+            problem=problem, language=language)
 
-        # Fetch the list of owners who have solutions for this problem and language
+        # Fetch the list of the owners who have solutions for this problem and language
         owners = get_user_model().objects.filter(
-            id__in=Solution.objects.filter(
-                problem=self.object, language=language).values_list('owner', flat=True)
-        )
+            id__in=solutions.values_list("owner", flat=True))
 
-        # Fetch owenr id
+        # Fetch the owner id from the owner form (if none take the first owner from owners)
         selected_owner_id = self.request.GET.get("owner", owners.first().id)
 
-        # Fetch owner
-        selected_owner = get_object_or_404(
+        # Fetch owner from owrer id.
+        owner = get_object_or_404(
             get_user_model(), id=selected_owner_id)
 
-        # Fetch owner solution
+        # Fetch owner solution as queryset
         solutions = Solution.objects.filter(
-            problem=self.object, language=language, owner=selected_owner)
+            problem=problem, language=language, owner=owner)
 
         # There's only one solution per language per user
         solution = solutions.first()
 
         # Fetch related problems.
-        problem = self.get_object()
         related_problems = Problem.objects.annotate(
-            common_tags=Count('tags', filter=Q(tags__in=problem.tags.all()))
+            common_tags=Count("tags", filter=Q(tags__in=problem.tags.all()))
         ).filter(common_tags__gte=2).exclude(pk=problem.pk).distinct()
 
         # Default text for coding form.
@@ -138,8 +142,6 @@ class ProblemDetailView(DetailView):
         context["code_text"] = code_text
         context["output_form"] = output_form
         context["testcases"] = testcases
-        # context["testcases_input"] = testcases_input
-        # context["testcases_output"] = testcases_output
 
         return context
 
@@ -149,6 +151,7 @@ class ProblemDetailView(DetailView):
 
         # Fetch code from a code area and execute it.
         code_text = request.POST.get("code_area")
+        
         try:
             executed_code = execute_code(code_text)
             output_form = OutputForm(initial={"output_area": executed_code})

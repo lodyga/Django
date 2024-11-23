@@ -101,4 +101,4 @@ class Solution(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.problem.title} ({self.language.name})"
+        return f"{self.problem.title} ({self.language.name}) by {self.owner}"

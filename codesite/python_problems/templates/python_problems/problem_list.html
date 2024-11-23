@@ -200,7 +200,7 @@
       <label>
         <strong>Settings tab</strong>
       </label>
-      <div class="mb-3" id="settings_tab">
+      <div class="mb-3">
         <button onclick="toggleTags()" class="btn btn-secondary px-2 py-0">Show Tags</button>
       </div>
       <div class="row mb-2">
@@ -215,15 +215,16 @@
     </div>
   </div>
   <script>
-  function toggleTags() {
-    var tags = document.querySelectorAll(".tags");
-    for (var i = 0; i < tags.length; i++) {
-      if (tags[i].style.display === "none") {
-        tags[i].style.display = "inline-block";
-      } else {
-        tags[i].style.display = "none";
+    function toggleTags() {
+      const tags = document.querySelectorAll('a.tags');
+    
+      for (const tag of tags) {
+        if (tag.style.display === 'none') {
+          tag.style.display = 'inline-block'
+        } else {
+          tag.style.display = 'none'
+        }
       }
     }
-  }
   </script>
 {% endblock content %}

@@ -3,6 +3,12 @@
   Python
 {% endblock title %}
 {% block head %}
+  {# CodeMirror default styles #}
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
+  {# Monokai theme for CodeMirror #}
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
 {% endblock head %}
 {% block content %}
   {% load static %}
@@ -30,7 +36,7 @@
                   {% for related in related_problems %}
                     <li>
                       <a href="{% url 'python_problems:problem-detail' related.slug solution.language.name %}"
-                         class="btn">{{ related.title|truncatechars:25 }}</a>
+                         class="btn">{{ related.title|truncatechars:23 }}</a>
                     </li>
                   {% endfor %}
                 </ul>
@@ -41,251 +47,249 @@
       </div>
     </div>
     <div class="col-md-8 p-4">
-      <div class="row">
-        <div class="col-auto mb-5 mt-5">
-          <h1>{{ problem.title }}</h1>
-          <hr>
-        </div>
-        <div class="row mb-2">
-          {% if user == solution.owner %}
-            <div class="col-auto mb-2">
-              <p>
-                <a href="{% url 'python_problems:solution-update' solution.id %}">Update</a>
-              </p>
-              <p>
-                <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>
-              </p>
-            </div>
-          {% endif %}
-          <div class="col-auto mb-2">
-            <form method="get" action="">
-              <label for="owner" class="mb-2">
-                <b>Solution Owner:</b>
-              </label>
-              <select id="owner"
-                      name="owner"
-                      class="form-select"
-                      onchange="this.form.submit()">
-                {% for owner in owners %}
-                  <option value="{{ owner.id }}"
-                          {% if owner.id|stringformat:"s" == selected_owner %}selected{% endif %}>
-                    {{ owner.username }}
-                  </option>
-                {% endfor %}
-              </select>
-            </form>
-          </div>
-          <div class="col-auto mb-2">
-            <p>
-              <b>Language</b>:
-              <p>{{ solution.language.name }}</p>
-            </p>
-          </div>
-          <div class="col-auto mb-2">
-            <p>
-              <b>Difficulty</b>:
-              <p>{{ problem.difficulty }}</p>
-            </p>
-          </div>
-          <div class="col-auto mb-2">
-            <p>
-              <b>Tags</b>:
-              {% comment %}<p>{{ tags|join:", " }}</p>{% endcomment %}
-              <p>
-                {% for tag in tags %}
-                  <a href="{% url 'python_problems:problem-index' %}?query={{ tag }}">{{ tag }}</a>
-                  {% if not forloop.last %},{% endif %}
-                {% endfor %}
-              </p>
-            </p>
-          </div>
-          <div class="col-auto mb-2">
-            <p>
-              <b>Complexity</b>:
-            </p>
-            <p>Time: {{ solution.time_complexity }}, Space: {{ solution.space_complexity }}</p>
-          </div>
-          <div class="col-auto mb-2">
-            <p>
-              <b>URL</b>:
-            </p>
-            <a href="{{ problem.url }}" target="_blank">{{ problem.url|slice:"8:20" }}</a>
-          </div>
-        </div>
+      <div class="row-auto mb-5 mt-5">
+        <h1>{{ problem.title }}</h1>
+        <hr>
       </div>
-      <hr>
-      <label for="problemDescription" class="form-label">
-        <b>Problem description</b>:
-      </label>
-      <pre class="mb-5" style="white-space: pre-wrap" id="problemDescription">{{ problem.description }}</pre>
-      <label for="codeForm" class="form-label">
-        <b>Code Area</b>:
-      </label>
-      <form id="codeForm"
-            action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
-            method="POST"
-            class="mb-2">
-        {% csrf_token %}
-        <div class="code-area-container mb-2 border border-primary">
-          <textarea name="code_area"
-                    id="id_code_area"
-                    cols="80"
-                    rows="10"
-                    class="python-code  border border-primary">{{ code_text }}</textarea>
-        </div>
-        <link rel="stylesheet"
-              href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
-        <link rel="stylesheet"
-              href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
-        <script>
-              document.addEventListener('DOMContentLoaded', function () {
-                  var storedDarkMode = localStorage.getItem('darkMode');
-                  var theme = storedDarkMode === "enabled" ? "monokai" : "default";
-                  var editor = CodeMirror.fromTextArea(document.getElementById("id_code_area"), {
-                      mode: "python",
-                      theme: theme,
-                      lineNumbers: true, // Enable line numbers
-                      autofocus: false, // Automatically focus on the editor
-                      placeholder: "Enter your Python code here..." // Placeholder text
-                  });
-              });
-        </script>
-        <div class="d-flex align-items-center">
-          <button id="submitButton" type="submit" class="btn btn-warning ">
-            <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
-            Run
-          </button>
-          <div class="alert alert-info p-2 ms-1 mt-3">
-            <em>Run</em> for python code only.
-          </div>
-        </div>
-      </form>
-      <script>
-            document.getElementById('codeForm').addEventListener('submit', function () {
-                document.getElementById('submitButton').disabled = true; // Disable the submit button
-                document.getElementById('spinner').classList.remove('d-none'); // Show the spinner
-                document.getElementById('submitButton').innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running';
-            });
-      </script>
-      {% if output_form.output_area.value == "Error: 'output'" %}
-        {% comment %} {{ output_form.output_area.value }} {% endcomment %}
-        <div class="alert alert-warning">
-          <strong>Warning!</strong> No <em>output</em> variable in Code Area.
-        </div>
-      {% elif "Error" in output_form.output_area.value %}
-        <div>
-          <div class="alert alert-warning">
-            <strong>Warning!</strong> Error detected.
-          </div>
-        </div>
-      {% else %}
-        <div>
-          <div class="alert alert-info">No errors in code.</div>
-        </div>
-      {% endif %}
-      {% load crispy_forms_tags %}
-      <form action="" class="mb-5">
-        {{ output_form|crispy }}
-      </form>
-      <label for="testcases" class="form-label">
-        <b>Test Cases</b>:
-      </label>
-      <div id="testcases">
-        {% for testcase in testcases %}
-          <div id="testcase-{{ forloop.counter }}" class="testcase-content">
-            <div class="row">
-              <div class="col-auto monospace">
-                <span class="badge bg-secondary">Input:</span>
-                <div class="form-control mb-1" rows="1">{{ testcase.0 }}</div>
-              </div>
-              <div class="col-auto monospace">
-                <span class="badge bg-secondary">Output:</span>
-                <div class="form-control mb-1" rows="1">{{ testcase.1 }}</div>
-              </div>
+      <div class="row mt-4 mb-4">
+        {% if user == solution.owner %}
+          <div class="col-auto mb-2">
+            <div class="mb-3">
+              <a href="{% url 'python_problems:solution-update' solution.id %}">Update</a>
+            </div>
+            <div>
+              <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>
             </div>
           </div>
-        {% endfor %}
+        {% endif %}
+        <div class="col-auto mb-2">
+          <form method="get" action="">
+            <label for="owner" class="mb-2">
+              <b>Solution Owner:</b>
+            </label>
+            <select id="owner"
+                    name="owner"
+                    class="form-select"
+                    onchange="this.form.submit()">
+              {% for owner in owners %}
+                <option value="{{ owner.id }}"
+                        {% if owner.id|stringformat:"s" == selected_owner %}selected{% endif %}>
+                  {{ owner.username }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+        <div class="col-auto mb-2">
+          <p>
+            <b>Language</b>:
+            <p>{{ solution.language.name }}</p>
+          </p>
+        </div>
+        <div class="col-auto mb-2">
+          <p>
+            <b>Difficulty</b>:
+            <p>{{ problem.difficulty.name }}</p>
+          </p>
+        </div>
+        <div class="col-auto mb-2">
+          <p>
+            <b>Tags</b>:
+            {% comment %}<p>{{ tags|join:", " }}</p>{% endcomment %}
+            <p>
+              {% for tag in tags %}
+                <a href="{% url 'python_problems:problem-index' %}?query={{ tag }}"
+                   class="tags btn btn-secondary py-0 px-1"
+                   style="display: inline-block">{{ tag }}</a>
+              {% endfor %}
+            </p>
+          </p>
+        </div>
+        <div class="col-auto mb-2">
+          <p>
+            <b>Complexity</b>:
+          </p>
+          <p>Time: {{ solution.time_complexity.name }}, Space: {{ solution.space_complexity.name }}</p>
+        </div>
+        <div class="col-auto mb-2">
+          <p>
+            <b>URL</b>:
+          </p>
+          <a href="{{ problem.url }}" target="_blank">{{ problem.url|slice:"8:20" }}</a>
+        </div>
+        <hr>
       </div>
-      <div id="buttons" class="mb-5">
-        <!-- Buttons will be inserted here by JavaScript -->
+      <div class="row mb-2">
+        <label for="problem_description" class="form-label">
+          <b>Problem description</b>:
+        </label>
+        <pre class="mb-5" style="white-space: pre-wrap" id="problem_description">{{ problem.description }}</pre>
       </div>
-      <button type="button"
-              class="btn btn-primary mb-2"
-              data-bs-toggle="collapse"
-              data-bs-target="#solution">Show solution</button>
-      <div id="solution" class="collapse">
-        <p>
-          <b>Solution by
-          {{ solution.owner.username }}</b>
-          {% if user == solution.owner %}
-            (<a href="{% url 'python_problems:solution-update' solution.id %}">Update</a> |
-            <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>)
+      <div class="row mb-2">
+        <label for="code_form" class="form-label">
+          <b>Code Area</b>:
+        </label>
+        <form id="code_form"
+              action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
+              method="post"
+              class="mb-2">
+          {% csrf_token %}
+          <div class="code-area-container mb-2 border border-warning">
+            <textarea name="code_area"
+                      id="code_area"
+                      cols="80"
+                      rows="10"
+                      class="python-code border border-primary">{{ code_text }}</textarea>
+          </div>
+          <div class="d-inline-flex align-items-center">
+            <button id="submit_button" type="submit" class="btn btn-warning ">
+              <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
+              Run
+            </button>
+            <div class="alert alert-info p-2 ms-1 mt-3">
+              <em>Run</em> for python code only.
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="row mb-2">
+        <div>
+          {% if output_form.output_area.value == "Error: 'output'" %}
+            <div class="alert alert-warning">
+              <strong>Warning!</strong> No <em>output</em> variable in Code Area.
+            </div>
+          {% elif "Error" in output_form.output_area.value %}
+            <div class="alert alert-warning">
+              <strong>Warning!</strong> Error detected.
+            </div>
+          {% else %}
+            <div class="alert alert-info">No errors in code.</div>
           {% endif %}
-        </p>
-        <div class="box">
-          <pre style="font-family:'Courier New', Courier, monospace">{{ solution.solution }}</pre>
         </div>
       </div>
-      <hr>
+      <div class="row mb-2">
+        {% load crispy_forms_tags %}
+        <form action="" class="mb-5">
+          {{ output_form|crispy }}
+        </form>
+      </div>
+      <div class="row mb-2">
+        <label for="testcases" class="form-label">
+          <b>Test Cases</b>:
+        </label>
+        <div id="testcases_container" class="col-auto">
+          {% for testcase in testcases %}
+            <div id="testcase-{{ forloop.counter }}" class="testcase-content">
+              <div class="row">
+                <div class="col-auto monospace">
+                  <span class="badge bg-secondary">Input:</span>
+                  <div class="form-control mb-1" rows="1">{{ testcase.0 }}</div>
+                </div>
+                <div class="col-auto monospace">
+                  <span class="badge bg-secondary">Output:</span>
+                  <div class="form-control mb-1" rows="1">{{ testcase.1 }}</div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <div id="buttons_container" class="mb-5">
+          <!-- Buttons will be inserted here by JavaScript -->
+        </div>
+      </div>
+      <div class="row-auto mb-2">
+        <button type="button"
+                class="btn btn-primary mb-2"
+                data-bs-toggle="collapse"
+                data-bs-target="#solution">Show solution</button>
+        <div id="solution" class="collapse">
+          <p>
+            <b>Solution by
+            {{ solution.owner.username }}</b>
+            {% if user == solution.owner %}
+              (<a href="{% url 'python_problems:solution-update' solution.id %}">Update</a> |
+              <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>)
+            {% endif %}
+          </p>
+          <div class="box">
+            <pre style="font-family:'Courier New', Courier, monospace">{{ solution.solution }}</pre>
+          </div>
+        </div>
+        <hr>
+      </div>
     </div>
     <div class="col-md-2 p-4">
-      <div class="row">
-        <div>
-          <a href="{% url 'python_problems:problem-index' %}"
-             class="btn btn-secondary px-3 py-0 mb-2">Back</a>
-        </div>
+      <div class="row-auto">
+        <a href="{% url 'python_problems:problem-index' %}"
+           class="btn btn-secondary px-3 py-0 mb-2">Back</a>
       </div>
     </div>
   </div>
+  {# CodeMirror block #}
+  {# CodeMirror core JavaScript #}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
+  {# Python mode for CodeMirror #}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const testCases = {{ testcases|safe }};
+    {# CodeMirror textarea #}
+    document.addEventListener('DOMContentLoaded', loadCodeMirror)
+    
+    function loadCodeMirror() {
+      let storedDarkMode = localStorage.getItem('darkMode');
+      let theme = storedDarkMode === 'enabled' ? 'monokai' : 'default';
+      
+      CodeMirror.fromTextArea(document.getElementById('code_area'), {
+        mode: 'python',
+        theme: theme,
+        lineNumbers: true, // Enable line numbers
+        autofocus: false, // Automatically focus on the editor
+        // placeholder: 'Enter your Python code here...' // Placeholder text
+      });
+    };
+
+    {# Run button #}
+    document.getElementById('code_form').addEventListener('submit', submitCode) 
+      function submitCode() {
+        document.getElementById('submit_button').disabled = true;  // Disable the submit button
+        document.getElementById('spinner').classList.remove('d-none');  // Show the spinner
+        document.getElementById('submit_button').lastChild.textContent = 'Running';  // chhange 'Run' to 'Running'
+      }
+
+    {# Testcase buttons #}
+    document.addEventListener('DOMContentLoaded', loadTestcaseButtons);
+    
+    function loadTestcaseButtons() {
+      const testCases = {{ testcases|safe }};
+      const buttonsContainer = document.getElementById('buttons_container');
+      const testcasesContainer = document.getElementById('testcases_container');
+
+      testCases.forEach((testCase, index) => {
+        // Create button
+        const button = document.createElement('button');
+        button.className = 'btn btn-secondary btn-sm me-2 py-0 px-3';
+        button.textContent = index + 1;
+        button.onclick = (event) => {
+          // event.preventDefault();
+          showTestCase(index + 1);
+        }
+        buttonsContainer.appendChild(button);
+      });
+
+      function showTestCase(index) {
+        // Hide all test cases
+        const testcaseElements = document.getElementsByClassName('testcase-content');
+        for (let testcase of testcaseElements) {
+          testcase.style.display = 'none';
+        }
         
-        const buttonsContainer = document.getElementById('buttons');
-        const testcasesContainer = document.getElementById('testcases');
-        // const testcaseForm = document.getElementById('testcase-form');
-        // const formTextarea = testcaseForm.querySelector('textarea[name="testcase"]');
-        // const testcaseInputForm = document.getElementById('testcase-input-form');
-        // const testcaseOutputForm = document.getElementById('testcase-output-form');
-        // const inputTextarea = testcaseInputForm.querySelector('textarea[name="testcase_input"]');
-        // const outputTextarea = testcaseOutputForm.querySelector('textarea[name="testcase_output"]');
+        // Show selected test case
+        document.getElementById(`testcase-${index}`).style.display = 'block';
+      }
 
-        testCases.forEach((testCase, index) => {
-            // Create button
-            const button = document.createElement('button');
-            button.className = 'btn btn-secondary btn-sm me-2 py-0 px-3';
-            button.textContent = index + 1;
-            button.onclick = (event) => {
-                event.preventDefault();
-                showTestCase(index + 1);
-            };
-            buttonsContainer.appendChild(button);
-        });
-
-        function showTestCase(index) {
-            // Hide all test cases
-                const testcaseElements = testcasesContainer.getElementsByClassName('testcase-content');
-                for (let testcase of testcaseElements) {
-                    testcase.style.display = 'none';
-            }
-
-            // Show the selected test case
-                const selectedTestcase = document.getElementById(`testcase-${index}`);
-                if (selectedTestcase) {
-                    selectedTestcase.style.display = 'block';
-                const [inputPart, outputPart] = testCases[index - 1];
-                formTextarea.value = selectedPre.textContent.trim();
-                inputTextarea.value = "inputPart.trim();"
-                outputTextarea.value = outputPart.trim();
-            }
-        }
-
-        // Optionally, show the first test case by default
-        if (testCases.length > 0) {
-            showTestCase(1);
-        }
-    });
+      // Show the first test case by default
+      if (testCases.length > 0) {
+        showTestCase(1);
+      }
+    }
   </script>
 {% endblock content %}
