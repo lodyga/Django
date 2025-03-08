@@ -22,8 +22,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "ukasz.eu.pythonanywhere.com",
-    "localhost",  # for local Docker
-    "codesite.onrender.com"  # for Docker container on Render
+    "localhost",  # local Docker
+    "codesite.onrender.com",  # Docker container on Render
+    "testserver", # Testing in Activity Bar
 ]
 
 
@@ -37,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    "debug_toolbar",
-    "rest_framework",
+    # "debug_toolbar",  # debug toolbar
+    "rest_framework",  # rest framework
 
     # Extensions - installed with requirements.txt
     'crispy_forms',
@@ -61,7 +62,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 TAGGIT_CASE_INSENSITIVE = True
 
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",  # Debug Toolbar
+    # "debug_toolbar.middleware.DebugToolbarMiddleware",  # Debug Toolbar
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

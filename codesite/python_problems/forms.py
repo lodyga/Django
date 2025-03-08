@@ -1,5 +1,5 @@
 from django import forms
-from python_problems.models import Problem, Solution, Language
+from .models import Problem, Solution, Language
 
 
 # Custom form to remove "slug", "owner" fields

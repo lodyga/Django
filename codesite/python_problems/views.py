@@ -1,20 +1,26 @@
-from django.shortcuts import render, get_object_or_404
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView, DetailView
-from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q, Count
-from django.core.paginator import Paginator
-from django.contrib.auth import get_user_model
-
-from .models import Tag, Difficulty, Complexity, Language, Problem, Solution
-from .forms import OutputForm, ProblemForm, SolutionForm
-from .static.python_problems.scripts import execute_code, parse_testcases, parse_url
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from .forms import OutputForm, ProblemForm, SolutionForm
+from .models import Complexity, Difficulty, Language, Problem, Solution, Tag
+from .static.python_problems.scripts import execute_code, parse_testcases, parse_url
 
 # REST API
 from rest_framework import viewsets
-from .serializers import TagSerializer, DifficultySerializer, ComplexitySerializer, LanguageSerializer, ProblemSerializer, SolutionSerializer
+from .serializers import (
+    ComplexitySerializer,
+    DifficultySerializer,
+    LanguageSerializer,
+    ProblemSerializer,
+    SolutionSerializer,
+    TagSerializer
+)
 
 
 def tag_graph_view(request):
@@ -68,48 +74,63 @@ class ProblemIndexView(ListView):
         page_number = self.request.GET.get("page", 1)
         page_obj = paginator.get_page(page_number)
 
-        # Context
-        context["problem_list"] = problem_list
-        context["difficulty_list"] = difficulty_list
-        context["tag_list"] = tag_list
-        context["query"] = query
-        context["difficulty_id"] = difficulty_id
-        context["order_by"] = order_by
-        context["problems_per_page"] = problems_per_page
-        context["page_obj"] = page_obj
-        context["problem_languages"] = problem_languages
+        context.update({
+            "problem_list": problem_list,
+            "difficulty_list": difficulty_list,
+            "tag_list": tag_list,
+            "query": query,
+            "difficulty_id": difficulty_id,
+            "order_by": order_by,
+            "problems_per_page": problems_per_page,
+            "page_obj": page_obj,
+            "problem_languages": problem_languages,
+        })
 
         return context
 
 
 class ProblemDetailView(DetailView):
     model = Problem
+    template_name = "python_problems/problem_detail.html"  # needed for post render()
+    default_code_text = """# Write code here.\r\n# Remember to pass the solution to the output.\r\n\r\ndef fun(x):\r\n    return x\r\n\r\noutput = fun(1)"""
 
     def get_context_data(self, **kwargs):
+        User = get_user_model()
+
         # fetch get_context_data() from DetailView
         context = super().get_context_data(**kwargs)
 
-        # fetch current problem
+        # get current problem
         problem = self.get_object()
 
-        # capture language name from self.kwars which are captured from URL path
+        # Get current language from the URL
         language_name = self.kwargs.get("language")
-        # fetch the language model  # Language.objects.get(name="Python")
+
+        # get the language model  # Language.objects.get(name="Python")
         language = get_object_or_404(Language, name=language_name)
-        # fetch solutions from all users based on the problem and the language
+        del language_name
+
+        # solution language id
+        language_id = language.id
+
+        # fetch solutions for all users based on the problem and the language
         solutions = Solution.objects.filter(
             problem=problem, language=language)
 
         # Fetch the list of the owners who have solutions for this problem and language
-        owners = get_user_model().objects.filter(
+        owners = User.objects.filter(
             id__in=solutions.values_list("owner", flat=True))
 
-        # Fetch the owner id from the owner form (if none take the first owner from owners)
-        selected_owner_id = self.request.GET.get("owner", owners.first().id)
+        # Fetch current owner id from the owner form-select (if none selected take the first owner from owners)
+        owner_id = self.request.GET.get("owner", owners.first().id)
 
-        # Fetch owner from owrer id.
-        owner = get_object_or_404(
-            get_user_model(), id=selected_owner_id)
+        # Fetch owner from owner id.
+        owner = get_object_or_404(User, id=owner_id)
+
+        # Get all languages for the problem for curent owner
+        solution_languages = Language.objects.filter(
+            id__in=Solution.objects.filter(
+                problem=problem, owner=owner).values_list("language", flat=True))
 
         # Fetch owner solution as queryset
         solutions = Solution.objects.filter(
@@ -123,39 +144,47 @@ class ProblemDetailView(DetailView):
             common_tags=Count("tags", filter=Q(tags__in=problem.tags.all()))
         ).filter(common_tags__gte=2).exclude(pk=problem.pk).distinct()
 
-        # Default text for coding form.
-        code_text = """# Write code here.\n# Remember to pass the solution to the output.\n\ndef fun(x):\n    return x\n\noutput = fun(1)"""
-
         # Output form
         output_form = OutputForm(initial={"output_area": "None"})
 
         # Parse testcases
         testcases, testcases_input, testcases_output = parse_testcases(
             solution.testcase)
-        
+
         # Parse URL
         url = parse_url(problem.url)
 
-        # Context
-        context['owners'] = owners
-        context['selected_owner'] = selected_owner_id
-        context['solution'] = solution
-        context["tags"] = problem.tags.values_list("name", flat=True)
-        context["related_problems"] = related_problems
-        context["code_text"] = code_text
-        context["output_form"] = output_form
-        context["testcases"] = testcases
-        context["url"] = url
+        context.update({
+            "owners": owners,
+            "owner_id": owner_id,
+            "solution": solution,
+            "language": language,  # Pass the selected language
+            "language_id": language_id,  # Used for the <option> selected state
+            "solution_languages": solution_languages,  # Available languages in the dropdown
+            "tags": problem.tags.values_list("name", flat=True),
+            "related_problems": related_problems,
+            "code_text": self.default_code_text,
+            "output_form": output_form,
+            "testcases": testcases,
+            "url": url,
+        })
 
         return context
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, **kwargs):
         self.object = self.get_object()
+        problem = self.object  # Get the Problem instance
         context = self.get_context_data(**kwargs)
+        User = get_user_model()
 
-        # Fetch code from a code area and execute it.
+        # If language is selected, update the URL
+        language_id = request.POST.get("language")
+        if language_id:
+            language = get_object_or_404(Language, id=language_id)
+            return redirect("python_problems:problem-detail", problem.slug, language.name)
+
+        # Get code from a code area and execute it.
         code_text = request.POST.get("code_area")
-        
         try:
             executed_code = execute_code(code_text)
             output_form = OutputForm(initial={"output_area": executed_code})
@@ -163,11 +192,24 @@ class ProblemDetailView(DetailView):
             output_form = OutputForm(
                 initial={"output_area": f"Error: {str(e)}"})
 
-        # Context
-        context["code_text"] = code_text
-        context["output_form"] = output_form
+        # Get owner from form select or keep the current one
+        owner_id = request.POST.get("owner") or context["owner_id"]
+        owner = get_object_or_404(User, id=owner_id)
 
-        return self.render_to_response(context)
+        # Use the current language.
+        language_id = context["language_id"]
+        language = get_object_or_404(Language, id=language_id)
+
+        context.update({
+            "code_text": self.default_code_text,
+            "output_form": output_form,
+            "owner_id": owner_id,
+            "language_id": language_id,
+            "solution": Solution.objects.filter(
+                problem=problem, owner=owner, language=language).first()
+        })
+
+        return render(request, self.template_name, context)
 
 
 class TagIndexView(ListView):

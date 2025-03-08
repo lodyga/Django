@@ -1,7 +1,7 @@
 from django.db import models
-from django.utils.text import slugify
-from django.urls import reverse
 from django.conf import settings
+from django.urls import reverse
+from django.utils.text import slugify
 
 
 class Tag(models.Model):
@@ -36,8 +36,10 @@ class Complexity(models.Model):
 
 
 class NonStrippingTextField(models.TextField):
-    """A TextField that does not strip whitespace at the beginning/end of
-    it's value. Might be important for markup/code."""
+    """
+    A TextField that does not strip whitespace at the beginning/end of
+    it's value. Might be important for markup/code.
+    """
 
     def formfield(self, **kwargs):
         kwargs['strip'] = False
@@ -52,7 +54,6 @@ class Language(models.Model):
 
 
 class Problem(models.Model):
-    # Problem-related attributes
     title = models.CharField(unique=True, max_length=200)
     slug = models.SlugField(unique=True, blank=True)
     tags = models.ManyToManyField("Tag")

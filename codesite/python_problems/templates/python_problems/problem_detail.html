@@ -63,9 +63,10 @@
           </div>
         {% endif %}
         <div class="col-auto mb-2">
-          <form method="get" action="">
+          <form method="post" action="">
+            {% csrf_token %}
             <label for="owner" class="mb-2">
-              <b>Solution Owner:</b>
+              <b>Author:</b>
             </label>
             <select id="owner"
                     name="owner"
@@ -73,18 +74,33 @@
                     onchange="this.form.submit()">
               {% for owner in owners %}
                 <option value="{{ owner.id }}"
-                        {% if owner.id|stringformat:"s" == selected_owner %}selected{% endif %}>
-                  {{ owner.username }}
+                {# owner_id is a string when selected from form select #}
+                        {% if owner.id|stringformat:"s" == owner_id|stringformat:"s" %}selected{% endif %}>
+                  {{ owner }}
                 </option>
               {% endfor %}
             </select>
           </form>
         </div>
         <div class="col-auto mb-2">
-          <p>
-            <b>Language</b>:
-            <p>{{ solution.language.name }}</p>
-          </p>
+          <form method="post" action="">
+            {% csrf_token %}
+              <label for="language" class="mb-2">
+                <b>Language:</b>
+              </label>
+              <select id="language"
+                      name="language"
+                      class="form-select"
+                      onchange="this.form.submit()">
+                {% for language in solution_languages %}
+                  <option value="{{ language.id }}"
+                  {# language.id and language_id are ints #}
+                          {% if language.id == language_id %}selected{% endif %}>
+                    {{ language }}
+                  </option>
+                {% endfor %}
+              </select>
+            </form>
         </div>
         <div class="col-auto mb-2">
           <p>
@@ -204,14 +220,70 @@
                 data-bs-toggle="collapse"
                 data-bs-target="#solution">Show solution</button>
         <div id="solution" class="collapse">
-          <p>
+          
+          <div class="row mt-4 mb-4">
+            <hr>
+            {% if user == solution.owner %}
+            <div class="col-auto mb-2">
+              <div class="mb-3">
+                <a href="{% url 'python_problems:solution-update' solution.id %}">Update</a>
+              </div>
+              <div>
+                <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>
+              </div>
+            </div>
+            {% endif %}
+            <div class="col-auto mb-2">
+              <form method="post" action="">
+                {% csrf_token %}
+                <label for="owner" class="mb-2">
+                  <b>Author:</b>
+                </label>
+                <select id="owner"
+                        name="owner"
+                        class="form-select"
+                        onchange="this.form.submit()">
+                  {% for owner in owners %}
+                    <option value="{{ owner.id }}"
+                    {# owner_id is a string when selected from form select #}
+                            {% if owner.id|stringformat:"s" == owner_id|stringformat:"s" %}selected{% endif %}>
+                      {{ owner }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </form>
+            </div>
+            <div class="col-auto mb-2">
+              <form method="post" action="">
+                {% csrf_token %}
+                  <label for="language" class="mb-2">
+                    <b>Language:</b>
+                  </label>
+                  <select id="language"
+                          name="language"
+                          class="form-select"
+                          onchange="this.form.submit()">
+                    {% for language in solution_languages %}
+                      <option value="{{ language.id }}"
+                      {# language.id and language_id are ints #}
+                              {% if language.id == language_id %}selected{% endif %}>
+                        {{ language }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </form>
+            </div>
+            <hr>
+          </div>
+          
+          {% comment %} <p>
             <b>Solution by
             {{ solution.owner.username }}</b>
             {% if user == solution.owner %}
               (<a href="{% url 'python_problems:solution-update' solution.id %}">Update</a> |
               <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>)
             {% endif %}
-          </p>
+          </p> {% endcomment %}
           <div class="box">
             <pre style="font-family:'Courier New', Courier, monospace">{{ solution.solution }}</pre>
           </div>

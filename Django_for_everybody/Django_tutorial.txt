@@ -11,7 +11,7 @@
 
 $ python -m django --version
 $ django-admin startproject mysite
-$ python manage.py runserver
+$ python manage.py runserver == ./manage.py runserver
 "We’re in the business of making web frameworks, not web servers."
 python3 manage.py runserver 127.0.0.1:8000
 $ python3 manage.py startapp polls
@@ -20,7 +20,7 @@ $ python3 manage.py sqlmigrate polls 0001; sql version of 0001_initial.py
 $ python3 manage.py shell
 q = Question(question_text="What's new?", pub_date=timezone.now())
 return HttpResponseRedirect(reverse("polls:results", args=(question.id,))) -> "/polls/3/results/"
-python3 manage.py test <app_name>
+python3 manage.py test <app_name> == ./manage.py text
 python3 -m pip install django-debug-toolbar
 
 
@@ -545,6 +545,9 @@ AJAX / JSON
 
 Simple Http request/response
 key is atribute
+
+
+
 
 
 

@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from .models import Tag, Problem, Difficulty, Complexity, Solution, Language
 
 admin.site.register(Tag)

@@ -1,0 +1,7 @@
+*.swp
+__pycache__
+.DS_Store
+db.sqlite3
+*.pyc
+temp.py
+temp2.py

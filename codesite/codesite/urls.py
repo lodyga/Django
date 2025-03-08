@@ -4,7 +4,7 @@ from django.contrib.auth.views import LoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("__debug__/", include("debug_toolbar.urls")),
+    # path("__debug__/", include("debug_toolbar.urls")),  # debug toolbar
     path("accounts/", include("django.contrib.auth.urls")),
     # Set GithHub, OAuth Apps, Authorization callback URL, http://<domain>/oauth/complete/github/
     re_path(r"^oauth/", include("social_django.urls", namespace="social")),
