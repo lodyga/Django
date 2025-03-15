@@ -24,81 +24,143 @@ from .serializers import (
 
 
 def tag_graph_view(request):
-    tags = Tag.objects.all()
-    data = [{'tag': tag.name, 'count': tag.problem_set.count()}
-            for tag in tags]
-    sorted_data = sorted(data, key=lambda x: x['count'], reverse=True)
-    return render(request, 'python_problems/tag_graph.html', {'data': sorted_data})
+    tag_list = Tag.objects.all()
+    data = [{"tag": tag.name, 
+             "count": tag.problem_set.count()}
+            for tag in tag_list]
+    sorted_data = sorted(data, key=lambda x: x["count"], reverse=True)
+    return render(request, "python_problems/tag_graph.html", {"data": sorted_data})
 
 
 class ProblemIndexView(ListView):
-    model = Problem
+    model = Problem  # Problem model
+    template_name = "python_problems/problem_list.html"  # needed for post render()
 
     def get_context_data(self, **kwargs):
         # fetch get_context_data from parent class
         context = super().get_context_data(**kwargs)
 
-        # Fetch data from database.
-        problem_list = self.model.objects.all()
+        # Get data from database.
         difficulty_list = Difficulty.objects.all()
+        problem_list = Problem.objects.all()
         tag_list = Tag.objects.all()
 
-        # Fetch data from request.
-        query = self.request.GET.get("query", "")
-        difficulty_id = int(self.request.GET.get(
-            "difficulty")) if self.request.GET.get("difficulty") else 0
-        order_by = self.request.GET.get("order_by", "created_at")
-
-        # Fileter problems by difficulty.
-        if difficulty_id:
-            problem_list = problem_list.filter(difficulty__id=difficulty_id)
-
-        # Filter problems by query from search form.
-        if query:
-            problem_list = problem_list.filter(
-                Q(tags__name__icontains=query) | Q(title__icontains=query)).distinct()
-
-        # For each problem, get distinct language from solutions
-        problem_languages = {
-            problem: Language.objects.filter(
-                id__in=Solution.objects.filter(problem=problem).values_list('language', flat=True).distinct())
-            for problem in problem_list
-        }
-
-        # Order problems.
-        problem_list = problem_list.order_by(order_by)
-
-        # Pagination of problems.
-        problems_per_page = int(self.request.GET.get("problems_per_page", 10))
+        # Problems pagination.
+        problems_per_page = 7
         paginator = Paginator(problem_list, problems_per_page)
-        page_number = self.request.GET.get("page", 1)
-        page_obj = paginator.get_page(page_number)
+        page_obj = paginator.get_page(1)
+
+        # Get solution languages for each problem
+        problems_languages = {}
+        for problem in problem_list[:problems_per_page]:
+            language_indexes = (
+                Solution.objects
+                .filter(problem=problem)
+                .values_list("language", flat=True))
+            language_list = Language.objects.filter(id__in=language_indexes)
+            del language_indexes
+            problems_languages[problem] = language_list
 
         context.update({
-            "problem_list": problem_list,
+            "difficulty_id": 0,
             "difficulty_list": difficulty_list,
-            "tag_list": tag_list,
-            "query": query,
-            "difficulty_id": difficulty_id,
-            "order_by": order_by,
-            "problems_per_page": problems_per_page,
+            "language_id": 0,
+            "language_list": Language.objects.all(),
+            "order_by": "created_at",
             "page_obj": page_obj,
-            "problem_languages": problem_languages,
+            "problems_languages": problems_languages,
+            "problem_list": problem_list,
+            "problems_per_page": problems_per_page,
+            "tag_id": 0,
+            "tag_list": tag_list,
+            "query_text": "",
         })
 
         return context
 
+    def post(self, request, **kwargs):
+        # Explicitly fetch object_list (since ListView doesn't do it in POST)
+        self.object_list = self.get_queryset()
+        context = self.get_context_data(**kwargs)
+        problem_list = Problem.objects.all()
+
+        # Get data from request POST.        
+        query_text = request.POST.get("query_text", context["query_text"])
+        difficulty_id = int(request.POST.get("difficulty_id", context["difficulty_id"]))
+        tag_id = int(request.POST.get("tag_id", context["tag_id"]))
+        language_id = int(request.POST.get("language_id", context["language_id"]))
+        order_by = request.POST.get("order_by", context["order_by"])
+        problems_per_page = int(request.POST.get("problems_per_page", context["problems_per_page"]))
+        page_number = int(request.POST.get("page_number") or request.POST.get("form_page_number", 1))
+        
+        # Fileter problems by difficulty.
+        if difficulty_id:
+            difficulty = get_object_or_404(Difficulty, id=difficulty_id)
+            problem_list = problem_list.filter(difficulty=difficulty)
+
+        # Fileter problems by language.
+        if language_id:
+            language = get_object_or_404(Language, id=language_id)
+            problem_list = problem_list.filter(problem_solutions__language=language)
+
+        # Fileter problems by tag.
+        if tag_id:
+            tag = get_object_or_404(Tag, id=tag_id)
+            problem_list = problem_list.filter(tags=tag)
+
+        # Filter problems by query text from search form.
+        if query_text:
+            problem_list = (
+                problem_list
+                .filter(Q(tags__name__icontains=query_text) | Q(title__icontains=query_text))
+                .distinct())
+
+        # Order problems.
+        problem_list = problem_list.order_by(order_by)
+
+        # Paginate problems.
+        paginator = Paginator(problem_list, problems_per_page)
+        page_obj = paginator.get_page(page_number)
+
+        # Get solution languages for problems on `page_number` page.
+        start = (page_number - 1) * problems_per_page
+        end = start + problems_per_page
+        problems_languages = {}
+        for problem in problem_list[start:end]:
+            language_indexes = (
+                Solution.objects
+                .filter(problem=problem)
+                .values_list("language", flat=True))
+            language_list = Language.objects.filter(id__in=language_indexes)
+            del language_indexes
+            problems_languages[problem] = language_list
+
+        context.update({
+            "difficulty_id": difficulty_id,
+            "language_id": language_id,
+            "order_by": order_by,
+            "page_number": page_number,
+            "page_obj": page_obj,
+            "problems_languages": problems_languages,
+            "problem_list": problem_list,
+            "problems_per_page": problems_per_page,
+            "query_text": query_text,
+            "tag_id": tag_id,
+        })
+
+        return render(request, self.template_name, context)
+
 
 class ProblemDetailView(DetailView):
-    model = Problem
+    model = Problem  # Problem model
     template_name = "python_problems/problem_detail.html"  # needed for post render()
     default_code_text = """# Write code here.\r\n# Remember to pass the solution to the output.\r\n\r\ndef fun(x):\r\n    return x\r\n\r\noutput = fun(1)"""
 
     def get_context_data(self, **kwargs):
-        User = get_user_model()
-
         # fetch get_context_data() from DetailView
         context = super().get_context_data(**kwargs)
+
+        User = get_user_model()
 
         # get current problem
         problem = self.get_object()
@@ -113,18 +175,19 @@ class ProblemDetailView(DetailView):
         # solution language id
         language_id = language.id
 
-        # fetch solutions for all users based on the problem and the language
+        # Get solutions for all users based on the problem and the language
         solutions = Solution.objects.filter(
             problem=problem, language=language)
 
-        # Fetch the list of the owners who have solutions for this problem and language
+        # Get the list of the owners who have solutions for this problem and language
         owners = User.objects.filter(
             id__in=solutions.values_list("owner", flat=True))
 
-        # Fetch current owner id from the owner form-select (if none selected take the first owner from owners)
-        owner_id = self.request.GET.get("owner", owners.first().id)
+        # Get current owner id from the owner form-select (if none selected take the first owner from owners)
+        # owner_id = self.request.GET.get("owner", owners.first().id)
+        owner_id = owners.first().id
 
-        # Fetch owner from owner id.
+        # Get owner from owner id.
         owner = get_object_or_404(User, id=owner_id)
 
         # Get all languages for the problem for curent owner
@@ -132,17 +195,22 @@ class ProblemDetailView(DetailView):
             id__in=Solution.objects.filter(
                 problem=problem, owner=owner).values_list("language", flat=True))
 
-        # Fetch owner solution as queryset
+        # Get owners solution as queryset
         solutions = Solution.objects.filter(
             problem=problem, language=language, owner=owner)
 
         # There's only one solution per language per user
         solution = solutions.first()
 
-        # Fetch related problems.
-        related_problems = Problem.objects.annotate(
-            common_tags=Count("tags", filter=Q(tags__in=problem.tags.all()))
-        ).filter(common_tags__gte=2).exclude(pk=problem.pk).distinct()
+        # Get related problems.
+        common_tags = Count("tags", filter=Q(tags__in=problem.tags.all()))
+        related_problems = (
+            Problem.objects
+            .annotate(common_tags=common_tags)
+            .filter(common_tags__gte=2)
+            .exclude(pk=problem.pk)
+            .distinct()
+        )
 
         # Output form
         output_form = OutputForm(initial={"output_area": "None"})
@@ -155,16 +223,16 @@ class ProblemDetailView(DetailView):
         url = parse_url(problem.url)
 
         context.update({
-            "owners": owners,
-            "owner_id": owner_id,
-            "solution": solution,
+            "code_text": self.default_code_text,
             "language": language,  # Pass the selected language
             "language_id": language_id,  # Used for the <option> selected state
-            "solution_languages": solution_languages,  # Available languages in the dropdown
-            "tags": problem.tags.values_list("name", flat=True),
-            "related_problems": related_problems,
-            "code_text": self.default_code_text,
             "output_form": output_form,
+            "owner_id": owner_id,
+            "owners": owners,
+            "related_problems": related_problems,
+            "solution": solution,
+            "solution_languages": solution_languages,  # Available languages in the dropdown
+            "tag_list": problem.tags.all(),
             "testcases": testcases,
             "url": url,
         })
@@ -172,8 +240,9 @@ class ProblemDetailView(DetailView):
         return context
 
     def post(self, request, **kwargs):
-        self.object = self.get_object()
-        problem = self.object  # Get the Problem instance
+        # sets the current object (Problem instance).
+        problem = self.object = self.get_object()
+
         context = self.get_context_data(**kwargs)
         User = get_user_model()
 
@@ -193,7 +262,7 @@ class ProblemDetailView(DetailView):
                 initial={"output_area": f"Error: {str(e)}"})
 
         # Get owner from form select or keep the current one
-        owner_id = request.POST.get("owner") or context["owner_id"]
+        owner_id = int(request.POST.get("owner_id", context["owner_id"]))
         owner = get_object_or_404(User, id=owner_id)
 
         # Use the current language.

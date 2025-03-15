@@ -14,22 +14,26 @@
           <h2>Python problems tag list</h2>
         </div>
         {% if tag_list %}
-        <ul>
-          {% for tag in tag_list %}
-              <li>
-                {{ tag.name }} (
-                {% if tag.problem_set.count == 1 %}
-                  1 Problem - <a href="{% url 'python_problems:problem-index' %}?query={{ tag.name }}">Search</a>
-                {% else %}
-                  {{ tag.problem_set.count }} Problems - <a href="{% url 'python_problems:problem-index' %}?query={{ tag.name }}">Search</a>
-                  {% endif %}
-                {# Tag update/delete #}
-                ) {% comment %} |
-                (<a href="{% url 'python_problems:tag-update' tag.id %}">Update</a> |
-                <a href="{% url 'python_problems:tag-delete' tag.id %}">Delete</a>) {% endcomment %}
-                <hr>
-              </li>
+          <ul>
+            <form method="post" action="{% url 'python_problems:problem-index' %}">
+              {% csrf_token %}
+              {% for tag in tag_list %}
+                <li>
+                  <button class="tags btn btn-link py-0 px-1"
+                          name="tag_id"
+                          type="submit"
+                          value="{{ tag.id }}">
+                    {{ tag }}
+                  </button>
+                  ( {{ tag.problem_set.count }} problems )
+                  {# Tag update/delete #}
+                  {% comment %} |
+                  (<a href="{% url 'python_problems:tag-update' tag.id %}">Update</a> |
+                  <a href="{% url 'python_problems:tag-delete' tag.id %}">Delete</a>) {% endcomment %}
+                  <hr>
+                </li>
               {% endfor %}
+            </form>
           </ul>
         {% else %}
           <p>No python problems available.</p>

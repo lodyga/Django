@@ -40,7 +40,6 @@ class NonStrippingTextField(models.TextField):
     A TextField that does not strip whitespace at the beginning/end of
     it's value. Might be important for markup/code.
     """
-
     def formfield(self, **kwargs):
         kwargs['strip'] = False
         return super().formfield(**kwargs)
@@ -58,13 +57,16 @@ class Problem(models.Model):
     slug = models.SlugField(unique=True, blank=True)
     tags = models.ManyToManyField("Tag")
     difficulty = models.ForeignKey(
-        Difficulty, related_name="problems_difficulty", on_delete=models.DO_NOTHING)
+        Difficulty,
+        related_name="problems_difficulty",
+        on_delete=models.DO_NOTHING)
     url = models.URLField()
     description = NonStrippingTextField(blank=False, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
-                              on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -80,25 +82,37 @@ class Problem(models.Model):
 
 class Solution(models.Model):
     problem = models.ForeignKey(
-        Problem, related_name="problem_solutions", on_delete=models.CASCADE)
+        Problem,
+        related_name="problem_solutions",
+        on_delete=models.CASCADE)
     language = models.ForeignKey(
-        Language, related_name="solutions_per_language", on_delete=models.CASCADE)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
-                              on_delete=models.CASCADE)
+        Language,
+        related_name="solutions_per_language",
+        on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE)
     solution = models.TextField(blank=True, null=True)
     testcase = models.TextField(
-        blank=True, null=True, help_text="Provide each testcase in `()` in a new like (function(agrs), solution)")
+        blank=True,
+        null=True,
+        help_text="Provide each testcase in `()` in a new like (function(agrs), solution)")
     time_complexity = models.ForeignKey(
-        "Complexity", related_name="solutions_time_complexity", on_delete=models.DO_NOTHING)
+        "Complexity",
+        related_name="solutions_time_complexity",
+        on_delete=models.DO_NOTHING)
     space_complexity = models.ForeignKey(
-        "Complexity", related_name="solutions_space_complexity", on_delete=models.DO_NOTHING)
+        "Complexity",
+        related_name="solutions_space_complexity",
+        on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['problem', 'language', 'owner'],
-                                    name='unique_solution_per_problem_language_owner')
+            models.UniqueConstraint(
+                fields=['problem', 'language', 'owner'],
+                name='unique_solution_per_problem_language_owner')
         ]
 
     def __str__(self):

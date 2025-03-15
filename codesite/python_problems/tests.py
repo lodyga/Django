@@ -1,12 +1,13 @@
-from .models import Complexity, Difficulty, Language, Problem, Solution, Tag
-from django.urls import reverse
-from django.test import TestCase
-from django.contrib.auth import get_user_model
 import django
 import html
 import os
+from django.contrib.auth import get_user_model
+from django.test import RequestFactory, TestCase
+from django.urls import reverse
+from .models import Complexity, Difficulty, Language, Problem, Solution, Tag
+from .views import ProblemIndexView
 
-# Update with your project name
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "codesite.settings")
 django.setup()  # Initialize Django
 
@@ -234,16 +235,14 @@ class SolutionModelTests(TestCase):
 
     def test_create_two_solutions_in_different_languages_for_same_problem(self):
         """
-        Test creating two Solution instances in different Language instances 
+        Test creating two Solution instances in different Language instances
         linked to the same Problem instance.
         """
         Language.objects.all().delete()
-        create_sample_solution(
-            language=Language.objects.get_or_create(name="Python")[0]
-        )
-        create_sample_solution(
-            language=Language.objects.get_or_create(name="JavaScript")[0]
-        )
+        language_1, _ = Language.objects.get_or_create(name="Python")
+        language_2, _ = Language.objects.get_or_create(name="JavaScript")
+        create_sample_solution(language=language_1)
+        create_sample_solution(language=language_2)
         solutions = Solution.objects.all()
         self.assertEqual(solutions.count(), 2)
         self.assertEqual(Language.objects.count(), 2)
@@ -251,32 +250,33 @@ class SolutionModelTests(TestCase):
 
     def test_create_two_solutions_in_same_language_for_different_problems(self):
         """
-        Test creating two Solution instances in the same Language instance 
+        Test creating two Solution instances in the same Language instance
         linked to different Problem instances.
         """
         Language.objects.all().delete()
         create_sample_solution()
-        create_sample_solution(
-            create_sample_problem(
-                title="Valid Parentheses"
-            )
-        )
+        title = "Valid Parentheses"
+        problem = create_sample_problem(title=title)
+        create_sample_solution(problem=problem)
         solutions = Solution.objects.all()
         self.assertEqual(solutions.count(), 2)
         self.assertEqual(Language.objects.count(), 1)
         self.assertEqual(solutions[0].language, solutions[1].language)
 
 
-class ProblemIndexViewTests(TestCase):
+class ProblemIndexViewTests0(TestCase):
     def test_no_problems(self):
         """
         If no problems exist, an appropriate message is displayed.
         """
-        response = self.client.get(reverse("python_problems:problem-index"))
+        viewname = "python_problems:problem-index"
+        url = reverse(viewname)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No python problems available.")
+        self.assertContains(
+            response, "No Python problems available for the given parameters.")
         # Same as assertContains, but with manual content.decode()
-        self.assertIn("No python problems available.",
+        self.assertIn("No Python problems available for the given parameters.",
                       response.content.decode())
         self.assertQuerySetEqual(response.context["problem_list"], [])
 
@@ -285,9 +285,10 @@ class ProblemIndexViewTests(TestCase):
         Test if the right template is choosen.
         """
         template_name = "python_problems/problem_list.html"
-        response = self.client.get(reverse("python_problems:problem-index"))
+        viewname = "python_problems:problem-index"
+        url = reverse(viewname)
+        response = self.client.get(url)
         self.assertTemplateUsed(response, template_name)
-        self.assertListEqual(response.template_name, [template_name])
 
     def test_with_problem(self):
         """
@@ -333,63 +334,60 @@ class SolutionDetailViewTests(TestCase):
         """
         Test if the right template is choosen.
         """
-        solution = create_sample_solution(
-            problem=create_sample_problem(
-                title="Two Sum"
-            ),
-            language=Language.objects.get_or_create(name="Python")[0]
-        )
-        url = reverse(
-            "python_problems:problem-detail",
-            kwargs={"slug": solution.problem.slug,
-                    "language": solution.language.name})
+        template_name = "python_problems/problem_detail.html"
+        solution = create_sample_solution()
+        viewname = "python_problems:problem-detail"
+        kwargs = {"slug": solution.problem.slug,
+                  "language": solution.language.name}
+        url = reverse(viewname, kwargs=kwargs)
         response = self.client.get(url)
-        self.assertTemplateUsed(
-            response, "python_problems/problem_detail.html")
+        self.assertTemplateUsed(response, template_name)
 
     def test_context_data(self):
         """
         Test if the correct context data is passed to the template.
         """
         solution = create_sample_solution()
-        url = reverse(
-            "python_problems:problem-detail",
-            kwargs={"slug": solution.problem.slug,
-                    "language": solution.language.name})
+        viewname = "python_problems:problem-detail"
+        kwargs = {"slug": solution.problem.slug,
+                  "language": solution.language.name}
+        url = reverse(viewname, kwargs=kwargs)
         response = self.client.get(url)
-        self.assertEqual(
-            response.context["problem"].problem_solutions.first(), solution)
+        actual_solution = response.context["problem"].problem_solutions.first()
+        self.assertEqual(actual_solution, solution)
 
     def test_404_response(self):
         """
         Test if a 404 response is returned for a non-existent problem.
         """
-        url = reverse(
-            "python_problems:problem-detail",
-            kwargs={"slug": "non-existent-slug",
-                    "language": "non-existent-language"})
+        status_code = 404
+        viewname = "python_problems:problem-detail"
+        kwargs = {"slug": "non-existent-slug",
+                  "language": "non-existent-language"}
+        url = reverse(viewname, kwargs=kwargs)
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status_code)
 
     def test_problem_details_display(self):
         """
         Test if the problem details are correctly displayed in the template.
         """
         User = get_user_model()
+        title = "Two Sum"
+        owner, _ = User.objects.get_or_create(
+            username="tester", password="testpass")
+        language, _ = Language.objects.get_or_create(name="Python")
+        problem = create_sample_problem(
+            title=title,
+            owner=owner)
         solution = create_sample_solution(
-            problem=create_sample_problem(
-                title="Two Sum",
-                owner=User.objects.get_or_create(
-                    username="tester", password="testpass")[0]
-            ),
-            language=Language.objects.get_or_create(name="Python")[0],
-            owner=User.objects.get_or_create(
-                username="tester", password="testpass")[0]
-        )
-        url = reverse(
-            "python_problems:problem-detail",
-            kwargs={"slug": solution.problem.slug,
-                    "language": solution.language.name})
+            problem=problem,
+            language=language,
+            owner=owner)
+        viewname = "python_problems:problem-detail"
+        kwargs = {"slug": solution.problem.slug,
+                  "language": solution.language.name}
+        url = reverse(viewname, kwargs=kwargs)
         response = self.client.get(url)
 
         self.assertContains(response, solution.problem.title)
@@ -424,11 +422,10 @@ class SolutionLanguageSwitchTest(TestCase):
         """
         Check if selecting a different language updates the displayed solution.
         """
-        url = reverse(
-            "python_problems:problem-detail",
-            kwargs={"slug": self.problem.slug,
-                    "language": self.language_1.name})
-
+        viewname = "python_problems:problem-detail"
+        kwargs = {"slug": self.problem.slug,
+                  "language": self.language_1.name}
+        url = reverse(viewname, kwargs=kwargs)
         response = self.client.get(url)
         content = html.unescape(response.content.decode())
 
@@ -440,7 +437,9 @@ class SolutionLanguageSwitchTest(TestCase):
 
         # Simulate changing the language via POST
         response = self.client.post(
-            url, {"language": self.language_2.id}, follow=True)
+            url,
+            {"language": self.language_2.id},
+            follow=True)
 
         # Decode HTML entities in response content
         content = html.unescape(response.content.decode())
@@ -470,24 +469,21 @@ class SolutionUserSwitchTest(TestCase):
             problem=self.problem,
             language=self.language,
             solution=self.solution_text_1,
-            owner=self.owner_1
-        )
+            owner=self.owner_1)
         self.solution_2 = create_sample_solution(
             problem=self.problem,
             language=self.language,
             solution=self.solution_text_2,
-            owner=self.owner_2
-        )
+            owner=self.owner_2)
 
     def test_switching_owner_updates_solution(self):
         """
         Check if selecting a different owner updates the displayed solution.
         """
-        url = reverse(
-            "python_problems:problem-detail",
-            kwargs={"slug": self.problem.slug,
-                    "language": self.language.name})
-
+        viewname = "python_problems:problem-detail"
+        kwargs = {"slug": self.problem.slug,
+                  "language": self.language.name}
+        url = reverse(viewname, kwargs=kwargs)
         response = self.client.get(url)
         content = html.unescape(response.content.decode())
 
@@ -496,10 +492,235 @@ class SolutionUserSwitchTest(TestCase):
 
         # Simulate changing the user via POST
         response = self.client.post(
-            url, {"owner": self.owner_2.id}, follow=True)
+            url,
+            {"owner_id": self.owner_2.id},
+            follow=True)
 
         # Decode HTML entities in response content
         content = html.unescape(response.content.decode())
 
         # Verify response contains the correct solution after the update
         self.assertIn(self.solution_text_2, content)
+
+
+class ProblemIndexViewTests1(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """Set up test data for all tests."""
+        Language.objects.all().delete()
+        cls.difficulty_easy = Difficulty.objects.create(name="Easy")
+        cls.difficulty_medium = Difficulty.objects.create(name="Medium")
+
+        cls.tag_array, _ = Tag.objects.get_or_create(name="Array")
+        cls.tag_two_pointers, _ = Tag.objects.get_or_create(
+            name="Two Pointers")
+
+        cls.language_python, _ = Language.objects.get_or_create(name="Python")
+        cls.language_javaScript, _ = Language.objects.get_or_create(
+            name="JavaScript")
+
+        # Create multiple problems
+        cls.problem_easy = create_sample_problem(
+            title="Two Sum",
+            difficulty=cls.difficulty_easy,
+            tags=[cls.tag_array])
+        cls.problem_medium = create_sample_problem(
+            title="Two Sum II - Input Array Is Sorted",
+            difficulty=cls.difficulty_medium,
+            tags=[cls.tag_array, cls.tag_two_pointers])
+
+        # Create solutions
+        create_sample_solution(
+            problem=cls.problem_easy,
+            language=cls.language_python,
+            solution="print('Easy')")
+        create_sample_solution(
+            problem=cls.problem_medium,
+            language=cls.language_javaScript,
+            solution="System.out.println('Medium')")
+
+    def test_filter_by_difficulty(self):
+        """
+        Test filtering by difficulty_id.
+        """
+        url = reverse("python_problems:problem-index")
+        response = self.client.post(
+            url,
+            {"difficulty_id": self.difficulty_easy.id},
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Two Sum")
+        self.assertNotContains(response, "Two Sum II - Input Array Is Sorted")
+
+    def test_filter_by_tag(self):
+        """
+        Test filtering by tag_id.
+        """
+        url = reverse("python_problems:problem-index")
+        response = self.client.post(
+            url,
+            {"tag_id": self.tag_two_pointers.id},
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Two Sum II - Input Array Is Sorted")
+
+    def test_search_by_query_text(self):
+        """
+        Test filtering by query_text (title and tag names).
+        """
+        url = reverse("python_problems:problem-index")
+        response = self.client.post(
+            url,
+            {"query_text": "Sorted"},
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Two Sum II - Input Array Is Sorted")
+
+    def test_ordering(self):
+        """
+        Test ordering by 'title'.
+        """
+        url = reverse("python_problems:problem-index")
+        response = self.client.post(
+            url,
+            {"order_by": "title"},
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        problems = list(response.context["problem_list"])
+        sorted_problems = sorted(
+            response.context["problem_list"],
+            key=lambda problem: problem.title)
+        self.assertEqual(problems, sorted_problems)
+
+    def test_pagination(self):
+        """
+        Test pagination with multiple problems per page.
+        """
+        for index in range(15):
+            create_sample_problem(title=f"Problem {index}")
+
+        url = reverse("python_problems:problem-index")
+        response = self.client.post(
+            url,
+            {"problems_per_page": 5,
+             "page_number": 2},
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page_obj"].number, 2)
+        self.assertEqual(response.context["page_obj"].paginator.per_page, 5)
+
+    def test_preserve_all_filters(self):
+        """
+        Test that all filters persist together.
+        """
+        url = reverse("python_problems:problem-index")
+        response = self.client.post(
+            url,
+            {"difficulty_id": self.difficulty_easy.id,
+             "tag_id": self.tag_array.id,
+             "query_text": "Problem",
+             "order_by": "title",
+             "problems_per_page": 5,
+             "page_number": 1},
+            follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["difficulty_id"], self.difficulty_easy.id)
+        self.assertEqual(response.context["tag_id"], self.tag_array.id)
+        self.assertEqual(response.context["query_text"], "Problem")
+        self.assertEqual(response.context["order_by"], "title")
+        self.assertEqual(response.context["problems_per_page"], 5)
+        self.assertEqual(response.context["page_obj"].number, 1)
+
+
+class ProblemIndexViewTests2(TestCase):
+    def setUp(self):
+        # Create test data
+        self.factory = RequestFactory()
+        User = get_user_model()
+        self.user, _ = User.objects.get_or_create(
+            username="tester", password="testpass")
+
+        # Create languages
+        Language.objects.all().delete()
+        self.language_python, _ = Language.objects.get_or_create(name="Python")
+        self.language_javaScript, _ = Language.objects.get_or_create(
+            name="JavaScript")
+
+        # Create difficulties
+        self.difficulty_easy, _ = Difficulty.objects.get_or_create(name="Easy")
+        self.difficulty_medium, _ = Difficulty.objects.get_or_create(
+            name="Medium")
+
+        # Create tags
+        self.tag_array = Tag.objects.create(name="Array")
+        self.tag_two_pointers = Tag.objects.create(name="Two Pointers")
+
+        # Create problems
+        self.problem_1 = create_sample_problem(
+            title="Two Sum",
+            difficulty=self.difficulty_easy,
+            description="Description 1")
+        self.problem_1.tags.add(self.tag_array)
+
+        self.problem_2 = create_sample_problem(
+            title="Two Sum II - Input Array Is Sorted",
+            difficulty=self.difficulty_medium,
+            description="Description 2")
+        self.problem_2.tags.add(self.tag_two_pointers)
+
+        # Create solutions
+        create_sample_solution(
+            problem=self.problem_1,
+            language=self.language_python,
+            solution="Solution 1",
+            owner=self.user
+        )
+        create_sample_solution(
+            problem=self.problem_2,
+            language=self.language_javaScript,
+            solution="Solution 2",
+            owner=self.user
+        )
+
+    def test_get_request(self):
+        # Create a GET request
+        url = reverse("python_problems:problem-index")
+        request = self.factory.get(url)
+        request.user = self.user
+
+        # Call the view
+        response = ProblemIndexView.as_view()(request)
+
+        # Check the response status code
+        self.assertEqual(response.status_code, 200)
+
+        # Check the context data
+        self.assertIn("difficulty_id", response.context_data)
+        self.assertIn("order_by", response.context_data)
+        self.assertIn("page_obj", response.context_data)
+        self.assertIn("problem_list", response.context_data)
+        self.assertIn("problems_per_page", response.context_data)
+        self.assertIn("query_text", response.context_data)
+        self.assertIn("tag_id", response.context_data)
+
+        # Verify initial values
+        self.assertEqual(response.context_data["difficulty_id"], 0)
+        self.assertEqual(response.context_data["order_by"], "created_at")
+        self.assertEqual(response.context_data["problems_per_page"], 7)
+        self.assertEqual(response.context_data["query_text"], "")
+        self.assertEqual(response.context_data["tag_id"], 0)
+
+        # Verify problem list
+        self.assertQuerysetEqual(
+            response.context_data["problem_list"].order_by('id'),
+            Problem.objects.all().order_by('id'),
+            # Compare objects directly (no transformation)
+            transform=lambda x: x)
+
+
+
+
+
+
+

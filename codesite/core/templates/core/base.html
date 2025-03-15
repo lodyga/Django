@@ -1,16 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
-  {% comment %}<html lang="en" {% if dark_mode %}data-bs-theme="dark"{% endif %}>{% endcomment %}
-  {#<html lang="en" data-bs-theme="dark">#}
+<html lang="en" data-bs-theme="dark">
   <head>
     <style>
-/* Hide the "Dark Mode" checkbox visually */
-.form-check-input {
-  position: absolute;
-  opacity: 0;
-  height: 0;
-  width: 0;
-}
     </style>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,228 +24,18 @@
           href="https://use.fontawesome.com/releases/v5.8.1/css/v4-shims.css" />
     {% comment %}    {% load static %}
     <link rel="stylesheet" href="{% static 'core/style.css' %}">{% endcomment %}
+    {% load static %}
+    <script src="{% static 'js/darkmode.js' %}" defer></script>
     {% block head %}
     {% endblock head %}
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary m-2"
-         style="border-radius:10px !important">
-      <div class="container-fluid">
-        {% comment %}<a class="navbar-brand" href="{% url 'login' %}?next={% url 'core:index' %}">Hello {{ request.user }}</a>{% endcomment %}
-        <a class="navbar-brand">Codesite |</a>
-        <ul class="navbar-nav">
-          <li>
-            <a class="navbar-brand" href="{% url 'login' %}?next={{ request.path }}">Hello {{ request.user }}</a>
-          </li>
-        </ul>
-        <ul class="navbar-nav me-5">
-          {% if request.user.social_auth.first %}
-            <li>
-              <img src="https://github.com/{{ request.user.social_auth.first }}.png"
-                   width="30"
-                   height="30"
-                   class="rounded-circle"
-                   alt="github img">
-            </li>
-          {% endif %}
-        </ul>
-        <ul class="navbar-nav me-auto">
-          {% url 'core:index' as home_url %}
-          <li class="nav-item">
-            <a href="{{ home_url }}"
-               class="nav-link {% if request.get_full_path == home_url %}active{% endif %}">Home</a>
-          </li>
-          {% url 'python_problems:problem-index' as python_index_url %}
-          {% url 'python_problems:tag-graph' as python_tag_graph %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {% if request.get_full_path == python_index_url or request.get_full_path == python_tag_graph %}active{% endif %}"
-               href="#"
-               id="navbarDropdown"
-               role="button"
-               data-bs-toggle="dropdown"
-               aria-expanded="false">Python</a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li>
-                <a class="dropdown-item {% if request.get_full_path == python_index_url %}active{% endif %}"
-                   href="{{ python_index_url }}">Python Problems</a>
-              </li>
-              <li>
-                <a class="dropdown-item {% if request.get_full_path == python_tag_graph %}active{% endif %}"
-                   href="{{ python_tag_graph }}">Statistics</a>
-              </li>
-            </ul>
-          </li>
-          {% url 'sql_problems:index' as sql_index_url %}
-          {% url 'sql_problems:conversion' as sql_conversion_url %}
-          {% url 'sql_problems:ascii' as sql_ascii_url %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle {% if request.get_full_path == sql_conversion_url or request.get_full_path == sql_index_url or request.get_full_path == sql_ascii_url %}active{% endif %}"
-               href="#"
-               id="navbarDropdown"
-               role="button"
-               data-bs-toggle="dropdown"
-               aria-expanded="false">SQL</a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li>
-                <a class="dropdown-item {% if request.get_full_path == sql_index_url %}active{% endif %}"
-                   href="{{ sql_index_url }}">SQL Problems</a>
-              </li>
-              <li>
-                <a class="dropdown-item {% if request.get_full_path == sql_conversion_url %}active{% endif %}"
-                   href="{{ sql_conversion_url }}">Conversion</a>
-              </li>
-              <li>
-                <a class="dropdown-item {% if request.get_full_path == sql_ascii_url %}active{% endif %}"
-                   href="{{ sql_ascii_url }}">db from ASCII</a>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle"
-               href="#"
-               id="navbarDropdown"
-               role="button"
-               data-bs-toggle="dropdown"
-               aria-expanded="false">Admin</a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li>
-                <a class="dropdown-item"
-                   href="{% url 'python_problems:problem-create' %}">Create a problem</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="{% url 'python_problems:tag-create' %}">Add a tag</a>
-              </li>
-              <li>
-                <hr class="dropdown-divider" />
-              </li>
-              {% if user.is_authenticated %}
-                <li>
-                  <a class="dropdown-item"
-                     href="{% url 'logout' %}?next={% url 'core:index' %}">Logout</a>
-                </li>
-              {% else %}
-                <li>
-                  <a class="dropdown-item"
-                     href="{% url 'login' %}?next={% url 'core:index' %}">Login</a>
-                </li>
-              {% endif %}
-            </ul>
-          </li>
-        </ul>
-        {% comment %}<ul class="navbar-nav mb-lg-0">
-          <li>
-            <a class="nav-link active" href="#">Active</a>
-          </li>
-        </ul>{% endcomment %}
-        <ul class="navbar-nav">
-          {% url 'sql_problems:index' as sql_index_url %}
-          {% url 'sql_problems:conversion' as sql_conversion_url %}
-          {% url 'sql_problems:ascii' as sql_ascii_url %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle"
-               href="#"
-               id="navbarDropdown"
-               role="button"
-               data-bs-toggle="dropdown"
-               aria-expanded="false">Settings</a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li>
-                <div class="form-check">
-                  <input type="checkbox"
-                         class="form-check-input"
-                         id="darkModeToggle"
-                         {% if dark_mode %}checked{% endif %}>
-                  <label class="form-check-label" for="darkModeToggle" id="darkModeLabel">Dark Mode</label>
-                </div>
-              </li>
-            </ul>
-          </li>
-        </ul>
-        <ul class="navbar-nav">
-          {% if user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link"
-                 href="{% url 'logout' %}?next={% url 'core:index' %}">Logout</a>
-            </li>
-          {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'login' %}?next={% url 'core:index' %}">Login</a>
-            </li>
-          {% endif %}
-        </ul>
-      </div>
-    </nav>
-    {% comment %}{% include "core/header.html" %}{% endcomment %}
-    {% comment %} <div class="px-6 py-6"> {% endcomment %}
-    <div class="container-fluid">
+    <div class="container-fluid">  {# without detail page gets bottom horizontal bar #}
+      {% include "core/header.html" %}
       {% block content %}
       {% endblock content %}
+      {% include "core/footer.html" %}
     </div>
-    {% comment %}{% include "core/footer.html" %}{% endcomment %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary m-2"
-         style="border-radius:10px !important">
-      <div class="container-fluid">
-        <ul class="navbar-nav">
-          <a class="nav-link" href="{% url 'login' %}?next={% url 'core:index' %}">{{ settings.APP_NAME }} project by Łukasz Łodożyński</a>
-        </ul>
-      </div>
-      <div class="container-fluid">
-        <ul class="navbar-nav">
-          <li>
-            <a class="nav-link"
-               href="https://www.linkedin.com/in/%C5%82ukasz-%C5%82odo%C5%BCy%C5%84ski-687528205/"
-               target="_blank">LinkedIn</a>
-          </li>
-          <li>
-            <a class="nav-link"
-               href="https://github.com/lodyga/Django/tree/master/codesite"
-               target="_blank">Git repo</a>
-          </li>
-          <li>
-            <a class="nav-link" href="{% url 'forums:bug-forum' %}">Report a bug</a>
-          </li>
-          <li>
-            <a class="nav-link" href="{% url 'forums:feature-forum' %}">Request a feature</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        var darkModeToggle = document.getElementById("darkModeToggle");
-        var darkModeLabel = document.getElementById("darkModeLabel");
-        var htmlElement = document.querySelector('html');
-        
-        // Function to toggle dark mode
-        function toggleDarkMode() {
-          var isChecked = darkModeToggle.checked;
-          var darkMode = isChecked;
-          
-          darkModeLabel.textContent = isChecked ? "Light Mode" : "Dark Mode";
-          
-          // Update the data-bs-theme attribute of the html element
-          if (darkMode) {
-              htmlElement.setAttribute('data-bs-theme', 'dark');
-          } else {
-              htmlElement.removeAttribute('data-bs-theme');
-          }
-          
-          // Store the dark mode state in local storage
-          localStorage.setItem('darkMode', darkMode ? 'enabled' : 'disabled');
-        }
-        
-        // Check if dark mode is enabled in local storage
-        var storedDarkMode = localStorage.getItem('darkMode');
-        if (storedDarkMode === 'enabled') {
-          darkModeToggle.checked = true;
-          toggleDarkMode();
-        }
-        
-        // Event listener for dark mode toggle
-        darkModeToggle.addEventListener("change", function() {
-          toggleDarkMode();
-        });
-      });
-    </script>
+
   </body>
 </html>

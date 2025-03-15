@@ -2,7 +2,34 @@
 {% block title %}
     Contact
 {% endblock title %}
+{% block head %}
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+            crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone@7.10.3/babel.min.js"
+            crossorigin></script>
+{% endblock head %}
 {% block content %}
     <h1>Contact</h1>
     <p>{{ request.user }}</p>
+    <div id="root"></div>
+    <script type="text/babel" data-presets="react,stage-3">
+    function Example() {
+      const [count, setCount] = React.useState(0);
+      React.useEffect(() => {
+        document.title = `You clicked ${count} times`;
+      });
+      return (
+        <div>
+          <p>You clicked {count} times</p>
+          <button onClick={() => setCount(count + 1)}>
+            Click me
+          </button>
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById("root"))
+    root.render(<Example />);
+    </script>
 {% endblock content %}

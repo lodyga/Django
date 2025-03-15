@@ -1,18 +1,42 @@
 {% block footer %}
-<footer class="py-6 px-6 flex justify-between bg-gray-800">
-    <div class="w-2/3 pr-10">
-      <h3 class="mb-5 font-semibold text-gray-400">About</h3>
-      <p class="text-lg text-gray-500"> Footer text </p>
-    </div>
-    <div class="w-1/3">
-      <h3 class="mb-5 font-semibold text-gray-400">Menu</h3>
-      <ul class="space-y-2">
-        <li><a href="#" class="text-lg text-teal-500 hover:text-teal-700">About</a></li>
-        <li><a href="{% url "core:contact" %}" class="text-lg text-teal-500 hover:text-teal-700">Contact</a></li>
-        <li><a href="#" class="text-lg text-teal-500 hover:text-teal-700">Privacy policy</a></li>
-        <li><a href="#" class="text-lg text-teal-500 hover:text-teal-700">Terms of use</a></li>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary m-2"
+       style="border-radius:10px !important">
+    <div class="container-fluid">
+      <ul class="navbar-nav">
+        <a class="nav-link" 
+           href="{% url 'login' %}?next={% url 'core:index' %}">{{ settings.APP_NAME }} project by Łukasz Łodożyński</a>
       </ul>
     </div>
-</footer>
+    <div class="container-fluid">
+      <ul class="navbar-nav">
+        <li>
+          <a class="nav-link"
+             href="https://www.linkedin.com/in/%C5%82ukasz-%C5%82odo%C5%BCy%C5%84ski-687528205/"
+             target="_blank">
+            LinkedIn
+          </a>
+        </li>
+        <li>
+          <a class="nav-link"
+             href="https://github.com/lodyga/Django/tree/master/codesite"
+             target="_blank">
+            Git repo
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" 
+             href="{% url 'forums:bug-forum' %}">
+             Report a bug
+          </a>
+        </li>
+        <li>
+          <a class="nav-link" 
+             href="{% url 'forums:feature-forum' %}">
+            Request a feature
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 {% endblock footer %}
 

@@ -1,18 +1,153 @@
-<nav class="px-6 py-6 flex justify-between items-center border-b border-gary-200">
-    <a href="/" class="text-xl font-semibold">Hello {{ request.user }}</a>
-
-    <div class="space-x-6 bg-gray-200">
-      <a href="{% url "python_problems:index" %}" class="text-lg font-semibold hover:text-gray-500">Python</a>
-      <a href="{% url "core:index" %}" class="text-lg font-semibold hover:text-gray-500">Home</a>
-      <a href="{% url "python_problems:index" %}" class="text-lg font-semibold hover:text-gray-500">New item</a>
-      <a href="{% url "python_problems:index" %}" class="text-lg font-semibold hover:text-gray-500">Browse</a>
-
-      {% if request.user.is_authenticated %}
-      <a href="{% url "python_problems:index" %}" class="px-6 py-3 text-lg font-semibold bg-teal-500 text-white rounded-xl hover:bg-teal-700">Inbox</a>
-      <a href="{% url "python_problems:index" %}" class="px-6 py-3 text-lg font-semibold bg-gray-500 text-white rounded-xl hover:bg-gray-700">Dasbhoard</a>
-      {% else %}
-        {% comment %}<a href="{% url "core:signup-view" %}" class="px-6 py-3 text-lg font-semibold bg-teal-500 text-white rounded-xl hover:bg-teal-700">Sign up</a>
-        <a href="{% url "core:login-view" %}" class="px-6 py-3 text-lg font-semibold bg-gray-500 text-white rounded-xl hover:bg-gray-700">Login</a>{% endcomment %}
-      {% endif %}
+{% block header %}    
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary m-2"
+       style="border-radius:10px !important">
+    <div class="container-fluid">
+      {% comment %}<a class="navbar-brand" href="{% url 'login' %}?next={% url 'core:index' %}">Hello {{ request.user }}</a>{% endcomment %}
+      <a class="navbar-brand">Codesite |</a>
+      <ul class="navbar-nav">
+        <li>
+          <a class="navbar-brand" href="{% url 'login' %}?next={{ request.path }}">Hello {{ request.user }}</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav me-5">
+        {% if request.user.social_auth.first %}
+          <li>
+            <img src="https://github.com/{{ request.user.social_auth.first }}.png"
+                 width="30"
+                 height="30"
+                 class="rounded-circle"
+                 alt="github img">
+          </li>
+        {% endif %}
+      </ul>
+      <ul class="navbar-nav me-auto">
+        {% url 'core:index' as home_url %}
+        <li class="nav-item">
+          <a href="{{ home_url }}"
+             class="nav-link {% if request.get_full_path == home_url %}active{% endif %}">Home</a>
+        </li>
+        {% url 'python_problems:problem-index' as python_index_url %}
+        {% url 'python_problems:tag-graph' as python_tag_graph %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle {% if request.get_full_path == python_index_url or request.get_full_path == python_tag_graph %}active{% endif %}"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">Python</a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <a class="dropdown-item {% if request.get_full_path == python_index_url %}active{% endif %}"
+                 href="{{ python_index_url }}">Python Problems</a>
+            </li>
+            <li>
+              <a class="dropdown-item {% if request.get_full_path == python_tag_graph %}active{% endif %}"
+                 href="{{ python_tag_graph }}">Statistics</a>
+            </li>
+          </ul>
+        </li>
+        {% url 'sql_problems:index' as sql_index_url %}
+        {% url 'sql_problems:conversion' as sql_conversion_url %}
+        {% url 'sql_problems:ascii' as sql_ascii_url %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle {% if request.get_full_path == sql_conversion_url or request.get_full_path == sql_index_url or request.get_full_path == sql_ascii_url %}active{% endif %}"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">SQL</a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <a class="dropdown-item {% if request.get_full_path == sql_index_url %}active{% endif %}"
+                 href="{{ sql_index_url }}">SQL Problems</a>
+            </li>
+            <li>
+              <a class="dropdown-item {% if request.get_full_path == sql_conversion_url %}active{% endif %}"
+                 href="{{ sql_conversion_url }}">Conversion</a>
+            </li>
+            <li>
+              <a class="dropdown-item {% if request.get_full_path == sql_ascii_url %}active{% endif %}"
+                 href="{{ sql_ascii_url }}">db from ASCII</a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">Admin</a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <a class="dropdown-item"
+                 href="{% url 'python_problems:problem-create' %}">Create a problem</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{% url 'python_problems:tag-create' %}">Add a tag</a>
+            </li>
+            <li>
+              <hr class="dropdown-divider" />
+            </li>
+            {% if user.is_authenticated %}
+              <li>
+                <a class="dropdown-item"
+                   href="{% url 'logout' %}?next={% url 'core:index' %}">Logout</a>
+              </li>
+            {% else %}
+              <li>
+                <a class="dropdown-item"
+                   href="{% url 'login' %}?next={% url 'core:index' %}">Login</a>
+              </li>
+            {% endif %}
+          </ul>
+        </li>
+      </ul>
+      {% comment %} <ul class="navbar-nav mb-lg-0">
+        <li>
+          <a class="nav-link active" href="#">Active</a>
+        </li>
+      </ul> {% endcomment %}
+      <ul class="navbar-nav">
+        {% url 'sql_problems:index' as sql_index_url %}
+        {% url 'sql_problems:conversion' as sql_conversion_url %}
+        {% url 'sql_problems:ascii' as sql_ascii_url %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">Settings</a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <div class="form-check">
+                <label class="form-check-label" 
+                       for="darkModeToggle" 
+                       id="darkModeLabel">
+                  Light Mode
+                </label>
+                <input class="form-check-input visually-hidden"
+                       id="darkModeToggle"
+                       type="checkbox"
+                       {% if dark_mode %}checked{% endif %}>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link"
+               href="{% url 'logout' %}?next={% url 'core:index' %}">Logout</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'login' %}?next={% url 'core:index' %}">Login</a>
+          </li>
+        {% endif %}
+      </ul>
     </div>
-</nav>
+  </nav>
+{% endblock header %}
