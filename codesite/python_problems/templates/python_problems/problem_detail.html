@@ -9,7 +9,29 @@
   {# Monokai theme for CodeMirror #}
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
-{% endblock head %}
+
+  {# CodeMirror core JavaScript #}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js" defer></script>
+  {# Python mode for CodeMirror #}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js" defer></script>
+
+  
+  {% load static %}
+  <script src="{% static 'js/codemirror.js' %}" defer></script>
+  <script src="{% static 'js/testcase-buttons.js' %}" defer></script>
+  
+  <!-- Store test cases in a data attribute -->
+  {% comment %} <div id="testcase-container" data-testcases='{{ testcases|safe }}'></div> {% endcomment %}
+  <div id="testCasesContainer" data-test-cases="{{ testcases|safe }}"></div>
+  {% comment %} <div id="testCasesData" data-test-cases="{{ testcases|safe }}"></div> {% endcomment %}
+  
+  
+  {% comment %} <!-- Add a container for buttons -->
+  <div id="buttons_container"></div> {% endcomment %}
+
+  
+
+  {% endblock head %}
 {% block content %}
   {% load static %}
   <link rel="stylesheet"
@@ -308,71 +330,53 @@
       </div>
     </div>
   </div>
-  {# CodeMirror block #}
-  {# CodeMirror core JavaScript #}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js"></script>
-  {# Python mode for CodeMirror #}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js"></script>
-  <script>
-    {# CodeMirror textarea #}
-    document.addEventListener('DOMContentLoaded', loadCodeMirror)
-    
-    function loadCodeMirror() {
-      let storedDarkMode = localStorage.getItem('darkMode');
-      let theme = storedDarkMode === 'enabled' ? 'monokai' : 'default';
-      
-      CodeMirror.fromTextArea(document.getElementById('code_area'), {
-        mode: 'python',
-        theme: theme,
-        lineNumbers: true, // Enable line numbers
-        autofocus: false, // Automatically focus on the editor
-        // placeholder: 'Enter your Python code here...' // Placeholder text
-      });
-    };
 
-    {# Run button #}
-    document.getElementById('code_form').addEventListener('submit', submitCode) 
-      function submitCode() {
-        document.getElementById('submit_button').disabled = true;  // Disable the submit button
-        document.getElementById('spinner').classList.remove('d-none');  // Show the spinner
-        document.getElementById('submit_button').lastChild.textContent = 'Running';  // chhange 'Run' to 'Running'
-      }
+  <script>
 
     {# Testcase buttons #}
     document.addEventListener('DOMContentLoaded', loadTestcaseButtons);
     
-    function loadTestcaseButtons() {
-      const testCases = {{ testcases|safe }};
-      const buttonsContainer = document.getElementById('buttons_container');
-      const testcasesContainer = document.getElementById('testcases_container');
+function loadTestcaseButtons() {
+  const testCases = {{ testcases|safe }};
+  // const container = document.getElementById("testcase-container");
+  // const testCases = JSON.parse(container.getAttribute("data-testcases"));
+  //const testCasesContainer = document.getElementById('testCasesContainer');
+  //const testCases = JSON.parse(testCasesContainer.dataset.testCases);
+  //const testCasesData = document.getElementById('testCasesData');
+  //const testCases = JSON.parse(testCasesData.dataset.testCases);
+  //const testCases = JSON.parse(testCasesData.dataset.testCases);
 
-      testCases.forEach((testCase, index) => {
-        // Create button
-        const button = document.createElement('button');
-        button.className = 'btn btn-secondary btn-sm me-2 py-0 px-3';
-        button.textContent = index + 1;
-        button.onclick = (event) => {
-          // event.preventDefault();
-          showTestCase(index + 1);
-        }
-        buttonsContainer.appendChild(button);
-      });
+  const buttonsContainer = document.getElementById('buttons_container');
+  const testcasesContainer = document.getElementById('testcases_container');
 
-      function showTestCase(index) {
-        // Hide all test cases
-        const testcaseElements = document.getElementsByClassName('testcase-content');
-        for (let testcase of testcaseElements) {
-          testcase.style.display = 'none';
-        }
-        
-        // Show selected test case
-        document.getElementById(`testcase-${index}`).style.display = 'block';
-      }
-
-      // Show the first test case by default
-      if (testCases.length > 0) {
-        showTestCase(1);
-      }
+  testCases.forEach((testCase, index) => {
+    // Create button
+    const button = document.createElement('button');
+    button.className = 'btn btn-secondary btn-sm me-2 py-0 px-3';
+    button.textContent = index + 1;
+    button.onclick = (event) => {
+      // event.preventDefault();
+      showTestCase(index + 1);
     }
+    buttonsContainer.appendChild(button);
+  });
+
+  function showTestCase(index) {
+    // Hide all test cases
+    const testcaseElements = document.getElementsByClassName('testcase-content');
+    for (let testcase of testcaseElements) {
+      testcase.style.display = 'none';
+    }
+    
+    // Show selected test case
+    document.getElementById(`testcase-${index}`).style.display = 'block';
+  }
+
+  // Show the first test case by default
+  if (testCases.length > 0) {
+    showTestCase(1);
+  }
+}
+
   </script>
 {% endblock content %}

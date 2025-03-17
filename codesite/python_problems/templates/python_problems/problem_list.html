@@ -1,14 +1,17 @@
 {% extends "core/base.html" %}
-{% load pagination_page_filter problem_filters paginator_tags %}
-
 {% block title %}
   Python
 {% endblock title %}
-{% block content %}
+{% block head %}
   {# From app static filies, only for this app https://www.w3schools.com/django/django_collect_static_files.php #}
   {# {% load static %} <link rel="stylesheet" href="{% static 'python_problems/style_local.css' %}"> #}
   {# For global static files, for all apps https://www.w3schools.com/django/django_add_global_static_files.php #}
   {# {% load static %} <link rel="stylesheet" href="{% static 'style_global.css' %}"> #}
+  {% load pagination_page_filter problem_filters %}
+  {% load static %}
+  <script src="{% static 'js/toggle-tags.js' %}" defer></script>
+{% endblock head %}
+{% block content %}
   <div class="row m-1">
     <div class="col-md-2">
       <a href="{% url 'core:index' %}"
@@ -135,12 +138,12 @@
                   id="problems_per_page"
                   name="problems_per_page"
                   onchange="this.form.submit()">
-            <option value=5 {% if problems_per_page == 5 %}selected{% endif %}>5 / page</option>
-            <option value=6 {% if problems_per_page == 6 %}selected{% endif %}>6 / page</option>
-            <option value=7 {% if problems_per_page == 7 %}selected{% endif %}>7 / page</option>
-            <option value=8 {% if problems_per_page == 8 %}selected{% endif %}>8 / page</option>
-            <option value=10 {% if problems_per_page == 10 %}selected{% endif %}>10 / page</option>
-            <option value=20 {% if problems_per_page == 20 %}selected{% endif %}>20 / page</option>
+            <option value="5" {% if problems_per_page == 5 %}selected{% endif %}>5 / page</option>
+            <option value="6" {% if problems_per_page == 6 %}selected{% endif %}>6 / page</option>
+            <option value="7" {% if problems_per_page == 7 %}selected{% endif %}>7 / page</option>
+            <option value="8" {% if problems_per_page == 8 %}selected{% endif %}>8 / page</option>
+            <option value="10" {% if problems_per_page == 10 %}selected{% endif %}>10 / page</option>
+            <option value="20" {% if problems_per_page == 20 %}selected{% endif %}>20 / page</option>
             <option value="{{ problem_list|length }}"
                     {% if problems_per_page == problem_list|length %}selected{% endif %}>All</option>
           </select>
@@ -250,7 +253,7 @@
               <!-- First Page Button -->
               {% if page_obj.has_previous %}
                 <li class="page-item">
-                  <button type="submit" class="page-link" name="page_number" value=1>
+                  <button type="submit" class="page-link" name="page_number" value="1">
                     &laquo;
                   </button>
                 </li>
@@ -330,20 +333,18 @@
                 </li>
               {% endif %}
 
-              
-
               <!-- Problems Per Page Dropdown -->
               <li class="page-item">
                 <select class="form-select d-inline w-auto ms-3"
                         id="problems_per_page"
                         name="problems_per_page"
                         onchange="this.form.submit()">
-                  <option value=5 {% if problems_per_page == 5 %}selected{% endif %}>5 / page</option>
-                  <option value=6 {% if problems_per_page == 6 %}selected{% endif %}>6 / page</option>
-                  <option value=7 {% if problems_per_page == 7 %}selected{% endif %}>7 / page</option>
-                  <option value=8 {% if problems_per_page == 8 %}selected{% endif %}>8 / page</option>
-                  <option value=10 {% if problems_per_page == 10 %}selected{% endif %}>10 / page</option>
-                  <option value=20 {% if problems_per_page == 20 %}selected{% endif %}>20 / page</option>
+                  <option value="5" {% if problems_per_page == 5 %}selected{% endif %}>5 / page</option>
+                  <option value="6" {% if problems_per_page == 6 %}selected{% endif %}>6 / page</option>
+                  <option value="7" {% if problems_per_page == 7 %}selected{% endif %}>7 / page</option>
+                  <option value="8" {% if problems_per_page == 8 %}selected{% endif %}>8 / page</option>
+                  <option value="10" {% if problems_per_page == 10 %}selected{% endif %}>10 / page</option>
+                  <option value="20" {% if problems_per_page == 20 %}selected{% endif %}>20 / page</option>
                   <option value="{{ problem_list|length }}"
                           {% if problems_per_page == problem_list|length %}selected{% endif %}>All</option>
                 </select>
@@ -384,28 +385,6 @@
       <div class="mb-3">
         <button onclick="toggleTags()" class="btn btn-secondary px-2 py-0">Show Tags</button>
       </div>
-      <div class="row mb-2">
-        <div>
-          <a href="{% url 'python_problems:problem-create' %}">Create a problem</a> |
-          <a href="{% url 'python_problems:solution-create' %}">Create a solution</a> |
-          <a href="{% url 'python_problems:language-create' %}">Add a language</a> |
-          <a href="{% url 'python_problems:tag-index' %}">Tag list</a> |
-          <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
-        </div>
-      </div>
     </div>
   </div>
-  <script>
-    {# Toggle on/off tag buttons in problem list view #}
-    function toggleTags() {
-      const tags = document.querySelectorAll('form button.tags_js');
-      for (const tag of tags) {
-        if (tag.style.display === 'none') {
-          tag.style.display = 'inline-block';
-        } else {
-          tag.style.display = 'none';
-        }
-      }
-    }
-  </script>
 {% endblock content %}

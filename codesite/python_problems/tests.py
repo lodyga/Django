@@ -238,7 +238,7 @@ class SolutionModelTests(TestCase):
         Test creating two Solution instances in different Language instances
         linked to the same Problem instance.
         """
-        Language.objects.all().delete()
+        # Language.objects.all().delete()
         language_1, _ = Language.objects.get_or_create(name="Python")
         language_2, _ = Language.objects.get_or_create(name="JavaScript")
         create_sample_solution(language=language_1)
@@ -717,10 +717,3 @@ class ProblemIndexViewTests2(TestCase):
             Problem.objects.all().order_by('id'),
             # Compare objects directly (no transformation)
             transform=lambda x: x)
-
-
-
-
-
-
-

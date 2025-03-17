@@ -30,12 +30,12 @@
     {% endblock head %}
   </head>
   <body>
+    {% include "core/header.html" %}
     <div class="container-fluid">  {# without detail page gets bottom horizontal bar #}
-      {% include "core/header.html" %}
       {% block content %}
       {% endblock content %}
-      {% include "core/footer.html" %}
     </div>
+    {% include "core/footer.html" %}
 
   </body>
 </html>

@@ -1,3 +1,7 @@
+migrations
+py manage.py showmigrations python_problems
+
+
 <img src="{{ item.image.url }}" class="rounded-xl">
 <img src="{% static 'images/chair.jpg' %}" class="center">
 <img src="/static/images/chair.jpg">

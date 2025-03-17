@@ -25,7 +25,7 @@ from .serializers import (
 
 def tag_graph_view(request):
     tag_list = Tag.objects.all()
-    data = [{"tag": tag.name, 
+    data = [{"tag": tag.name,
              "count": tag.problem_set.count()}
             for tag in tag_list]
     sorted_data = sorted(data, key=lambda x: x["count"], reverse=True)
@@ -84,15 +84,19 @@ class ProblemIndexView(ListView):
         context = self.get_context_data(**kwargs)
         problem_list = Problem.objects.all()
 
-        # Get data from request POST.        
+        # Get data from request POST.
         query_text = request.POST.get("query_text", context["query_text"])
-        difficulty_id = int(request.POST.get("difficulty_id", context["difficulty_id"]))
+        difficulty_id = int(request.POST.get(
+            "difficulty_id", context["difficulty_id"]))
         tag_id = int(request.POST.get("tag_id", context["tag_id"]))
-        language_id = int(request.POST.get("language_id", context["language_id"]))
+        language_id = int(request.POST.get(
+            "language_id", context["language_id"]))
         order_by = request.POST.get("order_by", context["order_by"])
-        problems_per_page = int(request.POST.get("problems_per_page", context["problems_per_page"]))
-        page_number = int(request.POST.get("page_number") or request.POST.get("form_page_number", 1))
-        
+        problems_per_page = int(request.POST.get(
+            "problems_per_page", context["problems_per_page"]))
+        page_number = int(request.POST.get("page_number")
+                          or request.POST.get("form_page_number", 1))
+
         # Fileter problems by difficulty.
         if difficulty_id:
             difficulty = get_object_or_404(Difficulty, id=difficulty_id)
@@ -101,7 +105,8 @@ class ProblemIndexView(ListView):
         # Fileter problems by language.
         if language_id:
             language = get_object_or_404(Language, id=language_id)
-            problem_list = problem_list.filter(problem_solutions__language=language)
+            problem_list = problem_list.filter(
+                problem_solutions__language=language)
 
         # Fileter problems by tag.
         if tag_id:
@@ -269,13 +274,17 @@ class ProblemDetailView(DetailView):
         language_id = context["language_id"]
         language = get_object_or_404(Language, id=language_id)
 
+        solution = Solution.objects.filter(
+            problem=problem,
+            owner=owner,
+            language=language).first()
+
         context.update({
-            "code_text": self.default_code_text,
+            "code_text": code_text,
             "output_form": output_form,
             "owner_id": owner_id,
             "language_id": language_id,
-            "solution": Solution.objects.filter(
-                problem=problem, owner=owner, language=language).first()
+            "solution": solution
         })
 
         return render(request, self.template_name, context)

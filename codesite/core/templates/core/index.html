@@ -10,28 +10,106 @@
         <h1 class="mb-5">Site Index</h1>
         <ul>
           <li>
-            <a href="https://codesite.onrender.com/" target="_blank">Codesite as a Docker container hosted on Render</a>
-            <p>It takes about 30 seconds to boot up after inactivity.</p>
-          </li>
-          <li>
             <a href="{% url 'login' %}">Login</a>
           </li>
         </ul>
         <ul>
           <li>
-            <div class="row">
-              <div class="col-auto">
-                <a href="{% url 'python_problems:problem-index' %}">Python</a>
-              </div>
-              <div class="col-auto">
-                &laquo;-- Most features here.
-              </div>
-            </div>
+            <a href="{% url 'python_problems:problem-index' %}">Problems</a>
           </li>
           <ul>
+            <form method="post" action="{% url 'python_problems:problem-index' %}">
+            {% csrf_token %}
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="language_id" value="1">
+                  Python
+                </button>
+              </li>
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="language_id" value="2">
+                  JavaScript
+                </button>
+              </li>
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="language_id" value="6">
+                  Java
+                </button>
+              </li>
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="language_id" value="7">
+                  C++
+                </button>
+              </li>
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="language_id" value="3">
+                  Pandas
+                </button>
+              </li>
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="language_id" value="4">
+                  MySQL
+                </button>
+              </li>
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="language_id" value="5">
+                  PostgreSQL
+                </button>
+              </li>
+            </form>
+          </ul>
+        </ul>
+        <ul>
+          <form method="post" action="{% url 'python_problems:problem-index' %}">
+          {% csrf_token %}
             <li>
-              <a href="{% url 'python_problems:api-root' %}">REST API</a>
+              <a href="{% url 'python_problems:problem-index' %}">Search problems by</a>
             </li>
+            <ul>
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="query_text" value="Palindrome">
+                  Query: Palindrome
+                </button>
+              </li>
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="difficulty_id" value="1">
+                  Difficulty: Easy
+                </button>
+              </li>
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="tag_id" value="2">
+                  Tag: Array
+                </button>
+              </li>
+              <li>
+                <button type="submit" class="btn btn-link p-0" name="language_id" value="1">
+                  Language: Python
+                </button>
+              </li>
+            </ul>
+            <li>
+              <a href="{% url 'python_problems:problem-index' %}">Display settings</a>
+            </li>
+              <ul>
+                <li>
+                  <button type="submit" class="btn btn-link p-0" name="order_by" value="title">
+                    Order_by: "title"
+                  </button>
+                </li>
+                <li>
+                  <button type="submit" class="btn btn-link p-0" name="problems_per_page" value="7">
+                    Problems per page: 7
+                  </button>
+                </li>
+              </ul>
+              </ul>
+            </form>
+          </ul>
+        </ul>
+        <ul>
+          <li>
+            <a href="{% url 'python_problems:problem-index' %}">Admin</a>
+          </li>
+          <ul>
             <li>
               <a href="{% url 'python_problems:problem-create' %}">Create a problem</a>
             </li>
@@ -39,33 +117,27 @@
               <a href="{% url 'python_problems:solution-create' %}">Create a solution</a>
             </li>
             <li>
+              <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
+            </li>
+            <li>
               <a href="{% url 'python_problems:language-create' %}">Add a language</a>
             </li>
             <li>
-              <a href="{% url 'python_problems:tag-index' %}">Tag</a>
+              <a href="{% url 'python_problems:tag-index' %}">Tags</a>
             </li>
-            <ul>
-              <li>
-                <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
-              </li>
-              <li>
-                <a href="{% url 'python_problems:tag-graph' %}">Statistics</a>
-              </li>
-            </ul>
+            <li>
+              <a href="{% url 'python_problems:tag-graph' %}">Statistics</a>
+            </li>
+            <li>
+              <a href="{% url 'python_problems:api-root' %}">REST API</a>
+            </li>
           </ul>
         </ul>
         <ul>
           <li>
-            <a href="sql/">SQL</a>
+            <a href="https://codesite.onrender.com/" target="_blank">Codesite as a Docker container hosted on Render</a>
+            <p>It takes about 30 seconds to boot up after inactivity.</p>
           </li>
-          <ul>
-            <li>
-              <a href="sql/conversion/">database conversion</a>
-            </li>
-            <li>
-              <a href="sql/ascii/">database from ASCII</a>
-            </li>
-          </ul>
         </ul>
         <ul>
           <li>
@@ -79,6 +151,19 @@
               </li>
             </ul>
           </li>
+        </ul>
+        <ul>
+          <li>
+            <a href="sql/">SQL</a>
+          </li>
+          <ul>
+            <li>
+              <a href="sql/conversion/">database conversion</a>
+            </li>
+            <li>
+              <a href="sql/ascii/">database from ASCII</a>
+            </li>
+          </ul>
         </ul>
       </div>
     </div>

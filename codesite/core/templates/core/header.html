@@ -1,4 +1,6 @@
-{% block header %}    
+{% block header %}
+  <form method="post" action="{% url 'python_problems:problem-index' %}">
+  {% csrf_token %}
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary m-2"
        style="border-radius:10px !important">
     <div class="container-fluid">
@@ -24,29 +26,166 @@
         {% url 'core:index' as home_url %}
         <li class="nav-item">
           <a href="{{ home_url }}"
-             class="nav-link {% if request.get_full_path == home_url %}active{% endif %}">Home</a>
+             class="nav-link {% if request.get_full_path == home_url %}active{% endif %}">
+            Home
+          </a>
         </li>
         {% url 'python_problems:problem-index' as python_index_url %}
         {% url 'python_problems:tag-graph' as python_tag_graph %}
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle {% if request.get_full_path == python_index_url or request.get_full_path == python_tag_graph %}active{% endif %}"
+          {% comment %} <a class="nav-link dropdown-toggle {% if request.get_full_path == python_index_url or request.get_full_path == python_tag_graph %}active{% endif %}" {% endcomment %}
+          <a class="nav-link dropdown-toggle 
+                   {% if language_id == 1 %}active{% endif %}"   
              href="#"
              id="navbarDropdown"
              role="button"
              data-bs-toggle="dropdown"
-             aria-expanded="false">Python</a>
+             aria-expanded="false">
+            Python
+          </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
+            {% comment %} <li>
               <a class="dropdown-item {% if request.get_full_path == python_index_url %}active{% endif %}"
                  href="{{ python_index_url }}">Python Problems</a>
-            </li>
-            <li>
-              <a class="dropdown-item {% if request.get_full_path == python_tag_graph %}active{% endif %}"
-                 href="{{ python_tag_graph }}">Statistics</a>
+            </li> {% endcomment %}
+            {% comment %} todo {% endcomment %}
+            <li>     
+              <button class="btn dropdown-item" 
+                      type="submit" 
+                      name="language_id" 
+                      value="1">
+                Python
+              </button>
             </li>
           </ul>
         </li>
-        {% url 'sql_problems:index' as sql_index_url %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle 
+                   {% if language_id == 2 %}active{% endif %}"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            JavaScript
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <button class="btn dropdown-item" 
+                      type="submit" 
+                      name="language_id" 
+                      value="2">
+                JavaScript
+              </button>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle 
+                   {% if language_id == 6 %}active{% endif %}"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            Java
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <button class="btn dropdown-item" 
+                      type="submit" 
+                      name="language_id" 
+                      value="6">
+                Java
+              </button>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle 
+                   {% if language_id == 7 %}active{% endif %}"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            C++
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <button class="btn dropdown-item" 
+                      type="submit" 
+                      name="language_id" 
+                      value="7">
+                C++
+              </button>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle 
+                   {% if language_id == 3 %}active{% endif %}"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            Pandas
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <button class="btn dropdown-item" 
+                      type="submit" 
+                      name="language_id" 
+                      value="3">
+                Pandas
+              </button>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle 
+                   {% if language_id == 4 %}active{% endif %}"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            MySQL
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <button class="btn dropdown-item" 
+                      type="submit" 
+                      name="language_id" 
+                      value="4">
+                MySQL
+              </button>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle 
+                   {% if language_id == 5 %}active{% endif %}"
+             href="#"
+             id="navbarDropdown"
+             role="button"
+             data-bs-toggle="dropdown"
+             aria-expanded="false">
+            PostgreSQL
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li>
+              <button class="btn dropdown-item" 
+                      type="submit" 
+                      name="language_id" 
+                      value="5">
+                PostgreSQL
+              </button>
+            </li>
+          </ul>
+        </li>
+        {% comment %} {% url 'sql_problems:index' as sql_index_url %}
         {% url 'sql_problems:conversion' as sql_conversion_url %}
         {% url 'sql_problems:ascii' as sql_ascii_url %}
         <li class="nav-item dropdown">
@@ -70,7 +209,7 @@
                  href="{{ sql_ascii_url }}">db from ASCII</a>
             </li>
           </ul>
-        </li>
+        </li> {% endcomment %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle"
              href="#"
@@ -84,7 +223,28 @@
                  href="{% url 'python_problems:problem-create' %}">Create a problem</a>
             </li>
             <li>
-              <a class="dropdown-item" href="{% url 'python_problems:tag-create' %}">Add a tag</a>
+              <a class="dropdown-item"
+                 href="{% url 'python_problems:solution-create' %}">Create a solution</a>
+            </li>
+            <li>
+              <a class="dropdown-item" 
+                 href="{% url 'python_problems:tag-create' %}">Add a tag</a>
+            </li>
+            <li>
+              <a class="dropdown-item" 
+                 href="{% url 'python_problems:language-create' %}">Add a language</a>
+            </li>
+            <li>
+              <a class="dropdown-item" 
+                 href="{% url 'python_problems:tag-index' %}">Tags</a>
+            </li>
+            <li>
+              <a class="dropdown-item {% if request.get_full_path == python_tag_graph %}active{% endif %}"
+                 href="{{ python_tag_graph }}">Statistics</a>
+            </li>
+            <li>
+              <a class="dropdown-item" 
+                 href="{% url 'python_problems:api-root' %}">REST API</a>
             </li>
             <li>
               <hr class="dropdown-divider" />
@@ -103,6 +263,7 @@
           </ul>
         </li>
       </ul>
+      
       {% comment %} <ul class="navbar-nav mb-lg-0">
         <li>
           <a class="nav-link active" href="#">Active</a>
@@ -150,4 +311,5 @@
       </ul>
     </div>
   </nav>
+  </form>
 {% endblock header %}
