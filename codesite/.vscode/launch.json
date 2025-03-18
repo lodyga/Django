@@ -29,7 +29,7 @@
     //"runtimeExecutable": "/var/lib/flatpak/app/com.google.Chrome",
     {
       "name": "Launch Chrome (flatpak)",
-      "type": "pwa-chrome",
+      "type": "chrome",
       "request": "launch",
       "url": "http://127.0.0.1:8000",
       "webRoot": "${workspaceFolder}",
@@ -38,7 +38,7 @@
     },
     {
       "name": "Launch Edge (flatpak)",
-      "type": "pwa-msedge",
+      "type": "msedge",
       "request": "launch",
       "url": "http://127.0.0.1:8000",
       "webRoot": "${workspaceFolder}",
@@ -91,7 +91,7 @@
     },
     {
       "name": "Attach to Chromium (snap)",
-      "type": "pwa-chrome",
+      "type": "chrome",
       "request": "attach",
       "port": 9222,
       "webRoot": "${workspaceFolder}"

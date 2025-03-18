@@ -1,6 +1,3 @@
-# _search_bar.html
-# add problems per page to local storage
-# snap "show tags" on index list
 # reverse search for order by, difficulty
 
 # Edit/info/settings tab

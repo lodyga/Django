@@ -18,128 +18,7 @@
       <a href="{% url 'core:index' %}"
          class="btn btn-secondary px-3 py-0 mt-3 mb-5">Back</a>
       <div class="mb-3">
-        <label for="search_bar" class="form-label">
-          <b>Search tab:</b>
-        </label>
-        <hr>
-        <form method="post" id="search_bar">
-          {% csrf_token %}
-
-          <!-- Search Box -->
-          <label for="search_box" class="form-label">
-            <b>Search box:</b>
-          </label>
-          <div class="input-group mb-3">
-            <input class="p-2 mb-1"
-                   id="search_box"
-                   name="query_text"
-                   placeholder="Search by tag or title"
-                   style="border-radius: 0.35rem"
-                   type="text"
-                   value="{{ query_text }}">
-            <button class="btn btn-primary px-2 py-0"
-                    style="border-radius: 0.35rem"
-                    type="submit">
-              Search
-            </button>
-          </div>
-
-          <!-- Difficulty Filter -->
-          <label for="difficulty" class="form-label">
-            <b>Difficulty:</b>
-          </label>
-          <select class="form-select mb-3"
-                  id="difficulty"
-                  name="difficulty_id"
-                  onchange="this.form.submit()"
-                  style="width: auto">
-            <option value="{{ 0 }}"
-                    {% if difficulty.id == 0 %}selected{% endif %}>
-              {{ "All" }}
-            </option>
-            {% for difficulty in difficulty_list %}
-              <option value="{{ difficulty.id }}"
-                      {% if difficulty.id == difficulty_id %}selected{% endif %}>
-                {{ difficulty }}
-              </option>
-            {% endfor %}
-          </select>
-
-          <!-- Tag Filter -->
-          <label for="tags">
-            <b>Tag:</b>
-          </label>
-          <select class="form-select mb-3"
-                  id="tag"
-                  name="tag_id"
-                  onchange="this.form.submit()"
-                  style="width: auto;">
-            <option value="{{ 0 }}"
-                    {% if tag.id == 0 %}selected{% endif %}>
-              {{ "All" }}
-              {% for tag in tag_list.all %}
-              <option value="{{ tag.id }}"
-                      {% if tag.id == tag_id %}selected{% endif %}>
-                {{ tag }}
-              {% endfor %}
-            </option>
-          </select>
-          
-          <!-- Select Language -->
-          <label for="language" class="form-label">
-            <b>Language:</b>
-          </label>
-          <select class="form-select mb-3"
-                  id="language"
-                  name="language_id"
-                  onchange="this.form.submit()"
-                  style="width: auto;">
-            <option value="{{ 0 }}"
-                    {% if language.id == 0 %}selected{% endif %}>
-              {{ "All" }}
-              {% for language in language_list.all %}
-              <option value="{{ language.id }}"
-                      {% if language.id == language_id %}selected{% endif %}>
-                {{ language }}
-              {% endfor %}
-            </option>
-          </select>
-
-          <!-- Order by -->
-          <label for="order_by" class="form-label">
-            <b>Order by:</b>
-          </label>
-          <select class="form-select mb-3"
-                  id="order_by"
-                  name="order_by"
-                  onchange="this.form.submit()"
-                  style="width: auto">
-            <option value="difficulty" 
-                    {% if order_by == "difficulty" %}selected{% endif %}>Difficulty
-            </option>
-            <option value="title" 
-                    {% if order_by == "title" %}selected{% endif %}>Title
-            </option>
-            <option value="owner" 
-                    {% if order_by == "owner" %}selected{% endif %}>Author
-            </option>
-            <option value="created_at"
-                    {% if order_by == "created_at" %}selected{% endif %}>Creation date
-            </option>
-            <option value="updated_at"
-                    {% if order_by == "updated_at" %}selected{% endif %}>Update date
-            </option>
-          </select>
-          
-          <!-- Problems Per Page Dropdown -->
-          <label for="problems_per_page_primary" class="form-label">
-            <b>Problems per page:</b>
-          </label>
-          {% include "python_problems/partials/_problems_per_page.html" with select_class="form-select w-auto mb-3" select_id="problems_per_page_primary"%}
-          
-          <!-- Hidden Fields for Paginator -->
-          <input type="hidden" name="page_number" value="{{ page_number }}">
-        </form>
+        {% include "python_problems/partials/_search_bar.html" %}
       </div>
       
       <!-- Clear filters -->
@@ -169,12 +48,12 @@
                     </li>
                   </div>
                     
-                  {# Tag buttons in JS #}
+                  {# Tag buttons #}
                   <div class="col-md-auto">
                     {% for tag in problem.tags.all %}
                       <form method="post" style="display: inline">
                         {% csrf_token %}
-                        <button class="tags_js btn btn-secondary py-0 px-1" 
+                        <button class="tags btn btn-secondary py-0 px-1" 
                                 style="display: none"
                                 type="submit">
                           {{ tag.name }}
@@ -184,17 +63,9 @@
                   </div>
                 </div>
                 <div class="row">
+
                   {# Show difficulty #}
                   <div class="col-md-auto mt-1">
-                    {% comment %} <button class="page-link btn px-2 py-0
-                                   {% if problem.difficulty.name == 'Easy' %}btn-success{% endif %}
-                                   {% if problem.difficulty.name == 'Medium' %}btn-warning{% endif %}
-                                   {% if problem.difficulty.name == 'Hard' %}btn-danger{% endif %}
-                                   {% if problem.difficulty.name == 'Impossible' %}btn-secondary{% endif %}"
-                            disabled
-                            id="difficulty_tag">
-                      {{ problem.difficulty }}
-                    </button> {% endcomment %}
                     <p class={% if problem.difficulty.name == 'Easy' %}"text-success"{% endif %}
                              {% if problem.difficulty.name == 'Medium' %}"text-warning"{% endif %}
                              {% if problem.difficulty.name == 'Hard' %}"text-danger"{% endif %}
@@ -214,21 +85,6 @@
                     {% endfor %}
                   </div>
                 </div>
-
-                {# Tag buttons in Bootstrap #}
-                {% comment %} <div class="collapse col-md-auto"
-                     id="tags">
-                  {% for tag in problem.tags.all %}
-                    <form method="post" style="display: inline">
-                      {% csrf_token %}
-                      <input type="hidden" name="tag" value="{{ tag.id }}">
-                      <button type="submit" 
-                              class="tags btn btn-secondary py-0 px-1">
-                        {{ tag.name }}
-                      </button>
-                    </form>
-                  {% endfor %}
-                </div> {% endcomment %}
               </div>
               <hr>
             </div>
@@ -348,18 +204,13 @@
       <label>
         <b>Settings tab</b>
       </label>
-      {# Tag buttons in Bootstrap #}      
-      {% comment %} <div class="mb-3">
-        <button type="button"
-                class="btn btn-secondary px-2 py-0"
-                data-bs-toggle="collapse"
-                data-bs-target="#tags">
-          Show Tags
-        </button>
-      </div> {% endcomment %}
-      {# Tag buttons in JS #}
+
+      {# Tag buttons #}
       <div class="mb-3">
-        <button onclick="toggleTags()" class="btn btn-secondary px-2 py-0">Show Tags</button>
+        <button class="btn btn-secondary px-2 py-0"
+                id="toggleTags">
+          Show tags
+        </button>
       </div>
     </div>
   </div>
