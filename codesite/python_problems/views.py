@@ -61,6 +61,9 @@ class ProblemIndexView(ListView):
             del language_indexes
             problems_languages[problem] = language_list
 
+        # Option values for problems_per_page form-select.
+        problems_per_page_options = [5, 6, 7, 8, 10, 15, 20, 50, 100, len(problem_list)]
+
         context.update({
             "difficulty_id": 0,
             "difficulty_list": difficulty_list,
@@ -71,6 +74,7 @@ class ProblemIndexView(ListView):
             "problems_languages": problems_languages,
             "problem_list": problem_list,
             "problems_per_page": problems_per_page,
+            "problems_per_page_options": problems_per_page_options,
             "tag_id": 0,
             "tag_list": tag_list,
             "query_text": "",
@@ -94,6 +98,7 @@ class ProblemIndexView(ListView):
         order_by = request.POST.get("order_by", context["order_by"])
         problems_per_page = int(request.POST.get(
             "problems_per_page", context["problems_per_page"]))
+        # problems_per_page = int(request.POST.get("problems_per_page") or context["problems_per_page"])
         page_number = int(request.POST.get("page_number")
                           or request.POST.get("form_page_number", 1))
 

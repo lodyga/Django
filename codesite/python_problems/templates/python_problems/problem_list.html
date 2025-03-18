@@ -9,6 +9,7 @@
   {# {% load static %} <link rel="stylesheet" href="{% static 'style_global.css' %}"> #}
   {% load pagination_page_filter problem_filters %}
   {% load static %}
+  <script src="{% static 'js/problems-per-page.js' %}"></script>
   <script src="{% static 'js/toggle-tags.js' %}" defer></script>
 {% endblock head %}
 {% block content %}
@@ -131,26 +132,13 @@
           </select>
           
           <!-- Problems Per Page Dropdown -->
-          <label for="problems_per_page" class="form-label">
+          <label for="problems_per_page_primary" class="form-label">
             <b>Problems per page:</b>
           </label>
-          <select class="form-select w-auto mb-3"
-                  id="problems_per_page"
-                  name="problems_per_page"
-                  onchange="this.form.submit()">
-            <option value="5" {% if problems_per_page == 5 %}selected{% endif %}>5 / page</option>
-            <option value="6" {% if problems_per_page == 6 %}selected{% endif %}>6 / page</option>
-            <option value="7" {% if problems_per_page == 7 %}selected{% endif %}>7 / page</option>
-            <option value="8" {% if problems_per_page == 8 %}selected{% endif %}>8 / page</option>
-            <option value="10" {% if problems_per_page == 10 %}selected{% endif %}>10 / page</option>
-            <option value="20" {% if problems_per_page == 20 %}selected{% endif %}>20 / page</option>
-            <option value="{{ problem_list|length }}"
-                    {% if problems_per_page == problem_list|length %}selected{% endif %}>All</option>
-          </select>
+          {% include "python_problems/partials/_problems_per_page.html" with select_class="form-select w-auto mb-3" select_id="problems_per_page_primary"%}
           
           <!-- Hidden Fields for Paginator -->
           <input type="hidden" name="page_number" value="{{ page_number }}">
-          {% comment %} <input type="hidden" name="problems_per_page" value="{{ problems_per_page }}"> {% endcomment %}
         </form>
       </div>
       
@@ -335,19 +323,7 @@
 
               <!-- Problems Per Page Dropdown -->
               <li class="page-item">
-                <select class="form-select d-inline w-auto ms-3"
-                        id="problems_per_page"
-                        name="problems_per_page"
-                        onchange="this.form.submit()">
-                  <option value="5" {% if problems_per_page == 5 %}selected{% endif %}>5 / page</option>
-                  <option value="6" {% if problems_per_page == 6 %}selected{% endif %}>6 / page</option>
-                  <option value="7" {% if problems_per_page == 7 %}selected{% endif %}>7 / page</option>
-                  <option value="8" {% if problems_per_page == 8 %}selected{% endif %}>8 / page</option>
-                  <option value="10" {% if problems_per_page == 10 %}selected{% endif %}>10 / page</option>
-                  <option value="20" {% if problems_per_page == 20 %}selected{% endif %}>20 / page</option>
-                  <option value="{{ problem_list|length }}"
-                          {% if problems_per_page == problem_list|length %}selected{% endif %}>All</option>
-                </select>
+                {% include "python_problems/partials/_problems_per_page.html" with select_class="form-select d-inline w-auto ms-3" select_id="problems_per_page_secondary" %}
               </li>
             </ul>
 
