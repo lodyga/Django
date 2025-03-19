@@ -225,9 +225,8 @@ class ProblemDetailView(DetailView):
         # Output form
         output_form = OutputForm(initial={"output_area": "None"})
 
-        # Parse testcases
-        testcases, testcases_input, testcases_output = parse_testcases(
-            solution.testcase)
+        # Parse test cases
+        test_cases = parse_testcases(solution.testcase)
 
         # Parse URL
         url = parse_url(problem.url)
@@ -243,7 +242,7 @@ class ProblemDetailView(DetailView):
             "solution": solution,
             "solution_languages": solution_languages,  # Available languages in the dropdown
             "tag_list": problem.tags.all(),
-            "testcases": testcases,
+            "test_cases": test_cases,
             "url": url,
         })
 

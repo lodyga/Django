@@ -1,0 +1,48 @@
+<div class="row mb-2">
+  <label for="code_form" class="form-label">
+    <b>Code Area</b>:
+  </label>
+  <form id="code_form"
+        action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
+        method="post"
+        class="mb-2">
+    {% csrf_token %}
+    <div class="code-area-container mb-2 border border-warning">
+      <textarea name="code_area"
+                id="code_area"
+                cols="80"
+                rows="10"
+                class="python-code border border-primary">{{ code_text }}</textarea>
+    </div>
+    <div class="d-inline-flex align-items-center">
+      <button id="submit_button" type="submit" class="btn btn-warning ">
+        <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
+        Run
+      </button>
+      <div class="alert alert-info p-2 ms-1 mt-3">
+        <em>Run</em> for python code only.
+      </div>
+    </div>
+  </form>
+</div>
+<div class="row mb-2">
+  <div>
+    {% if output_form.output_area.value == "Error: 'output'" %}
+      <div class="alert alert-warning">
+        <strong>Warning!</strong> No <em>output</em> variable in Code Area.
+      </div>
+    {% elif "Error" in output_form.output_area.value %}
+      <div class="alert alert-warning">
+        <strong>Warning!</strong> Error detected.
+      </div>
+    {% else %}
+      <div class="alert alert-info">No errors in code.</div>
+    {% endif %}
+  </div>
+</div>
+<div class="row mb-2">
+  {% load crispy_forms_tags %}
+  <form action="" class="mb-5">
+    {{ output_form|crispy }}
+  </form>
+</div>

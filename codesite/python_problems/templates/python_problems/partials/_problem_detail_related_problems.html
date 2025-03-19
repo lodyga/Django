@@ -1,0 +1,30 @@
+<div class="col sticky-top">
+  <div class="row-auto">
+    <a class="btn btn-secondary px-3 py-0 mb-2"
+       href="{% url 'python_problems:problem-index' %}">
+       Back
+    </a>
+  </div>
+  <div class="row-auto">
+    <button type="button"
+            class="btn btn-primary px-3 py-1 mb-2"
+            data-bs-toggle="collapse"
+            data-bs-target="#related">
+            Related problems
+    </button>
+    <div id="related" class="collapse">
+      <div class="box">
+        <ul>
+          {% for related in related_problems %}
+            <li>
+              <a class="btn btn-link"
+                 href="{% url 'python_problems:problem-detail' related.slug solution.language.name %}">
+                {{ related.title|truncatechars:23 }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

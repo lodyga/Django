@@ -1,0 +1,74 @@
+<div class="col">
+  <div class="row-auto">
+    <button type="button"
+            class="btn btn-primary mb-2 ms-0"
+            data-bs-toggle="collapse"
+            data-bs-target="#solution">
+      Show solution
+    </button>
+  </div>
+  <div id="solution" class="row collapse">
+    <div class="col">
+      <div class="row mt-4 mb-4">
+        <hr>
+        {% if user == solution.owner %}
+        <div class="col-auto mb-2">
+          <div class="mb-3">
+            <a href="{% url 'python_problems:solution-update' solution.id %}">
+              Update
+            </a>
+          </div>
+          <div>
+            <a href="{% url 'python_problems:solution-delete' solution.id %}">
+              Delete
+            </a>
+          </div>
+        </div>
+        {% endif %}
+        <div class="col-auto mb-2">
+          <form method="post">
+            {% csrf_token %}
+            <label for="owner" class="mb-2">
+              <b>Author:</b>
+            </label>
+            <select class="form-select"
+                    id="owner"
+                    name="owner_id"
+                    onchange="this.form.submit()">
+              {% for owner in owners %}
+                <option value="{{ owner.id }}"
+                        {% if owner.id == owner_id %}selected{% endif %}>
+                  {{ owner }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+        <div class="col-auto mb-2">
+          <form method="post">
+            {% csrf_token %}
+            <label for="language" class="mb-2">
+              <b>Language:</b>
+            </label>
+            <select class="form-select"
+                    id="language"
+                    name="language"
+                    onchange="this.form.submit()">
+              {% for language in solution_languages %}
+                <option value="{{ language.id }}"
+                        {% if language.id == language_id %}selected{% endif %}>
+                  {{ language }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+      <hr>
+    </div>
+    </div>
+    <div class="box">
+      <pre style="font-family:'Courier New', Courier, monospace">{{ solution.solution }}</pre>
+    </div>
+    <hr>
+  </div>
+</div>

@@ -1,0 +1,102 @@
+{% load pagination_page_filter %}
+<nav>
+  <form method="post">
+    {% csrf_token %}
+    <ul class="pagination">
+      <!-- First Page Button -->
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <button type="submit" class="page-link" name="page_number" value="1">
+            &laquo;
+          </button>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&laquo;</span>
+        </li>
+      {% endif %}
+      <!-- Previous Page Button -->
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <button type="submit" class="page-link" name="page_number" value="{{ page_obj.previous_page_number }}">
+            &lsaquo;
+          </button>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&lsaquo;</span>
+        </li>
+      {% endif %}
+      
+      <!-- Page Numbers -->
+      {% for page_number in page_obj.paginator.page_range %}
+        {% if page_number == page_obj.number %}
+          <!-- Page number dropdown -->
+          <li class="page-item">
+            <select class="form-select d-inline w-auto"
+                    id="form_page_number"
+                    name="form_page_number"
+                    onchange="this.form.submit()">
+              {% for page_number in page_obj.paginator.page_range %}
+                <option value="{{ page_number }}"
+                        {% if page_number == page_obj.number %}selected{% endif %}>
+                  Page {{ page_number }}
+                </option>
+              {% endfor %}
+            </select>
+          </li>
+          {% comment %} <li class="page-item active">
+            <span class="page-link">{{ page_number }}</span>
+          </li> {% endcomment %}
+        {% elif page_number|in_pagination_range:page_obj %}
+          <li class="page-item">
+            <button type="submit" class="page-link" name="page_number" value="{{ page_number }}">
+              {{ page_number }}
+            </button>
+          </li>
+        {% comment %} {% else %}
+          <li class="page-item disabled">
+            <span class="page-link">&hellip;</span>
+          </li> {% endcomment %}
+        {% endif %}
+      {% endfor %}
+
+      <!-- Next Page Button -->
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <button type="submit" class="page-link" name="page_number" value="{{ page_obj.next_page_number }}">
+            &rsaquo;
+          </button>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&rsaquo;</span>
+        </li>
+      {% endif %}
+      <!-- Last Page Button -->
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <button type="submit" class="page-link" name="page_number" value="{{ page_obj.paginator.num_pages }}">
+            &raquo;
+          </button>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&raquo;</span>
+        </li>
+      {% endif %}
+
+      <!-- Problems Per Page Dropdown -->
+      <li class="page-item">
+        {% include "python_problems/partials/_problems_per_page.html" with select_class="form-select d-inline w-auto ms-3" select_id="problems_per_page_secondary" %}
+      </li>
+    </ul>
+
+    <!-- Hidden Fields for Filters -->
+    <input type="hidden" name="difficulty_id" value="{{ difficulty_id }}">
+    <input type="hidden" name="language_id" value="{{ language_id }}">
+    <input type="hidden" name="order_by" value="{{ order_by }}">
+    <input type="hidden" name="query_text" value="{{ query_text }}">
+    <input type="hidden" name="tag_id" value="{{ tag_id }}">
+  </form>
+</nav>

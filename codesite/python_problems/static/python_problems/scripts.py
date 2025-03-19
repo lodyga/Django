@@ -143,53 +143,46 @@ def execute_code_docker(code):
             process.join()
 
 
-def parse_testcases(solution_testcase):
-    """ testcases parsing """
+def parse_testcases(solution_test_cases):
+    """
+    Parse each test case into input and output part.
+    """
+    if not solution_test_cases:
+        return []
 
-    if solution_testcase:
-        # Split the test cases by newline characters
-        lines = solution_testcase.split('\r\n')
-    else:
-        # if empty testcase
-        return [], [], []
+    test_cases = []
+    for raw_test_case in solution_test_cases.splitlines():
+        raw_test_case = raw_test_case.strip()
 
-    testcases = []
-    testcases_input = []
-    testcases_output = []
-    for line in lines:
-        line = line.strip()
-
-        if line.startswith("console.log"):
-            line = line[11:]
-        
-        if line.startswith("print"):
-            line = line[5:]
+        if raw_test_case.startswith("console.log"):
+            raw_test_case = raw_test_case[11:].strip()
+        elif raw_test_case.startswith("print"):
+            raw_test_case = raw_test_case[5:].strip()
 
         try:
-            input_part = ""
-            output_part = ""
+            input_test_case = ""
+            output_test_case = ""
             seen_brackets = []
 
-            for ind, char in enumerate(line[1:-1], 1):
-                if char == "," and not seen_brackets:
-                    output_part = line[ind + 1:-1].strip()
+            for index, char in enumerate(raw_test_case[1:-1], 1):
+                if (char == "," and 
+                        not seen_brackets):
+                    output_test_case = raw_test_case[index + 1:-1].strip()
                     break
 
-                input_part += char
+                input_test_case += char
                 if char in "[(":
                     seen_brackets.append(char)
                 elif char in "])":
                     seen_brackets.pop()
 
         except:
-            input_part = "Invalid testcase"
-            output_part = "Invalid testcase"
+            input_test_case = "Invalid testcase input"
+            output_test_case = "Invalid testcase output"
         finally:
-            testcases.append((input_part, output_part))
-            testcases_input.append(input_part)
-            testcases_output.append(output_part)
+            test_cases.append((input_test_case, output_test_case))
 
-    return testcases, testcases_input, testcases_output
+    return test_cases
 
 
 def parse_url(raw_url):

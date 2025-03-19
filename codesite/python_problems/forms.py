@@ -1,5 +1,5 @@
 from django import forms
-from .models import Problem, Solution, Language
+from .models import Problem, Solution
 
 
 # Custom form to remove "slug", "owner" fields
@@ -17,4 +17,4 @@ class SolutionForm(forms.ModelForm):
 
 class OutputForm(forms.Form):
     output_area = forms.CharField(widget=forms.Textarea(
-        attrs={"placeholder": "None", 'rows': 3, 'cols': 80}))
+        attrs={"placeholder": "None", "rows": 3, "cols": 80}))
