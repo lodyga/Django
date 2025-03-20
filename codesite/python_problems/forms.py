@@ -17,4 +17,4 @@ class SolutionForm(forms.ModelForm):
 
 class OutputForm(forms.Form):
     output_area = forms.CharField(widget=forms.Textarea(
-        attrs={"placeholder": "None", "rows": 3, "cols": 80}))
+        attrs={"placeholder": "None from Forms", "rows": 3, "cols": 80}))

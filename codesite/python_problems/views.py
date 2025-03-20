@@ -62,7 +62,9 @@ class ProblemIndexView(ListView):
             problems_languages[problem] = language_list
 
         # Option values for problems_per_page form-select.
-        problems_per_page_options = [5, 6, 7, 8, 10, 15, 20, 50, 100, len(problem_list)]
+        problems_per_page_options = [
+            5, 6, 7, 8, 10, 15, 20, 50, 100, len(problem_list)
+        ]
 
         context.update({
             "difficulty_id": 0,
@@ -164,7 +166,7 @@ class ProblemIndexView(ListView):
 class ProblemDetailView(DetailView):
     model = Problem  # Problem model
     template_name = "python_problems/problem_detail.html"  # needed for post render()
-    default_code_text = """# Write code here.\r\n# Remember to pass the solution to the output.\r\n\r\ndef fun(x):\r\n    return x\r\n\r\noutput = fun(1)"""
+    default_code_text = """# Write code here.\r\n# Remember to pass the solution to the output.\r\n\r\ndef fun(x):\r\n\treturn x\r\n\r\noutput = fun(1)"""
 
     def get_context_data(self, **kwargs):
         # fetch get_context_data() from DetailView
@@ -223,7 +225,7 @@ class ProblemDetailView(DetailView):
         )
 
         # Output form
-        output_form = OutputForm(initial={"output_area": "None"})
+        output_form = OutputForm(initial={"output_area": "None from Views"})
 
         # Parse test cases
         test_cases = parse_testcases(solution.testcase)
@@ -261,11 +263,12 @@ class ProblemDetailView(DetailView):
             language = get_object_or_404(Language, id=language_id)
             return redirect("python_problems:problem-detail", problem.slug, language.name)
 
-        # Get code from a code area and execute it.
+        # Get the code text from the code area and execute it.
         code_text = request.POST.get("code_area")
         try:
-            executed_code = execute_code(code_text)
-            output_form = OutputForm(initial={"output_area": executed_code})
+            code_executed = execute_code(code_text)
+            output_form = OutputForm(
+                initial={"output_area": code_executed})
         except Exception as e:
             output_form = OutputForm(
                 initial={"output_area": f"Error: {str(e)}"})

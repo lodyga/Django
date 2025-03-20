@@ -1,6 +1,7 @@
 <div class="col">
   <div class="row-auto">
     <button type="button"
+            id="buttonCollapse"
             class="btn btn-primary mb-2 ms-0"
             data-bs-toggle="collapse"
             data-bs-target="#solution">
@@ -64,11 +65,11 @@
           </form>
         </div>
       <hr>
+      </div>
     </div>
-    </div>
-    <div class="box">
-      <pre style="font-family:'Courier New', Courier, monospace">{{ solution.solution }}</pre>
-    </div>
+    <form id="ownerSolutionForm">
+      <textarea id="ownerSolutionTextarea">{{ solution.solution }}</textarea>
+    </form>
     <hr>
   </div>
 </div>
