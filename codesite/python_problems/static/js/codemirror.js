@@ -2,12 +2,23 @@
 document.addEventListener('DOMContentLoaded', loadCodeMirror)
 
 function loadCodeMirror() {
-  let storedDarkMode = localStorage.getItem('darkMode');
-  let theme = storedDarkMode === 'enabled' ? 'monokai' : 'default';
+  const storedDarkMode = localStorage.getItem('darkMode');
+  const theme = storedDarkMode === 'enabled' ? 'monokai' : 'default';
+  
+  const storedLanguageContainer = document.getElementById('languageContainer');
+  const languageId = JSON.parse(storedLanguageContainer.getAttribute('languageName'));
+  const languageModes = {
+    1: 'python',
+    2: 'javascript',
+    3: 'python',
+    4: 'text/x-mysql',
+    5: 'text/x-pgsql',
+    6: 'text/x-java',
+    7: 'text/x-c++src',
+  };
 
   CodeMirror.fromTextArea(document.getElementById('code_area'), {
-    mode: 'python',
-    // mode: 'javascript',
+    mode: languageModes[languageId] || 'text',
     theme: theme,
     // tabSize: 4,
     indentUnit: 4, // Set indentation to 4 spaces (for Python)
@@ -24,7 +35,7 @@ document.getElementById('code_form').addEventListener('submit', submitCode)
 function submitCode() {
   document.getElementById('submit_button').disabled = true;  // Disable the submit button
   document.getElementById('spinner').classList.remove('d-none');  // Show the spinner
-  document.getElementById('submit_button').lastChild.textContent = 'Running';  // chhange 'Run' to 'Running'
+  document.getElementById('submit_button').lastChild.textContent = 'Running';  // change 'Run' to 'Running'
 }
 
 

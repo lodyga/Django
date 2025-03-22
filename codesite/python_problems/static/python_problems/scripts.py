@@ -1,13 +1,14 @@
-import tempfile
-import os
-import subprocess
+from time import sleep
+import requests
 import multiprocessing
 import re
+import socket
 from RestrictedPython import compile_restricted
 from RestrictedPython import safe_builtins, limited_builtins, utility_builtins, safe_globals
 from RestrictedPython.Eval import default_guarded_getitem, default_guarded_getiter
 from RestrictedPython.PrintCollector import PrintCollector
 from RestrictedPython.Guards import guarded_unpack_sequence, guarded_iter_unpack_sequence, full_write_guard, safer_getattr
+from .rapidapi_auth import RAPIDAPI_KEY
 
 
 def execute_code(source_code):
@@ -97,52 +98,6 @@ def execute_code(source_code):
             process.join()
 
 
-def execute_code_docker(code):
-    def code_execution(code, result_queue):
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.py') as temp_script:
-            temp_script.write(code.encode('utf-8'))
-            temp_script_path = temp_script.name
-
-        docker_command = [
-            'docker', 'run', '--rm',
-            '-v', f'{temp_script_path}:/sandbox/temp_script.py:ro',
-            'sandbox-image',
-            'python', 'temp_script.py'
-        ]
-
-        try:
-            result = subprocess.run(
-                docker_command, capture_output=True, text=True, timeout=5)
-            if result.returncode == 0:
-                result_queue.put(result.stdout)
-            else:
-                result_queue.put(f"Error: {result.stderr}")
-        except subprocess.TimeoutExpired:
-            result_queue.put("Error: Execution timed out")
-        finally:
-            os.remove(temp_script_path)
-
-    result_queue = multiprocessing.Queue()
-    process = multiprocessing.Process(
-        target=code_execution, args=(code, result_queue))
-
-    try:
-        process.start()
-        process.join(timeout=15)
-
-        if process.is_alive():
-            process.terminate()
-            process.join()
-            return "Error: Execution timed out"
-
-        result = result_queue.get()
-        return result
-    finally:
-        if process.is_alive():
-            process.terminate()
-            process.join()
-
-
 def parse_testcases(solution_test_cases):
     """
     Parse each test case into input and output part.
@@ -165,7 +120,7 @@ def parse_testcases(solution_test_cases):
             seen_brackets = []
 
             for index, char in enumerate(raw_test_case[1:-1], 1):
-                if (char == "," and 
+                if (char == "," and
                         not seen_brackets):
                     output_test_case = raw_test_case[index + 1:-1].strip()
                     break
@@ -188,3 +143,53 @@ def parse_testcases(solution_test_cases):
 def parse_url(raw_url):
     return re.search(r"((https?)://)?(www\.)?(app\.)?(\w+\.\w+)(/)?", raw_url).group(5)
 
+
+def is_localhost():
+    localhost_list = ["127.0.0.1", "127.0.1.1", "::1"]
+    hostname = socket.gethostname()
+    host_ip = socket.gethostbyname(hostname)
+    return host_ip in localhost_list
+
+
+def execute_code_by_judge0(source_code, language):
+    language_name_to_id = {
+        "Python": 71,
+        "JavaScript": 63,
+        "Java": 62,
+        "C++": 54,
+    }
+    language_id = language_name_to_id[language]
+
+    host_url = "http://localhost:2358" if is_localhost() else "https://judge0-ce.p.rapidapi.com"
+
+    # Submit code
+    submissions_url = host_url + "/submissions"
+    headers = {
+        "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
+        "x-rapidapi-key": RAPIDAPI_KEY
+    }
+    json = {
+        "source_code": source_code,
+        "language_id": language_id
+    }
+    response = requests.post(
+        submissions_url, json=json, headers=headers).json()
+    token = response["token"]
+
+    # Fetch results
+    # token = "455d43a3-e959-4ff6-91c7-a5215fd390be"  # for test
+    response_url = f"{submissions_url}/{token}"
+    status_id = 1
+    while status_id in (1, 2):
+        sleep(0.5)
+        response = requests.get(response_url, headers=headers).json()
+        if "error" in response:  # handles C++ response["error"]
+            return response["error"]
+        status_id = response["status"]["id"]
+
+    if status_id == 3:
+        stdout = response["stdout"]
+        return stdout
+    else:
+        stderr = response["stderr"]
+        return stderr

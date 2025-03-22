@@ -2,28 +2,27 @@
 {% block title %}
   Python
 {% endblock title %}
+
 {% block head %}
-  {# CodeMirror default styles #}
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.css">
-  {# Monokai theme for CodeMirror #}
-  <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
-  {# CodeMirror core JavaScript #}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/codemirror.min.js" defer></script>
-  {# Python mode for CodeMirror #}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.63.0/mode/python/python.min.js" defer></script>
+  {# CodeMirror #}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css" defer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/python/python.min.js" defer></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/javascript/javascript.min.js" defer></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/clike/clike.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/sql/sql.min.js" defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css" defer>
 
   {% load static %}
   <script src="{% static 'js/codemirror.js' %}" defer></script>
   <script src="{% static 'js/test-case-buttons.js' %}" defer></script>  
   
-  <!-- Store test cases in a data attribute -->
+  {# Store as a data attribute #}
   <div id="testCaseContainer" testCaseLength="{{ test_cases|length }}"></div>
+  <div id="languageContainer" languageName="{{ language.id }}"></div>
 {% endblock head %}
 
 {% block content %}
-  {% load static %}
   <link rel="stylesheet"
         type="text/css"
         href="{% static 'python_problems/style_local.css' %}" />

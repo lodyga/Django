@@ -55,11 +55,11 @@
             {% if tag.id == 0 %}selected{% endif %}>
       {{ "All" }}
       {% for tag in tag_list.all %}
-      <option value="{{ tag.id }}"
+        <option value="{{ tag.id }}"
               {% if tag.id == tag_id %}selected{% endif %}>
-        {{ tag }}
+          {{ tag }}
+        </option>
       {% endfor %}
-    </option>
   </select>
   
   <!-- Select Language -->
@@ -74,12 +74,12 @@
     <option value="{{ 0 }}"
             {% if language.id == 0 %}selected{% endif %}>
       {{ "All" }}
-      {% for language in language_list.all %}
+    {% for language in language_list.all %}
       <option value="{{ language.id }}"
               {% if language.id == language_id %}selected{% endif %}>
         {{ language }}
-      {% endfor %}
-    </option>
+      </option>
+    {% endfor %}
   </select>
   <!-- Order by -->
   <label for="order_by" class="form-label">

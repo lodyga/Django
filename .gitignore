@@ -2,7 +2,6 @@
 __pycache__
 .DS_Store
 *.sqlite3
-github_settings.py
 *.pyc
 djangoenv/
 django42/

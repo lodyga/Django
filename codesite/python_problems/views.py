@@ -1,4 +1,4 @@
-from django.conf import settings
+# from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
@@ -9,7 +9,7 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .forms import OutputForm, ProblemForm, SolutionForm
 from .models import Complexity, Difficulty, Language, Problem, Solution, Tag
-from .static.python_problems.scripts import execute_code, parse_testcases, parse_url
+from .static.python_problems.scripts import execute_code, execute_code_by_judge0, parse_testcases, parse_url
 
 # REST API
 from rest_framework import viewsets
@@ -44,6 +44,7 @@ class ProblemIndexView(ListView):
         difficulty_list = Difficulty.objects.all()
         problem_list = Problem.objects.all()
         tag_list = Tag.objects.all()
+        language_list = Language.objects.all()
 
         # Problems pagination.
         problems_per_page = 7
@@ -57,9 +58,10 @@ class ProblemIndexView(ListView):
                 Solution.objects
                 .filter(problem=problem)
                 .values_list("language", flat=True))
-            language_list = Language.objects.filter(id__in=language_indexes)
+            problem_languages_list = Language.objects.filter(
+                id__in=language_indexes)
             del language_indexes
-            problems_languages[problem] = language_list
+            problems_languages[problem] = problem_languages_list
 
         # Option values for problems_per_page form-select.
         problems_per_page_options = [
@@ -70,7 +72,7 @@ class ProblemIndexView(ListView):
             "difficulty_id": 0,
             "difficulty_list": difficulty_list,
             "language_id": 0,
-            "language_list": Language.objects.all(),
+            "language_list": language_list,
             "order_by": "created_at",
             "page_obj": page_obj,
             "problems_languages": problems_languages,
@@ -166,7 +168,6 @@ class ProblemIndexView(ListView):
 class ProblemDetailView(DetailView):
     model = Problem  # Problem model
     template_name = "python_problems/problem_detail.html"  # needed for post render()
-    default_code_text = """# Write code here.\r\n# Remember to pass the solution to the output.\r\n\r\ndef fun(x):\r\n\treturn x\r\n\r\noutput = fun(1)"""
 
     def get_context_data(self, **kwargs):
         # fetch get_context_data() from DetailView
@@ -233,8 +234,27 @@ class ProblemDetailView(DetailView):
         # Parse URL
         url = parse_url(problem.url)
 
+        # Set default code text
+        # default_code_text = """# Your code here!\r\n# Remember to pass the solution to the output.\r\n\r\ndef fun(x):\r\n\treturn x\r\n\r\noutput = fun(1)"""
+        if language.id == 1:
+            default_code_text = """# Python (3.8.1)\r\n\r\nfrom typing import List  # Use types from typing\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
+        elif language.id == 2:
+            default_code_text = """// JavaScript (Node.js 12.14.0)\r\n\r\nclass Solution {\r\n  fun(x) {\r\n    return x\r\n  }\r\n}\r\n\r\nconst solution = new Solution();\r\nconsole.log(solution.fun('Hello, World!'))"""
+        elif language.id == 6:
+            default_code_text = """// Java (OpenJDK 13.0.1)\r\n\r\npublic class Main {\r\n    public static void main(String[] args) {\r\n        System.out.println("Hello, World!");\r\n    }\r\n}"""
+        elif language.id == 7:
+            default_code_text = """// C++ (GCC 9.2.0)\r\n\r\n#include <iostream>\r\nusing namespace std;\r\n\r\nint main() {\r\n  cout << "Hello, World!";\r\n  return 0;\r\n}"""
+        elif language.id == 3:
+            default_code_text = """# Python (3.8.1)\r\nimport pandas as pd\r\n\r\n"""
+        elif language.id == 4:
+            default_code_text = """SELECT *\r\nFROM *\r\nWHERE *"""
+        elif language.id == 5:
+            default_code_text = """SELECT *\r\nFROM *\r\nWHERE *"""
+        else:
+            default_code_text = """Not known programming language."""
+
         context.update({
-            "code_text": self.default_code_text,
+            "code_text": default_code_text,
             "language": language,  # Pass the selected language
             "language_id": language_id,  # Used for the <option> selected state
             "output_form": output_form,
@@ -264,14 +284,14 @@ class ProblemDetailView(DetailView):
             return redirect("python_problems:problem-detail", problem.slug, language.name)
 
         # Get the code text from the code area and execute it.
-        code_text = request.POST.get("code_area")
-        try:
-            code_executed = execute_code(code_text)
-            output_form = OutputForm(
-                initial={"output_area": code_executed})
-        except Exception as e:
-            output_form = OutputForm(
-                initial={"output_area": f"Error: {str(e)}"})
+        # code_text = request.POST.get("code_area")
+        # try:
+        #     code_executed = execute_code(code_text)
+        #     output_form = OutputForm(
+        #         initial={"output_area": code_executed})
+        # except Exception as e:
+        #     output_form = OutputForm(
+        #         initial={"output_area": f"Error: {str(e)}"})
 
         # Get owner from form select or keep the current one
         owner_id = int(request.POST.get("owner_id", context["owner_id"]))
@@ -285,6 +305,16 @@ class ProblemDetailView(DetailView):
             problem=problem,
             owner=owner,
             language=language).first()
+
+        # judge0
+        output_form = context["output_form"]
+        code_text = request.POST.get("code_area")
+        if code_text:
+            code_executed = execute_code_by_judge0(code_text, language.name)
+            output_form = OutputForm(
+                initial={"output_area": code_executed})
+        else:
+            code_text = context["code_text"]
 
         context.update({
             "code_text": code_text,

@@ -3,5 +3,7 @@ __pycache__
 .DS_Store
 db.sqlite3
 *.pyc
+github_settings.py
+rapidapi_auth.py
 temp.py
 temp2.py
