@@ -145,10 +145,10 @@ def parse_url(raw_url):
 
 
 def is_localhost():
-    localhost_list = ["127.0.0.1", "127.0.1.1", "::1"]
+    # localhost_list = ["127.0.0.1", "127.0.1.1", "::1"]
     hostname = socket.gethostname()
-    host_ip = socket.gethostbyname(hostname)
-    return host_ip in localhost_list
+    # host_ip = socket.gethostbyname(hostname)
+    return hostname == "GF108"
 
 
 def execute_code_by_judge0(source_code, language):
