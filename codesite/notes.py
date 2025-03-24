@@ -1,3 +1,7 @@
+# list proceses on port 8000
+lsof -i :8000
+kill <pid>
+
 self.client.get() returns <class 'django.template.response.TemplateResponse'>
 self.client.post() returns <class 'django.http.response.HttpResponse'>
 
@@ -13,10 +17,11 @@ assertIn(text, content)
 """
 
 """
+decode utf-8; get rid of b
 response.content.decode()
-    decode utf-8; get rid of b
+
+&#x27; -> \'
 content = html.unescape(response.content.decode())
-    &#x27; -> \'
 """
 
 

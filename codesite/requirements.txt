@@ -4,6 +4,7 @@ cffi==1.15.1
 charset-normalizer==3.2.0
 click==8.1.7
 cmake==3.29.6
+cohere==5.14.0
 colorama==0.4.6
 crispy-bootstrap5==0.7
 cryptography==41.0.6

@@ -1,15 +1,20 @@
 # from django.conf import settings
+import cohere
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from .cohere_auth import COHERE_API_KEY
 from .forms import OutputForm, ProblemForm, SolutionForm
 from .models import Complexity, Difficulty, Language, Problem, Solution, Tag
-from .static.python_problems.scripts import execute_code, execute_code_by_judge0, parse_testcases, parse_url
+from .static.python_problems.scripts import execute_code_by_judge0, parse_testcases, parse_url
 
 # REST API
 from rest_framework import viewsets
@@ -83,7 +88,6 @@ class ProblemIndexView(ListView):
             "tag_list": tag_list,
             "query_text": "",
         })
-
         return context
 
     def post(self, request, **kwargs):
@@ -161,7 +165,6 @@ class ProblemIndexView(ListView):
             "query_text": query_text,
             "tag_id": tag_id,
         })
-
         return render(request, self.template_name, context)
 
 
@@ -267,31 +270,53 @@ class ProblemDetailView(DetailView):
             "test_cases": test_cases,
             "url": url,
         })
-
         return context
+
+    # @method_decorator(csrf_exempt)
+    # def dispatch(self, *args, **kwargs):
+    #     return super().dispatch(*args, **kwargs)
 
     def post(self, request, **kwargs):
         # sets the current object (Problem instance).
         problem = self.object = self.get_object()
-
         context = self.get_context_data(**kwargs)
         User = get_user_model()
+
+
+
+
+
+        # Handle the AI assistant request
+        user_message = request.POST.get("message", "")
+        if user_message:
+            # Initialize the Cohere client
+            # return JsonResponse({"response": "Chat response"})
+            co = cohere.ClientV2(COHERE_API_KEY)
+
+            # Call the Cohere API
+            response = co.generate(
+                model="command",  # Use the "command" model
+                prompt=user_message,
+                # max_tokens=100,  # Adjust as needed
+            )
+
+            # Extract the AI's response
+            ai_response = response.generations[0].text
+            return JsonResponse({"response": ai_response})
+
+            # Check if the request is an AJAX request
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                # Return the AI's response as JSON
+                return JsonResponse({"response": ai_response})
+
+
+
 
         # If language is selected, update the URL
         language_id = request.POST.get("language")
         if language_id:
             language = get_object_or_404(Language, id=language_id)
             return redirect("python_problems:problem-detail", problem.slug, language.name)
-
-        # Get the code text from the code area and execute it.
-        # code_text = request.POST.get("code_area")
-        # try:
-        #     code_executed = execute_code(code_text)
-        #     output_form = OutputForm(
-        #         initial={"output_area": code_executed})
-        # except Exception as e:
-        #     output_form = OutputForm(
-        #         initial={"output_area": f"Error: {str(e)}"})
 
         # Get owner from form select or keep the current one
         owner_id = int(request.POST.get("owner_id", context["owner_id"]))
@@ -318,12 +343,11 @@ class ProblemDetailView(DetailView):
 
         context.update({
             "code_text": code_text,
+            "language_id": language_id,
             "output_form": output_form,
             "owner_id": owner_id,
-            "language_id": language_id,
             "solution": solution
         })
-
         return render(request, self.template_name, context)
 
 

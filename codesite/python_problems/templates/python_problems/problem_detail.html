@@ -16,10 +16,12 @@
   {% load static %}
   <script src="{% static 'js/codemirror.js' %}" defer></script>
   <script src="{% static 'js/test-case-buttons.js' %}" defer></script>  
+  <script src="{% static 'js/ai-assistant.js' %}" defer></script>  
   
   {# Store as a data attribute #}
   <div id="testCaseContainer" testCaseLength="{{ test_cases|length }}"></div>
-  <div id="languageContainer" languageName="{{ language.id }}"></div>
+  <div id="languageContainer" languageId="{{ language.id }}"></div>
+  <div id="userContainer" userName="{{ request.user }}"></div>
 {% endblock head %}
 
 {% block content %}
@@ -49,6 +51,10 @@
         <pre class="mb-5" 
              style="white-space: pre-wrap" 
              id="problem_description">{{ problem.description }}</pre>
+      </div>
+      <div class="row mb-2">
+        {# AI assistant #}
+        {% include "python_problems/partials/_problem_detail_ai_assistant.html" %}
       </div>
       <div class="row mb-2">
         {# Code area #}

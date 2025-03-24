@@ -6,7 +6,7 @@ function loadCodeMirror() {
   const theme = storedDarkMode === 'enabled' ? 'monokai' : 'default';
   
   const storedLanguageContainer = document.getElementById('languageContainer');
-  const languageId = JSON.parse(storedLanguageContainer.getAttribute('languageName'));
+  const languageId = JSON.parse(storedLanguageContainer.getAttribute('languageId'));
   const languageModes = {
     1: 'python',
     2: 'javascript',
@@ -17,7 +17,7 @@ function loadCodeMirror() {
     7: 'text/x-c++src',
   };
 
-  CodeMirror.fromTextArea(document.getElementById('code_area'), {
+  CodeMirror.fromTextArea(document.getElementById('codeArea'), {
     mode: languageModes[languageId] || 'text',
     theme: theme,
     // tabSize: 4,

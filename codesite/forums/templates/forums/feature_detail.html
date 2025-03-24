@@ -14,7 +14,6 @@
           {% endif %} {% endcomment %}
           {{ forum.title }}
         </h1>
-        <p>{{ forum.text }}</p>
         <p>by {{ forum.owner }} ({{ forum.updated_at|naturaltime }})</p>
         {% if user.is_authenticated %}
           <br clear="all" />
