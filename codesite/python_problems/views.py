@@ -1,5 +1,6 @@
 # from django.conf import settings
 import cohere
+import requests
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
@@ -272,9 +273,6 @@ class ProblemDetailView(DetailView):
         })
         return context
 
-    # @method_decorator(csrf_exempt)
-    # def dispatch(self, *args, **kwargs):
-    #     return super().dispatch(*args, **kwargs)
 
     def post(self, request, **kwargs):
         # sets the current object (Problem instance).
@@ -287,29 +285,52 @@ class ProblemDetailView(DetailView):
 
 
         # Handle the AI assistant request
-        user_message = request.POST.get("message", "")
-        if user_message:
-            # Initialize the Cohere client
-            # return JsonResponse({"response": "Chat response"})
-            co = cohere.ClientV2(COHERE_API_KEY)
+#         user_message = request.POST.get("message", "")
+#         if user_message:
+#             # Initialize the Cohere client
+#             # return JsonResponse({"response": COHERE_API_KEY})
+#             co = cohere.ClientV2(COHERE_API_KEY)
+# 
+#             # Call the Cohere API
+#             response = co.generate(
+#                 model="command",  # Use the "command" model
+#                 prompt=user_message,
+#                 # max_tokens=100,  # Adjust as needed
+#             )
+# 
+#             # Extract the AI's response
+#             ai_response = response.generations[0].text
+#             return JsonResponse({"response": ai_response})
+# 
+#             # Check if the request is an AJAX request
+#             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+#                 # Return the AI's response as JSON
+#                 return JsonResponse({"response": ai_response})
+        try:
+            user_message = request.POST.get("message", "")
 
-            # Call the Cohere API
-            response = co.generate(
-                model="command",  # Use the "command" model
-                prompt=user_message,
-                # max_tokens=100,  # Adjust as needed
-            )
+            if user_message:
+                headers = {
+                    "Authorization": f"Bearer {COHERE_API_KEY}",
+                    "Content-Type": "application/json",
+                }
+                data = {
+                    "model": "command",
+                    "prompt": user_message,
+                }
 
-            # Extract the AI's response
-            ai_response = response.generations[0].text
-            return JsonResponse({"response": ai_response})
+                response = requests.post("https://api.cohere.ai/v2/generate", json=data, headers=headers)
 
-            # Check if the request is an AJAX request
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                # Return the AI's response as JSON
+                if response.status_code != 200:
+                    return JsonResponse({"error": f"API Error: {response.text}"}, status=response.status_code)
+
+                ai_response = response.json()["generations"][0]["text"]
                 return JsonResponse({"response": ai_response})
 
-
+        except Exception as e:
+            error_message = str(e)
+            # print(f"AI Assistant Error: {error_message}")
+            return JsonResponse({"error": error_message}, status=500)
 
 
         # If language is selected, update the URL

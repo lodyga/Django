@@ -53,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        // "X-CSRFToken": "{{ csrf_token }}",  // Add CSRF token for Django
         "X-CSRFToken": csrfToken,  // Add CSRF token for Django
       },
       body: `message=${encodeURIComponent(message)}`,
