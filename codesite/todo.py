@@ -1,8 +1,4 @@
-# spinner when waiting for cohere
 # chanegin dark mode chanegs code area theme
-# login on render
-# fetch from judge0 Python 3.8.1
-# docker on vsc button
 # ?move to 'show solution' from the view
 # reverse search for order by, difficulty
 # Edit/info/settings tab
