@@ -1,3 +1,24 @@
+# markdown
+<link rel="stylesheet" href="{% static 'css/pygments.css' %}">
+      <div class="row mb-2 markdown-content">
+        {{ markdown_content|safe }}
+      </div>
+        md_file = os.path.join(os.path.dirname(__file__), "temp.md")
+        
+        with open(md_file, "r", encoding="utf-8") as f:
+            md_content = f.read()
+
+        markdown_content = markdown.markdown(
+            md_content,
+            extensions=[
+                "fenced_code",
+                "codehilite",  # Requires Pygments (pip install pygments)
+            ]
+        )        
+"markdown_content": markdown_content,
+
+curl -X POST "https://api.cohere.ai/v1/generate" -H "Authorization: Bearer pass" -H "Content-Type: application/json" -d '{"model":"command","prompt":"Hello","max_tokens":10}'
+
 # list proceses on port 8000
 lsof -i :8000
 kill <pid>

@@ -44,6 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const message = userInput.value.trim();
     if (!message) return;
 
+    // Show spinner and disable button
+    sendButton.disabled = true;
+    document.getElementById('aiSendButtonSpinner').classList.remove("d-none");
+    sendButton.lastChild.textContent = "Wait...";
+
     // Add the user's message to the chat box
     addMessage(userName, message);
     userInput.value = "";  // Clear the input field
@@ -64,6 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       addMessage("AI", "Error: Could not get a response.");
     }
+
+    // Hide spinner and re-enable button
+    sendButton.disabled = false;
+    document.getElementById('aiSendButtonSpinner').classList.add('d-none');
+    sendButton.lastChild.textContent = "Send";
   }
 
   // Event listener for the send button

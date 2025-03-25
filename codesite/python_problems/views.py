@@ -1,6 +1,8 @@
 # from django.conf import settings
-import cohere
+import markdown
+import os
 import requests
+import time
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
@@ -308,6 +310,9 @@ class ProblemDetailView(DetailView):
 #                 return JsonResponse({"response": ai_response})
         try:
             user_message = request.POST.get("message", "")
+
+            # time.sleep(2)  # for tests
+            # return JsonResponse({"response": "Waited 2 seconds."}) 
 
             if user_message:
                 headers = {
