@@ -1,11 +1,11 @@
 <div class="col">
   <div class="row-auto">
     <button type="button"
-            id="buttonCollapse"
+            id="solutionToggleButton"
             class="btn btn-primary mb-2 ms-0"
             data-bs-toggle="collapse"
             data-bs-target="#solution">
-      Show solution
+      Toggle solution
     </button>
   </div>
   <div id="solution" class="row collapse">
@@ -68,7 +68,7 @@
       </div>
     </div>
     <form id="ownerSolutionForm">
-      <textarea id="ownerSolutionTextarea">{{ solution.solution }}</textarea>
+      <textarea id="solutionContentContainer">{{ solution.solution }}</textarea>
     </form>
     <hr>
   </div>

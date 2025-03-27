@@ -46,8 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Show spinner and disable button
     sendButton.disabled = true;
+    sendButton.firstChild.textContent = "Wait ";
     document.getElementById('aiSendButtonSpinner').classList.remove("d-none");
-    sendButton.lastChild.textContent = "Wait...";
 
     // Add the user's message to the chat box
     addMessage(userName, message);
@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Hide spinner and re-enable button
     sendButton.disabled = false;
+    sendButton.firstChild.textContent = "Send";
     document.getElementById('aiSendButtonSpinner').classList.add('d-none');
-    sendButton.lastChild.textContent = "Send";
   }
 
   // Event listener for the send button

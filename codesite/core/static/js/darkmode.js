@@ -1,32 +1,40 @@
-document.addEventListener('DOMContentLoaded', initializeDarkMode);
+document.addEventListener('DOMContentLoaded', initializeDarkMode)
+
 function initializeDarkMode() {
   const darkModeToggle = document.getElementById('darkModeToggle');
   const darkModeLabel = document.getElementById('darkModeLabel');
-  const htmlElement = document.querySelector('html');
-
-  // Check if dark mode is enabled in local storage
+  const htmlDocument = document.querySelector('html');
   const storedDarkMode = localStorage.getItem('darkMode');
   darkModeToggle.checked = storedDarkMode === 'disabled' ? false : true;
   toggleDarkMode();
 
-  // Function to toggle dark mode
   function toggleDarkMode() {
-    const isChecked = darkModeToggle.checked;
-    const darkMode = isChecked;
-
-    darkModeLabel.textContent = isChecked ? 'Light Mode' : 'Dark Mode';
-
-    // Update the data-bs-theme attribute of the html element
+    const darkMode = darkModeToggle.checked;
     if (darkMode) {
-      htmlElement.setAttribute('data-bs-theme', 'dark');
+      darkModeLabel.textContent = 'Light Mode';
+      htmlDocument.setAttribute('data-bs-theme', 'dark');
+      localStorage.setItem('darkMode', 'enabled');
     } else {
-      htmlElement.removeAttribute('data-bs-theme');
+      darkModeLabel.textContent = 'Dark Mode';
+      htmlDocument.removeAttribute('data-bs-theme');
+      localStorage.setItem('darkMode', 'disabled');
     }
 
-    // Store the dark mode state in local storage
-    localStorage.setItem('darkMode', darkMode ? 'enabled' : 'disabled');
-  }
+    updateCodeMirrorThemes();
+  };
 
-  // Event listener for dark mode toggle
+  function updateCodeMirrorThemes() {
+    const storedDarkMode = localStorage.getItem('darkMode');
+    const theme = storedDarkMode === 'disabled' ? 'default' : 'monokai';
+
+    if (codeEditor) {
+      codeEditor.setOption('theme', theme)
+    }
+
+    if (solutionViewer) {
+      solutionViewer.setOption('theme', theme)
+    }
+  };
+
   darkModeToggle.addEventListener('change', toggleDarkMode);
-}
+};

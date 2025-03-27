@@ -8,5 +8,9 @@
         "-p",
         "tests.py"
     ],
-    "python.envFile": "${workspaceFolder}/.env"
+    "python.envFile": "${workspaceFolder}/.env",
+    "search.exclude": {
+        "djangoenv/**": true,
+        "productionfiles/admin/**": true
+    }
 }

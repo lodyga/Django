@@ -359,7 +359,7 @@ class ProblemDetailView(DetailView):
 
         # judge0
         output_form = context["output_form"]
-        code_text = request.POST.get("code_area")
+        code_text = request.POST.get("code_container")
         if code_text:
             code_executed = execute_code_by_judge0(code_text, language.name)
             output_form = OutputForm(

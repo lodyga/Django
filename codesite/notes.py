@@ -1,4 +1,11 @@
-# markdown
+
+
+# text
+darkModeLabel.textContent = 'Light\nMode';
+darkModeLabel.innerText = 'Light\nMode';
+darkModeLabel.innerHTML = 'Light\nMode';
+
+# markdown, pygments.css
 <link rel="stylesheet" href="{% static 'css/pygments.css' %}">
       <div class="row mb-2 markdown-content">
         {{ markdown_content|safe }}
@@ -143,14 +150,6 @@ Fixed bug where returning "grouped_anagrams.values()" from Group Anagrams proble
  <pre>{{ solution.solution }}</pre>
 {% endfor %}
 
-# context["code_form"] = code_form
-# print(output_form.initial.get("output_area"))
-# print(output_form.initial["output_area"])
-# print(output_form["output_area"].value())
-# print(dir(output_form))
-# print(output_form.__dict__)
-# print(output_form.__dict__.get("initial").get("output_area"))
-# print(output_form.fields.get("output_area").widget.attrs.get("placeholder"))
 
 """
 print(output_form.__dict__):

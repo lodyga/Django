@@ -1,5 +1,5 @@
-# chanegin dark mode chanegs code area theme
-# ?move to 'show solution' from the view
+# VSC next/prev shortctus in activity bar and panel
+# move the screen to 'show solution' if run from prbolem view
 # reverse search for order by, difficulty
 # Edit/info/settings tab
 # dev opts for update|delete

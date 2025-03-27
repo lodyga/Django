@@ -1,25 +1,25 @@
 <div class="col">
   <div class="row mb-2">
-    <label for="code_form" class="form-label">
+    <label for="codeForm" class="form-label">
       <b>Code Area</b>:
     </label>
-    <form id="code_form"
+    <form id="codeForm"
           action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
           method="post"
           class="mb-2">
       {% csrf_token %}
       <div class="code-area-container mb-2 border border-warning">
-        <textarea name="code_area"
-                  id="codeArea"
+        <textarea name="code_container"
+                  id="codeContainer"
                   cols="80"
                   rows="20"
                   >{{ code_text }}</textarea>
       </div>
-      <button id="submit_button" 
+      <button id="submitButton" 
               type="submit" 
               class="btn btn-warning {% if language_id > 2 and language_id < 6 %}d-none{% endif %}">
-        <span id="spinner" class="spinner-border spinner-border-sm d-none"></span>
         Run
+        <span id="submitButtonSpinner" class="spinner-border spinner-border-sm d-none"></span>
       </button>
     </form>
     <div class="col-auto">
