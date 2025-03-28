@@ -1,8 +1,5 @@
 # from django.conf import settings
-import markdown
-import os
 import requests
-import time
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
@@ -17,7 +14,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .cohere_auth import COHERE_API_KEY
 from .forms import OutputForm, ProblemForm, SolutionForm
 from .models import Complexity, Difficulty, Language, Problem, Solution, Tag
-from .static.python_problems.scripts import execute_code_by_judge0, parse_testcases, parse_url
+from .static.python_problems.scripts import execute_code_by_judge0, parse_test_cases, parse_url
 
 # REST API
 from rest_framework import viewsets
@@ -121,8 +118,7 @@ class ProblemIndexView(ListView):
         # Fileter problems by language.
         if language_id:
             language = get_object_or_404(Language, id=language_id)
-            problem_list = problem_list.filter(
-                problem_solutions__language=language)
+            problem_list = problem_list.filter(solution__language=language)
 
         # Fileter problems by tag.
         if tag_id:
@@ -235,7 +231,7 @@ class ProblemDetailView(DetailView):
         output_form = OutputForm(initial={"output_area": "None from Views"})
 
         # Parse test cases
-        test_cases = parse_testcases(solution.testcase)
+        test_cases = parse_test_cases(solution.test_case)
 
         # Parse URL
         url = parse_url(problem.url)

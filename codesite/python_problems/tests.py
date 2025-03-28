@@ -54,8 +54,8 @@ def create_sample_solution(
         problem=None,
         language=None,
         owner=None,
-        solution=None,
-        testcase=None,
+        source_code=None,
+        test_case=None,
         time_complexity=None,
         space_complexity=None):
     """
@@ -69,10 +69,10 @@ def create_sample_solution(
     if owner is None:
         owner, _ = User.objects.get_or_create(
             username="tester", password="testpass")
-    if solution is None:
-        solution = "Simple solution."
-    if testcase is None:
-        testcase = "Simple testcase."
+    if source_code is None:
+        source_code = "Simple solution."
+    if test_case is None:
+        test_case = "Simple test case."
     if time_complexity is None:
         time_complexity, _ = Complexity.objects.get_or_create(name="O(n)")
     if space_complexity is None:
@@ -82,8 +82,8 @@ def create_sample_solution(
         problem=problem,
         language=language,
         owner=owner,
-        solution=solution,
-        testcase=testcase,
+        source_code=source_code,
+        test_case=test_case,
         time_complexity=time_complexity,
         space_complexity=space_complexity
     )
@@ -210,8 +210,8 @@ class SolutionModelTests(TestCase):
         language = Language.objects.create(name="Python")
         owner, _ = User.objects.get_or_create(
             username="tester", password="testpass")
-        solution_text = "Simple solution."
-        testcase = "Simple testcase."
+        source_code = "Simple solution."
+        test_case = "Simple test case."
         time_complexity, _ = Complexity.objects.get_or_create(name="O(n)")
         space_complexity, _ = Complexity.objects.get_or_create(name="O(n)")
 
@@ -219,8 +219,8 @@ class SolutionModelTests(TestCase):
             problem=problem,
             language=language,
             owner=owner,
-            solution=solution_text,
-            testcase=testcase,
+            source_code=source_code,
+            test_case=test_case,
             time_complexity=time_complexity,
             space_complexity=space_complexity
         )
@@ -228,8 +228,8 @@ class SolutionModelTests(TestCase):
         self.assertEqual(solution.problem, problem)
         self.assertEqual(solution.language, language)
         self.assertEqual(solution.owner, owner)
-        self.assertEqual(solution.solution, solution_text)
-        self.assertEqual(solution.testcase, testcase)
+        self.assertEqual(solution.source_code, source_code)
+        self.assertEqual(solution.test_case, test_case)
         self.assertEqual(solution.time_complexity, time_complexity)
         self.assertEqual(solution.space_complexity, space_complexity)
 
@@ -353,7 +353,7 @@ class SolutionDetailViewTests(TestCase):
                   "language": solution.language.name}
         url = reverse(viewname, kwargs=kwargs)
         response = self.client.get(url)
-        actual_solution = response.context["problem"].problem_solutions.first()
+        actual_solution = response.context["problem"].solution_set.first()
         self.assertEqual(actual_solution, solution)
 
     def test_404_response(self):
@@ -404,18 +404,18 @@ class SolutionLanguageSwitchTest(TestCase):
         Language.objects.all().delete()
         self.language_1, _ = Language.objects.get_or_create(name="Python")
         self.language_2, _ = Language.objects.get_or_create(name="JavaScript")
-        self.solution_text_1 = "print('Python solution')"
-        self.solution_text_2 = "console.log('JavaScript solution');"
+        self.source_code_1 = "print('Python solution')"
+        self.source_code_2 = "console.log('JavaScript solution');"
         self.problem = create_sample_problem()
         self.solution_1 = create_sample_solution(
             problem=self.problem,
             language=self.language_1,
-            solution=self.solution_text_1
+            source_code=self.source_code_1
         )
         self.solution_2 = create_sample_solution(
             problem=self.problem,
             language=self.language_2,
-            solution=self.solution_text_2
+            source_code=self.source_code_2
         )
 
     def test_switching_language_updates_solution(self):
@@ -430,7 +430,7 @@ class SolutionLanguageSwitchTest(TestCase):
         content = html.unescape(response.content.decode())
 
         # Verify response contains the correct solution before the update
-        self.assertIn(self.solution_text_1, content)
+        self.assertIn(self.source_code_1, content)
         # Verify the final URL includes the correct language
         self.assertEqual(
             response.request["PATH_INFO"], f"/python/{self.problem.slug}/{self.language_1.name}/")
@@ -445,7 +445,7 @@ class SolutionLanguageSwitchTest(TestCase):
         content = html.unescape(response.content.decode())
 
         # Verify response contains the correct solution after the update
-        self.assertIn(self.solution_text_2, content)
+        self.assertIn(self.source_code_2, content)
 
         self.assertEqual(
             response.request["PATH_INFO"], f"/python/{self.problem.slug}/{self.language_2.name}/")
@@ -459,8 +459,8 @@ class SolutionUserSwitchTest(TestCase):
         Language.objects.all().delete()
         User = get_user_model()
         self.language, _ = Language.objects.get_or_create(name="Python")
-        self.solution_text_1 = "print('Python solution')"
-        self.solution_text_2 = "print('Python solution 2')"
+        self.source_code_1 = "print('Python solution')"
+        self.source_code_2 = "print('Python solution 2')"
         self.owner_1, _ = User.objects.get_or_create()
         self.owner_2, _ = User.objects.get_or_create(
             username="tester_2", password="testpass")
@@ -468,12 +468,12 @@ class SolutionUserSwitchTest(TestCase):
         self.solution_1 = create_sample_solution(
             problem=self.problem,
             language=self.language,
-            solution=self.solution_text_1,
+            source_code=self.source_code_1,
             owner=self.owner_1)
         self.solution_2 = create_sample_solution(
             problem=self.problem,
             language=self.language,
-            solution=self.solution_text_2,
+            source_code=self.source_code_2,
             owner=self.owner_2)
 
     def test_switching_owner_updates_solution(self):
@@ -488,7 +488,7 @@ class SolutionUserSwitchTest(TestCase):
         content = html.unescape(response.content.decode())
 
         # Verify response contains the correct solution before the update
-        self.assertIn(self.solution_text_1, content)
+        self.assertIn(self.source_code_1, content)
 
         # Simulate changing the user via POST
         response = self.client.post(
@@ -500,7 +500,7 @@ class SolutionUserSwitchTest(TestCase):
         content = html.unescape(response.content.decode())
 
         # Verify response contains the correct solution after the update
-        self.assertIn(self.solution_text_2, content)
+        self.assertIn(self.source_code_2, content)
 
 
 class ProblemIndexViewTests1(TestCase):
@@ -533,11 +533,11 @@ class ProblemIndexViewTests1(TestCase):
         create_sample_solution(
             problem=cls.problem_easy,
             language=cls.language_python,
-            solution="print('Easy')")
+            source_code="print('Easy')")
         create_sample_solution(
             problem=cls.problem_medium,
             language=cls.language_javaScript,
-            solution="System.out.println('Medium')")
+            source_code="System.out.println('Medium')")
 
     def test_filter_by_difficulty(self):
         """
@@ -673,13 +673,13 @@ class ProblemIndexViewTests2(TestCase):
         create_sample_solution(
             problem=self.problem_1,
             language=self.language_python,
-            solution="Solution 1",
+            source_code="Solution 1",
             owner=self.user
         )
         create_sample_solution(
             problem=self.problem_2,
             language=self.language_javaScript,
-            solution="Solution 2",
+            source_code="Solution 2",
             owner=self.user
         )
 

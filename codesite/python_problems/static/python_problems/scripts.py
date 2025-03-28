@@ -5,7 +5,7 @@ import socket
 from .rapidapi_auth import RAPIDAPI_KEY
 
 
-def parse_testcases(solution_test_cases):
+def parse_test_cases(solution_test_cases):
     """
     Parse each test case into input and output part.
     """
@@ -39,8 +39,8 @@ def parse_testcases(solution_test_cases):
                     seen_brackets.pop()
 
         except:
-            input_test_case = "Invalid testcase input"
-            output_test_case = "Invalid testcase output"
+            input_test_case = "Invalid test case input"
+            output_test_case = "Invalid test case output"
         finally:
             test_cases.append((input_test_case, output_test_case))
 

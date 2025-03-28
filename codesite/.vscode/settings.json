@@ -11,6 +11,7 @@
     "python.envFile": "${workspaceFolder}/.env",
     "search.exclude": {
         "djangoenv/**": true,
-        "productionfiles/admin/**": true
+        "productionfiles/admin/**": true,
+        "fixtures/**": true
     }
 }

@@ -83,27 +83,25 @@ class Problem(models.Model):
 class Solution(models.Model):
     problem = models.ForeignKey(
         Problem,
-        related_name="problem_solutions",
         on_delete=models.CASCADE)
     language = models.ForeignKey(
         Language,
-        related_name="solutions_per_language",
         on_delete=models.CASCADE)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE)
-    solution = models.TextField(blank=True, null=True)
-    testcase = models.TextField(
+    source_code = models.TextField(blank=True, null=True)
+    test_case = models.TextField(
         blank=True,
         null=True,
-        help_text="Provide each testcase in `()` in a new like (function(agrs), solution)")
+        help_text='Format test cases as `([class.?]function(args), expected_result)`, one per line. Example: (reverse_string("hello"), "olleh")')
     time_complexity = models.ForeignKey(
         "Complexity",
-        related_name="solutions_time_complexity",
+        related_name="solution_time_complexity",
         on_delete=models.DO_NOTHING)
     space_complexity = models.ForeignKey(
         "Complexity",
-        related_name="solutions_space_complexity",
+        related_name="solution_space_complexity",
         on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -111,8 +109,8 @@ class Solution(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['problem', 'language', 'owner'],
-                name='unique_solution_per_problem_language_owner')
+                fields=('problem', 'language', 'owner'),
+                name='unique_user_solution_per_problem_and_language')
         ]
 
     def __str__(self):

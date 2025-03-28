@@ -145,11 +145,6 @@ Fixed bug where "grouped_anagrams.values()" from Group Anagrams problem returned
 Fixed bug where returning "grouped_anagrams.values()" from Group Anagrams problem caused function to run indefinitely by converting to list.
 
 
-{% for solution in problem.solutions_problem.all %}
- <strong>Language:</strong> {{ solution.language.name }}<br>
- <pre>{{ solution.solution }}</pre>
-{% endfor %}
-
 
 """
 print(output_form.__dict__):
