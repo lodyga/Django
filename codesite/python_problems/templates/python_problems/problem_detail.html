@@ -5,18 +5,19 @@
 
 {% block head %}
   {# CodeMirror #}
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css" defer>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/python/python.min.js" defer></script> 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/javascript/javascript.min.js" defer></script> 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/clike/clike.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/sql/sql.min.js" defer></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.62.0/theme/monokai.css" defer>
-
+  
   {% load static %}
-  <script src="{% static 'js/codemirror.js' %}" defer></script>
-  <script src="{% static 'js/test-case-buttons.js' %}" defer></script>
-  <script src="{% static 'js/ai-assistant.js' %}" defer></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'python_problems/style.css' %}">
+  <script src="{% static 'python_problems/code-mirror.js' %}" defer></script>
+  <script src="{% static 'python_problems/test-case-buttons.js' %}" defer></script>
+  <script src="{% static 'python_problems/ai-assistant.js' %}" defer></script>
   
   {# Store as a data attribute #}
   <div id="testCaseContainer" testCaseLength="{{ test_cases|length }}"></div>
@@ -25,49 +26,28 @@
 {% endblock head %}
 
 {% block content %}
-  <link rel="stylesheet"
-        type="text/css"
-        href="{% static 'python_problems/style_local.css' %}" />
   <div class="row">
     {# Left tab #}
-    <div class="col-md-2 p-3">
-      {# Releated problems #}
-      {% include "python_problems/partials/_problem_detail_related_problems.html" %}
-    </div>
+    {# Releated problems #}
+    {% include "python_problems/partials/_problem_detail_related_problems.html" %}
     {# Middle tab #}
     <div class="col-md-8 p-3">
-      <div class="row-auto mb-5">
-        <h1>{{ problem.title }}</h1>
-        <hr>
-      </div>
-      <div class="row mb-3">
-        {# Problem info #}
-        {% include "python_problems/partials/_problem_detail_problem_info.html" %}
-      </div>
-      <div class="row mb-2">
-        <label for="problem_description" class="form-label">
-          <b>Description</b>:
-        </label>
-        <pre class="mb-5" 
-             style="white-space: pre-wrap" 
-             id="problem_description">{{ problem.description }}</pre>
-      </div>
-      <div class="row mb-2">
-        {# AI assistant #}
-        {% include "python_problems/partials/_problem_detail_ai_assistant.html" %}
-      </div>
-      <div class="row mb-2">
-        {# Code area #}
-        {% include "python_problems/partials/_problem_detail_code_area.html" %}
-      </div>
-      <div class="row mb-2">
-        {# Test cases #}
-        {% include "python_problems/partials/_problem_detail_test_cases.html" %}
-      </div>
-      <div class="row mb-2">
-        {# Show solution #}
-        {% include "python_problems/partials/_problem_detail_show_solution.html" %}
-      </div>
+      {% comment %} {# for testing #}
+      {% include "python_problems/partials/_problem_detail_testing.html" %} {% endcomment %}
+      {# Problem title #}
+      {% include "python_problems/partials/_problem_detail_problem_title.html" %}
+      {# Problem info #}
+      {% include "python_problems/partials/_problem_detail_problem_info.html" %}
+      {# Description #}
+      {% include "python_problems/partials/_problem_detail_description.html" %}
+      {# AI assistant #}
+      {% include "python_problems/partials/_problem_detail_ai_assistant.html" %}
+      {# Code area #}
+      {% include "python_problems/partials/_problem_detail_code_area.html" %}
+      {# Test cases #}
+      {% include "python_problems/partials/_problem_detail_test_cases.html" %}
+      {# Show solution #}
+      {% include "python_problems/partials/_problem_detail_show_solution.html" %}
     </div>
     {# Right tab #}
     <div class="col-md-2 p-3">

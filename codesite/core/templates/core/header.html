@@ -5,7 +5,9 @@
        style="border-radius:10px !important">
     <div class="container-fluid">
       {% comment %}<a class="navbar-brand" href="{% url 'login' %}?next={% url 'core:index' %}">Hello {{ request.user }}</a>{% endcomment %}
-      <a class="navbar-brand">Codesite |</a>
+      <a href="{% url 'core:index' %}" class="navbar-brand">
+        Codesite |
+      </a>
       <ul class="navbar-nav">
         <li>
           <a class="navbar-brand" href="{% url 'login' %}?next={{ request.path }}">Hello {{ request.user }}</a>

@@ -1,5 +1,9 @@
 
 
+
+
+# Bootstrap blue color: #0d6efd; color: var(--bs-primary);
+
 # text
 darkModeLabel.textContent = 'Light\nMode';
 darkModeLabel.innerText = 'Light\nMode';

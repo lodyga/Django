@@ -1,0 +1,115 @@
+:root {
+  --node-size: clamp(1rem, 6vw, 2rem);
+  --arrow-length: clamp(0.5rem, 4vw, 1.5rem);
+  --arrow-thickness: clamp(0.05rem, 0.1vw, 0.5rem);
+  --arrowhead-width: 0.5rem;
+  --arrowhead-height: 0.8rem;
+}
+
+.list-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+}
+
+.node {
+  --size: var(--node-size);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background-color: var(--bs-primary);
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--size) * 0.6);
+  flex-shrink: 0;
+}
+
+.arrow-container {
+  display: flex;
+  align-items: center;
+  width: var(--arrow-length);
+}
+
+.arrow {
+  width: 100%;
+  height: var(--arrow-thickness);
+  background: var(--bs-primary);
+  position: relative;
+}
+
+.arrow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 0.5em solid var(--bs-primary);
+  border-top: 0.5em solid transparent;
+  border-bottom: 0.5em solid transparent;
+}
+
+.null {
+  --size: var(--node-size);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background-color: var(--bs-secondary);
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--size) * 0.3);
+  flex-shrink: 0;
+}
+
+
+
+
+
+.linked-list-container {
+  display: inline-flex;
+  align-items: center;
+  margin: 0.2em;
+  vertical-align: middle;
+}
+
+.ll-node {
+  --size: 1.8em;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: var(--bs-primary);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  margin: 0 0.1em;
+}
+
+.ll-arrow {
+  width: 1em;
+  height: 0.1em;
+  background: var(--bs-primary);
+  position: relative;
+  margin: 0 0.1em;
+}
+
+.ll-arrow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left: 0.3em solid var(--bs-primary);
+  border-top: 0.3em solid transparent;
+  border-bottom: 0.3em solid transparent;
+}
+
+.ll-null {
+  font-style: italic;
+  font-size: 0.8em;
+  margin-left: 0.3em;
+}

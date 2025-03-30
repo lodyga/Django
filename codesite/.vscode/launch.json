@@ -1,6 +1,17 @@
 {
   "configurations": [
     {
+      "name": "Django Test",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": [
+        "test"
+      ],
+      "django": true,
+      "justMyCode": false
+    },
+    {
       "name": "Docker: Python - Django",
       "type": "docker",
       "request": "launch",
@@ -14,97 +25,6 @@
         ],
         "projectType": "django"
       }
-    },
-    {
-      "name": "Django Test",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${workspaceFolder}/manage.py",
-      "args": [
-        "test"
-      ],
-      "django": true,
-      "justMyCode": false
-    },
-    //"runtimeExecutable": "/var/lib/flatpak/app/com.google.Chrome",
-    {
-      "name": "Launch Chrome (flatpak)",
-      "type": "chrome",
-      "request": "launch",
-      "url": "http://127.0.0.1:8000",
-      "webRoot": "${workspaceFolder}",
-      "trace": true,
-      "runtimeExecutable": "/var/lib/flatpak/app/com.google.Chrome" // <-- Set the path manually
-    },
-    {
-      "name": "Launch Edge (flatpak)",
-      "type": "msedge",
-      "request": "launch",
-      "url": "http://127.0.0.1:8000",
-      "webRoot": "${workspaceFolder}",
-      "trace": true,
-      "runtimeExecutable": "/var/lib/flatpak/app/com.microsoft.Edge" // <-- Set the path manually
-    },
-    {
-      "name": "Attach to Chrome (flatpak)(working)",
-      "type": "chrome",
-      "request": "attach",
-      "port": 9222,
-      "webRoot": "${workspaceFolder}"
-      // flatpak run com.google.Chrome --remote-debugging-port=9222
-    },
-    {
-      "name": "Attach to Edge (flatpak)(working)",
-      "type": "msedge",
-      "request": "attach",
-      "port": 9222,
-      "webRoot": "${workspaceFolder}"
-      // flatpak run com.microsoft.Edge --remote-debugging-port=9222
-    },
-    {
-      "name": "Launch Firefox (snap)",
-      "type": "firefox",
-      "request": "launch",
-      "port": 6000,
-      "url": "http://127.0.0.1:8000",
-      "webRoot": "${workspaceFolder}",
-      // "runtimeExecutable": "/usr/bin/firefox"
-    },
-    {
-      "name": "Attach to Firefox (snap)",
-      "type": "firefox",
-      "request": "attach",
-      "port": 6000,
-      "webRoot": "${workspaceFolder}",
-      "url": "http://127.0.0.1:8000",
-      // "runtimeExecutable": "/usr/bin/firefox"
-      // snap run firefox --start-debugger-server 6000
-    },
-    {
-      "name": "Launch Chromium (snap)",
-      "type": "chrome",
-      "request": "launch",
-      "url": "http://127.0.0.1:8000",
-      "webRoot": "${workspaceFolder}",
-      "runtimeExecutable": "/snap/bin/chromium",
-      // "runtimeArgs": ["--remote-debugging-port=9222"]
-    },
-    {
-      "name": "Attach to Chromium (snap)",
-      "type": "chrome",
-      "request": "attach",
-      "port": 9222,
-      "webRoot": "${workspaceFolder}"
-      // snap run chromium --remote-debugging-port=9222
-    },
-    {
-      "name": "Launch Chrome against Django",
-      "type": "chrome", // Use 'pwa-chrome' for Chrome debugging
-      "request": "launch",
-      "url": "http://localhost:8000", // Replace with your Django server URL
-      "webRoot": "${workspaceFolder}", // Root directory of your project
-      "sourceMaps": true,
-      "trace": true
     }
   ]
 }

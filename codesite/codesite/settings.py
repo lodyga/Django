@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'social_django',  # for social login, social-auth-app-django
 
+    # Apps
     "core",
     "python_problems",
     "sql_problems",

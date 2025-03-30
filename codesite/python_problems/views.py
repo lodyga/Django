@@ -14,7 +14,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .cohere_auth import COHERE_API_KEY
 from .forms import OutputForm, ProblemForm, SolutionForm
 from .models import Complexity, Difficulty, Language, Problem, Solution, Tag
-from .static.python_problems.scripts import execute_code_by_judge0, parse_test_cases, parse_url
+from .static.python_problems.scripts import *
 
 # REST API
 from rest_framework import viewsets
@@ -236,35 +236,16 @@ class ProblemDetailView(DetailView):
         # Parse URL
         url = parse_url(problem.url)
 
-        # Set default code text
-        # default_code_text = """# Your code here!\r\n# Remember to pass the solution to the output.\r\n\r\ndef fun(x):\r\n\treturn x\r\n\r\noutput = fun(1)"""
-        if language.id == 1:
-            default_code_text = """# Python (3.8.1)\r\n\r\nfrom typing import List  # Use types from typing\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
-        elif language.id == 2:
-            default_code_text = """// JavaScript (Node.js 12.14.0)\r\n\r\nclass Solution {\r\n  fun(x) {\r\n    return x\r\n  }\r\n}\r\n\r\nconst solution = new Solution();\r\nconsole.log(solution.fun('Hello, World!'))"""
-        elif language.id == 6:
-            default_code_text = """// Java (OpenJDK 13.0.1)\r\n\r\npublic class Main {\r\n    public static void main(String[] args) {\r\n        System.out.println("Hello, World!");\r\n    }\r\n}"""
-        elif language.id == 7:
-            default_code_text = """// C++ (GCC 9.2.0)\r\n\r\n#include <iostream>\r\nusing namespace std;\r\n\r\nint main() {\r\n  cout << "Hello, World!";\r\n  return 0;\r\n}"""
-        elif language.id == 3:
-            default_code_text = """# Python (3.8.1)\r\nimport pandas as pd\r\n\r\n"""
-        elif language.id == 4:
-            default_code_text = """SELECT *\r\nFROM *\r\nWHERE *"""
-        elif language.id == 5:
-            default_code_text = """SELECT *\r\nFROM *\r\nWHERE *"""
-        else:
-            default_code_text = """Not known programming language."""
-
         context.update({
-            "code_text": default_code_text,
-            "language": language,  # Pass the selected language
-            "language_id": language_id,  # Used for the <option> selected state
+            "source_code": get_placeholder_source_code(language.id),
+            "language": language,
+            "language_id": language_id,
             "output_form": output_form,
             "owner_id": owner_id,
             "owners": owners,
             "related_problems": related_problems,
             "solution": solution,
-            "solution_languages": solution_languages,  # Available languages in the dropdown
+            "solution_languages": solution_languages,  # Languages vailable in the dropdown
             "tag_list": problem.tags.all(),
             "test_cases": test_cases,
             "url": url,
@@ -273,43 +254,14 @@ class ProblemDetailView(DetailView):
 
 
     def post(self, request, **kwargs):
-        # sets the current object (Problem instance).
         problem = self.object = self.get_object()
         context = self.get_context_data(**kwargs)
         User = get_user_model()
 
-
-
-
-
-        # Handle the AI assistant request
-#         user_message = request.POST.get("message", "")
-#         if user_message:
-#             # Initialize the Cohere client
-#             # return JsonResponse({"response": COHERE_API_KEY})
-#             co = cohere.ClientV2(COHERE_API_KEY)
-# 
-#             # Call the Cohere API
-#             response = co.generate(
-#                 model="command",  # Use the "command" model
-#                 prompt=user_message,
-#                 # max_tokens=100,  # Adjust as needed
-#             )
-# 
-#             # Extract the AI's response
-#             ai_response = response.generations[0].text
-#             return JsonResponse({"response": ai_response})
-# 
-#             # Check if the request is an AJAX request
-#             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-#                 # Return the AI's response as JSON
-#                 return JsonResponse({"response": ai_response})
         try:
             user_message = request.POST.get("message", "")
-
             # time.sleep(2)  # for tests
             # return JsonResponse({"response": "Waited 2 seconds."}) 
-
             if user_message:
                 headers = {
                     "Authorization": f"Bearer {COHERE_API_KEY}",
@@ -355,20 +307,20 @@ class ProblemDetailView(DetailView):
 
         # judge0
         output_form = context["output_form"]
-        code_text = request.POST.get("code_container")
-        if code_text:
-            code_executed = execute_code_by_judge0(code_text, language.name)
+        source_code = request.POST.get("code_container")
+        if source_code:
+            code_executed = execute_code_by_judge0(source_code, language.name)
             output_form = OutputForm(
                 initial={"output_area": code_executed})
         else:
-            code_text = context["code_text"]
+            source_code = context["source_code"]
 
         context.update({
-            "code_text": code_text,
+            "source_code": source_code,
             "language_id": language_id,
             "output_form": output_form,
             "owner_id": owner_id,
-            "solution": solution
+            "solution": solution,
         })
         return render(request, self.template_name, context)
 

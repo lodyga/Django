@@ -3,6 +3,7 @@
   <form method="post">
     {% csrf_token %}
     <ul class="pagination">
+
       <!-- First Page Button -->
       {% if page_obj.has_previous %}
         <li class="page-item">
@@ -15,6 +16,7 @@
           <span class="page-link">&laquo;</span>
         </li>
       {% endif %}
+
       <!-- Previous Page Button -->
       {% if page_obj.has_previous %}
         <li class="page-item">
@@ -73,6 +75,7 @@
           <span class="page-link">&rsaquo;</span>
         </li>
       {% endif %}
+      
       <!-- Last Page Button -->
       {% if page_obj.has_next %}
         <li class="page-item">

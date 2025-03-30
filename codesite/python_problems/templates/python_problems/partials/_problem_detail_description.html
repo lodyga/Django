@@ -1,0 +1,13 @@
+<div class="row mb-2">
+{% load linked_list_filters %}
+<div class="row mb-2">
+  <label for="problem_description" class="form-label">
+    <b>Description</b>:
+  </label>
+  {% autoescape off %}
+  <pre class="mb-5" 
+       style="white-space: pre-wrap"
+       id="problem_description">{{ problem.description|process_linked_lists }}</pre>
+  {% endautoescape %}
+</div>
+</div>

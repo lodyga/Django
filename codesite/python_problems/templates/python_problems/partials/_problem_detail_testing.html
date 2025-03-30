@@ -1,0 +1,22 @@
+<div class="row mb-3">
+  <div class="row mt-5">
+    <div class="col-12">
+      <div class="list-container">
+        {% for item in elements %}
+        <div class="node">{{ item }}</div>
+        {% if not forloop.last %}
+          <div class="arrow-container">
+            <div class="arrow"></div>
+          </div>
+        {% endif %}
+        {% endfor %}
+        {% if elements %}
+          <div class="arrow-container">
+            <div class="arrow"></div>
+          </div>
+        <span class="null">NULL</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

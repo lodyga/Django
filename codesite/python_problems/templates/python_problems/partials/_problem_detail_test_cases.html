@@ -1,24 +1,28 @@
-<label for="testCasesContainer" class="form-label">
-  <b>Test Cases</b>:
-</label>
-<div class="col-auto" 
-     id="testCasesContainer">
-  {% for test_case in test_cases %}
-    <div id="testCase-{{ forloop.counter }}" 
-         class="test_case_content">
-      <div class="row">
-        <div class="col-auto monospace">
-          <span class="badge bg-secondary">Input:</span>
-          <div class="form-control" rows="1">{{ test_case.0 }}</div>
-        </div>
-        <div class="col-auto monospace">
-          <span class="badge bg-secondary">Output:</span>
-          <div class="form-control" rows="1">{{ test_case.1 }}</div>
+<div class="row mb-2">
+{% if test_cases %}
+  <label for="testCasesContainer" class="form-label">
+    <b>Test Cases</b>:
+  </label>
+  <div class="col-auto" 
+       id="testCasesContainer">
+    {% for test_case in test_cases %}
+      <div id="testCase-{{ forloop.counter }}" 
+           class="test_case_content">
+        <div class="row">
+          <div class="col-auto monospace">
+            <span class="badge bg-secondary">Input:</span>
+            <div class="form-control" rows="1">{{ test_case.0 }}</div>
+          </div>
+          <div class="col-auto monospace">
+            <span class="badge bg-secondary">Output:</span>
+            <div class="form-control" rows="1">{{ test_case.1 }}</div>
+          </div>
         </div>
       </div>
-    </div>
-  {% endfor %}
-</div>
-<div id="buttonsContainer" class="mb-5">
-   {# Placeholder for JavaScript 'js/test-case-buttons.js' buttons #}
+    {% endfor %}
+  </div>
+  <div id="buttonsContainer" class="mb-5">
+    {# Placeholder for JavaScript 'python_problems/test-case-buttons.js' buttons #}
+  </div>
+{% endif %}
 </div>
