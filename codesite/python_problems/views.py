@@ -128,7 +128,10 @@ class ProblemIndexView(ListView):
         problem_list = problem_list.order_by(order_by)
 
         # Store the filtered problem IDs and IDs to slug map in session.
-        store_filtered_problem_navigation_map_in_session(self, problem_list)
+        store_filtered_problem_navigation_map_in_session(
+            request=self.request,
+            problem_list=problem_list)
+
         # request.session["problem_filters"] = {
         #     "query_text": query_text,
         #     "difficulty_id": difficulty_id,

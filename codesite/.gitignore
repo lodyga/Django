@@ -6,5 +6,6 @@ db.sqlite3
 github_settings.py
 rapidapi_auth.py
 cohere_auth.py
+judge0_auth.py
 temp.py
 temp2.py
