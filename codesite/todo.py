@@ -1,4 +1,4 @@
-# remove fixtures
+# in detail view show all testcases to copy paste to code area.
 # url: http://127.0.0.1:8000/python/two-sum/JavaScript/ change python to problems
 # move the screen to 'show solution' if run from prbolem view
 # reverse search for order by, difficulty

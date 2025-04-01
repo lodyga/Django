@@ -1,24 +1,35 @@
 // Initiate codeMirror instances globally
 let codeEditor = null;
 let solutionViewer = null;
+const languageModes = {
+  1: 'python',
+  2: 'javascript',
+  3: 'python',
+  4: 'text/x-mysql',
+  5: 'text/x-pgsql',
+  6: 'text/x-java',
+  7: 'text/x-c++src',
+}
+
+function getTheme() {
+  const storedDarkMode = localStorage.getItem('darkMode');
+  const theme = storedDarkMode === 'disabled' ? 'default' : 'monokai';
+  return theme
+}
+
+function getLanguageId() {
+  const storedLanguageContainer = document.getElementById('languageContainer');
+  const languageId = JSON.parse(storedLanguageContainer.getAttribute('languageId'));
+  return languageId
+}
+
 
 document.addEventListener('DOMContentLoaded', loadCodeMirror)
 
 function loadCodeMirror() {
   const codeContainer = document.getElementById('codeContainer');
-  const storedDarkMode = localStorage.getItem('darkMode');
-  const theme = storedDarkMode === 'enabled' ? 'monokai' : 'default';
-  const storedLanguageContainer = document.getElementById('languageContainer');
-  const languageId = JSON.parse(storedLanguageContainer.getAttribute('languageId'));
-  const languageModes = {
-    1: 'python',
-    2: 'javascript',
-    3: 'python',
-    4: 'text/x-mysql',
-    5: 'text/x-pgsql',
-    6: 'text/x-java',
-    7: 'text/x-c++src',
-  };
+  const theme = getTheme();
+  const languageId = getLanguageId();
 
   codeEditor = CodeMirror.fromTextArea(codeContainer, {
     mode: languageModes[languageId] || 'text',
@@ -29,8 +40,8 @@ function loadCodeMirror() {
     autoCloseBrackets: true,
     lineNumbers: true,
     autofocus: false,
-  });
-};
+  })
+}
 
 
 // Owners Solution Textarea
@@ -45,10 +56,11 @@ function toggleSolutionView() {
     solutionViewer = null; // Clear the editor instance; Releases reference
   }
 
-  const storedDarkMode = localStorage.getItem('darkMode');
-  const theme = storedDarkMode === 'disabled' ? 'default' : 'monokai';
+  const theme = getTheme();
+  const languageId = getLanguageId();
 
   solutionViewer = CodeMirror.fromTextArea(solutionContentContainer, {
+    mode: languageModes[languageId] || 'text',
     theme: theme,
     readOnly: true,
     lineNumbers: true,
