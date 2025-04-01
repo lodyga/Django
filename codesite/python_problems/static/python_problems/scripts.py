@@ -165,7 +165,6 @@ def store_filtered_problem_navigation_map_in_session(request, problem_list):
     if hasattr(request, 'session'):
         try:
             request.session["filtered_problem_navigation_map"] = filtered_problem_navigation_map
-            # request.session["filtered_problem_ids"] = sorted(filtered_problem_navigation_map.keys())
         except Exception as e:
             # Log but don't fail if session storage fails
             import logging
@@ -239,6 +238,7 @@ def get_cohere_response(user_message):
     except Exception as e:
         error_message = str(e)
         return JsonResponse({"error": error_message}, status=500)
+
 
 def rank_languages(language_list, problem_list):
     pass
