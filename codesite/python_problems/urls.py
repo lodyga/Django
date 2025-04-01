@@ -36,7 +36,6 @@ urlpatterns = [
          name="solution-create"),  # create have to be befre slug
     path("language_add/", views.LanguageCreate.as_view(), name="language-create"),
 
-    # path("<int:pk>/<str:language>/", views.ProblemDetailPkView.as_view(), name="problem-detail"),
     path("<slug:slug>/<str:language>/",
          views.ProblemDetailView.as_view(), name="problem-detail"),
     path("problem/<int:pk>/update/",

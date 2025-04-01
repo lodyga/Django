@@ -4,9 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const userName = storedUser.getAttribute('userName');
   const chatBox = document.getElementById("chatBox");
   const savedChat = sessionStorage.getItem('chatHistory');
-  if (savedChat) {
-    chatBox.value = savedChat;
-  };
+  if (savedChat) {chatBox.value = savedChat;};
   const userInput = document.getElementById("userInput");
   const sendButton = document.getElementById("sendButton");
 
@@ -19,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     chatBox.scrollTop = chatBox.scrollHeight;  // Auto-scroll to the bottom
     sessionStorage.setItem('chatHistory', chatBox.value)
   }
+
 
   // Get the CSRF token from the cookie
   function getCookie(name) {

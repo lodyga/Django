@@ -55,7 +55,7 @@ def create_sample_solution(
         language=None,
         owner=None,
         source_code=None,
-        test_case=None,
+        test_cases=None,
         time_complexity=None,
         space_complexity=None):
     """
@@ -71,8 +71,8 @@ def create_sample_solution(
             username="tester", password="testpass")
     if source_code is None:
         source_code = "Simple solution."
-    if test_case is None:
-        test_case = "Simple test case."
+    if test_cases is None:
+        test_cases = "Simple test case."
     if time_complexity is None:
         time_complexity, _ = Complexity.objects.get_or_create(name="O(n)")
     if space_complexity is None:
@@ -83,7 +83,7 @@ def create_sample_solution(
         language=language,
         owner=owner,
         source_code=source_code,
-        test_case=test_case,
+        test_cases=test_cases,
         time_complexity=time_complexity,
         space_complexity=space_complexity
     )
@@ -211,7 +211,7 @@ class SolutionModelTests(TestCase):
         owner, _ = User.objects.get_or_create(
             username="tester", password="testpass")
         source_code = "Simple solution."
-        test_case = "Simple test case."
+        test_cases = "Simple test case."
         time_complexity, _ = Complexity.objects.get_or_create(name="O(n)")
         space_complexity, _ = Complexity.objects.get_or_create(name="O(n)")
 
@@ -220,7 +220,7 @@ class SolutionModelTests(TestCase):
             language=language,
             owner=owner,
             source_code=source_code,
-            test_case=test_case,
+            test_cases=test_cases,
             time_complexity=time_complexity,
             space_complexity=space_complexity
         )
@@ -229,7 +229,7 @@ class SolutionModelTests(TestCase):
         self.assertEqual(solution.language, language)
         self.assertEqual(solution.owner, owner)
         self.assertEqual(solution.source_code, source_code)
-        self.assertEqual(solution.test_case, test_case)
+        self.assertEqual(solution.test_cases, test_cases)
         self.assertEqual(solution.time_complexity, time_complexity)
         self.assertEqual(solution.space_complexity, space_complexity)
 

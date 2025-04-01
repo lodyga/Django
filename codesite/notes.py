@@ -150,12 +150,6 @@ Fixed bug where returning "grouped_anagrams.values()" from Group Anagrams proble
 
 
 
-"""
-print(output_form.__dict__):
-{'is_bound': False, 'data': <MultiValueDict: {}>, 'files': <MultiValueDict: {}>, 'auto_id': 'id_%s', 'initial': {'output_area': "Error: 'output'"}, 'error_class': <class 'django.forms.utils.ErrorList'>, 'label_suffix': ':', 'empty_permitted': False, '_errors': None, 'fields': {'output_area': <django.forms.fields.CharField object at 0x7832c705b1f0>}, '_bound_fields_cache': {}, 'renderer': <django.forms.renderers.DjangoTemplates object at 0x7832c701b0a0>}
-
-"""
-
 # hack my site
 import os
 cwd = os.getcwd()

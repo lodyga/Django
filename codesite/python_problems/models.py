@@ -91,7 +91,7 @@ class Solution(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE)
     source_code = models.TextField(blank=True, null=True)
-    test_case = models.TextField(
+    test_cases = models.TextField(
         blank=True,
         null=True,
         help_text='Format test cases as `([class.?]function(args), expected_result)`, one per line. Example: (reverse_string("hello"), "olleh")')
