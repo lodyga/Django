@@ -18,6 +18,10 @@
   <script src="{% static 'python_problems/code-mirror.js' %}" defer></script>
   <script src="{% static 'python_problems/test-case-buttons.js' %}" defer></script>
   <script src="{% static 'python_problems/ai-assistant.js' %}" defer></script>
+  <script src="{% static 'python_problems/code-buttons.js' %}" defer></script>
+  <script src="{% static 'python_problems/problem-info.js' %}" defer></script>
+  <script src="{% static 'python_problems/problem-description.js' %}" defer></script>
+  <script src="{% static 'python_problems/problem-solution.js' %}" defer></script>
   
   {# Store as a data attribute #}
   <div id="testCaseContainer" testCaseLength="{{ test_cases|length }}"></div>
@@ -38,7 +42,7 @@
       {% include "python_problems/partials/_problem_detail_problem_title.html" %}
       {# Problem info #}
       {% include "python_problems/partials/_problem_detail_problem_info.html" %}
-      {# Description #}
+      {# Problem description #}
       {% include "python_problems/partials/_problem_detail_description.html" %}
       {# AI assistant #}
       {% include "python_problems/partials/_problem_detail_ai_assistant.html" %}

@@ -74,9 +74,9 @@ class ProblemIndexView(ListView):
             "problems_languages": problems_languages,
             "problems_per_page": problems_per_page,
             "problems_per_page_options": problems_per_page_options,
+            "query_text": "",
             "tag_id": 0,
             "tag_list": tag_list,
-            "query_text": "",
         })
         return context
 
@@ -224,7 +224,7 @@ class ProblemDetailView(DetailView):
         solution = solutions.first()
 
         output_form = OutputForm(initial={"output_area": "None from Views"})
-        test_cases = parse_test_cases(solution.test_cases)
+        test_cases = clean_test_cases(solution.test_cases)
         url = parse_url(problem.url)
         source_code = get_placeholder_source_code(language.id)
         tag_list = problem.tags.all()
@@ -242,10 +242,12 @@ class ProblemDetailView(DetailView):
             "language": language,
             "language_id": language_id,
             'next_problem_slug': next_problem_slug,
+            "output_container": "null",
             "output_form": output_form,
             "owner_id": owner_id,
             "owners": owners,
             'prev_problem_slug': prev_problem_slug,
+            "raw_test_cases": solution.test_cases,
             "related_problems": related_problems,
             "solution": solution,
             "solution_languages": solution_languages,  # Languages vailable in the dropdown
@@ -261,39 +263,59 @@ class ProblemDetailView(DetailView):
         context = self.get_context_data(**kwargs)
         User = get_user_model()
 
+        is_run_code_button_pressed = request.POST.get("code_form_action") == "run"
+        is_test_code_button_pressed = request.POST.get("code_form_action") == "test"
+        # is_submit_code_button_pressed = request.POST.get("code_form_action") == "submit"
+        is_code_container_filled = "code_container" in request.POST
+
         if "message" in request.POST:
             return get_cohere_response(request.POST.get("message"))
 
-        if "language" in request.POST:
-            language_id = request.POST.get("language")
+        if "language_id" in request.POST:
+            language_id = request.POST.get("language_id")
             language = get_object_or_404(Language, id=language_id)
             return redirect("python_problems:problem-detail", problem.slug, language.name)
 
-        owner_id = int(request.POST.get("owner_id", context["owner_id"]))
-        owner = get_object_or_404(User, id=owner_id)
-
         language_id = context["language_id"]
         language = get_object_or_404(Language, id=language_id)
+
+        owner_id = int(request.POST.get("owner_id", context["owner_id"]))
+        owner = get_object_or_404(User, id=owner_id)
 
         solution = Solution.objects.filter(
             problem=problem,
             owner=owner,
             language=language).first()
-
-        if "code_container" in request.POST:
+        
+        # Run code
+        if (is_run_code_button_pressed and 
+                is_code_container_filled):
             source_code = request.POST.get("code_container")
             output = execute_code(source_code, language.name)
             output_form = OutputForm(
                 initial={"output_area": output})
+            output_container = output
+        # Validate code
+        elif (is_test_code_button_pressed and 
+                is_code_container_filled):
+            source_code = request.POST.get("code_container")
+            test_cases = context["test_cases"]
+            output = validate_code(source_code, language.name, test_cases)
+            output_form = OutputForm(
+                initial={"output_area": output})
+            output_container = output
         else:
             source_code = context["source_code"]
             output_form = context["output_form"]
+            output_container = context["output_container"]
 
         context.update({
             "source_code": source_code,
             "language_id": language_id,
+            "output_container": output_container,
             "output_form": output_form,
             "owner_id": owner_id,
+            "raw_test_cases": solution.test_cases,
             "solution": solution,
         })
         return render(request, self.template_name, context)

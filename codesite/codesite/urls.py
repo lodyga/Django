@@ -9,7 +9,7 @@ urlpatterns = [
     # Set GithHub, OAuth Apps, Authorization callback URL, http://<domain>/oauth/complete/github/
     re_path(r"^oauth/", include("social_django.urls", namespace="social")),
     path("", include("core.urls")),
-    path("python/", include("python_problems.urls")),
+    path("problems/", include("python_problems.urls")),
     path("sql/", include("sql_problems.urls")),
     path("forums/", include("forums.urls")),
 ]

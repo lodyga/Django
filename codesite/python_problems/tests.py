@@ -433,7 +433,7 @@ class SolutionLanguageSwitchTest(TestCase):
         self.assertIn(self.source_code_1, content)
         # Verify the final URL includes the correct language
         self.assertEqual(
-            response.request["PATH_INFO"], f"/python/{self.problem.slug}/{self.language_1.name}/")
+            response.request["PATH_INFO"], f"/problems/{self.problem.slug}/{self.language_1.name}/")
 
         # Simulate changing the language via POST
         response = self.client.post(
@@ -448,7 +448,7 @@ class SolutionLanguageSwitchTest(TestCase):
         self.assertIn(self.source_code_2, content)
 
         self.assertEqual(
-            response.request["PATH_INFO"], f"/python/{self.problem.slug}/{self.language_2.name}/")
+            response.request["PATH_INFO"], f"/problems/{self.problem.slug}/{self.language_2.name}/")
 
 
 class SolutionUserSwitchTest(TestCase):

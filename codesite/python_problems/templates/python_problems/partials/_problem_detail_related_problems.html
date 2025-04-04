@@ -7,26 +7,6 @@
       </a>
     </div>
     <div class="row-auto mb-1">
-      {% if prev_problem_slug %}
-        <a href="{% url 'python_problems:problem-detail' prev_problem_slug language.name %}"
-           class="btn btn-secondary py-1">
-          &larr; Previous Problem
-        </a>
-      {% else %}
-        <span class="btn btn-secondary disabled">&larr; Previous</span>
-      {% endif %}
-    </div>
-    <div class="row-auto mb-1">
-      {% if next_problem_slug %}
-        <a href="{% url 'python_problems:problem-detail' next_problem_slug language.name %}"
-           class="btn btn-secondary py-1">
-          Next Problem &rarr;
-        </a>
-      {% else %}
-        <span class="btn btn-secondary disabled">Next &rarr;</span>
-      {% endif %}
-    </div>
-    <div class="row-auto mb-1">
       <button type="button"
               class="btn btn-secondary px-3 py-1 mb-2"
               data-bs-toggle="collapse"

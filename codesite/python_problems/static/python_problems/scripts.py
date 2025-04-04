@@ -8,9 +8,9 @@ from .judge0_auth import JUDGE0_API_KEY
 from .cohere_auth import COHERE_API_KEY
 
 
-def parse_test_cases(solution_test_cases):
+def clean_test_cases(solution_test_cases):
     """
-    Parse each test case into input and output part.
+    Clean each test case into (input, output) tuple.
     """
     if not solution_test_cases:
         return []
@@ -23,29 +23,45 @@ def parse_test_cases(solution_test_cases):
             raw_test_case = raw_test_case[11:].strip()
         elif raw_test_case.startswith("print"):
             raw_test_case = raw_test_case[5:].strip()
+        elif raw_test_case.startswith("System.out.println"):
+            raw_test_case = raw_test_case[18:].strip()
 
-        try:
-            input_test_case = ""
-            output_test_case = ""
-            seen_brackets = []
+        # Legit brackets test cases.
+        if (raw_test_case.count("[") == raw_test_case.count("]") and
+                raw_test_case.count("(") == raw_test_case.count(")")):
+            if raw_test_case.find("==") != -1:
+                input_test_case, output_test_case = raw_test_case.split("==")
+                test_cases.append((input_test_case.strip()[1:], 
+                               # output_test_case.strip()[:-2])
+                               output_test_case.split(")")[0].strip()))
+            else:
+                try:
+                    input_test_case = ""
+                    output_test_case = ""
+                    seen_brackets = []
 
-            for index, char in enumerate(raw_test_case[1:-1], 1):
-                if (char == "," and
-                        not seen_brackets):
-                    output_test_case = raw_test_case[index + 1:-1].strip()
-                    break
+                    for index, char in enumerate(raw_test_case[1:-1], 1):
+                        if (char == "," and
+                                not seen_brackets):
+                            output_test_case = raw_test_case[index + 1:-1].strip()
+                            break
 
-                input_test_case += char
-                if char in "[(":
-                    seen_brackets.append(char)
-                elif char in "])":
-                    seen_brackets.pop()
+                        input_test_case += char
+                        if char in "[(":
+                            seen_brackets.append(char)
+                        elif char in "])":
+                            seen_brackets.pop()
 
-        except:
-            input_test_case = "Invalid test case input"
-            output_test_case = "Invalid test case output"
-        finally:
-            test_cases.append((input_test_case, output_test_case))
+                except:
+                    input_test_case = "Invalid test case input"
+                    output_test_case = "Invalid test case output"
+                finally:
+                    test_cases.append((input_test_case, output_test_case))
+        # Test cases that tests brackest.
+        else:
+            input_test_case, output_test_case = raw_test_case.rsplit(",")
+            test_cases.append((input_test_case.strip()[1:], 
+                               output_test_case.strip()[:-1]))
 
     return test_cases
 
@@ -82,24 +98,83 @@ def execute_code(source_code, language):
         "source_code": source_code,
         "language_id": language_id
     }
+    querystring = {
+        "base64_encoded": "false",
+        "wait": "true"
+    }  # Wait for execution to finish
     response = requests.post(
-        submissions_url, json=json, headers=headers).json()
+        submissions_url, json=json, headers=headers, params=querystring).json()
     token = response["token"]
 
     # Fetch results
-    # token = "455d43a3-e959-4ff6-91c7-a5215fd390be"  # for test
     response_url = f"{submissions_url}/{token}"
-    status_id = 1
-    while status_id in (1, 2):
-        sleep(0.5)
-        response = requests.get(response_url, headers=headers).json()
-        if "error" in response:  # handles C++ response["error"]
-            return response["error"]
-        status_id = response["status"]["id"]
+    response = requests.get(response_url, headers=headers).json()
+
+    if "error" in response:  # handles C++ response["error"]
+        return response["error"]
+
+    status_id = response["status"]["id"]
 
     if status_id == 3:
         stdout = response["stdout"]
         return stdout
+    else:
+        stderr = response["stderr"]
+        return stderr
+
+
+def validate_code(source_code, language, test_cases):
+    expected_output = ""
+    for test_case in test_cases:
+        if language == "Python":
+            source_code = source_code + "\r\nprint(" + str(test_case[0]) + ")"
+        elif language == "JavaScript":
+            source_code = source_code + "\r\nconsole.log(" + str(test_case[0]) + ")"
+        expected_output = expected_output + str(test_case[1]) + "\n"
+
+    host_url = "http://localhost:2358" if is_localhost() else "https://judge0-ce.p.rapidapi.com"
+    submissions_url = host_url + "/submissions"
+    language_name_to_id = {
+        "C++": 54,
+        "Java": 62,
+        "JavaScript": 63,
+        "Python": 71,
+    }
+    language_id = language_name_to_id[language]
+    json = {
+        "language_id": language_id,
+        "source_code": source_code,
+    }
+    headers = {
+        "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
+        "x-rapidapi-key": JUDGE0_API_KEY,
+    }
+    querystring = {
+        "base64_encoded": "false",
+        "wait": "true"
+    }  # Wait for execution to finish
+    
+    # Submit code
+    response = requests.post(
+        submissions_url, json=json, headers=headers, params=querystring).json()
+    token = response["token"]
+
+    # Fetch results
+    response_url = f"{submissions_url}/{token}"
+    response = requests.get(response_url, headers=headers).json()
+
+    if "error" in response:  # handles C++ response["error"]
+        return response["error"]
+
+    status_id = response["status"]["id"]
+
+    if status_id == 3:
+        stdout = response["stdout"]
+        if (stdout.find("false") == - 1 or 
+                stdout.endswith(expected_output)):
+            return "Tests passed."
+        else: 
+            return "Tests failed."
     else:
         stderr = response["stderr"]
         return stderr
@@ -240,5 +315,3 @@ def get_cohere_response(user_message):
         return JsonResponse({"error": error_message}, status=500)
 
 
-def rank_languages(language_list, problem_list):
-    pass

@@ -1,55 +1,80 @@
-<div class="row mb-2">
-<div class="col">
-  <div class="row mb-2">
-    <label for="codeForm" class="form-label">
-      <b>Code Area</b>:
-    </label>
-    <form id="codeForm"
-          action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
-          method="post"
-          class="mb-2">
-      {% csrf_token %}
-      <div class="code-area-container mb-2 border border-warning">
-        <textarea name="code_container"
-                  id="codeContainer"
-                  cols="80"
-                  rows="20"
-                  >{{ source_code }}</textarea>
+<div class="row mb-5">
+  <div class="col">
+    <div class="row mb-3">
+      <div class="col">
+        <span class="badge bg-secondary">Code input:</span>
+        <form id="codeForm"
+              action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
+              method="post"
+              class="mb-2">
+          {% csrf_token %}
+          <input type="hidden" id="codeFormAction" name="code_form_action" value="">
+          <div class="code-area-container border border-warning">
+            <textarea name="code_container"
+                      id="codeContainer"
+                      cols="80"
+                      rows="20"
+                      >{{ source_code }}</textarea>
+          </div>
+          <div class="row">
+            <div class="col-auto">
+              <button id="runCodeButton"
+                      name="run_code_button"
+                      value="True"
+                      type="button"
+                      title="Run code snippet."
+                      class="btn btn-warning py-0 {% if language_id > 2 and language_id < 6 %}d-none{% endif %}">
+                Run
+                <span id="runCodeButtonSpinner" class="spinner-border spinner-border-sm d-none"></span>
+              </button>
+            </div>
+            <div class="col-auto">
+              <button id="testCodeButton"
+                      name="test_code_button"
+                      value="True"
+                      type="button"
+                      title="Run against the test cases."
+                      class="btn btn-primary py-0 {% if language_id > 2 and language_id < 6 %}d-none{% endif %}">
+                Test
+                <span id="testCodeButtonSpinner" class="spinner-border spinner-border-sm d-none"></span>
+              </button>
+            </div>
+            <div class="col-auto">
+              <button id="submitCodeButton"
+                      name="submit_code_button"
+                      value="True"
+                      type="button" 
+                      title="Save the code for posterity."
+                      class="btn btn-success py-0">
+                Submit
+                <span id="submitCodeButtonSpinner" class="spinner-border spinner-border-sm d-none"></span>
+              </button>
+            </div>
+            <div class="col-auto">
+              <button class="btn btn-info py-0"
+                      id="aiAssistantButton"
+                      title="Use AI to outsource IQ."
+                      type="button">
+                AI Assistant
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
-      <button id="submitButton" 
-              type="submit" 
-              class="btn btn-warning {% if language_id > 2 and language_id < 6 %}d-none{% endif %}">
-        Run
-        <span id="submitButtonSpinner" class="spinner-border spinner-border-sm d-none"></span>
-      </button>
-    </form>
-    <div class="col-auto">
-      <button class="btn btn-success"
-              id="aiAssistantButton">
-        AI Assistant
-      </button>
     </div>
-  </div>
-  <div class="row mb-2">
-    <div>
-      {% if output_form.output_area.value == "Error: 'output'" %}
-        <div class="alert alert-warning">
-          <strong>Warning!</strong> No <em>output</em> variable in Code Area.
+    <div class="row mb-2">
+      <div class="">
+        <span class="badge bg-secondary">Code output:</span>
+        <div class="form-control mb-2 col-auto" 
+             name="output_container">
+          {{ output_container }}
         </div>
-      {% elif "Error" in output_form.output_area.value %}
-        <div class="alert alert-warning">
-          <strong>Warning!</strong> Error detected.
-        </div>
-      {% else %}
-        <div class="alert alert-info">No errors in the code.</div>
-      {% endif %}
+      </div>
     </div>
+    {% if "TypeError: 'type' object is not subscriptable" in output_container %}
+      <div class="alert alert-danger">
+        <b>Python 3.8: Import types from typing (e.g., List[str] instead of list[str]).</b>
+      </div>
+    {% endif %}
   </div>
-  <div class="row mb-2">
-    {% load crispy_forms_tags %}
-    <form action="" class="mb-5">
-      {{ output_form|crispy }}
-    </form>
-  </div>
-</div>
 </div>

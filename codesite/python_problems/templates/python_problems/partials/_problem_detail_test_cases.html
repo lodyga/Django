@@ -1,21 +1,26 @@
 <div class="row mb-2">
 {% if test_cases %}
-  <label for="testCasesContainer" class="form-label">
+  {% comment %} <label for="testCasesContainer" class="form-label">
     <b>Test Cases</b>:
-  </label>
+  </label> {% endcomment %}
   <div class="col-auto" 
        id="testCasesContainer">
     {% for test_case in test_cases %}
       <div id="testCase-{{ forloop.counter }}" 
            class="test_case_content">
         <div class="row">
-          <div class="col-auto monospace">
-            <span class="badge bg-secondary">Input:</span>
+          <div class="col-auto">
+            <span class="badge bg-secondary">Test case input:</span>
             <div class="form-control" rows="1">{{ test_case.0 }}</div>
           </div>
-          <div class="col-auto monospace">
-            <span class="badge bg-secondary">Output:</span>
+          <div class="col-auto">
+            <span class="badge bg-secondary">Test case output:</span>
             <div class="form-control" rows="1">{{ test_case.1 }}</div>
+          </div>
+          <div class="col-auto">
+            <button id="copyButton" class="btn btn-secondary mt-4">
+              <i class="far fa-copy"></i> Copy
+            </button>
           </div>
         </div>
       </div>
@@ -24,5 +29,11 @@
   <div id="buttonsContainer" class="mb-5">
     {# Placeholder for JavaScript 'python_problems/test-case-buttons.js' buttons #}
   </div>
+  {# Test cases to clipboard. #}
+  {% spaceless %}
+    <div id="rawTestCases" class="d-none">
+      <span>{{ raw_test_cases }}</span>
+    </div>
+  {% endspaceless %}
 {% endif %}
 </div>

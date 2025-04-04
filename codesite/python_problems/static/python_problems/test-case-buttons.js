@@ -32,3 +32,19 @@ function loadTestCaseButtons() {
     showTestCase(1);
   }
 }
+
+document.getElementById('copyButton').addEventListener('click', function () {
+  const rawTestCases = document.getElementById('rawTestCases').innerText;
+  // Copy to clipboard
+  navigator.clipboard.writeText(rawTestCases)
+    .then(() => {
+      // Show success message
+      const copyButton = document.getElementById('copyButton');
+      copyButton.classList.replace('btn-secondary', 'btn-success');
+      copyButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      setTimeout(() => {
+        copyButton.innerHTML = '<i class="far fa-copy"></i> Copy';
+        copyButton.classList.replace('btn-success', 'btn-secondary');
+      }, 2000);
+    })
+});

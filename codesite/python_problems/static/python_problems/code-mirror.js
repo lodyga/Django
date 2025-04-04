@@ -25,7 +25,6 @@ function getLanguageId() {
 
 
 document.addEventListener('DOMContentLoaded', loadCodeMirror)
-
 function loadCodeMirror() {
   const codeContainer = document.getElementById('codeContainer');
   const theme = getTheme();
@@ -40,8 +39,21 @@ function loadCodeMirror() {
     autoCloseBrackets: true,
     lineNumbers: true,
     autofocus: false,
-  })
-}
+  });
+
+  codeEditor.setSize(null, "auto");
+
+
+  const solutionContentContainer = document.getElementById('solutionContentContainer');
+  solutionViewer = CodeMirror.fromTextArea(solutionContentContainer, {
+    mode: languageModes[languageId] || 'text',
+    theme: theme,
+    readOnly: true,
+    lineNumbers: true,
+  });
+  solutionViewer.setSize(null, "auto");
+};
+
 
 
 // Owners Solution Textarea
@@ -74,15 +86,4 @@ function toggleSolutionView() {
     this.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 500);
 
-}
-
-
-// `Run` button
-const submitButton = document.getElementById('submitButton');
-const submitButtonSpinner = document.getElementById('submitButtonSpinner');
-document.getElementById('codeForm').addEventListener('submit', submitCode)
-function submitCode() {
-  submitButton.disabled = true;
-  submitButton.firstChild.textContent = 'Running ';
-  submitButtonSpinner.classList.remove('d-none');
 }
