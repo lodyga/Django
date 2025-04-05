@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const b = infoToggle.querySelector('b');
   
     // Get saved state (default to true if not set)
-    const isProblemSolutionVisible = localStorage.getItem('problemSolutionState') !== 'false';
+    const isProblemSolutionVisible = localStorage.getItem('problemSolutionState') === 'true';
   
     // Initialize Bootstrap collapse
     const solutionCollapse = new bootstrap.Collapse('#problemSolution', {

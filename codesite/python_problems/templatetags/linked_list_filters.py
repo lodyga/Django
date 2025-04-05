@@ -5,20 +5,18 @@ register = template.Library()
 
 
 @register.filter
-def process_linked_lists(value):
+def process_linked_lists(text):
     # Replace <linkedlist> tags with graphical versions
-    value = re.sub(
-        r'<linkedlist>([^<]+)</linkedlist>',
+    return re.sub(
+        r"<linkedlist>([^<]+)</linkedlist>",
         _convert_to_linked_list,
-        value
-    )
-    return value
+        text)
 
 
 def _convert_to_linked_list(match):
-    items = [item.strip()
-             for item in match.group(1).split(',') 
-             if item.strip()]
+    items = (item.strip()
+             for item in match.group(1).split(",")
+             if item.strip())
     if not items:
         return match.group(0)
 
@@ -29,8 +27,6 @@ def _convert_to_linked_list(match):
 
     return (
         f'<div class="linked-list-container">'
-        f'{"".join(nodes[:-1])}'
-        f'<div class="ll-arrow"></div>'
+        f'{"".join(nodes)}'
         f'<span class="ll-null">NULL</span>'
-        f'</div>'
-    )
+        f"</div>")

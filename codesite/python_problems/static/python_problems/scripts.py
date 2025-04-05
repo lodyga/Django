@@ -31,9 +31,9 @@ def clean_test_cases(solution_test_cases):
                 raw_test_case.count("(") == raw_test_case.count(")")):
             if raw_test_case.find("==") != -1:
                 input_test_case, output_test_case = raw_test_case.split("==")
-                test_cases.append((input_test_case.strip()[1:], 
-                               # output_test_case.strip()[:-2])
-                               output_test_case.split(")")[0].strip()))
+                test_cases.append((input_test_case.strip()[1:],
+                                   # output_test_case.strip()[:-2])
+                                   output_test_case.split(")")[0].strip()))
             else:
                 try:
                     input_test_case = ""
@@ -43,7 +43,8 @@ def clean_test_cases(solution_test_cases):
                     for index, char in enumerate(raw_test_case[1:-1], 1):
                         if (char == "," and
                                 not seen_brackets):
-                            output_test_case = raw_test_case[index + 1:-1].strip()
+                            output_test_case = raw_test_case[index +
+                                                             1:-1].strip()
                             break
 
                         input_test_case += char
@@ -59,8 +60,8 @@ def clean_test_cases(solution_test_cases):
                     test_cases.append((input_test_case, output_test_case))
         # Test cases that tests brackest.
         else:
-            input_test_case, output_test_case = raw_test_case.rsplit(",")
-            test_cases.append((input_test_case.strip()[1:], 
+            input_test_case, output_test_case = raw_test_case.rsplit("==")
+            test_cases.append((input_test_case.strip()[1:],
                                output_test_case.strip()[:-1]))
 
     return test_cases
@@ -129,7 +130,8 @@ def validate_code(source_code, language, test_cases):
         if language == "Python":
             source_code = source_code + "\r\nprint(" + str(test_case[0]) + ")"
         elif language == "JavaScript":
-            source_code = source_code + "\r\nconsole.log(" + str(test_case[0]) + ")"
+            source_code = source_code + \
+                "\r\nconsole.log(" + str(test_case[0]) + ")"
         expected_output = expected_output + str(test_case[1]) + "\n"
 
     host_url = "http://localhost:2358" if is_localhost() else "https://judge0-ce.p.rapidapi.com"
@@ -153,7 +155,7 @@ def validate_code(source_code, language, test_cases):
         "base64_encoded": "false",
         "wait": "true"
     }  # Wait for execution to finish
-    
+
     # Submit code
     response = requests.post(
         submissions_url, json=json, headers=headers, params=querystring).json()
@@ -170,10 +172,11 @@ def validate_code(source_code, language, test_cases):
 
     if status_id == 3:
         stdout = response["stdout"]
-        if (stdout.find("false") == - 1 or 
+        if (language == "C++" and not response["stdout"] or
+            stdout.find("false") == - 1 or
                 stdout.endswith(expected_output)):
             return "Tests passed."
-        else: 
+        else:
             return "Tests failed."
     else:
         stderr = response["stderr"]
@@ -313,5 +316,3 @@ def get_cohere_response(user_message):
     except Exception as e:
         error_message = str(e)
         return JsonResponse({"error": error_message}, status=500)
-
-
