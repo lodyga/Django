@@ -26,41 +26,40 @@ def clean_test_cases(solution_test_cases):
         elif raw_test_case.startswith("System.out.println"):
             raw_test_case = raw_test_case[18:].strip()
 
-        # Legit brackets test cases.
-        if (raw_test_case.count("[") == raw_test_case.count("]") and
+        if raw_test_case.find("===") != -1:
+            input_test_case, output_test_case = raw_test_case.split("==")
+            test_cases.append((input_test_case.strip()[1:],
+                               output_test_case.split(")")[0].strip()))
+        elif raw_test_case.find("==") != -1:
+            input_test_case, output_test_case = raw_test_case.split("==")
+            test_cases.append((input_test_case.strip()[1:],
+                               output_test_case.split(")")[0].strip()))
+        elif (raw_test_case.count("[") == raw_test_case.count("]") and
                 raw_test_case.count("(") == raw_test_case.count(")")):
-            if raw_test_case.find("==") != -1:
-                input_test_case, output_test_case = raw_test_case.split("==")
-                test_cases.append((input_test_case.strip()[1:],
-                                   # output_test_case.strip()[:-2])
-                                   output_test_case.split(")")[0].strip()))
-            else:
-                try:
-                    input_test_case = ""
-                    output_test_case = ""
-                    seen_brackets = []
+            try:
+                input_test_case = ""
+                output_test_case = ""
+                seen_brackets = []
 
-                    for index, char in enumerate(raw_test_case[1:-1], 1):
-                        if (char == "," and
-                                not seen_brackets):
-                            output_test_case = raw_test_case[index +
-                                                             1:-1].strip()
-                            break
+                for index, char in enumerate(raw_test_case[1:-1], 1):
+                    if (char == "," and
+                            not seen_brackets):
+                        output_test_case = raw_test_case[index + 1: -1].strip()
+                        break
 
-                        input_test_case += char
-                        if char in "[(":
-                            seen_brackets.append(char)
-                        elif char in "])":
-                            seen_brackets.pop()
+                    input_test_case += char
+                    if char in "[(":
+                        seen_brackets.append(char)
+                    elif char in "])":
+                        seen_brackets.pop()
 
-                except:
-                    input_test_case = "Invalid test case input"
-                    output_test_case = "Invalid test case output"
-                finally:
-                    test_cases.append((input_test_case, output_test_case))
-        # Test cases that tests brackest.
+            except:
+                input_test_case = "Invalid test case input"
+                output_test_case = "Invalid test case output"
+            finally:
+                test_cases.append((input_test_case, output_test_case))
         else:
-            input_test_case, output_test_case = raw_test_case.rsplit("==")
+            input_test_case, output_test_case = raw_test_case.rsplit(",")
             test_cases.append((input_test_case.strip()[1:],
                                output_test_case.strip()[:-1]))
 
@@ -175,9 +174,9 @@ def validate_code(source_code, language, test_cases):
         if (language == "C++" and not response["stdout"] or
             stdout.find("false") == - 1 or
                 stdout.endswith(expected_output)):
-            return "Tests passed."
+            return "Tests passed!"
         else:
-            return "Tests failed."
+            return "Tests failed!"
     else:
         stderr = response["stderr"]
         return stderr
