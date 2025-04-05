@@ -52,8 +52,8 @@
               <b>Language:</b>
             </label>
             <select class="form-select"
-                    id="language"
-                    name="language"
+                    id="languageId"
+                    name="language_id"
                     onchange="this.form.submit()">
               {% for language in solution_languages %}
                 <option value="{{ language.id }}"

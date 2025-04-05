@@ -1,3 +1,4 @@
+# Tests passed! in green
 # color complixities in detail view
 # better light mode
 # hints to buttons

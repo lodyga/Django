@@ -27,7 +27,7 @@ def clean_test_cases(solution_test_cases):
             raw_test_case = raw_test_case[18:].strip()
 
         if raw_test_case.find("===") != -1:
-            input_test_case, output_test_case = raw_test_case.split("==")
+            input_test_case, output_test_case = raw_test_case.split("===")
             test_cases.append((input_test_case.strip()[1:],
                                output_test_case.split(")")[0].strip()))
         elif raw_test_case.find("==") != -1:
