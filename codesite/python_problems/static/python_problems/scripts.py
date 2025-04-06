@@ -6,6 +6,7 @@ from django.apps import apps
 from django.http import JsonResponse
 from .judge0_auth import JUDGE0_API_KEY
 from .cohere_auth import COHERE_API_KEY
+from python_problems.models import Problem
 
 
 def clean_test_cases(solution_test_cases):
@@ -234,56 +235,24 @@ def get_problems_languages(page_number, problem_list, problems_per_page):
     return problems_languages
 
 
-def store_filtered_problem_navigation_map_in_session(request, problem_list):
-    filtered_problem_navigation_map = dict(
-        problem_list.values_list("id", "slug"))
+def get_adjacent_slugs(problem, language):
+    problem_list = Problem.objects.filter(
+        difficulty=problem.difficulty,
+        solution__language=language)
 
-    # Only try to store if session is available
-    if hasattr(request, 'session'):
-        try:
-            request.session["filtered_problem_navigation_map"] = filtered_problem_navigation_map
-        except Exception as e:
-            # Log but don't fail if session storage fails
-            import logging
-            logging.warning(f"Could not store navigation data: {str(e)}")
+    problem_ids = list(problem_list.values_list("id", flat=True))
 
+    problem_index = problem_ids.index(problem.id)
 
-def get_filtered_problem_navigation_map_from_session(self):
-    filtered_problem_navigation_map = self.request.session.get(
-        'filtered_problem_navigation_map', {})
-    filtered_problem_navigation_map = {
-        int(key): val
-        for key, val in filtered_problem_navigation_map.items()}
-    return filtered_problem_navigation_map
+    prev_problem_id = problem_ids[problem_index - 1]
+    next_problem_id = problem_ids[(problem_index + 1) % len(problem_ids)]
 
-
-def get_filtered_problem_navigation_ids_from_session(self):
-    filtered_problem_navigation_map = get_filtered_problem_navigation_map_from_session(
-        self)
-    return sorted(filtered_problem_navigation_map.keys())
-
-
-def get_adjacent_slugs(self, problem_id):
-    filtered_problem_navigation_map = get_filtered_problem_navigation_map_from_session(
-        self)
-    filtered_problem_ids = get_filtered_problem_navigation_ids_from_session(
-        self)
-
-    # Find current index in filtered list
-    current_index = None
-    for index, filtered_problem_id in enumerate(filtered_problem_ids):
-        if filtered_problem_id == problem_id:
-            current_index = index
-            break
-
-    if current_index is not None:  # current_index might be 0
-        prev_problem_id = filtered_problem_ids[current_index - 1]
-        next_problem_id = filtered_problem_ids[(
-            current_index + 1) % len(filtered_problem_ids)]
-        prev_problem_slug = filtered_problem_navigation_map[prev_problem_id]
-        next_problem_slug = filtered_problem_navigation_map[next_problem_id]
-    else:
-        prev_problem_slug, next_problem_slug = None, None
+    prev_problem_slug = Problem.objects.filter(
+        id=prev_problem_id,
+        solution__language=language).first().slug
+    next_problem_slug = Problem.objects.filter(
+        id=next_problem_id,
+        solution__language=language).first().slug
 
     return (prev_problem_slug, next_problem_slug)
 

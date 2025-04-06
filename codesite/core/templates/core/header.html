@@ -32,6 +32,13 @@
             Home
           </a>
         </li>
+        {% url 'python_problems:problem-index' as problems_url %}
+        <li class="nav-item">
+          <a href="{{ problems_url }}"
+             class="nav-link {% if request.get_full_path == problems_url %}active{% endif %}">
+            Problems
+          </a>
+        </li>
         {% url 'python_problems:problem-index' as python_index_url %}
         {% url 'python_problems:tag-graph' as python_tag_graph %}
         <li class="nav-item dropdown">

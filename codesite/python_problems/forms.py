@@ -14,7 +14,3 @@ class SolutionForm(forms.ModelForm):
         model = Solution
         exclude = ["owner"]
 
-
-class OutputForm(forms.Form):
-    output_area = forms.CharField(widget=forms.Textarea(
-        attrs={"placeholder": "None from Forms", "rows": 3, "cols": 80}))

@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from rest_framework import viewsets
-from .forms import OutputForm, ProblemForm, SolutionForm
+from .forms import *
 from .models import *
 from .serializers import *
 from .static.python_problems.scripts import *
@@ -58,11 +58,6 @@ class ProblemIndexView(ListView):
         # Option values for problems_per_page form-select.
         problems_per_page_options = [
             5, 6, 7, 8, 10, 15, 20, 50, 100, len(problem_list)]
-
-        # Store the filtered problem IDs and IDs to slug map in session.
-        store_filtered_problem_navigation_map_in_session(
-            request=self.request,
-            problem_list=problem_list)
 
         context.update({
             "difficulty_id": 0,
@@ -127,20 +122,6 @@ class ProblemIndexView(ListView):
         # Order problems.
         problem_list = problem_list.order_by(order_by)
 
-        # Store the filtered problem IDs and IDs to slug map in session.
-        store_filtered_problem_navigation_map_in_session(
-            request=self.request,
-            problem_list=problem_list)
-
-        # request.session["problem_filters"] = {
-        #     "query_text": query_text,
-        #     "difficulty_id": difficulty_id,
-        #     "language_id": language_id,
-        #     "tag_id": tag_id,
-        #     "order_by": order_by,
-        #     "problems_per_page": problems_per_page
-        # }
-
         # Paginate problems.
         paginator = Paginator(problem_list, problems_per_page)
         page_obj = paginator.get_page(page_number)
@@ -178,20 +159,12 @@ class ProblemDetailView(DetailView):
         # get current problem
         problem = self.get_object()
 
-        # Get adjacent problem slugs
-        prev_problem_slug, next_problem_slug = get_adjacent_slugs(
-            self, problem.id)
-
-        # Get the filters from session to maintain them in navigation
-        # problem_filters = self.request.session.get('problem_filters', {})
-
         # Get current language from URL
         language_name = self.kwargs.get("language")
 
         # get the language model  # Language.objects.get(name=language_name)
         language = get_object_or_404(Language, name=language_name)
         del language_name
-
         language_id = language.id
 
         solutions = Solution.objects.filter(
@@ -202,7 +175,8 @@ class ProblemDetailView(DetailView):
         owners = User.objects.filter(
             id__in=solutions.values_list("owner", flat=True))
 
-        # Get current owner id from the owner form-select (if none selected take the first owner from owners)
+        # Get current owner id from the owner form-select 
+        # (if none selected take the first owner from owners)
         owner_id = owners.first().id
 
         # Get owner from owner id.
@@ -223,7 +197,6 @@ class ProblemDetailView(DetailView):
         # There's only one solution per owner and language
         solution = solutions.first()
 
-        output_form = OutputForm(initial={"output_area": "None from Views"})
         test_cases = clean_test_cases(solution.test_cases)
         url = parse_url(problem.url)
         source_code = get_placeholder_source_code(language.id)
@@ -238,12 +211,14 @@ class ProblemDetailView(DetailView):
             .exclude(pk=problem.pk)
             .distinct())
 
+        # Get adjacent problem slugs
+        prev_problem_slug, next_problem_slug = get_adjacent_slugs(problem, language)
+
         context.update({
             "language": language,
             "language_id": language_id,
             'next_problem_slug': next_problem_slug,
             "output_container": "null",
-            "output_form": output_form,
             "owner_id": owner_id,
             "owners": owners,
             'prev_problem_slug': prev_problem_slug,
@@ -292,8 +267,6 @@ class ProblemDetailView(DetailView):
                 is_code_container_filled):
             source_code = request.POST.get("code_container")
             output = execute_code(source_code, language.name)
-            output_form = OutputForm(
-                initial={"output_area": output})
             output_container = output
         # Validate code
         elif (is_test_code_button_pressed and 
@@ -301,19 +274,15 @@ class ProblemDetailView(DetailView):
             source_code = request.POST.get("code_container")
             test_cases = context["test_cases"]
             output = validate_code(source_code, language.name, test_cases)
-            output_form = OutputForm(
-                initial={"output_area": output})
             output_container = output
         else:
             source_code = context["source_code"]
-            output_form = context["output_form"]
             output_container = context["output_container"]
 
         context.update({
             "source_code": source_code,
             "language_id": language_id,
             "output_container": output_container,
-            "output_form": output_form,
             "owner_id": owner_id,
             "raw_test_cases": solution.test_cases,
             "solution": solution,
