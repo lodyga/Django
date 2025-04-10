@@ -24,6 +24,7 @@ ALLOWED_HOSTS = [
     "ukasz.eu.pythonanywhere.com",
     "localhost",  # local Docker
     "codesite.onrender.com",  # Docker container on Render
+    ".koyeb.app",  # Allows all subdomains of koyeb.app
     "testserver", # Testing in Activity Bar
 ]
 
@@ -160,17 +161,22 @@ try:
     from . import github_settings
     SOCIAL_AUTH_GITHUB_KEY = github_settings.SOCIAL_AUTH_GITHUB_KEY
     SOCIAL_AUTH_GITHUB_SECRET = github_settings.SOCIAL_AUTH_GITHUB_SECRET
+    SOCIAL_AUTH_GOOGLE_KEY = github_settings.SOCIAL_AUTH_GOOGLE_KEY
+    SOCIAL_AUTH_GOOGLE_SECRET = github_settings.SOCIAL_AUTH_GOOGLE_SECRET
+    SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = github_settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
 except:
     print('When you want to use social login, please see code/github_settings.py')
 
 
 # Social
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.github.GithubOAuth2',
-    # 'social_core.backends.twitter.TwitterOAuth',
-    # 'social_core.backends.facebook.FacebookOAuth2',
+    "social_core.backends.github.GithubOAuth2",
+    "social_core.backends.google.GoogleOAuth2",
+    # "social_core.backends.google_onetap.GoogleOneTap",
+    # "social_core.backends.twitter.TwitterOAuth",
+    # "social_core.backends.facebook.FacebookOAuth2",
 
-    'django.contrib.auth.backends.ModelBackend',
+    "django.contrib.auth.backends.ModelBackend",
 )
 
 

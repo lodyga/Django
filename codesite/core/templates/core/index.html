@@ -10,6 +10,23 @@
         <h1 class="mb-5">Site Index</h1>
         <ul>
           <li>
+            <dib>Mirror sites:</dib>
+          </li>
+          <ul>
+            <li>
+              <a href="https://ukasz.eu.pythonanywhere.com/" target="_blank">PythonAnywhere (GitHub)</a>
+            </li>
+            <li>
+              <a href="https://proud-helena-ukasz-09eca8c8.koyeb.app/" target="_blank">Koyeb (Doceker)</a>
+            </li>
+            <li>
+              <a href="https://codesite.onrender.com/" target="_blank">Render (Doceker)</a>
+              <div>(Spinning up the service takes up to a minute.)</div>
+            </li>
+          </ul>
+        </ul>
+        <ul>
+          <li>
             <a href="{% url 'login' %}">Login</a>
           </li>
         </ul>
@@ -132,12 +149,6 @@
               <a href="{% url 'python_problems:api-root' %}">REST API</a>
             </li>
           </ul>
-        </ul>
-        <ul>
-          <li>
-            <a href="https://codesite.onrender.com/" target="_blank">Codesite as a Docker container hosted on Render</a>
-            <p>It takes about 30 seconds to boot up after inactivity.</p>
-          </li>
         </ul>
         <ul>
           <li>

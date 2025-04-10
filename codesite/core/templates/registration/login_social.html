@@ -13,16 +13,27 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-auto">
-        {% if settings.SOCIAL_AUTH_GITHUB_KEY %}
+      {% if settings.SOCIAL_AUTH_GITHUB_KEY %}
+        <div class="col-auto">
           <a class="btn btn-info mb-3"
              role="button"
              href="{% url 'social:begin' 'github' %}?next={{ next }}">
             <i class="fa fa-github" aria-hidden="true"></i>
             Login with GitHub
           </a>
-        {% endif %}
-      </div>
+        </div>
+      {% endif %}
+      {% if settings.SOCIAL_AUTH_GOOGLE_KEY %}
+        <div class="col-auto">
+          <a class="btn btn-warning mb-3"
+             role="button"
+             {% comment %} href="{% url 'social:begin' 'google-oauth2' %}?next={{ next }}"> {% endcomment %}
+             href="{% url 'social:begin' 'google-oauth2' %}">
+            <i class="fa fa-google" aria-hidden="true"></i>
+            Login with Google
+          </a>
+        </div>
+      {% endif %}
     </div>
     <div class="row">
       <div class="col-auto">

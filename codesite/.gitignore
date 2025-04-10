@@ -3,6 +3,7 @@ __pycache__
 .DS_Store
 db.sqlite3
 *.pyc
+djangoenv/
 github_settings.py
 rapidapi_auth.py
 cohere_auth.py

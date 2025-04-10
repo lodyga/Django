@@ -1,3 +1,5 @@
+# add logging to koyeb.
+# Add docker hub ref to bottom navbar
 # Tests passed! in green
 # color complixities in detail view
 # better light mode
@@ -16,7 +18,3 @@
 # chanege python to code_problems...
 # selenium for testing darkmode
 # Language.objects.all().delete() fix Python, JS, in migrations; UNIQUE constraint failed: python_problems_language.name
-
-
-
-

@@ -12,7 +12,7 @@
       "justMyCode": false
     },
     {
-      "name": "Docker: Python - Django",
+      "name": "Docker: Django",
       "type": "docker",
       "request": "launch",
       "preLaunchTask": "docker-run: debug",

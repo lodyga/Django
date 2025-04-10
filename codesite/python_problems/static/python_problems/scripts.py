@@ -113,6 +113,8 @@ def execute_code(source_code, language):
 
     if "error" in response:  # handles C++ response["error"]
         return response["error"]
+    elif response["compile_output"] is not None:  # handles Java response["compile_output"]
+        return response["compile_output"]
 
     status_id = response["status"]["id"]
 
