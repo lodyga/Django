@@ -135,6 +135,7 @@ def validate_code(source_code, language, test_cases):
             source_code = source_code + \
                 "\r\nconsole.log(" + str(test_case[0]) + ")"
         expected_output = expected_output + str(test_case[1]) + "\n"
+    expected_output = re.sub(r" ", "", expected_output)
 
     host_url = "http://localhost:2358" if is_localhost() else "https://judge0-ce.p.rapidapi.com"
     submissions_url = host_url + "/submissions"
@@ -173,10 +174,12 @@ def validate_code(source_code, language, test_cases):
     status_id = response["status"]["id"]
 
     if status_id == 3:
-        stdout = response["stdout"]
+        stdout_raw = response["stdout"]
+        stdout = re.sub(r" ", "", stdout_raw) if stdout_raw else stdout_raw
+
         if (language == "C++" and not response["stdout"] or
-            stdout.find("false") == - 1 or
-                stdout.endswith(expected_output)):
+            stdout.endswith(expected_output) or
+                stdout.find("rue") != -1 and stdout.find("alse") == -1):
             return "Tests passed!"
         else:
             return "Tests failed!"
@@ -195,7 +198,7 @@ def get_placeholder_source_code(language_id):
     elif language_id == 2:
         placeholder_source_code = """// JavaScript (Node.js 12.14.0)\r\n\r\nclass Solution {\r\n  fun(x) {\r\n    return x\r\n  }\r\n}\r\n\r\nconst solution = new Solution();\r\nconsole.log(solution.fun('Hello, World!'))"""
     elif language_id == 6:
-        placeholder_source_code = """// Java (OpenJDK 13.0.1)\r\n\r\npublic class Main {\r\n    public static void main(String[] args) {\r\n        System.out.println("Hello, World!");\r\n    }\r\n}"""
+        placeholder_source_code = """// Java (OpenJDK 13.0.1)\r\nimport java.util.*;\r\n\r\npublic class Main {\r\n    public static void main(String[] args) {\r\n        System.out.println("Hello, World!");\r\n    }\r\n}"""
     elif language_id == 7:
         placeholder_source_code = """// C++ (GCC 9.2.0)\r\n\r\n#include <iostream>\r\nusing namespace std;\r\n\r\nint main() {\r\n  cout << "Hello, World!";\r\n  return 0;\r\n}"""
     elif language_id == 3:
