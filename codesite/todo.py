@@ -1,4 +1,3 @@
-# Binary tree run/test only for Python and JavaScript (for now).
 # add logging to koyeb.
 # Add docker hub ref to bottom navbar
 # Tests passed! in green

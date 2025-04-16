@@ -23,13 +23,16 @@ class Queue {
       this.enqueue(item);
    }
    dequeue() {
-      return this.items.shift();
+      return this.items.shift()
    }
    pop(item) {
-      return this.dequeue(item);
+      return this.dequeue(item)
    }
    isEmpty() {
-      return this.items.length === 0;
+      return this.items.length === 0
+   }
+   size() {
+      return this.items.length
    }
 }
 
