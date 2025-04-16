@@ -1,9 +1,13 @@
+import binarytree as tree
 import re
 import requests
 import socket
+from collections import deque
 from time import sleep
 from django.apps import apps
+from django.conf import settings
 from django.http import JsonResponse
+from django.templatetags.static import static
 from .judge0_auth import JUDGE0_API_KEY
 from .cohere_auth import COHERE_API_KEY
 from python_problems.models import Problem
@@ -79,6 +83,8 @@ def is_localhost():
 
 
 def execute_code(source_code, language):
+    source_code = get_utils(language) + source_code
+
     language_name_to_id = {
         "Python": 71,
         "JavaScript": 63,
@@ -113,7 +119,8 @@ def execute_code(source_code, language):
 
     if "error" in response:  # handles C++ response["error"]
         return response["error"]
-    elif response["compile_output"] is not None:  # handles Java response["compile_output"]
+    # handles Java response["compile_output"]
+    elif response["compile_output"] is not None:
         return response["compile_output"]
 
     status_id = response["status"]["id"]
@@ -127,6 +134,8 @@ def execute_code(source_code, language):
 
 
 def validate_code(source_code, language, test_cases):
+    source_code = get_utils(language) + source_code
+
     expected_output = ""
     for test_case in test_cases:
         if language == "Python":
@@ -135,7 +144,7 @@ def validate_code(source_code, language, test_cases):
             source_code = source_code + \
                 "\r\nconsole.log(" + str(test_case[0]) + ")"
         expected_output = expected_output + str(test_case[1]) + "\n"
-    expected_output = re.sub(r" ", "", expected_output)
+    expected_output = re.sub(r"[ \n]", "", expected_output)
 
     host_url = "http://localhost:2358" if is_localhost() else "https://judge0-ce.p.rapidapi.com"
     submissions_url = host_url + "/submissions"
@@ -175,7 +184,7 @@ def validate_code(source_code, language, test_cases):
 
     if status_id == 3:
         stdout_raw = response["stdout"]
-        stdout = re.sub(r" ", "", stdout_raw) if stdout_raw else stdout_raw
+        stdout = re.sub(r"[ \n]", "", stdout_raw) if stdout_raw else stdout_raw
 
         if (language == "C++" and not response["stdout"] or
             stdout.endswith(expected_output) or
@@ -186,6 +195,28 @@ def validate_code(source_code, language, test_cases):
     else:
         stderr = response["stderr"]
         return stderr
+
+
+def get_utils(langeage):
+    """
+    Utility functions for binary tree operations.
+    """
+    # file_url = static("python_problems/binary_tree_utils.py")  # Gets the correct static path
+    # file_path = settings.BASE_DIR / file_url
+    if langeage == "Python":
+        file_name = "binary_tree_utils.py"
+    elif langeage == "JavaScript":
+        file_name = "binary-tree-utils.js"
+
+    file_path = settings \
+        .BASE_DIR \
+        / "python_problems/static/python_problems" \
+        / file_name
+
+    with open(file_path, "r") as file:
+        utils = file.read()
+
+    return utils
 
 
 def get_placeholder_source_code(language_id):
