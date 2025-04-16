@@ -1,12 +1,47 @@
 // import { Queue } from '@datastructures-js/queue';
 
+/**
+ * @file Utility functions for binary tree operations in JavaScript.
+ * @module treeUtils
+ * @description Provides a Queue class and tree utilities for level-order traversal.
+ * @example
+ * const queue = new Queue([1, 2]);
+ * queue.enqueue(3);
+ */
+
+/**
+ * Vanilla JS queue data structure.
+ */
+class Queue {
+   constructor(items) {
+      this.items = items || [];
+   }
+   enqueue(item) {
+      this.items.push(item);
+   }
+   push(item) {
+      this.enqueue(item);
+   }
+   dequeue() {
+      return this.items.shift();
+   }
+   pop(item) {
+      return this.dequeue(item);
+   }
+   isEmpty() {
+      return this.items.length === 0;
+   }
+}
+
+
 class TreeNode {
    constructor(val = null, left = null, right = null) {
       this.val = val
       this.left = left
       this.right = right
    }
-};
+}
+
 
 /**
  * Build binary tree from level order traversal list.
@@ -23,13 +58,11 @@ function buildTree(nodeList) {
    }
 
    const root = new TreeNode(nodeList[0]);
-   // const queue = new Queue([root]);
-   const queue = [root];
+   const queue = new Queue([root]);
    let index = 1;
 
    while (index < nodeList.length) {
-      // let node = queue.pop();
-      let node = queue.shift();
+      let node = queue.pop();
 
       // Assign the left child if available
       if (
@@ -53,6 +86,7 @@ function buildTree(nodeList) {
    }
    return root
 };
+
 
 /**
  * Return tree node values in level order traversal format.
