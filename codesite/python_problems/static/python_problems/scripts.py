@@ -1,4 +1,3 @@
-import binarytree as tree
 import re
 import requests
 import socket
