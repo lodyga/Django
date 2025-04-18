@@ -52,7 +52,7 @@ class TreeNode {
  * @returns 
  */
 function buildTree(nodeList) {
-   while (nodeList.length && !nodeList[nodeList.length - 1]) {
+   while (nodeList.length && nodeList[nodeList.length - 1] === null) {
       nodeList.pop();
    }
 
