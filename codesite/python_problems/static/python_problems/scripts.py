@@ -82,7 +82,7 @@ def is_localhost():
 
 
 def execute_code(source_code, language):
-    source_code = get_utils(language) + source_code
+    source_code = get_heap_utils(language) + get_binary_tree_utils(language) + source_code
 
     language_name_to_id = {
         "Python": 71,
@@ -133,7 +133,7 @@ def execute_code(source_code, language):
 
 
 def validate_code(source_code, language, test_cases):
-    source_code = get_utils(language) + source_code
+    source_code = get_heap_utils(language) + get_binary_tree_utils(language) + source_code
 
     expected_output = ""
     for test_case in test_cases:
@@ -196,16 +196,40 @@ def validate_code(source_code, language, test_cases):
         return stderr
 
 
-def get_utils(langeage):
+def get_binary_tree_utils(language):
     """
     Utility functions for binary tree operations.
     """
     # file_url = static("python_problems/binary_tree_utils.py")  # Gets the correct static path
     # file_path = settings.BASE_DIR / file_url
-    if langeage == "Python":
+    if language == "Python":
         file_name = "binary_tree_utils.py"
-    elif langeage == "JavaScript":
+    elif language == "JavaScript":
         file_name = "binary-tree-utils.js"
+    else:
+        return ""
+
+    file_path = settings \
+        .BASE_DIR \
+        / "python_problems/static/python_problems" \
+        / file_name
+
+    with open(file_path, "r") as file:
+        utils = file.read()
+
+    return utils
+
+
+def get_heap_utils(language):
+    """
+    Utility functions for binary tree operations.
+    """
+    # if language == "Python":
+    #     file_name = "binary_tree_utils.py"
+    if language == "JavaScript":
+        file_name = "heap-utils.js"
+    else:
+        return ""
 
     file_path = settings \
         .BASE_DIR \
