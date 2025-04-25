@@ -82,7 +82,10 @@ def is_localhost():
 
 
 def execute_code(source_code, language):
-    source_code = get_heap_utils(language) + get_binary_tree_utils(language) + source_code
+    source_code = get_heap_utils(language) + \
+        get_binary_tree_utils(language) + \
+        get_linked_list_utils(language) + \
+        source_code
 
     language_name_to_id = {
         "Python": 71,
@@ -133,7 +136,10 @@ def execute_code(source_code, language):
 
 
 def validate_code(source_code, language, test_cases):
-    source_code = get_heap_utils(language) + get_binary_tree_utils(language) + source_code
+    source_code = get_heap_utils(language) + \
+        get_binary_tree_utils(language) + \
+        get_linked_list_utils(language) + \
+        source_code
 
     expected_output = ""
     for test_case in test_cases:
@@ -228,6 +234,28 @@ def get_heap_utils(language):
     #     file_name = "binary_tree_utils.py"
     if language == "JavaScript":
         file_name = "heap-utils.js"
+    else:
+        return ""
+
+    file_path = settings \
+        .BASE_DIR \
+        / "python_problems/static/python_problems" \
+        / file_name
+
+    with open(file_path, "r") as file:
+        utils = file.read()
+
+    return utils
+
+
+def get_linked_list_utils(language):
+    """
+    Utility functions for linked list operations.
+    """
+    if language == "Python":
+        file_name = "linked_list_utils.py"
+    elif language == "JavaScript":
+        file_name = "linked-list-utils.js"
     else:
         return ""
 
