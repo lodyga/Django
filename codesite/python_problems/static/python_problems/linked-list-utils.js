@@ -14,15 +14,27 @@ class ListNode {
 
 /**
  * Converts an array of values into a linked list
- * @param {Array<number>} values - Array of values to convert
- * @returns {ListNode} Head node of the constructed linked list
+ * @param {number[]} numbers
+ * @returns {ListNode}
  */
-function buildLinkedList(values) {
+function buildLinkedList(numbers, { cyclePosition = null }) {
    let node = new ListNode();
    const anchor = node;
-   for (const value of values) {
-      node.next = new ListNode(value);
+   let hasCycle = false;
+   let cycleNode;
+
+   for (let position = 0; position < numbers.length; position++) {
+      const number = numbers[position];
+      node.next = new ListNode(number);
       node = node.next;
+
+      if (position === cyclePosition) {
+         cycleNode = node;
+         hasCycle = true;
+      }
+   }
+   if (hasCycle) {
+      node.next = cycleNode;
    }
    return anchor.next
 }
@@ -30,8 +42,8 @@ function buildLinkedList(values) {
 
 /**
  * Converts a linked list back to an array
- * @param {ListNode} node - Head node of the linked list
- * @returns {Array<number>} Array containing the list values
+ * @param {ListNode} node
+ * @returns {Array<number>}
  */
 function getLinkedListValues(node) {
    const values = [];
