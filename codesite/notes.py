@@ -1,4 +1,8 @@
+# activate django virtual env
+source djangoenv/bin/activate
 
+# run django server
+py manage.py runserver
 
 
 

@@ -6,11 +6,18 @@ from .models import Problem, Solution
 class ProblemForm(forms.ModelForm):
     class Meta:
         model = Problem
-        exclude = ["slug", "owner"]
+        fields = ["title", "url", "difficulty", "tags", "description"]
+        # exclude = ["slug", "owner"]
 
 
-class SolutionForm(forms.ModelForm):
+class SolutionCreateForm(forms.ModelForm):
     class Meta:
         model = Solution
         exclude = ["owner"]
+
+
+class SolutionUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Solution
+        exclude = ["problem", "language", "owner"]
 

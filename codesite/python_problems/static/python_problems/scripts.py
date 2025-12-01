@@ -191,9 +191,11 @@ def validate_code(source_code, language, test_cases):
         stdout_raw = response["stdout"]
         stdout = re.sub(r"[ \n]", "", stdout_raw) if stdout_raw else stdout_raw
 
-        if (language == "C++" and not response["stdout"] or
+        if (
+            language == "C++" and not response["stdout"] or
             stdout.endswith(expected_output) or
-                stdout.find("rue") != -1 and stdout.find("alse") == -1):
+            stdout.find("rue") != -1 and stdout.find("alse") == -1
+        ):
             return "Tests passed!"
         else:
             return "Tests failed!"

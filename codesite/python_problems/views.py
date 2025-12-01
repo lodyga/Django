@@ -338,7 +338,7 @@ class ProblemDelete(LoginRequiredMixin, DeleteView):
 
 class SolutionCreate(LoginRequiredMixin, CreateView):
     model = Solution
-    form_class = SolutionForm  # Custom form to remove "owner" field.
+    form_class = SolutionCreateForm  # Custom form to remove "owner" field.
     success_url = reverse_lazy('python_problems:problem-index')
 
     def form_valid(self, form):
@@ -350,7 +350,7 @@ class SolutionCreate(LoginRequiredMixin, CreateView):
 
 class SolutionUpdate(LoginRequiredMixin, UpdateView):
     model = Solution
-    form_class = SolutionForm  # Custom form to remove "owner" field.
+    form_class = SolutionUpdateForm  # Custom form to exclude = ["problem", "language", "owner"] fields.
     success_url = reverse_lazy('python_problems:problem-index')
 
 
