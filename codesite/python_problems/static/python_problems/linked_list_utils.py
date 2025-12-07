@@ -11,7 +11,7 @@ class ListNode:
         self.next = next
 
 
-def build_linked_list_deprecated(numbers: List[int]):
+def build_linked_list_deprecated(numbers: List[int]) -> ListNode:
     """
     Build linked list from list.
     """
@@ -21,7 +21,7 @@ def build_linked_list_deprecated(numbers: List[int]):
     return node
 
 
-def build_linked_list(numbers: List[int], cycle_position: int = None):
+def build_linked_list(numbers: List[int], cycle_position: int = None) -> ListNode:
     """
     Build linked list with cycle from list.
     """
@@ -31,7 +31,6 @@ def build_linked_list(numbers: List[int], cycle_position: int = None):
     for position, number in enumerate(numbers):
         node.next = ListNode(number)
         node = node.next
-        
         if position == cycle_position:
             cycle_node = node
             has_cycle = True
@@ -41,7 +40,7 @@ def build_linked_list(numbers: List[int], cycle_position: int = None):
     return anchor.next
 
 
-def get_linked_list_values(root):
+def get_linked_list_values(root: ListNode) -> List[int]:
     """
     Return linked list values in list.
     """
@@ -50,3 +49,21 @@ def get_linked_list_values(root):
         values.append(root.val)
         root = root.next
     return values
+
+
+def are_linked_lists_equeal(root1: ListNode, root2: ListNode) -> bool:
+    node1 = root1
+    node2 = root2
+
+    while node1 or node2:
+        if node1 is None and node2 is None:
+            return True
+        elif (
+            node1 is None or node2 is None or
+            node1.val != node2.val
+        ):
+            return False
+
+        node1 = node1.next
+        node2 = node2.next
+    return True

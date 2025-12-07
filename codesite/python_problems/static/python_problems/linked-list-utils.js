@@ -1,8 +1,11 @@
+// export { ListNode, buildLinkedList, getLinkedListValues, areLinkedListsEqueal }
+
+
 /**
  * Represents a node in a singly-linked list.
  * @class
- * @param {number} [val=0] - The value stored in the node
- * @param {ListNode|null} [next=null] - Reference to the next node in the list
+ * @param {number|null} [val=null]
+ * @param {ListNode|null} [next=null]
  */
 class ListNode {
    constructor(val = null, next = null) {
@@ -17,7 +20,7 @@ class ListNode {
  * @param {number[]} numbers
  * @returns {ListNode}
  */
-function buildLinkedList(numbers, { cyclePosition = null } = {}) {
+const buildLinkedList = (numbers, { cyclePosition = null } = {}) => {
    let node = new ListNode();
    const anchor = node;
    let hasCycle = false;
@@ -45,11 +48,37 @@ function buildLinkedList(numbers, { cyclePosition = null } = {}) {
  * @param {ListNode} node
  * @returns {Array<number>}
  */
-function getLinkedListValues(node) {
+const getLinkedListValues = (node) => {
    const values = [];
    while (node) {
       values.push(node.val);
       node = node.next;
    }
    return values
+}
+
+
+/**
+ * Compare two linked lists value by value.
+ * @param {ListNode} root1 
+ * @param {ListNode} root2 
+ * @returns {boolean}
+ */
+const areLinkedListsEqueal = (root1, root2) => {
+   let node1 = root1;
+   let node2 = root2;
+
+   while (node1 || node2) {
+      if (node1 === null && node2 === null) {
+         return true
+      } else if (
+         (node1 === null || node2 === null) ||
+         node1.val !== node2.val
+      ) {
+         return false
+      }
+      node1 = node1.next;
+      node2 = node2.next;
+   }
+   return true
 }
