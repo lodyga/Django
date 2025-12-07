@@ -20,7 +20,7 @@ class ListNode {
  * @param {number[]} numbers
  * @returns {ListNode}
  */
-const buildLinkedList = (numbers, { cyclePosition = null } = {}) => {
+const buildLinkedList = (numbers, { cyclePosition = -1 } = {}) => {
    let node = new ListNode();
    const anchor = node;
    let hasCycle = false;

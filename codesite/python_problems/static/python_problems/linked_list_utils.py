@@ -21,7 +21,7 @@ def build_linked_list_deprecated(numbers: List[int]) -> ListNode:
     return node
 
 
-def build_linked_list(numbers: List[int], cycle_position: int = None) -> ListNode:
+def build_linked_list(numbers: List[int], cycle_position: int = -1) -> ListNode:
     """
     Build linked list with cycle from list.
     """
