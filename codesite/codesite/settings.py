@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "python_problems",
     "sql_problems",
     "forums",
+    "animations",
 
 ]
 

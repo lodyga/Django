@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+
+{% block title %}
+  Animate
+{% endblock title %}
+
+{% block head %}
+{% endblock head %}
+
+{% block content %}
+  {% comment %} {% include "animations/grid.html" %} {% endcomment %}
+  <li>
+    <a href="{% url 'animations:grid' %}">Grid</a>
+  </li>
+{% endblock content %}

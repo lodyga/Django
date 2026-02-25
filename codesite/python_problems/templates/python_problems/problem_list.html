@@ -1,13 +1,16 @@
 {% extends "core/base.html" %}
+
 {% block title %}
   Python
 {% endblock title %}
+
 {% block head %}
   {% load problem_filters %}
   {% load static %}
   <script src="{% static 'python_problems/problems-per-page.js' %}"></script>
   <script src="{% static 'python_problems/toggle-tags.js' %}" defer></script>
 {% endblock head %}
+
 {% block content %}
   <div class="row m-1">
     <div class="col-md-2">

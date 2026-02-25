@@ -175,7 +175,7 @@ class ProblemDetailView(DetailView):
         owners = User.objects.filter(
             id__in=solutions.values_list("owner", flat=True))
 
-        # Get current owner id from the owner form-select 
+        # Get current owner id from the owner form-select
         # (if none selected take the first owner from owners)
         owner_id = owners.first().id
 
@@ -212,7 +212,8 @@ class ProblemDetailView(DetailView):
             .distinct())
 
         # Get adjacent problem slugs
-        prev_problem_slug, next_problem_slug = get_adjacent_slugs(problem, language)
+        prev_problem_slug, next_problem_slug = get_adjacent_slugs(
+            problem, language)
 
         context.update({
             "language": language,
@@ -238,8 +239,10 @@ class ProblemDetailView(DetailView):
         context = self.get_context_data(**kwargs)
         User = get_user_model()
 
-        is_run_code_button_pressed = request.POST.get("code_form_action") == "run"
-        is_test_code_button_pressed = request.POST.get("code_form_action") == "test"
+        is_run_code_button_pressed = request.POST.get(
+            "code_form_action") == "run"
+        is_test_code_button_pressed = request.POST.get(
+            "code_form_action") == "test"
         # is_submit_code_button_pressed = request.POST.get("code_form_action") == "submit"
         is_code_container_filled = "code_container" in request.POST
 
@@ -261,16 +264,20 @@ class ProblemDetailView(DetailView):
             problem=problem,
             owner=owner,
             language=language).first()
-        
+
         # Run code
-        if (is_run_code_button_pressed and 
-                is_code_container_filled):
+        if (
+            is_run_code_button_pressed and
+            is_code_container_filled
+        ):
             source_code = request.POST.get("code_container")
             output = execute_code(source_code, language.name)
             output_container = output
         # Validate code
-        elif (is_test_code_button_pressed and 
-                is_code_container_filled):
+        elif (
+            is_test_code_button_pressed and
+            is_code_container_filled
+        ):
             source_code = request.POST.get("code_container")
             test_cases = context["test_cases"]
             output = validate_code(source_code, language.name, test_cases)
@@ -350,7 +357,8 @@ class SolutionCreate(LoginRequiredMixin, CreateView):
 
 class SolutionUpdate(LoginRequiredMixin, UpdateView):
     model = Solution
-    form_class = SolutionUpdateForm  # Custom form to exclude = ["problem", "language", "owner"] fields.
+    # Custom form to exclude = ["problem", "language", "owner"] fields.
+    form_class = SolutionUpdateForm
     success_url = reverse_lazy('python_problems:problem-index')
 
 

@@ -1,4 +1,5 @@
 {% extends "core/base.html" %}
+
 {% block title %}
   Python
 {% endblock title %}
@@ -14,7 +15,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/sql/sql.min.js" defer></script>
   
   {% load static %}
-  <link rel="stylesheet" type="text/css" href="{% static 'python_problems/style.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'python_problems/styles.css' %}">
   <script src="{% static 'python_problems/code-mirror.js' %}" defer></script>
   <script src="{% static 'python_problems/test-case-buttons.js' %}" defer></script>
   <script src="{% static 'python_problems/ai-assistant.js' %}" defer></script>
@@ -22,6 +23,7 @@
   <script src="{% static 'python_problems/problem-info.js' %}" defer></script>
   <script src="{% static 'python_problems/problem-description.js' %}" defer></script>
   <script src="{% static 'python_problems/problem-solution.js' %}" defer></script>
+  <script src="{% static 'python_problems/animate-grid.js' %}" defer></script>
   
   {# Store as a data attribute #}
   <div id="testCaseContainer" testCaseLength="{{ test_cases|length }}"></div>

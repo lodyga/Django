@@ -12,6 +12,7 @@ urlpatterns = [
     path("problems/", include("python_problems.urls")),
     path("sql/", include("sql_problems.urls")),
     path("forums/", include("forums.urls")),
+    path("animations/", include("animations.urls")),
 ]
 
 
