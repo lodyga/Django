@@ -1,0 +1,81 @@
+{% load problem_filters %}    
+
+<div class="my-5 mx-3">
+  <h2>Problem list</h2>
+</div>
+
+{% if page_obj %}
+  <ul>
+    {% for problem in page_obj %}
+      <div class="row">
+        <div class="col-md-auto">
+          <div class="row">
+            <div class="col-md-auto">
+              <li>
+                {{ problem.title }}
+                {% if user == problem.owner %}
+                  (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
+                  <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
+                {% endif %}
+              </li>
+            </div>
+              
+            {# Tag buttons #}
+            <div class="col-md-auto">
+              <form method="post">
+                {% csrf_token %}
+                {% for tag in problem.tags.all %}
+                  <button class="tags btn btn-secondary py-0 px-1"
+                          style="display: none"
+                          name="tag_id"
+                          type="submit"
+                          value="{{ tag.id }}">
+                    {{ tag }}
+                  </button>
+                {% endfor %}
+                <!-- Hidden Fields for Filters -->
+                <input type="hidden" name="difficulty_id" value="{{ difficulty_id }}">
+                <input type="hidden" name="language_id" value="{{ language_id }}">
+                <input type="hidden" name="order_by" value="{{ order_by }}">
+                <input type="hidden" name="page_number" value="{{ page_number }}">
+                <input type="hidden" name="problems_per_page" value="{{ problems_per_page }}">
+                <input type="hidden" name="query_text" value="{{ query_text }}">
+              </form>
+            </div>
+          </div>
+          <div class="row">
+            {# Show difficulty #}
+            <div class="col-md-auto mt-1">
+              <p class={% if problem.difficulty.name == 'Easy' %}"text-success"{% endif %}
+                       {% if problem.difficulty.name == 'Medium' %}"text-warning"{% endif %}
+                       {% if problem.difficulty.name == 'Hard' %}"text-danger"{% endif %}
+                       {% if problem.difficulty.name == 'Impossible' %}"text-secondary"{% endif %}>
+                {{ problem.difficulty }}
+              </p>
+            </div>
+            <!-- Problem languages -->
+            <div class="col-md-auto">
+              {% for language in problems_languages|dict_key:problem %}
+                <a class="btn btn-link py-0 px-1" 
+                    href="{% url 'python_problems:problem-detail' problem.slug language.name %}" 
+                    role="button">
+                  {{ language }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <hr>
+      </div>
+    {% endfor %}
+  </ul>
+  {# Bottom page navbar #}
+  {% include "python_problems/partials/_problem_list_page_navbar.html" %}
+{% else %}
+  <p>No Python problems available for the given parameters.</p>
+  <div class="mb-4">
+    <a class="btn btn-warning mb-2 p-1"
+       href="{% url 'python_problems:problem-index' %}"
+       role="button">Clear filters</a>
+  </div>
+{% endif %}

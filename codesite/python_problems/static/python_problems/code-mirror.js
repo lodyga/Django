@@ -18,9 +18,7 @@ function getTheme() {
 }
 
 function getLanguageId() {
-  const storedLanguageContainer = document.getElementById('languageContainer');
-  const languageId = JSON.parse(storedLanguageContainer.getAttribute('languageId'));
-  return languageId
+  return JSON.parse(document.getElementById('languageId').textContent);
 }
 
 

@@ -9,7 +9,6 @@
   <link rel="stylesheet" type="text/css" href="{% static 'animations/styles.css' %}">
   <script src="{% static 'animations/animate-grid.js' %}" defer></script>
 
-  {# Store as a data attribute #}
   {{ order|json_script:"order" }}
   {{ rows|json_script:"rows" }}
   {{ cols|json_script:"cols" }}

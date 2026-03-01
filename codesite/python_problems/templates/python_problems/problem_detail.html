@@ -25,10 +25,11 @@
   <script src="{% static 'python_problems/problem-solution.js' %}" defer></script>
   <script src="{% static 'python_problems/animate-grid.js' %}" defer></script>
   
-  {# Store as a data attribute #}
-  <div id="testCaseContainer" testCaseLength="{{ test_cases|length }}"></div>
-  <div id="languageContainer" languageId="{{ language.id }}"></div>
-  <div id="userContainer" userName="{{ request.user }}"></div>
+  {# Store data by id. #}
+  {{ test_cases|length|json_script:"testCaseLength" }}
+  {{ language.id|json_script:"languageId" }}
+  {{ request.user.username|json_script:"userName" }}
+
 {% endblock head %}
 
 {% block content %}
@@ -57,10 +58,8 @@
     </div>
     {# Right tab #}
     <div class="col-md-2 p-3">
-      <div class="row-auto">
-        <a href="{% url 'python_problems:problem-index' %}"
-           class="btn btn-secondary px-3 py-0 mb-2">Back</a>
-      </div>
+      <a href="{% url 'python_problems:problem-index' %}"
+         class="btn btn-secondary px-3 py-0 mb-2">Back</a>
     </div>
   </div>
 {% endblock content %}

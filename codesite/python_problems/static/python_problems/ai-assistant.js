@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const aiAssistantButton = document.getElementById('aiAssistantButton');
-  const storedUser = document.getElementById('userContainer');
-  const userName = storedUser.getAttribute('userName');
+  const userName = document.getElementById('userName').textContent;
   const chatBox = document.getElementById("chatBox");
   const savedChat = sessionStorage.getItem('chatHistory');
   if (savedChat) {chatBox.value = savedChat;};

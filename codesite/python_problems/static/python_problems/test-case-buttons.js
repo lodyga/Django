@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', loadTestCaseButtons);
 function loadTestCaseButtons() {
-  const testCaseContainer = document.getElementById('testCaseContainer');
-  const testCaseLength = JSON.parse(testCaseContainer.getAttribute('testCaseLength'));
+  const testCaseLength = JSON.parse(document.getElementById('testCaseLength').textContent);
   const buttonsContainer = document.getElementById('buttonsContainer');
 
   // Create buttons
