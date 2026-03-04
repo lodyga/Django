@@ -5,6 +5,10 @@ source djangoenv/bin/activate
 py manage.py runserver
 
 
+reverse PK
+list(problem.solution_set.values_list("language__name", flat=True).distinct())
+
+
 
 # Bootstrap blue color: #0d6efd; color: var(--bs-primary);
 

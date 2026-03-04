@@ -19,132 +19,81 @@ def tag_graph_view(request):
     data = [{"tag": tag.name,
              "count": tag.problem_set.count()}
             for tag in tag_list]
+    for tag in tag_list:
+        print(tag)
     sorted_data = sorted(data, key=lambda x: x["count"], reverse=True)
     return render(request, "python_problems/tag_graph.html", {"data": sorted_data})
 
 
 class ProblemIndexView(ListView):
-    model = Problem  # Problem model
-    template_name = "python_problems/problem_list.html"  # needed for post render()
+    model = Problem
+    template_name = "python_problems/problem_list.html"
+    paginate_by = 7
+
+    def get_queryset(self):
+        queryset = (
+            Problem.objects
+            .select_related("difficulty", "owner")
+            .prefetch_related("tags", "solution_set__language")
+        )
+
+        query_text = self.request.GET.get("query_text")
+        difficulty_id = self.request.GET.get("difficulty_id")
+        tag_id = self.request.GET.get("tag_id")
+        language_id = self.request.GET.get("language_id")
+        order_by = self.request.GET.get("order_by", "created_at")
+
+        if difficulty_id and difficulty_id != "0":
+            queryset = queryset.filter(difficulty_id=difficulty_id)
+
+        if language_id and language_id != "0":
+            queryset = queryset.filter(solution__language_id=language_id)
+
+        if tag_id and tag_id != "0":
+            queryset = queryset.filter(tags__id=tag_id)
+
+        if query_text:
+            queryset = queryset.filter(
+                Q(tags__name__icontains=query_text) |
+                Q(title__icontains=query_text)
+            ).distinct()
+
+        return queryset.order_by(order_by)
+
+    def get_paginate_by(self, queryset):
+        return int(self.request.GET.get("problems_per_page", 7))
 
     def get_context_data(self, **kwargs):
-        # fetch get_context_data from parent class
         context = super().get_context_data(**kwargs)
 
-        # Get data from database.
-        difficulty_list = Difficulty.objects.all()
-        language_list = Language.objects.all()
-        problem_list = Problem.objects.all()
-        tag_list = Tag.objects.all()
-
-        # Sort languages by solution count.
-        language_list = (
+        context["difficulty_list"] = Difficulty.objects.all()
+        context["problem_list"] = Problem.objects.all()
+        context["language_list"] = (
             Language.objects
-            .annotate(solution_count=models.Count("solution"))
-            .order_by("-solution_count"))
+            .annotate(solution_count=Count("solution"))
+            .order_by("-solution_count")
+        )
+        context["tag_list"] = Tag.objects.all()
 
-        # Problems pagination.
-        problems_per_page = 7
-        paginator = Paginator(problem_list, problems_per_page)
-        page_obj = paginator.get_page(1)
-
-        # Returns a dictionary mapping problems to their available languages
-        # for the current page.
-        problems_languages = get_problems_languages(
-            problem_list=problem_list,
-            problems_per_page=problems_per_page,
-            page_number=1)
+        # preserve current GET values
+        context["difficulty_id"] = int(
+            self.request.GET.get("difficulty_id", 0))
+        context["language_id"] = int(self.request.GET.get("language_id", 0))
+        context["tag_id"] = int(self.request.GET.get("tag_id", 0))
+        context["query_text"] = self.request.GET.get("query_text", "")
+        context["order_by"] = self.request.GET.get("order_by", "created_at")
+        context["problems_per_page"] = int(
+            self.request.GET.get("problems_per_page", 7))
 
         # Option values for problems_per_page form-select.
-        problems_per_page_options = [
-            5, 6, 7, 8, 10, 15, 20, 50, 100, len(problem_list)]
+        context["problems_per_page_options"] = [
+            5, 6, 7, 8, 10, 15, 20, 50, 100, len(Problem.objects.all())]
 
-        context.update({
-            "difficulty_id": 0,
-            "difficulty_list": difficulty_list,
-            "language_id": 0,
-            "language_list": language_list,
-            "order_by": "created_at",
-            "page_obj": page_obj,
-            "problems_languages": problems_languages,
-            "problems_per_page": problems_per_page,
-            "problems_per_page_options": problems_per_page_options,
-            "query_text": "",
-            "tag_id": 0,
-            "tag_list": tag_list,
-        })
+        params = self.request.GET.copy()
+        params.pop("page", None)
+        context["querystring"] = params.urlencode()
+
         return context
-
-    def post(self, request, **kwargs):
-        # Explicitly fetch object_list (since ListView doesn't do it in POST)
-        self.object_list = self.get_queryset()
-        context = self.get_context_data(**kwargs)
-        problem_list = Problem.objects.all()
-
-        # Get data from request POST.
-        query_text = request.POST.get(
-            "query_text", context["query_text"])
-        difficulty_id = int(request.POST.get(
-            "difficulty_id", context["difficulty_id"]))
-        tag_id = int(request.POST.get(
-            "tag_id", context["tag_id"]))
-        language_id = int(request.POST.get(
-            "language_id", context["language_id"]))
-        order_by = request.POST.get(
-            "order_by", context["order_by"])
-        problems_per_page = int(request.POST.get(
-            "problems_per_page", context["problems_per_page"]))
-        page_number = int(request.POST.get("page_number")
-                          or request.POST.get("form_page_number", 1))
-
-        # Fileter problems by difficulty.
-        if difficulty_id:
-            difficulty = get_object_or_404(Difficulty, id=difficulty_id)
-            problem_list = problem_list.filter(difficulty=difficulty)
-
-        # Fileter problems by language.
-        if language_id:
-            language = get_object_or_404(Language, id=language_id)
-            problem_list = problem_list.filter(solution__language=language)
-
-        # Fileter problems by tag.
-        if tag_id:
-            tag = get_object_or_404(Tag, id=tag_id)
-            problem_list = problem_list.filter(tags=tag)
-
-        # Filter problems by query text from search form.
-        if query_text:
-            problem_list = (
-                problem_list
-                .filter(Q(tags__name__icontains=query_text) | Q(title__icontains=query_text))
-                .distinct())
-
-        # Order problems.
-        problem_list = problem_list.order_by(order_by)
-
-        # Paginate problems.
-        paginator = Paginator(problem_list, problems_per_page)
-        page_obj = paginator.get_page(page_number)
-
-        # Returns a dictionary mapping problems to their available languages
-        # for the current page.
-        problems_languages = get_problems_languages(
-            problem_list=problem_list,
-            problems_per_page=problems_per_page,
-            page_number=page_number)
-
-        context.update({
-            "difficulty_id": difficulty_id,
-            "language_id": language_id,
-            "order_by": order_by,
-            "page_number": page_number,
-            "page_obj": page_obj,
-            "problems_languages": problems_languages,
-            "problems_per_page": problems_per_page,
-            "query_text": query_text,
-            "tag_id": tag_id,
-        })
-        return render(request, self.template_name, context)
 
 
 class ProblemDetailView(DetailView):

@@ -1,21 +1,15 @@
 <div class="row mb-5">
-  <div class="col">  
+  <div class="col">
     <div class="mb-5 d-flex justify-content-between">
       {% if prev_problem_slug %}
-        <a href="{% url 'python_problems:problem-detail' prev_problem_slug language.name %}"
-           class="btn btn-outline-secondary py-1">
-          &larr; Previous Problem
-        </a>
+        <a href="{% url 'python_problems:problem-detail' prev_problem_slug language.name %}" class="btn btn-outline-secondary py-1">← Previous Problem</a>
       {% else %}
-        <span class="btn btn-secondary disabled">&larr; Previous</span>
+        <span class="btn btn-secondary disabled">← Previous</span>
       {% endif %}
       {% if next_problem_slug %}
-        <a href="{% url 'python_problems:problem-detail' next_problem_slug language.name %}"
-           class="btn btn-outline-secondary py-1">
-          Next Problem &rarr;
-        </a>
+        <a href="{% url 'python_problems:problem-detail' next_problem_slug language.name %}" class="btn btn-outline-secondary py-1">Next Problem →</a>
       {% else %}
-        <span class="btn btn-secondary disabled">Next &rarr;</span>
+        <span class="btn btn-secondary disabled">Next →</span>
       {% endif %}
     </div>
     <div class="row">
@@ -23,4 +17,3 @@
     </div>
   </div>
 </div>
-{% comment %}   <hr> {% endcomment %}

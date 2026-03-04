@@ -5,8 +5,7 @@
     <b>Search tab:</b>
   </label>
   <hr>
-  <form method="post" id="search_bar">
-    {% csrf_token %}
+  <form method="get" id="search_bar">
     <!-- Search Box -->
     <label for="search_box" class="form-label">
       <b>Search box:</b>
@@ -34,10 +33,7 @@
             name="difficulty_id"
             onchange="this.form.submit()"
             style="width: auto">
-      <option value="{{ 0 }}"
-              {% if difficulty.id == 0 %}selected{% endif %}>
-        {{ "All" }}
-      </option>
+      <option value="0"{% if difficulty_id == 0 %} selected{% endif %}>All</option>
       {% for difficulty in difficulty_list %}
         <option value="{{ difficulty.id }}"
                 {% if difficulty.id == difficulty_id %}selected{% endif %}>
@@ -53,18 +49,15 @@
             id="tag"
             name="tag_id"
             onchange="this.form.submit()"
-            style="width: auto;">
-      <option value="{{ 0 }}"
-              {% if tag.id == 0 %}selected{% endif %}>
-        {{ "All" }}
+            style="width: auto">
+      <option value="0"{% if tag_id == 0 %} selected{% endif %}>All</option>
         {% for tag in tag_list.all %}
           <option value="{{ tag.id }}"
-                {% if tag.id == tag_id %}selected{% endif %}>
+                  {% if tag.id == tag_id %}selected{% endif %}>
             {{ tag }}
           </option>
         {% endfor %}
     </select>
-    
     <!-- Select Language -->
     <label for="language" class="form-label">
       <b>Language:</b>
@@ -74,9 +67,7 @@
             name="language_id"
             onchange="this.form.submit()"
             style="width: auto;">
-      <option value="{{ 0 }}"
-              {% if language.id == 0 %}selected{% endif %}>
-        {{ "All" }}
+      <option value="0"{% if language_id == 0 %} selected{% endif %}>All</option>
       {% for language in language_list.all %}
         <option value="{{ language.id }}"
                 {% if language.id == language_id %}selected{% endif %}>
@@ -93,13 +84,13 @@
             name="order_by"
             onchange="this.form.submit()"
             style="width: auto">
-      <option value="difficulty" 
+      <option value="difficulty"
               {% if order_by == "difficulty" %}selected{% endif %}>Difficulty
       </option>
-      <option value="title" 
+      <option value="title"
               {% if order_by == "title" %}selected{% endif %}>Title
       </option>
-      <option value="owner" 
+      <option value="owner"
               {% if order_by == "owner" %}selected{% endif %}>Author
       </option>
       <option value="created_at"
@@ -114,10 +105,18 @@
     <label for="problems_per_page_primary" class="form-label">
       <b>Problems per page:</b>
     </label>
-    {% include "python_problems/partials/_problems_per_page.html" with select_class="form-select w-auto mb-3" select_id="problems_per_page_primary"%}
-    
-    <!-- Hidden Fields for Paginator -->
-    <input type="hidden" name="page_number" value="{{ page_number }}">
+    <select class="form-select mb-3"
+        id="problems_per_page"
+        name="problems_per_page"
+        onchange="this.form.submit()"
+        style="width: auto">
+        {% for problem_counter in problems_per_page_options %}
+        <option value="{{ problem_counter }}"
+          {% if problem_counter == problems_per_page %}selected{% endif %}>
+          {% if problem_counter == problem_list|length %}All{% else %}{{ problem_counter }}{% endif %} / page
+        </option>
+      {% endfor %}
+    </select>
   </form>
 </div>
 <!-- Clear filters -->
