@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get both dropdowns
     const primarySelect = document.getElementById('problems_per_page_primary');
     const secondarySelect = document.getElementById('problems_per_page_secondary');
-    const selects = [primarySelect, secondarySelect].filter(Boolean);
+    //const selects = [primarySelect, secondarySelect].filter(Boolean);
+    const selects = primarySelect || secondarySelect;
 
     if (selects.length === 0) return;
 

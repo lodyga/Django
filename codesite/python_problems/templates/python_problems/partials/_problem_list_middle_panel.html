@@ -27,24 +27,18 @@
                 {% for tag in problem.tags.all %}
                   <button class="tags btn btn-secondary py-0 px-1" style="display: none" name="tag_id" type="submit" value="{{ tag.id }}">{{ tag }}</button>
                 {% endfor %}
-                <!-- Hidden Fields for Filters -->
-                <input type="hidden" name="difficulty_id" value="{{ difficulty_id }}" />
-                <input type="hidden" name="language_id" value="{{ language_id }}" />
-                <input type="hidden" name="order_by" value="{{ order_by }}" />
-                <input type="hidden" name="page_number" value="{{ page_number }}" />
-                <input type="hidden" name="problems_per_page" value="{{ problems_per_page }}" />
-                <input type="hidden" name="query_text" value="{{ query_text }}" />
               </form>
             </div>
           </div>
+          
           <div class="row">
             {# Show difficulty #}
             <div class="col-md-auto mt-1">
               <p class="{% if problem.difficulty.name == 'Easy' %} text-success
-                {% elif problem.difficulty.name == 'Medium' %} text-warning
-                {% elif problem.difficulty.name == 'Hard' %} text-danger
-                {% elif problem.difficulty.name == 'Impossible' %}
-                {% endif %}">{{ problem.difficulty }}</p>
+                        {% elif problem.difficulty.name == 'Medium' %} text-warning
+                        {% elif problem.difficulty.name == 'Hard' %} text-danger
+                        {% elif problem.difficulty.name == 'Impossible' %}
+                        {% endif %}">{{ problem.difficulty }}</p>
             </div>
 
             <!-- Problem languages -->
@@ -57,7 +51,7 @@
             </div>
           </div>
         </div>
-        <hr />
+        <hr>
       </div>
     {% endfor %}
   </ul>

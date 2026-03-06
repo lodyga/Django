@@ -82,8 +82,7 @@ class ProblemIndexView(ListView):
         context["tag_id"] = int(self.request.GET.get("tag_id", 0))
         context["query_text"] = self.request.GET.get("query_text", "")
         context["order_by"] = self.request.GET.get("order_by", "created_at")
-        context["problems_per_page"] = int(
-            self.request.GET.get("problems_per_page", 7))
+        context["problems_per_page"] = self.get_paginate_by(None)
 
         # Option values for problems_per_page form-select.
         context["problems_per_page_options"] = [

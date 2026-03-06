@@ -22,10 +22,7 @@
     {% if page_obj.has_previous %}
       <li class="page-item">
         <a class="page-link"
-          href="?page={{ page_obj.previous_page_number }}{% if querystring %}
-            
-            &{{ querystring }}
-          {% endif %}">
+          href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
           &lsaquo;
         </a>
       </li>
@@ -38,15 +35,33 @@
     {# Page Numbers #}
     {% for num in page_obj.paginator.page_range %}
       {% if num == page_obj.number %}
-        <li class="page-item active">
-          <span class="page-link">{{ num }}</span>
+        <li class="page-item">
+          <form method="get">
+            <input type="hidden" name="difficulty_id" value="{{ difficulty_id }}" />
+            <input type="hidden" name="tag_id" value="{{ tag_id }}" />
+            <input type="hidden" name="language_id" value="{{ language_id }}" />
+            <input type="hidden" name="order_by" value="{{ order_by }}" />
+            <input type="hidden" name="query_text" value="{{ query_text }}" />
+            <input type="hidden" name="problems_per_page" value="{{ problems_per_page }}" />
+            <select class="form-select d-inline w-auto"
+            id="form_page_number"
+            name="page"
+            onchange="this.form.submit()">
+            <!-- Page number dropdown -->
+            {% for num in page_obj.paginator.page_range %}
+                <option value="{{ num }}"
+                        {% if num == page_obj.number %}selected{% endif %}>
+                  Page {{ num }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>
         </li>
       {% elif num|in_pagination_range:page_obj %}
         <li class="page-item">
           <a class="page-link"
             href="?page={{ num }}{% if querystring %}
-              
-              &{{ querystring }}
+            &{{ querystring }}
             {% endif %}">
             {{ num }}
           </a>
@@ -58,10 +73,7 @@
     {% if page_obj.has_next %}
       <li class="page-item">
         <a class="page-link"
-          href="?page={{ page_obj.next_page_number }}{% if querystring %}
-            
-            &{{ querystring }}
-          {% endif %}">
+          href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
           &rsaquo;
         </a>
       </li>
@@ -75,10 +87,7 @@
     {% if page_obj.has_next %}
       <li class="page-item">
         <a class="page-link"
-          href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}
-            
-            &{{ querystring }}
-          {% endif %}">
+          href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">
           &raquo;
         </a>
       </li>
