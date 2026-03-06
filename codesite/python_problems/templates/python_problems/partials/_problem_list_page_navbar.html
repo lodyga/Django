@@ -5,10 +5,7 @@
     {% if page_obj.has_previous %}
       <li class="page-item">
         <a class="page-link"
-          href="?page=1{% if querystring %}
-            
-            &{{ querystring }}
-          {% endif %}">
+          href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">
           &laquo;
         </a>
       </li>
@@ -60,9 +57,7 @@
       {% elif num|in_pagination_range:page_obj %}
         <li class="page-item">
           <a class="page-link"
-            href="?page={{ num }}{% if querystring %}
-            &{{ querystring }}
-            {% endif %}">
+            href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}">
             {{ num }}
           </a>
         </li>
