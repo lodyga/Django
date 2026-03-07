@@ -19,14 +19,11 @@
           <br clear="all" />
           <p>
             {% load crispy_forms_tags %}
-            <form method="POST"
-                  action="{% url 'forums:feature-forum-comment-create' forum.id %}">
+            <form method="post" action="{% url 'forums:feature-forum-comment-create' forum.id %}">
               {% csrf_token %}
               {{ comment_form|crispy }}
               <input type="submit" value="Submit" />
-              <input type="submit"
-                     value="Back"
-                     onclick="window.location.href='{% url 'forums:feature-forum' %}';return false;" />
+              <input type="submit" value="Back" onclick="window.location.href='{% url 'forums:feature-forum' %}';return false;" />
             </form>
           </p>
         {% else %}
@@ -36,9 +33,8 @@
         {% for comment in comments %}
           <p>
             {{ comment.text }}
-            (by {{ comment.owner }} {{ comment.updated_at|naturaltime }})
-            {% if user == comment.owner %}
-              (<a href="{% url 'forums:feature-forum-comment-udpate' comment.id %}">Edit </a>)
+            (by {{ comment.owner }} {{ comment.updated_at|naturaltime }}){% if user == comment.owner %}
+              (<a href="{% url 'forums:feature-forum-comment-udpate' comment.id %}">Edit</a>)
             {% endif %}
             {% comment %} {% if user == comment.owner %}
               <a href="{% url 'forums:forum_comment_delete' comment.id %}"><i class="fa fa-trash"></i></a>

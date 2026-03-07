@@ -5,30 +5,24 @@
     {% if page_obj.has_previous %}
       <li class="page-item">
         <a class="page-link"
-          href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">
-          &laquo;
-        </a>
+           href="?page=1{% if querystring %}&{{ querystring }}{% endif %}">«</a>
       </li>
     {% else %}
       <li class="page-item disabled">
-        <span class="page-link">&laquo;</span>
+        <span class="page-link">«</span>
       </li>
     {% endif %}
-
     {# Previous Page #}
     {% if page_obj.has_previous %}
       <li class="page-item">
         <a class="page-link"
-          href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
-          &lsaquo;
-        </a>
+           href="?page={{ page_obj.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">‹</a>
       </li>
     {% else %}
       <li class="page-item disabled">
-        <span class="page-link">&lsaquo;</span>
+        <span class="page-link">‹</span>
       </li>
     {% endif %}
-
     {# Page Numbers #}
     {% for num in page_obj.paginator.page_range %}
       {% if num == page_obj.number %}
@@ -39,17 +33,16 @@
             <input type="hidden" name="language_id" value="{{ language_id }}" />
             <input type="hidden" name="order_by" value="{{ order_by }}" />
             <input type="hidden" name="query_text" value="{{ query_text }}" />
-            <input type="hidden" name="problems_per_page" value="{{ problems_per_page }}" />
+            <input type="hidden"
+                   name="problems_per_page"
+                   value="{{ problems_per_page }}" />
             <select class="form-select d-inline w-auto"
-            id="form_page_number"
-            name="page"
-            onchange="this.form.submit()">
-            <!-- Page number dropdown -->
-            {% for num in page_obj.paginator.page_range %}
-                <option value="{{ num }}"
-                        {% if num == page_obj.number %}selected{% endif %}>
-                  Page {{ num }}
-                </option>
+                    id="form_page_number"
+                    name="page"
+                    onchange="this.form.submit()">
+              <!-- Page number dropdown -->
+              {% for num in page_obj.paginator.page_range %}
+                <option value="{{ num }}" {% if num == page_obj.number %}selected{% endif %}>Page {{ num }}</option>
               {% endfor %}
             </select>
           </form>
@@ -57,38 +50,30 @@
       {% elif num|in_pagination_range:page_obj %}
         <li class="page-item">
           <a class="page-link"
-            href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}">
-            {{ num }}
-          </a>
+             href="?page={{ num }}{% if querystring %}&{{ querystring }}{% endif %}">{{ num }}</a>
         </li>
       {% endif %}
     {% endfor %}
-
     {# Next Page #}
     {% if page_obj.has_next %}
       <li class="page-item">
         <a class="page-link"
-          href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">
-          &rsaquo;
-        </a>
+           href="?page={{ page_obj.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}">›</a>
       </li>
     {% else %}
       <li class="page-item disabled">
-        <span class="page-link">&rsaquo;</span>
+        <span class="page-link">›</span>
       </li>
     {% endif %}
-
     {# Last Page #}
     {% if page_obj.has_next %}
       <li class="page-item">
         <a class="page-link"
-          href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">
-          &raquo;
-        </a>
+           href="?page={{ page_obj.paginator.num_pages }}{% if querystring %}&{{ querystring }}{% endif %}">»</a>
       </li>
     {% else %}
       <li class="page-item disabled">
-        <span class="page-link">&raquo;</span>
+        <span class="page-link">»</span>
       </li>
     {% endif %}
     <li class="page-item ms-3">
@@ -98,7 +83,7 @@
         <input type="hidden" name="language_id" value="{{ language_id }}" />
         <input type="hidden" name="order_by" value="{{ order_by }}" />
         <input type="hidden" name="query_text" value="{{ query_text }}" />
-        {% include 'python_problems/partials/_problems_per_page.html' with select_class='form-select mb-3 w-auto' select_id='problems_per_page_secondary' %}
+        {% include "python_problems/partials/_problems_per_page.html" with select_class="form-select mb-3 w-auto" select_id="problems_per_page_secondary" %}
       </form>
     </li>
   </ul>

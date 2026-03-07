@@ -15,20 +15,20 @@ from .static.python_problems.scripts import *
 
 
 def tag_graph_view(request):
-    tag_list = Tag.objects.all()
-    data = [{"tag": tag.name,
-             "count": tag.problem_set.count()}
-            for tag in tag_list]
-    for tag in tag_list:
-        print(tag)
-    sorted_data = sorted(data, key=lambda x: x["count"], reverse=True)
-    return render(request, "python_problems/tag_graph.html", {"data": sorted_data})
+    tag_list = (Tag.objects
+                .annotate(problem_count=Count("problem"))
+                .order_by("-problem_count"))
+
+    data = [
+        {"tag": tag.name, "count": tag.problem_count}
+        for tag in tag_list
+    ]
+    return render(request, "python_problems/tag_graph.html", {"data": data})
 
 
 class ProblemIndexView(ListView):
     model = Problem
     template_name = "python_problems/problem_list.html"
-    paginate_by = 7
 
     def get_queryset(self):
         queryset = (
@@ -68,28 +68,27 @@ class ProblemIndexView(ListView):
 
         context["difficulty_list"] = Difficulty.objects.all()
         context["problem_list"] = Problem.objects.all()
+        context["tag_list"] = Tag.objects.all()
         context["language_list"] = (
             Language.objects
             .annotate(solution_count=Count("solution"))
             .order_by("-solution_count")
         )
-        context["tag_list"] = Tag.objects.all()
 
-        # preserve current GET values
         context["difficulty_id"] = int(
             self.request.GET.get("difficulty_id", 0))
         context["language_id"] = int(self.request.GET.get("language_id", 0))
         context["tag_id"] = int(self.request.GET.get("tag_id", 0))
         context["query_text"] = self.request.GET.get("query_text", "")
         context["order_by"] = self.request.GET.get("order_by", "created_at")
-        context["problems_per_page"] = self.get_paginate_by(None)
-
-        # Option values for problems_per_page form-select.
+        context["problems_per_page"] = self.get_paginate_by(
+            self.get_queryset())
         context["problems_per_page_options"] = [
             5, 6, 7, 8, 10, 15, 20, 50, 100, len(Problem.objects.all())]
 
         params = self.request.GET.copy()
         params.pop("page", None)
+        # keep all active filters/sort/per-page values.
         context["querystring"] = params.urlencode()
 
         return context

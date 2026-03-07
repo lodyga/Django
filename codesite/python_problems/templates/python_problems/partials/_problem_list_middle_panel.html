@@ -1,9 +1,7 @@
 {% load problem_filters %}
-
 <div class="my-5 mx-3">
   <h2>Problem list</h2>
 </div>
-
 {% if page_obj %}
   <ul>
     {% for problem in page_obj %}
@@ -19,33 +17,32 @@
                 {% endif %}
               </li>
             </div>
-
             {# Tag buttons #}
             <div class="col-md-auto">
               <form method="post">
                 {% csrf_token %}
                 {% for tag in problem.tags.all %}
-                  <button class="tags btn btn-secondary py-0 px-1" style="display: none" name="tag_id" type="submit" value="{{ tag.id }}">{{ tag }}</button>
+                  <button class="tags btn btn-secondary py-0 px-1"
+                          style="display: none"
+                          name="tag_id"
+                          type="submit"
+                          value="{{ tag.id }}">{{ tag }}</button>
                 {% endfor %}
               </form>
             </div>
           </div>
-          
           <div class="row">
             {# Show difficulty #}
             <div class="col-md-auto mt-1">
-              <p class="{% if problem.difficulty.name == 'Easy' %} text-success
-                        {% elif problem.difficulty.name == 'Medium' %} text-warning
-                        {% elif problem.difficulty.name == 'Hard' %} text-danger
-                        {% elif problem.difficulty.name == 'Impossible' %}
-                        {% endif %}">{{ problem.difficulty }}</p>
+              <p class="{% if problem.difficulty.name == 'Easy' %} text-success {% elif problem.difficulty.name == 'Medium' %} text-warning {% elif problem.difficulty.name == 'Hard' %} text-danger {% elif problem.difficulty.name == 'Impossible' %} {% endif %}">
+                {{ problem.difficulty }}
+              </p>
             </div>
-
             <!-- Problem languages -->
             <div class="col-md-auto">
               {% for solution in problem.solution_set.all %}
-                <a class="btn btn-link py-0 px-1" 
-                   href="{% url 'python_problems:problem-detail' problem.slug solution.language %}" 
+                <a class="btn btn-link py-0 px-1"
+                   href="{% url 'python_problems:problem-detail' problem.slug solution.language %}"
                    role="button">{{ solution.language }}</a>
               {% endfor %}
             </div>
@@ -60,6 +57,8 @@
 {% else %}
   <p>No Python problems available for the given parameters.</p>
   <div class="mb-4">
-    <a class="btn btn-warning mb-2 p-1" href="{% url 'python_problems:problem-index' %}" role="button">Clear filters</a>
+    <a class="btn btn-warning mb-2 p-1"
+       href="{% url 'python_problems:problem-index' %}"
+       role="button">Clear filters</a>
   </div>
 {% endif %}

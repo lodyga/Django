@@ -41,7 +41,6 @@ function loadCodeMirror() {
 
   codeEditor.setSize(null, "auto");
 
-
   const solutionContentContainer = document.getElementById('solutionContentContainer');
   solutionViewer = CodeMirror.fromTextArea(solutionContentContainer, {
     mode: languageModes[languageId] || 'text',
@@ -49,6 +48,7 @@ function loadCodeMirror() {
     readOnly: true,
     lineNumbers: true,
   });
+
   solutionViewer.setSize(null, "auto");
 };
 

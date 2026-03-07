@@ -25,6 +25,7 @@ class Grid(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        source_code = inspect.getsource(self.algorithm)
 
         test_case = self.default_test_case
         order = self.default_order or []
@@ -37,6 +38,7 @@ class Grid(TemplateView):
             "test_case": test_case,
             "rows": ROWS,
             "cols": COLS,
+            "source_code": source_code,
         })
         return context
 
@@ -78,7 +80,7 @@ class Grid(TemplateView):
             "order": order,
             "test_case": test_case,
             "rows": ROWS,
-            "cols": COLS,
+            "cols": COLS
         })
 
         return render(request, self.template_name, context)

@@ -5,11 +5,17 @@ function initializeDarkMode() {
   const darkModeLabel = document.getElementById('darkModeLabel');
   const htmlDocument = document.querySelector('html');
   const storedDarkMode = localStorage.getItem('darkMode');
+
+  if (!darkModeToggle || !darkModeLabel || !htmlDocument) {
+    return;
+  }
+
   darkModeToggle.checked = storedDarkMode === 'disabled' ? false : true;
   toggleDarkMode();
 
   function toggleDarkMode() {
     const darkMode = darkModeToggle.checked;
+
     if (darkMode) {
       darkModeLabel.textContent = 'Light Mode';
       htmlDocument.setAttribute('data-bs-theme', 'dark');
@@ -27,12 +33,16 @@ function initializeDarkMode() {
     const storedDarkMode = localStorage.getItem('darkMode');
     const theme = storedDarkMode === 'disabled' ? 'default' : 'monokai';
 
-    if (codeEditor) {
+    if (typeof codeEditor !== 'undefined' && codeEditor) {
       codeEditor.setOption('theme', theme)
     }
 
-    if (solutionViewer) {
+    if (typeof solutionViewer !== 'undefined' && solutionViewer) {
       solutionViewer.setOption('theme', theme)
+    }
+
+    if (typeof gridAlgorithmViewer !== 'undefined' && gridAlgorithmViewer) {
+      gridAlgorithmViewer.setOption('theme', theme)
     }
   };
 

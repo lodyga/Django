@@ -5,8 +5,57 @@ source djangoenv/bin/activate
 py manage.py runserver
 
 
-reverse PK
+
+Django fetch related data efficiently up front, instead of one query per row.
+
+queryset = (
+    Problem.objects
+    .select_related("difficulty", "owner")
+    .prefetch_related("tags", "solution_set__language")
+)
+
+# Py
+Problem  # class
+Problem.objects  # manager 
+Problem.objects.all()  # queryset
+Problem.objects.count()  # 520
+
+Problem.title  # DeferredAttribute
+Problem.difficulty  # ForwardManyToOneDescriptor
+Problem.difficulty_id  # ForeignKeyDeferredAttribute
+Problem.tags  # ManyToManyDescriptor
+
+Problem.solution_set  # ReverseManyToOneDescriptor
+
+Language  # class
+Language.solution_set  # ReverseManyToOneDescriptor
+
+Problem.objects.select_related("difficulty", "owner")  # QuerySet
+Problem.objects.prefetch_related("tags", "solution_set__language")  # QuerySet
+
+
+# html
+problem.solution_set.values_list("language__name", flat=True).distinct() == <QuerySet ['Python', 'JavaScript']>
+
+
+
+
+# all Solution objects
+problem.solution_set.all()
+
+# language names (can repeat)
+problem.solution_set.values_list("language__name", flat=True)
+
+# unique language names
+problem.solution_set.values_list("language__name", flat=True).distinct()
+
+# Language objects (unique)
+Language.objects.filter(solution__problem=problem).distinct()
+
+for debugger only, reverse PK
 list(problem.solution_set.values_list("language__name", flat=True).distinct())
+
+
 
 
 
