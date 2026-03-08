@@ -23,10 +23,10 @@
         <button id="resetBtn" class="btn btn-secondary">Reset</button>
       </div>
     </div>
-    <div>
+    <div class="mb-5">
       Animate dff/bfs path directly from array or from <a href="{% url 'python_problems:problem-detail' 'number-of-islands' 'Python' %}">Number of Islands</a> test case.
     </div>
-    <form method="post" class="mt-3 mb-4">
+    <form method="post" class="mb-5">
       {% csrf_token %}
       <span class="badge bg-secondary">Order input:</span>
       Enter path format: [[0, 0], [1, 0]].
@@ -37,7 +37,7 @@
       </div>
       <button type="submit" class="btn btn-success">Update</button>
     </form>
-    <form method="post" class="mt-5, mb-5">
+    <form method="post" class="mb-5">
       {% csrf_token %}
       <div>
         Solve <a href="{% url 'python_problems:problem-detail' 'number-of-islands' 'Python' %}">Number of Islands</a>  and show path.

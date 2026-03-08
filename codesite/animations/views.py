@@ -105,6 +105,6 @@ class GridBfs(Grid):
 class Queue(TemplateView):
     template_name = "animations/queue.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+
+class Stack(TemplateView):
+    template_name = "animations/stack.html"

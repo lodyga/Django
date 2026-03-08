@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
    const order = JSON.parse(document.getElementById("order").textContent);
    const ROWS = JSON.parse(document.getElementById("rows").textContent);
    const COLS = JSON.parse(document.getElementById("cols").textContent);
+   const startBtn = document.getElementById("startBtn");
+   const resetBtn = document.getElementById("resetBtn");
 
    let isAnimating = true;
    const gridContainer = document.getElementById("grid");
@@ -17,8 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
          gridContainer.appendChild(cell);
       }
    }
-   document.getElementById("startBtn").addEventListener("click", startAnimation);
-   document.getElementById("resetBtn").addEventListener("click", resetAnimation);
+   startBtn.addEventListener("click", startAnimation);
+   resetBtn.addEventListener("click", resetAnimation);
 
    function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
