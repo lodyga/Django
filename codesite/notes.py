@@ -60,6 +60,15 @@ list(problem.solution_set.values_list("language__name", flat=True).distinct())
 
 
 # Bootstrap blue color: #0d6efd; color: var(--bs-primary);
+| Class             | Hex       | RGB                  |
+| ----------------- | --------- | -------------------- |
+| `.text-primary`   | `#0d6efd` | `rgb(13, 110, 253)`  |
+| `.text-secondary` | `#6c757d` | `rgb(108, 117, 125)` |
+| `.text-success`   | `#198754` | `rgb(25, 135, 84)`   |
+| `.text-danger`    | `#dc3545` | `rgb(220, 53, 69)`   |
+| `.text-warning`   | `#ffc107` | `rgb(255, 193, 7)`   |
+| `.text-info`      | `#0dcaf0` | `rgb(13, 202, 240)`  |
+
 
 # text
 darkModeLabel.textContent = 'Light\nMode';

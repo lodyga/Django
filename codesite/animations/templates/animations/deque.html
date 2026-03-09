@@ -1,0 +1,37 @@
+{% extends "core/base.html" %}
+{% block title %}
+  Deque Animation
+{% endblock title %}
+{% block head %}
+  {% load static %}
+  <link rel="stylesheet"
+        type="text/css"
+        href="{% static 'animations/deque.css' %}">
+  <script src="{% static 'animations/animate-deque.js' %}" defer></script>
+{% endblock head %}
+{% block content %}
+  <div class="deque-container">
+    <div class="col-auto text-center">
+      <h1>Deque Animation</h1>
+      <div class="deque-display" id="deque-display">
+        <!-- Deque elements will be added here -->
+      </div>
+      <div class="controls">
+        <div class="mb-2 mt-2">
+          <input type="text" id="char-input" maxlength="1" placeholder="X" value="6">
+          <button class="push-btn" id="push-left-btn">Push left</button>
+          <button class="push-btn" id="push-right-btn">Push right</button>
+        </div>
+        <div>
+          <button class="pop-btn" id="pop-left-btn">Pop left</button>
+          <button class="pop-btn" id="pop-right-btn">Pop right</button>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <p>
+          Search for problems with <a href="{% url 'python_problems:problem-index' %}?tag_id=33">queue</a> data structure.
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

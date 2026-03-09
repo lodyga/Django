@@ -108,3 +108,7 @@ class Queue(TemplateView):
 
 class Stack(TemplateView):
     template_name = "animations/stack.html"
+
+
+class Deque(TemplateView):
+    template_name = "animations/deque.html"

@@ -5,15 +5,32 @@ document.addEventListener('DOMContentLoaded', () => {
    const popBtn = document.getElementById('pop-btn');
    let stack = [];
 
-   for (const char of ['1', '2'])  {
+   function resizeElements() {
+      const elements = stackDisplay.children;
+      const num = elements.length;
+      if (num === 0) return;
+      const containerHeight = 600;
+      const totalMargin = 10 * num;
+      const availableHeight = containerHeight - totalMargin;
+      const size = Math.max(20, Math.min(50, availableHeight / num));
+      for (let el of elements) {
+         el.style.width = size + 'px';
+         el.style.height = size + 'px';
+         el.style.lineHeight = size + 'px';
+         el.style.fontSize = Math.max(12, size * 0.48) + 'px';
+      }
+   }
+
+   for (const char of ['1', '2', '3', '4', '5']) {
       stack.push(char);
       const element = document.createElement('div');
       element.className = 'stack-element entering';
       element.textContent = char;
       stackDisplay.prepend(element);
-         setTimeout(() => {
-            element.classList.remove('entering');
-         }, 10);
+      setTimeout(() => {
+         element.classList.remove('entering');
+         resizeElements();
+      }, 10);
    }
 
    pushBtn.addEventListener('click', () => {
@@ -26,8 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
          stackDisplay.prepend(element);
          setTimeout(() => {
             element.classList.remove('entering');
+            resizeElements();
          }, 10);
-         charInput.value = '';
       }
    });
 
@@ -39,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                stackDisplay.removeChild(lastElement);
                stack.pop();
+               resizeElements();
             }, 500);
          }
       }

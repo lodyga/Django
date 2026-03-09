@@ -10,4 +10,5 @@ urlpatterns = [
     path("grid_bfs", views.GridBfs.as_view(), name="grid-bfs"),
     path("queue", views.Queue.as_view(), name="animate-queue"),
     path("stack", views.Stack.as_view(), name="animate-stack"),
+    path("deque", views.Deque.as_view(), name="animate-deque"),
 ]

@@ -1,4 +1,4 @@
-.queue-container {
+.deque-container {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
@@ -24,15 +24,15 @@ button {
     cursor: pointer;
 }
 
-#push-btn {
+.push-btn {
     background-color: #198754;
 }
 
-#pop-btn {
+.pop-btn {
     background-color: #dc3545;
 }
 
-.queue-display {
+.deque-display {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -43,7 +43,7 @@ button {
     overflow: hidden;
 }
 
-.queue-element {
+.deque-element {
     display: inline-block;
     width: 50px;
     height: 50px;
@@ -58,12 +58,12 @@ button {
     transition: all 0.5s ease;
 }
 
-.queue-element.entering {
+.deque-element.entering {
     transform: scale(0);
     opacity: 0;
 }
 
-.queue-element.exiting {
+.deque-element.exiting {
     transform: scale(0);
     opacity: 0;
 }

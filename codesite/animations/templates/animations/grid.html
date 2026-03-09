@@ -53,6 +53,11 @@
       <button type="submit" class="btn btn-success">Solve & Update</button>
     </form>
     <div class="row mb-4">
+        <p>
+          Search for problems solved with <a href="{% url 'python_problems:problem-index' %}?tag_id=41">DFS</a> or <a href="{% url 'python_problems:problem-index' %}?tag_id=27">BFS</a> algorithms.
+        </p>
+      </div>
+    <div class="row mb-4">
       <span class="badge bg-secondary col-auto">Source code:</span>
       <textarea id="gridAlgorithmContentContainer">{{ source_code }}</textarea>
     </div>

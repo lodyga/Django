@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
    const popBtn = document.getElementById('pop-btn');
    let queue = [];
 
-   for (const char of ['1', '2'])  {
+   for (const char of ['1', '2', '3', '4', '5'])  {
       queue.push(char);
       const element = document.createElement('div');
       element.className = 'queue-element entering';
@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
          setTimeout(() => {
             element.classList.remove('entering');
          }, 10);
-         charInput.value = '';
       }
    });
 

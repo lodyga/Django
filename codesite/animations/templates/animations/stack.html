@@ -11,15 +11,22 @@
 {% endblock head %}
 {% block content %}
   <div class="stack-container">
-    <h1>Stack Animation</h1>
-    <div class="row justify-content-center mb-4">
-      <div class="col-auto stack-display" id="stack-display">
-        <!-- stack elements will be added here -->
+    <div class="col-auto text-center">
+      <h1>Stack Animation</h1>
+      <div class="row justify-content-center mb-4">
+        <div class="col-auto stack-display" id="stack-display">
+          <!-- Stack elements will be added here -->
+        </div>
+        <div class="col-auto controls">
+          <input type="text" id="char-input" maxlength="1" placeholder="X" value="6">
+          <button id="push-btn">Push</button>
+          <button id="pop-btn">Pop</button>
+        </div>
       </div>
-      <div class="col-auto controls">
-        <input type="text" id="char-input" maxlength="1" placeholder="X" value="3">
-        <button id="push-btn">Push</button>
-        <button id="pop-btn">Pop</button>
+      <div class="row mb-4">
+        <p>
+          Search for problems with <a href="{% url 'python_problems:problem-index' %}?tag_id=7">stack</a> data structure.
+        </p>
       </div>
     </div>
   </div>
