@@ -23,12 +23,11 @@
           </a>
         </div>
       {% endif %}
-      {% if settings.SOCIAL_AUTH_GOOGLE_KEY %}
+      {% if settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY %}
         <div class="col-auto">
           <a class="btn btn-warning mb-3"
              role="button"
-             {% comment %} href="{% url 'social:begin' 'google-oauth2' %}?next={{ next }}"> {% endcomment %}
-             href="{% url 'social:begin' 'google-oauth2' %}">
+             href="{% url 'social:begin' 'google-oauth2' %}?next={{ next }}">
             <i class="fa fa-google" aria-hidden="true"></i>
             Login with Google
           </a>

@@ -112,3 +112,7 @@ class Stack(TemplateView):
 
 class Deque(TemplateView):
     template_name = "animations/deque.html"
+
+
+class LinkedList(TemplateView):
+    template_name = "animations/linked_list.html"

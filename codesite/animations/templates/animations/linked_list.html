@@ -1,0 +1,37 @@
+{% extends "core/base.html" %}
+{% block title %}
+  Linked List Animation
+{% endblock title %}
+{% block head %}
+  {% load static %}
+  <link rel="stylesheet"
+        type="text/css"
+        href="{% static 'animations/linked-list.css' %}">
+  <script src="{% static 'animations/animate-linked-list.js' %}" defer></script>
+{% endblock head %}
+{% block content %}
+  <div class="container">
+    <div class="col-auto text-center">
+      <div class="linked-list-container row">
+        <h1>Linked List Animation</h1>
+        <div class="linked-list-display" id="linked-list-display">
+          <!-- Linked list nodes will be added here -->
+        </div>
+        <div class="controls">
+          <input type="text" id="char-input" maxlength="1" placeholder="X" value="6">
+          <button id="prepend-btn">Prepend</button>
+          <button id="append-btn">Append</button>
+          <button id="delete-head-btn">Delete head</button>
+          <button id="delete-tail-btn">Delete tail</button>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <p>
+          Search for problems with
+          <a href="{% url 'python_problems:problem-index' %}?tag_id=37">linked list</a>
+          data structure.
+        </p>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
