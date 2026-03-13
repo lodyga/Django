@@ -2,6 +2,7 @@
 Django settings for codesite project.
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -17,7 +18,7 @@ SECRET_KEY = 'django-insecure-(rb%k$#$!2p!)_!ob^=zjhj+48mbcxf9rx)i0vo4igx=txwb5r
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # When False encable static files handler
-DEBUG = False
+DEBUG = True if os.getenv("DJANGO_DEBUG", "False") == "True" else False
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -148,7 +149,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'productionfiles'  # for static files "STATIC_ROOT = BASE_DIR / 'static_collected'"
 # for global files, The search starts in the directories listed in STATICFILES_DIRS, using the order you have provided. Then, if the file is not found, the search continues in the static folder of each application.
 STATICFILES_DIRS = [
@@ -156,17 +157,21 @@ STATICFILES_DIRS = [
 ]
 
 
-
 # Configure the social login
+SOCIAL_AUTH_GITHUB_KEY = os.getenv("SOCIAL_AUTH_GITHUB_KEY")
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv("SOCIAL_AUTH_GITHUB_SECRET")
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
+
 try:
     from . import github_settings
-    SOCIAL_AUTH_GITHUB_KEY = github_settings.SOCIAL_AUTH_GITHUB_KEY
-    SOCIAL_AUTH_GITHUB_SECRET = github_settings.SOCIAL_AUTH_GITHUB_SECRET
-    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = github_settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
-    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = github_settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
+    SOCIAL_AUTH_GITHUB_KEY = SOCIAL_AUTH_GITHUB_KEY or github_settings.SOCIAL_AUTH_GITHUB_KEY
+    SOCIAL_AUTH_GITHUB_SECRET = SOCIAL_AUTH_GITHUB_SECRET or github_settings.SOCIAL_AUTH_GITHUB_SECRET
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = SOCIAL_AUTH_GOOGLE_OAUTH2_KEY or github_settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET or github_settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
     # SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = github_settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
-except:
-    print('When you want to use social login, please see code/github_settings.py')
+finally:
+    pass
 
 
 # Social

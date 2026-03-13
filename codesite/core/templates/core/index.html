@@ -17,9 +17,6 @@
               <a href="https://ukasz.eu.pythonanywhere.com/" target="_blank">PythonAnywhere (GitHub)</a>
             </li>
             <li>
-              <a href="https://proud-helena-ukasz-09eca8c8.koyeb.app/" target="_blank">Koyeb (Docker)</a>
-            </li>
-            <li>
               <a href="https://codesite.onrender.com/" target="_blank">Render (Docker)</a>
               <div>(Spinning up the service takes up to a minute.)</div>
             </li>
@@ -35,28 +32,17 @@
             <a href="{% url 'python_problems:problem-index' %}">Problems</a>
           </li>
           <ul>
-            <form method="get" action="{% url 'python_problems:problem-index' %}">
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="language_id" value="1">Python</button>
-              </li>
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="language_id" value="2">JavaScript</button>
-              </li>
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="language_id" value="6">Java</button>
-              </li>
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="language_id" value="7">C++</button>
-              </li>
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="language_id" value="3">Pandas</button>
-              </li>
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="language_id" value="4">MySQL</button>
-              </li>
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="language_id" value="5">PostgreSQL</button>
-              </li>
+            <form method="get"
+                  id="language"
+                  action="{% url 'python_problems:problem-index' %}">
+              {% for language in languages %}
+                <li>
+                  <button class="btn btn-link p-0"
+                          name="language_id"
+                          type="submit"
+                          value="{{ language.id }}">{{ language.name }}</button>
+                </li>
+              {% endfor %}
             </form>
           </ul>
         </ul>
@@ -98,87 +84,48 @@
           </ul>
         </ul>
         <ul>
-          <form method="get" action="{% url 'python_problems:problem-index' %}">
+          <li>
+            <a href="{% url 'python_problems:problem-index' %}">Admin</a>
+          </li>
+          <ul>
             <li>
-              <a href="{% url 'python_problems:problem-index' %}">Search problems by</a>
+              <a href="{% url 'python_problems:problem-create' %}">Create a problem</a>
             </li>
-            <ul>
-              <li>
-                <button type="submit"
-                        class="btn btn-link p-0"
-                        name="query_text"
-                        value="Palindrome">Query: Palindrome</button>
-              </li>
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="difficulty_id" value="1">Difficulty: Easy</button>
-              </li>
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="tag_id" value="2">Tag: Array</button>
-              </li>
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="language_id" value="1">Language: Python</button>
-              </li>
-            </ul>
             <li>
-              <a href="{% url 'python_problems:problem-index' %}">Display settings</a>
+              <a href="{% url 'python_problems:solution-create' %}">Create a solution</a>
             </li>
-            <ul>
-              <li>
-                <button type="submit" class="btn btn-link p-0" name="order_by" value="title">Order_by: "title"</button>
-              </li>
-              <li>
-                <button type="submit"
-                        class="btn btn-link p-0"
-                        name="problems_per_page"
-                        value="7">Problems per page: 7</button>
-              </li>
-            </ul>
+            <li>
+              <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
+            </li>
+            <li>
+              <a href="{% url 'python_problems:language-create' %}">Add a language</a>
+            </li>
+            <li>
+              <a href="{% url 'python_problems:tag-index' %}">Tags</a>
+            </li>
+            <li>
+              <a href="{% url 'python_problems:tag-graph' %}">Statistics</a>
+            </li>
+            <li>
+              <a href="{% url 'python_problems:api-root' %}">REST API</a>
+            </li>
           </ul>
-        </form>
-      </ul>
-    </ul>
-    <ul>
-      <li>
-        <a href="{% url 'python_problems:problem-index' %}">Admin</a>
-      </li>
-      <ul>
-        <li>
-          <a href="{% url 'python_problems:problem-create' %}">Create a problem</a>
-        </li>
-        <li>
-          <a href="{% url 'python_problems:solution-create' %}">Create a solution</a>
-        </li>
-        <li>
-          <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
-        </li>
-        <li>
-          <a href="{% url 'python_problems:language-create' %}">Add a language</a>
-        </li>
-        <li>
-          <a href="{% url 'python_problems:tag-index' %}">Tags</a>
-        </li>
-        <li>
-          <a href="{% url 'python_problems:tag-graph' %}">Statistics</a>
-        </li>
-        <li>
-          <a href="{% url 'python_problems:api-root' %}">REST API</a>
-        </li>
-      </ul>
-    </ul>
-    <ul>
-      <li>
-        Forums
+        </ul>
         <ul>
           <li>
-            <a href="{% url 'forums:bug-forum' %}">Report a bug</a>
-          </li>
-          <li>
-            <a href="{% url 'forums:feature-forum' %}">Request a feature</a>
+            Forums
+            <ul>
+              <li>
+                <a href="{% url 'forums:bug-forum' %}">Report a bug</a>
+              </li>
+              <li>
+                <a href="{% url 'forums:feature-forum' %}">Request a feature</a>
+              </li>
+            </ul>
           </li>
         </ul>
-      </li>
-    </ul>
+      </div>
+      <div class="col-2"></div>
+    </div>
   </div>
-</div>
-</div>
 {% endblock content %}

@@ -1,7 +1,7 @@
 {
   "configurations": [
     {
-      "name": "Django Test",
+      "name": "Django Tests",
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/manage.py",
@@ -12,7 +12,7 @@
       "justMyCode": false
     },
     {
-      "name": "Docker: Django",
+      "name": "Docker: Build Django Container",
       "type": "docker",
       "request": "launch",
       "preLaunchTask": "docker-run: debug",

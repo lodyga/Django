@@ -17,7 +17,7 @@
         <div class="col-auto">
           <a class="btn btn-info mb-3"
              role="button"
-             href="{% url 'social:begin' 'github' %}?next={{ next }}">
+             href="{% if request.user.is_authenticated %} {% url 'logout' %}?next={% url 'social:begin' 'github' %}?next={{ next }} {% else %} {% url 'social:begin' 'github' %}?next={{ next }} {% endif %}">
             <i class="fa fa-github" aria-hidden="true"></i>
             Login with GitHub
           </a>
@@ -27,7 +27,7 @@
         <div class="col-auto">
           <a class="btn btn-warning mb-3"
              role="button"
-             href="{% url 'social:begin' 'google-oauth2' %}?next={{ next }}">
+             href="{% if request.user.is_authenticated %} {% url 'logout' %}?next={% url 'social:begin' 'google-oauth2' %}?next={{ next }} {% else %} {% url 'social:begin' 'google-oauth2' %}?next={{ next }} {% endif %}">
             <i class="fa fa-google" aria-hidden="true"></i>
             Login with Google
           </a>

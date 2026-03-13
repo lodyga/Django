@@ -1,7 +1,4 @@
-# change SOCIAL_AUTH_GITHUB_KEY and SOCIAL_AUTH_GITHUB_SECRET in github_settings.py before building
-
-# For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.12-slim
+FROM python:3.12-sli
 
 EXPOSE 8000
 
@@ -33,6 +30,9 @@ RUN python -m pip install --upgrade pip && \
     python -m pip install -r requirements.txt
 
 COPY . /app
+
+# Collect static files for WhiteNoise
+RUN python manage.py collectstatic --noinput
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers

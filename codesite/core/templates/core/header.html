@@ -53,143 +53,12 @@
             Python
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            {% comment %} <li>
-              <a class="dropdown-item {% if request.get_full_path == python_index_url %}active{% endif %}"
-                 href="{{ python_index_url }}">Python Problems</a>
-            </li> {% endcomment %}
-            {% comment %} todo {% endcomment %}
             <li>     
               <button class="btn dropdown-item" 
                       type="submit" 
                       name="language_id" 
                       value="1">
-                Python
-              </button>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle 
-                   {% if language_id == 2 %}active{% endif %}"
-             href="#"
-             id="navbarDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-expanded="false">
-            JavaScript
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <button class="btn dropdown-item" 
-                      type="submit" 
-                      name="language_id" 
-                      value="2">
-                JavaScript
-              </button>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle 
-                   {% if language_id == 6 %}active{% endif %}"
-             href="#"
-             id="navbarDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-expanded="false">
-            Java
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <button class="btn dropdown-item" 
-                      type="submit" 
-                      name="language_id" 
-                      value="6">
-                Java
-              </button>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle 
-                   {% if language_id == 7 %}active{% endif %}"
-             href="#"
-             id="navbarDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-expanded="false">
-            C++
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <button class="btn dropdown-item" 
-                      type="submit" 
-                      name="language_id" 
-                      value="7">
-                C++
-              </button>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle 
-                   {% if language_id == 3 %}active{% endif %}"
-             href="#"
-             id="navbarDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-expanded="false">
-            Pandas
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <button class="btn dropdown-item" 
-                      type="submit" 
-                      name="language_id" 
-                      value="3">
-                Pandas
-              </button>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle 
-                   {% if language_id == 4 %}active{% endif %}"
-             href="#"
-             id="navbarDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-expanded="false">
-            MySQL
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <button class="btn dropdown-item" 
-                      type="submit" 
-                      name="language_id" 
-                      value="4">
-                MySQL
-              </button>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle 
-                   {% if language_id == 5 %}active{% endif %}"
-             href="#"
-             id="navbarDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-expanded="false">
-            PostgreSQL
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <button class="btn dropdown-item" 
-                      type="submit" 
-                      name="language_id" 
-                      value="5">
-                PostgreSQL
+                don't click here
               </button>
             </li>
           </ul>
@@ -261,15 +130,21 @@
             {% if user.is_authenticated %}
               <li>
                 <a class="dropdown-item"
-                   href="{% url 'logout' %}?next={% url 'core:index' %}">Logout</a>
+                  href="{% url 'logout' %}?next={{ next }}">Logout</a>
               </li>
             {% else %}
               <li>
                 <a class="dropdown-item"
-                   href="{% url 'login' %}?next={% url 'core:index' %}">Login</a>
+                   href="{% url 'login' %}?next={{ next }}">Login</a>
               </li>
             {% endif %}
           </ul>
+        </li>
+        <li class="nav-item">
+          <a href="{{ home_url }}"
+             class="nav-link {% if request.get_full_path == home_url %}active{% endif %}">
+            Site Index
+          </a>
         </li>
       </ul>
       
