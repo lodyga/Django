@@ -2,6 +2,12 @@
 {% block title %}
   Problem
 {% endblock title %}
+{% block head %}
+  {% load static %}
+  <link rel="stylesheet"
+        type="text/css"
+        href="{% static 'python_problems/styles.css' %}">
+{% endblock head %}
 {% block content %}
   <div class="container-fluid m-2">
     <div class="row">

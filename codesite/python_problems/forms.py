@@ -6,7 +6,7 @@ from .models import Problem, Solution
 class ProblemForm(forms.ModelForm):
     class Meta:
         model = Problem
-        fields = ["title", "url", "difficulty", "tags", "description"]
+        fields = ["title", "url", "difficulty", "description", "tags"]
         # exclude = ["slug", "owner"]
 
 

@@ -74,7 +74,6 @@ class ProblemIndexView(ListView):
             .annotate(solution_count=Count("solution"))
             .order_by("-solution_count")
         )
-
         context["difficulty_id"] = int(
             self.request.GET.get("difficulty_id", 0))
         context["language_id"] = int(self.request.GET.get("language_id", 0))
@@ -82,7 +81,8 @@ class ProblemIndexView(ListView):
         context["query_text"] = self.request.GET.get("query_text", "")
         context["order_by"] = self.request.GET.get("order_by", "created_at")
         context["problems_per_page"] = self.get_paginate_by(
-            self.get_queryset())
+            self.get_queryset()
+        )
         context["problems_per_page_options"] = [
             5, 6, 7, 8, 10, 15, 20, 50, 100, len(Problem.objects.all())]
 
@@ -108,9 +108,7 @@ class ProblemDetailView(DetailView):
 
         # Get current language from URL
         language_name = self.kwargs.get("language")
-
-        # get the language model  # Language.objects.get(name=language_name)
-        language = get_object_or_404(Language, name=language_name)
+        language = Language.objects.get(name=language_name)
         del language_name
         language_id = language.id
 
@@ -118,7 +116,7 @@ class ProblemDetailView(DetailView):
             problem=problem,
             language=language)
 
-        # Get the list of the owners who have solutions for the problem and language
+        # Get the list of the owners who have solutions for the problem and language;
         owners = User.objects.filter(
             id__in=solutions.values_list("owner", flat=True))
 
@@ -127,9 +125,9 @@ class ProblemDetailView(DetailView):
         owner_id = owners.first().id
 
         # Get owner from owner id.
-        owner = get_object_or_404(User, id=owner_id)
+        owner = User.objects.get(id=owner_id)
 
-        # Get all languages for owners problem
+        # Get all languages for owners problem.
         language_ids = (
             Solution.objects
             .filter(problem=problem, owner=owner)
@@ -173,7 +171,7 @@ class ProblemDetailView(DetailView):
             "raw_test_cases": solution.test_cases,
             "related_problems": related_problems,
             "solution": solution,
-            "solution_languages": solution_languages,  # Languages vailable in the dropdown
+            "solution_languages": solution_languages,
             "source_code": source_code,
             "tag_list": tag_list,
             "test_cases": test_cases,

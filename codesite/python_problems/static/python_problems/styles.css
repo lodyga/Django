@@ -113,3 +113,9 @@
   font-size: 0.8em;
   margin-left: 0.3em;
 }
+
+
+
+#id_tags.selectmultiple {
+  min-height: 32rem;
+}
