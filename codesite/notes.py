@@ -136,6 +136,15 @@ ContentType.objects.all().delete()
 py manage.py loaddata db.json
 
 
+python manage.py dumpdata \
+  --natural-foreign \
+  --natural-primary \
+  --exclude contenttypes \
+  --exclude auth.permission \
+  --exclude sessions \
+  > data.json
+
+
 # Run and Debug create a lunch.json file, creates .vscode/lunch.json
 
 # Docker:Add Docker Files to Workspace, creates Dockerfile, .dockerignore, .vscode/lunch.json, .vscode/tasks.json

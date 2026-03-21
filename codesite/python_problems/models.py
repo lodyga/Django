@@ -54,7 +54,7 @@ class Language(models.Model):
 
 class Problem(models.Model):
     title = models.CharField(unique=True, max_length=200)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, max_length=100)
     tags = models.ManyToManyField("Tag")
     difficulty = models.ForeignKey(
         Difficulty,

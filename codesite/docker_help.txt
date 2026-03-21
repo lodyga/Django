@@ -16,8 +16,11 @@ $ docker run --rm -d -p 8000:8000/tcp lodyga/codesite:latest
 docker rmi IMAGE ID
 docker rmi REPOSITORY:TAG
 
-# List the running containers
+# List all running containers
 docker ps
+
+# List all containers
+docker ps -a
 
 # Stop the running container:
 docker stop <container_id>

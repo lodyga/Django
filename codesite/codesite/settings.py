@@ -26,7 +26,7 @@ ALLOWED_HOSTS = [
     "localhost",  # local Docker
     "codesite.onrender.com",  # Docker container on Render
     ".koyeb.app",  # Allows all subdomains of koyeb.app
-    "testserver", # Testing in Activity Bar
+    "testserver",  # Testing in Activity Bar
 ]
 
 
@@ -68,14 +68,14 @@ TAGGIT_CASE_INSENSITIVE = True
 MIDDLEWARE = [
     # "debug_toolbar.middleware.DebugToolbarMiddleware",  # Debug Toolbar
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # static files handler
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'social_django.middleware.SocialAuthExceptionMiddleware',   # social login
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # static files handler
+    'social_django.middleware.SocialAuthExceptionMiddleware',  # social login
 
 
 ]
@@ -108,12 +108,31 @@ WSGI_APPLICATION = 'codesite.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+    # sqlite3
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    
+    # MySQL
+    'default2': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'codesite_db',
+        'USER': 'root',
+        'PASSWORD': 'password',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    },
+
+    # MySQL on pythonanywhere
+    'default3': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ukasz$codesite_db',
+        'USER': 'ukasz',
+        'PASSWORD': 'password',
+        'HOST': 'ukasz.mysql.eu.pythonanywhere-services.com',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -150,18 +169,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'productionfiles'  # for static files "STATIC_ROOT = BASE_DIR / 'static_collected'"
+# for static files "STATIC_ROOT = BASE_DIR / 'static_collected'"
+STATIC_ROOT = BASE_DIR / 'productionfiles'
 # for global files, The search starts in the directories listed in STATICFILES_DIRS, using the order you have provided. Then, if the file is not found, the search continues in the static folder of each application.
-STATICFILES_DIRS = [
-    BASE_DIR / 'mystaticfiles'
-]
+STATICFILES_DIRS = [BASE_DIR / 'mystaticfiles']
+# Cache busting. Forces browsers to download the latest version of files (CSS, JavaScript, images).
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 
 # Configure the social login
 SOCIAL_AUTH_GITHUB_KEY = os.getenv("SOCIAL_AUTH_GITHUB_KEY")
 SOCIAL_AUTH_GITHUB_SECRET = os.getenv("SOCIAL_AUTH_GITHUB_SECRET")
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv(
+    "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
 try:
     from . import github_settings
