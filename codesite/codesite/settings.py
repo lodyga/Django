@@ -170,7 +170,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 # for static files "STATIC_ROOT = BASE_DIR / 'static_collected'"
-STATIC_ROOT = BASE_DIR / 'productionfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 # for global files, The search starts in the directories listed in STATICFILES_DIRS, using the order you have provided. Then, if the file is not found, the search continues in the static folder of each application.
 STATICFILES_DIRS = [BASE_DIR / 'mystaticfiles']
 # Cache busting. Forces browsers to download the latest version of files (CSS, JavaScript, images).

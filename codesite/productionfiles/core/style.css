@@ -1,7 +1,0 @@
-/* Hide the "Dark Mode" checkbox visually */
-.form-check-input {
-    position: absolute;
-    opacity: 0;
-    height: 0;
-    width: 0;
-}

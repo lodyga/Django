@@ -11,7 +11,7 @@
     "python.envFile": "${workspaceFolder}/.env",
     "search.exclude": {
         "djangoenv/**": true,
-        "productionfiles/admin/**": true,
+        "staticfiles/admin/**": true,
         "fixtures/**": true
     },
     "python.defaultInterpreterPath": "/home/ukasz/Documents/IT/Django/codesite/djangoenv/bin/python"

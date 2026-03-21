@@ -1,0 +1,22 @@
+#grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 60px);
+  gap: 5px;
+  margin-bottom: 20px;
+}
+
+.cell {
+  width: 60px;
+  height: 60px;
+  background-color: #6c757d;
+  border: 1px solid black;
+  transition: background-color 0.3s;
+}
+
+.visiting {
+  background-color: #ffc107;
+}
+
+.visited {
+  background-color: #0d6efd;
+}

@@ -1,0 +1,71 @@
+.stack-container {
+    max-height: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+#char-input {
+    padding: 10px;
+    font-size: 16px;
+    width: 50px;
+    text-align: center;
+    background-color: #6c757d;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+#push-btn {
+    background-color: #198754;
+}
+
+#pop-btn {
+    background-color: #dc3545;
+}
+
+.stack-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100px;
+    max-height: 600px;
+    border: 2px solid #333;
+    background-color: #212529;
+    position: relative;
+    overflow: auto;
+}
+
+.stack-element {
+    width: 50px;
+    height: 50px;
+    background-color: #0d6efd;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 50px;
+    margin: 5px 0;
+    border-radius: 5px;
+    transition: all 0.5s ease;
+    flex-shrink: 1;
+    min-height: 20px;
+}
+
+.stack-element.entering {
+    transform: scale(0);
+    opacity: 0;
+}
+
+.stack-element.exiting {
+    transform: scale(0);
+    opacity: 0;
+}

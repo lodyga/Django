@@ -1,0 +1,112 @@
+.linked-list-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+#linked-list-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 120px;
+    border: 2px solid #333;
+    background-color: #212529;
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 14px;
+}
+
+.controls {
+    margin-top: 14px;
+    margin-bottom: 20px;
+}
+
+#char-input {
+    padding: 10px;
+    font-size: 16px;
+    width: 50px;
+    text-align: center;
+    background-color: #6c757d;
+}
+
+button {
+    padding: 10px 16px;
+    font-size: 16px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+#prepend-btn,
+#append-btn {
+    background-color: #198754;
+}
+
+#delete-head-btn,
+#delete-tail-btn {
+    background-color: #dc3545;
+}
+
+.list-item {
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.5s ease;
+}
+
+.node-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.node-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: #ffc107;
+    min-height: 14px;
+    margin-bottom: 4px;
+}
+
+.node {
+    width: 54px;
+    height: 54px;
+    background-color: #0d6efd;
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 54px;
+    border-radius: 6px;
+}
+
+.arrow {
+    color: #f8f9fa;
+    font-size: 24px;
+    margin: 0 8px;
+}
+
+.null-label {
+    color: #adb5bd;
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.list-item.entering {
+    transform: scale(0);
+    opacity: 0;
+}
+
+.list-item.exiting {
+    transform: scale(0);
+    opacity: 0;
+}
+
+@media (max-width: 768px) {
+    button {
+        margin-top: 8px;
+        margin-left: 6px;
+        padding: 9px 12px;
+        font-size: 14px;
+    }
+}
