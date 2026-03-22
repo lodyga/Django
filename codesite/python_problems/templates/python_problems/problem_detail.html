@@ -14,7 +14,6 @@
   <script src="{% static 'python_problems/problem-info.js' %}" defer></script>
   <script src="{% static 'python_problems/problem-description.js' %}" defer></script>
   <script src="{% static 'python_problems/problem-solution.js' %}" defer></script>
-  <script src="{% static 'python_problems/animate-grid.js' %}" defer></script>
   {# Store data by id. #}
   {{ test_cases|length|json_script:"testCaseLength" }}
   {{ language.id|json_script:"languageId" }}

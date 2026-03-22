@@ -104,17 +104,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'codesite.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
     # sqlite3
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-    
-    # MySQL
+
+    # MySQL on localhost
     'default2': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'codesite_db',
@@ -129,8 +126,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ukasz$codesite_db',
         'USER': 'ukasz',
-        'PASSWORD': 'password',
+        'PASSWORD': 'codesite',
         'HOST': 'ukasz.mysql.eu.pythonanywhere-services.com',
+        'PORT': '3306',
     }
 }
 

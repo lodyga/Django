@@ -145,9 +145,12 @@ python manage.py dumpdata \
   > data.json
 
 
-# Run and Debug create a lunch.json file, creates .vscode/lunch.json
+# Active database backend at runtime.
+$ python manage.py shell
+>> from django.db import connection
+>> print(connection.vendor)
 
-# Docker:Add Docker Files to Workspace, creates Dockerfile, .dockerignore, .vscode/lunch.json, .vscode/tasks.json
+
 
 
 
