@@ -25,7 +25,7 @@ ALLOWED_HOSTS = [
     "ukasz.eu.pythonanywhere.com",
     "localhost",  # local Docker
     "codesite.onrender.com",  # Docker container on Render
-    ".koyeb.app",  # Allows all subdomains of koyeb.app
+    # ".koyeb.app",  # Allows all subdomains of koyeb.app
     "testserver",  # Testing in Activity Bar
 ]
 
@@ -51,18 +51,14 @@ INSTALLED_APPS = [
     # Apps
     "core",
     "python_problems",
-    "sql_problems",
+    # "sql_problems",
     "forums",
     "animations",
-
 ]
 
-# When we get to tagging
 
-# When we get to crispy forms :)
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
-
 TAGGIT_CASE_INSENSITIVE = True
 
 MIDDLEWARE = [
@@ -76,8 +72,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',  # social login
-
-
 ]
 
 ROOT_URLCONF = 'codesite.urls'

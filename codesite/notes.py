@@ -68,13 +68,17 @@ list(problem.solution_set.values_list("language__name", flat=True).distinct())
 | `.text-success`   | `#198754` | `rgb(25, 135, 84)`   |
 | `.text-danger`    | `#dc3545` | `rgb(220, 53, 69)`   |
 | `.text-warning`   | `#ffc107` | `rgb(255, 193, 7)`   |
+
 | `.text-info`      | `#0dcaf0` | `rgb(13, 202, 240)`  |
 
 
-# text
-darkModeLabel.textContent = 'Light\nMode';
-darkModeLabel.innerText = 'Light\nMode';
-darkModeLabel.innerHTML = 'Light\nMode';
+
+pip install -r /path/to/requirements.txt
+
+
+
+
+
 
 # markdown, pygments.css
 <link rel="stylesheet" href="{% static 'css/pygments.css' %}">
@@ -127,29 +131,32 @@ py manage.py load_db fixtures/db_data.json
 
 # backup/restore db without a script
 # backup
-py manage.py dumpdata > db.json
+py manage.py dumpdata > data.json
 # restore
 # To load data without load_db.py first delete ContentType after migrate
 from django.contrib.contenttypes.models import ContentType
 # Delete all content types
 ContentType.objects.all().delete()
-py manage.py loaddata db.json
+py manage.py loaddata data.json
 
 
+# Worked for MySQL
 python manage.py dumpdata \
   --natural-foreign \
   --natural-primary \
   --exclude contenttypes \
-  --exclude auth.permission \
   --exclude sessions \
+  --exclude auth.permission \
   > data.json
 
+# Worked for PostqreSQL
+python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.permission > data.json
 
 # Active database backend at runtime.
 $ python manage.py shell
 >> from django.db import connection
 >> print(connection.vendor)
-
+>> print(connection.settings_dict)
 
 
 

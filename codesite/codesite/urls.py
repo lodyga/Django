@@ -10,7 +10,7 @@ urlpatterns = [
     re_path(r"^oauth/", include("social_django.urls", namespace="social")),
     path("", include("core.urls")),
     path("problems/", include("python_problems.urls")),
-    path("sql/", include("sql_problems.urls")),
+    # path("sql/", include("sql_problems.urls")),
     path("forums/", include("forums.urls")),
     path("animations/", include("animations.urls")),
 ]
