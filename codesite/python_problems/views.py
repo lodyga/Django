@@ -152,7 +152,7 @@ class ProblemDetailView(DetailView):
         related_problems = (
             Problem.objects
             .annotate(common_tags=common_tags)
-            .filter(common_tags__gte=2)
+            .filter(common_tags__gte=3)
             .exclude(pk=problem.pk)
             .distinct())
 
