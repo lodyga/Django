@@ -3,10 +3,10 @@ __pycache__
 .DS_Store
 db.sqlite3
 *.pyc
-djangoenv/
-github_settings.py
-rapidapi_auth.py
-cohere_auth.py
-judge0_auth.py
+django6env/
+auth/
+judge0*/
+reqirements42.txt
 temp.py
-temp2.py
+temp.md
+data.json

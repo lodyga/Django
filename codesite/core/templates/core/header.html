@@ -129,8 +129,10 @@
             </li>
             {% if user.is_authenticated %}
               <li>
-                <a class="dropdown-item"
-                  href="{% url 'logout' %}?next={{ next }}">Logout</a>
+                <form method="post" action="{% url 'logout' %}?next={{ next }}">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item">Logout</button>
+                </form>
               </li>
             {% else %}
               <li>
@@ -184,8 +186,10 @@
       <ul class="navbar-nav">
         {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link"
-               href="{% url 'logout' %}?next={% url 'core:index' %}">Logout</a>
+            <form method="post" action="{% url 'logout' %}?next={% url 'core:index' %}">
+              {% csrf_token %}
+              <button type="submit" class="nav-link btn btn-link p-0">Logout</button>
+            </form>
           </li>
         {% else %}
           <li class="nav-item">

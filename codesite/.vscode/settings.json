@@ -14,5 +14,12 @@
         "staticfiles/admin/**": true,
         "fixtures/**": true
     },
-    "python.defaultInterpreterPath": "/home/ukasz/Documents/IT/Django/codesite/djangoenv/bin/python"
+    "python.defaultInterpreterPath": "/home/ukasz/Documents/IT/Django/codesite/django6env/bin/python",
+    "python-envs.pythonProjects": [
+        {
+            "path": "manage.py",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ]
 }

@@ -2,7 +2,7 @@ import json
 from django.shortcuts import render
 from django.views import View
 from django.views.generic import TemplateView
-from python_problems.static.python_problems.scripts import execute_code
+from python_problems.scripts import execute_code
 from . import grid_dfs, grid_bfs
 import inspect  # the file contents as a string
 

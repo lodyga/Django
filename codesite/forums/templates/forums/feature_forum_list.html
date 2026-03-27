@@ -31,7 +31,10 @@
         <p>
           {% if user.is_authenticated %}
             <a href="{% url 'forums:feature-forum-create' %}">Request a feature</a> |
-            <a href="{% url 'logout' %}?next={% url 'forums:feature-forum' %}">Logout</a>
+            <form method="post" action="{% url 'logout' %}?next={% url 'forums:feature-forum' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-link p-0">Logout</button>
+            </form>
           {% else %}
             <a href="{% url 'login' %}?next={% url 'forums:feature-forum' %}">Login</a>
             to request a feature.

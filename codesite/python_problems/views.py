@@ -11,7 +11,7 @@ from rest_framework import viewsets
 from .forms import *
 from .models import *
 from .serializers import *
-from .static.python_problems.scripts import *
+from .scripts import *
 
 
 def tag_graph_view(request):

@@ -1,36 +1,23 @@
-"""
-Django settings for codesite project.
-"""
-
 import os
+from .auth.secret_key import SECRET_KEY
+from .auth import databases
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 APP_NAME = "Codesite"
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(rb%k$#$!2p!)_!ob^=zjhj+48mbcxf9rx)i0vo4igx=txwb5r'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-# When False encable static files handler
-DEBUG = True if os.getenv("DJANGO_DEBUG", "False") == "True" else False
+# When False enable static files handler.
+DEBUG = True #if os.getenv("DJANGO_DEBUG", "False") == "True" else False
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "ukasz.eu.pythonanywhere.com",
     "localhost",  # local Docker
     "codesite.onrender.com",  # Docker container on Render
-    # ".koyeb.app",  # Allows all subdomains of koyeb.app
     "testserver",  # Testing in Activity Bar
 ]
-
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -55,7 +42,6 @@ INSTALLED_APPS = [
     "forums",
     "animations",
 ]
-
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -87,7 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.settings',      # Add context_processors.py to core dir
+                'core.context_processors.settings',  # Add context_processors.py to core dir
                 'social_django.context_processors.backends',  # Social
                 'social_django.context_processors.login_redirect',  # Social
             ],
@@ -103,28 +89,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    },
-
-    # MySQL on localhost
-    'default2': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'codesite_db',
-        'USER': 'root',
-        'PASSWORD': 'password',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-    },
-
-    # MySQL on pythonanywhere
-    'default3': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ukasz$codesite_db',
-        'USER': 'ukasz',
-        'PASSWORD': 'codesite',
-        'HOST': 'ukasz.mysql.eu.pythonanywhere-services.com',
-        'PORT': '3306',
     }
 }
+if hasattr(databases, "DATABASES"):
+    DATABASES.update(databases.DATABASES)
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -144,16 +113,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -162,9 +127,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 # for static files "STATIC_ROOT = BASE_DIR / 'static_collected'"
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Changed dir because of nginx directory permissions.
+STATIC_ROOT = "/var/www/codesite/static"
 # for global files, The search starts in the directories listed in STATICFILES_DIRS, using the order you have provided. Then, if the file is not found, the search continues in the static folder of each application.
-STATICFILES_DIRS = [BASE_DIR / 'mystaticfiles']
+# STATICFILES_DIRS = [BASE_DIR / 'mystaticfiles']
 # Cache busting. Forces browsers to download the latest version of files (CSS, JavaScript, images).
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
@@ -177,24 +144,19 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv(
     "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
 try:
-    from . import github_settings
-    SOCIAL_AUTH_GITHUB_KEY = SOCIAL_AUTH_GITHUB_KEY or github_settings.SOCIAL_AUTH_GITHUB_KEY
-    SOCIAL_AUTH_GITHUB_SECRET = SOCIAL_AUTH_GITHUB_SECRET or github_settings.SOCIAL_AUTH_GITHUB_SECRET
-    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = SOCIAL_AUTH_GOOGLE_OAUTH2_KEY or github_settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
-    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET or github_settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
-    # SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = github_settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
+    from .auth import social_auth
+    SOCIAL_AUTH_GITHUB_KEY = SOCIAL_AUTH_GITHUB_KEY or social_auth.SOCIAL_AUTH_GITHUB_KEY
+    SOCIAL_AUTH_GITHUB_SECRET = SOCIAL_AUTH_GITHUB_SECRET or social_auth.SOCIAL_AUTH_GITHUB_SECRET
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = SOCIAL_AUTH_GOOGLE_OAUTH2_KEY or social_auth.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET or social_auth.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
+    # SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = social_auth.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
 finally:
     pass
-
 
 # Social
 AUTHENTICATION_BACKENDS = (
     "social_core.backends.github.GithubOAuth2",
     "social_core.backends.google.GoogleOAuth2",
-    # "social_core.backends.google_onetap.GoogleOneTap",
-    # "social_core.backends.twitter.TwitterOAuth",
-    # "social_core.backends.facebook.FacebookOAuth2",
-
     "django.contrib.auth.backends.ModelBackend",
 )
 

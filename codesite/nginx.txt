@@ -1,0 +1,94 @@
+# /etc/systemd/system/codesite.service
+[Service]
+User=ukasz
+Group=www-data
+WorkingDirectory=/home/ukasz/Documents/IT/Django/codesite
+Environment="DJANGO_DEBUG=False"
+Environment="PYTHONPATH=/home/ukasz/Documents/IT/Django/codesite"
+
+RuntimeDirectory=codesite
+RuntimeDirectoryMode=775
+
+ExecStart=/home/ukasz/Documents/IT/Django/codesite/django6env/bin/gunicorn \
+  --workers 3 \
+  --bind unix:/run/codesite/codesite.sock \
+  codesite.wsgi:application
+
+
+# /etc/nginx/conf.d/codesite.conf
+server {
+    listen 80;
+    server_name 127.0.0.1;
+
+    location /static/ {
+        alias /home/ukasz/Documents/IT/Django/codesite/staticfiles/;
+        access_log off;
+        expires 30d;
+    }
+
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass http://unix:/run/codesite/codesite.sock;
+    }
+}
+
+
+source djangoenv/bin/activate
+pip install gunicorn
+python manage.py collectstatic
+gunicorn codesite.wsgi
+gunicorn --bind 127.0.0.1:8001 codesite.wsgi
+
+# /etc/systemd/system/codesite.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now codesite
+sudo systemctl status codesite
+
+# /etc/nginx/conf.d/codesite.conf
+sudo nginx -t
+sudo systemctl reload nginx
+
+
+
+
+sudo systemctl start nginx
+sudo systemctl status nginx
+sudo systemctl reload nginx
+sudo systemctl enable nginx
+
+sudo systemctl is-enabled nginx
+sudo systemctl status nginx
+
+
+sudo nginx -t
+sudo systemctl reload nginx
+
+curl -I http://127.0.0.1/
+curl -I http://127.0.0.1/static/admin/css/base.css
+sudo systemctl status codesite
+
+
+
+sudo systemctl daemon-reload
+sudo systemctl restart codesite
+sudo systemctl status codesite --no-pager
+sudo nginx -t
+sudo systemctl reload nginx
+
+
+sudo nginx -t
+sudo systemctl start nginx
+sudo systemctl status nginx
+
+
+
+
+sudo chown -R ukasz:ukasz /var/www/codesite
+python manage.py collectstatic
+
+sudo chown -R nginx:nginx /var/www/codesite
+sudo chmod -R 755 /var/www/codesite
+sudo -u nginx /home/ukasz/Documents/IT/Django/codesite/django6env/bin/python /home/ukasz/Documents/IT/Django/codesite/manage.py collectstatic
