@@ -9,7 +9,7 @@ APP_NAME = "Codesite"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # When False enable static files handler.
-DEBUG = True #if os.getenv("DJANGO_DEBUG", "False") == "True" else False
+DEBUG = True if os.getenv("DJANGO_DEBUG", "False") == "True" else False
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -136,7 +136,7 @@ STATIC_ROOT = "/var/www/codesite/static"
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 
-# Configure the social login
+# Configure the social login.
 SOCIAL_AUTH_GITHUB_KEY = os.getenv("SOCIAL_AUTH_GITHUB_KEY")
 SOCIAL_AUTH_GITHUB_SECRET = os.getenv("SOCIAL_AUTH_GITHUB_SECRET")
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
