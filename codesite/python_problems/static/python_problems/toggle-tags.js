@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const aretagsVisible = localStorage.getItem('tagsVisible');
-  const toggleButton = document.getElementById('toggleTags');
+  const areTagsVisible = localStorage.getItem('tagsVisible');
+  const toggleTagsButton = document.getElementById('toggleTagsButton');
 
-  if (aretagsVisible == 'true') {
+  if (areTagsVisible == 'true') {
     toggleTags();
   }
 
@@ -11,15 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const tag of tags) {
       if (tag.style.display === 'none') {
         tag.style.display = 'inline-block';
-        toggleButton.textContent = 'Hide tags'
+        toggleTagsButton.textContent = 'Hide tags'
         localStorage.setItem('tagsVisible', 'true')
       } else {
         tag.style.display = 'none';
-        toggleButton.textContent = 'Show tags'
+        toggleTagsButton.textContent = 'Show tags'
         localStorage.setItem('tagsVisible', 'false')
       }
     }
   }
 
-  toggleButton.addEventListener('click', toggleTags);
+  toggleTagsButton.addEventListener('click', toggleTags);
 });

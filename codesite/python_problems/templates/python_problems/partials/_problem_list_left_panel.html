@@ -7,17 +7,19 @@
   <hr>
   <form method="get" id="search_bar">
     <!-- Search Box -->
-    <label for="search_box" class="form-label">
-      <b>Search box:</b>
-    </label>
-    <div class="input-group mb-3">
-      <input class="p-2 mb-1"
-             id="search_box"
-             name="query_text"
-             placeholder="Search by tag or title"
-             style="border-radius: 0.35rem"
-             type="text"
-             value="{{ query_text }}">
+    <div class="mb-3">
+      <label for="search_box" class="form-label">
+        <b>Search box:</b>
+      </label>
+      <div class="input-group">
+        <input class="p-2"
+               id="search_box"
+               name="query_text"
+               placeholder="Search by tag or title"
+               style="border-radius: 0.35rem"
+               type="text"
+               value="{{ query_text }}">
+      </div>
       <button class="btn btn-primary px-2 py-0"
               style="border-radius: 0.35rem"
               type="submit">

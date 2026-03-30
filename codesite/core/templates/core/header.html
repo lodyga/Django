@@ -42,7 +42,6 @@
         {% url 'python_problems:problem-index' as python_index_url %}
         {% url 'python_problems:tag-graph' as python_tag_graph %}
         <li class="nav-item dropdown">
-          {% comment %} <a class="nav-link dropdown-toggle {% if request.get_full_path == python_index_url or request.get_full_path == python_tag_graph %}active{% endif %}" {% endcomment %}
           <a class="nav-link dropdown-toggle 
                    {% if language_id == 1 %}active{% endif %}"   
              href="#"
@@ -63,66 +62,43 @@
             </li>
           </ul>
         </li>
-        {% comment %} {% url 'sql_problems:index' as sql_index_url %}
-        {% url 'sql_problems:conversion' as sql_conversion_url %}
-        {% url 'sql_problems:ascii' as sql_ascii_url %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle {% if request.get_full_path == sql_conversion_url or request.get_full_path == sql_index_url or request.get_full_path == sql_ascii_url %}active{% endif %}"
-             href="#"
-             id="navbarDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-expanded="false">SQL</a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li>
-              <a class="dropdown-item {% if request.get_full_path == sql_index_url %}active{% endif %}"
-                 href="{{ sql_index_url }}">SQL Problems</a>
-            </li>
-            <li>
-              <a class="dropdown-item {% if request.get_full_path == sql_conversion_url %}active{% endif %}"
-                 href="{{ sql_conversion_url }}">Conversion</a>
-            </li>
-            <li>
-              <a class="dropdown-item {% if request.get_full_path == sql_ascii_url %}active{% endif %}"
-                 href="{{ sql_ascii_url }}">db from ASCII</a>
-            </li>
-          </ul>
-        </li> {% endcomment %}
+      </ul>
+      <ul class="navbar-nav">
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle"
-             href="#"
-             id="navbarDropdown"
-             role="button"
-             data-bs-toggle="dropdown"
-             aria-expanded="false">Admin</a>
+            href="#"
+            id="navbarDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">Admin</a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li>
               <a class="dropdown-item"
-                 href="{% url 'python_problems:problem-create' %}">Create a problem</a>
+                href="{% url 'python_problems:problem-create' %}">Create a problem</a>
             </li>
             <li>
               <a class="dropdown-item"
-                 href="{% url 'python_problems:solution-create' %}">Create a solution</a>
+                href="{% url 'python_problems:solution-create' %}">Create a solution</a>
             </li>
             <li>
               <a class="dropdown-item" 
-                 href="{% url 'python_problems:tag-create' %}">Add a tag</a>
+                href="{% url 'python_problems:tag-create' %}">Add a tag</a>
             </li>
             <li>
               <a class="dropdown-item" 
-                 href="{% url 'python_problems:language-create' %}">Add a language</a>
+                href="{% url 'python_problems:language-create' %}">Add a language</a>
             </li>
             <li>
               <a class="dropdown-item" 
-                 href="{% url 'python_problems:tag-index' %}">Tags</a>
+                href="{% url 'python_problems:tag-index' %}">Tags</a>
             </li>
             <li>
               <a class="dropdown-item {% if request.get_full_path == python_tag_graph %}active{% endif %}"
-                 href="{{ python_tag_graph }}">Statistics</a>
+                href="{{ python_tag_graph }}">Statistics</a>
             </li>
             <li>
               <a class="dropdown-item" 
-                 href="{% url 'python_problems:api-root' %}">REST API</a>
+                href="{% url 'python_problems:api-root' %}">REST API</a>
             </li>
             <li>
               <hr class="dropdown-divider" />
@@ -137,28 +113,17 @@
             {% else %}
               <li>
                 <a class="dropdown-item"
-                   href="{% url 'login' %}?next={{ next }}">Login</a>
+                  href="{% url 'login' %}?next={{ next }}">Login</a>
               </li>
             {% endif %}
           </ul>
         </li>
         <li class="nav-item">
           <a href="{{ home_url }}"
-             class="nav-link {% if request.get_full_path == home_url %}active{% endif %}">
+            class="nav-link {% if request.get_full_path == home_url %}active{% endif %}">
             Site Index
           </a>
         </li>
-      </ul>
-      
-      {% comment %} <ul class="navbar-nav mb-lg-0">
-        <li>
-          <a class="nav-link active" href="#">Active</a>
-        </li>
-      </ul> {% endcomment %}
-      <ul class="navbar-nav">
-        {% url 'sql_problems:index' as sql_index_url %}
-        {% url 'sql_problems:conversion' as sql_conversion_url %}
-        {% url 'sql_problems:ascii' as sql_ascii_url %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle"
              href="#"

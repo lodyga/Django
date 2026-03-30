@@ -12,6 +12,7 @@ from .forms import *
 from .models import *
 from .serializers import *
 from .scripts import *
+from core.scripts import *
 
 
 def tag_graph_view(request):
@@ -93,6 +94,9 @@ class ProblemIndexView(ListView):
 
         return context
 
+    def post(self, request, **kwargs):
+        if "message" in request.POST:
+            return get_cohere_response(request)
 
 class ProblemDetailView(DetailView):
     model = Problem
@@ -192,7 +196,7 @@ class ProblemDetailView(DetailView):
         is_code_container_filled = "code_container" in request.POST
 
         if "message" in request.POST:
-            return get_cohere_response(request.POST.get("message"))
+            return get_cohere_response(request)
 
         if "language_id" in request.POST:
             language_id = request.POST.get("language_id")

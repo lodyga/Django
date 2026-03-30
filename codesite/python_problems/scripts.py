@@ -1,13 +1,13 @@
+
+import json
 import re
 import requests
 import socket
 from time import sleep
 from django.apps import apps
 from django.conf import settings
-from django.http import JsonResponse
 from django.templatetags.static import static
 from python_problems.auth.judge0_auth import JUDGE0_API_KEY
-from python_problems.auth.cohere_auth import COHERE_API_KEY
 from python_problems.models import Problem
 
 
@@ -341,30 +341,3 @@ def get_adjacent_slugs(problem, language):
     return (prev_problem_slug, next_problem_slug)
 
 
-def get_cohere_response(user_message):
-    try:
-        # time.sleep(2)  # for tests
-        # return JsonResponse({"response": "Waited 2 seconds."})
-        headers = {
-            "Authorization": f"Bearer {COHERE_API_KEY}",
-            "Content-Type": "application/json",
-        }
-        data = {
-            "model": "command",
-            "prompt": user_message,
-        }
-        response = requests.post(
-            "https://api.cohere.ai/v2/generate",
-            json=data,
-            headers=headers,
-            timeout=10
-        )
-        if response.status_code != 200:
-            return JsonResponse({"error": f"API Error: {response.text}"}, status=response.status_code)
-
-        ai_response = response.json()["generations"][0]["text"]
-        return JsonResponse({"response": ai_response})
-
-    except Exception as e:
-        error_message = str(e)
-        return JsonResponse({"error": error_message}, status=500)

@@ -1,0 +1,24 @@
+<div class="row mb-2">
+  <div class="col-auto">
+    <button class="btn btn-info py-0"
+            id="aiAssistantButton"
+            title="Use AI to outsource IQ."
+            type="button">AI Assistant</button>
+  </div>
+  <div class="container" id="aiContainer">
+    <span class="badge bg-secondary">AI Assistant:</span>
+    <textarea id="chatBox" name="chat_box" class="form-control border border-warning overflow-auto" style="height: 500px; max-height: 500px; display: flex; flex-direction: column " readonly>Chat with Cohere AI
+    </textarea>
+    <div class="input-group mb-3">
+      <button class="btn btn-outline-warning" type="button" id="sendButton">
+        Send
+        <span id="aiSendButtonSpinner"
+              class="spinner-border spinner-border-sm d-none"></span>
+      </button>
+      <input class="form-control"
+             id="userInput"
+             placeholder="Type your message here..."
+             type="text">
+    </div>
+  </div>
+</div>

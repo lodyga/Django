@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from python_problems.models import Language
 from django.views.generic import TemplateView
+from .scripts import *
 
 
 class IndexView(TemplateView):
@@ -25,6 +26,10 @@ class IndexView(TemplateView):
             if name in languages_by_name
         ]
         return context
+
+    def post(self, request, **kwargs):
+        if "message" in request.POST:
+            return get_cohere_response(request)
 
 
 def contact_view(request):

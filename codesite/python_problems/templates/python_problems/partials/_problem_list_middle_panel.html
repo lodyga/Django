@@ -3,6 +3,12 @@
   <h2>Problem list</h2>
 </div>
 {% if page_obj %}
+  <div class="mb-3">
+    <button class="btn btn-secondary px-2 py-0"
+            id="toggleTagsButton">
+      Show tags
+    </button>
+  </div>
   <ul>
     {% for problem in page_obj %}
       <div class="row">
