@@ -1,9 +1,8 @@
 from django.urls import path, include
-from . import views
-
 # REST API
 from rest_framework.routers import DefaultRouter
 from .views import TagViewSet, DifficultyViewSet, ComplexityViewSet, LanguageViewSet, ProblemViewSet, SolutionViewSet
+from . import views
 
 app_name = "python_problems"
 
@@ -17,9 +16,7 @@ router.register(r'solutions', SolutionViewSet)
 
 
 urlpatterns = [
-    # REST API
     path("api/", include(router.urls)),
-
     path("tag/", views.TagIndexView.as_view(), name="tag-index"),
     path("tag/create/", views.TagCreate.as_view(), name="tag-create"),
 
@@ -28,13 +25,14 @@ urlpatterns = [
     # path("tag/<int:pk>/delete/", views.TagDelete.as_view(), name="tag-delete"),
 
     path("tag/graph/", views.tag_graph_view, name="tag-graph"),
-
     path("", views.ProblemIndexView.as_view(), name="problem-index"),
+
     path("problem_create/", views.ProblemCreate.as_view(),
          name="problem-create"),  # create have to be befre slug
     path("solution_create/", views.SolutionCreate.as_view(),
          name="solution-create"),  # create have to be befre slug
-    path("language_add/", views.LanguageCreate.as_view(), name="language-create"),
+    path("language_add/", views.LanguageCreate.as_view(), 
+         name="language-create"),
 
     path("<slug:slug>/<str:language>/",
          views.ProblemDetailView.as_view(), name="problem-detail"),

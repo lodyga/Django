@@ -1,66 +1,73 @@
 {% extends "core/base.html" %}
 {% block content %}
-  <div class="container my-5 p-2">
-    <div class="row mb-5">
-      <div class="col-auto">
-        {% load crispy_forms_tags %}
-        <form method="post" action="{% url 'login' %}">
-          {% csrf_token %}
-          {{ form|crispy }}
-          <input type="submit" class="btn btn-primary mb-3" value="Login Locally" />
-          <input type="hidden" name="next" value="{{ next }}" />
-        </form>
-      </div>
-    </div>
-    <div class="row">
-      {% if settings.SOCIAL_AUTH_GITHUB_KEY %}
-        <div class="col-auto">
-          {% if request.user.is_authenticated %}
-            <form method="post" action="{% url 'logout' %}?next={% url 'social:begin' 'github' %}?next={{ next }}">
+  <div class="row m-1">
+    <div class="col-md-3"></div>
+    <div class="col-md-8">
+      <div class="container my-5 p-2">
+        <div class="row mb-5">
+          <div class="col-auto">
+            {% load crispy_forms_tags %}
+            <form method="post" action="{% url 'login' %}">
               {% csrf_token %}
-              <button type="submit" class="btn btn-info mb-3">
-                <i class="fa fa-github" aria-hidden="true"></i>
-                Login with GitHub
-              </button>
+              {{ form|crispy }}
+              <input type="submit" class="btn btn-primary mb-3" value="Login Locally" />
+              <input type="hidden" name="next" value="{{ next }}" />
             </form>
-          {% else %}
-            <a class="btn btn-info mb-3"
-               role="button"
-               href="{% url 'social:begin' 'github' %}?next={{ next }}">
-              <i class="fa fa-github" aria-hidden="true"></i>
-              Login with GitHub
-            </a>
-          {% endif %}
-        </div>
-      {% endif %}
-      {% if settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY %}
-        <div class="col-auto">
-          {% if request.user.is_authenticated %}
-            <form method="post" action="{% url 'logout' %}?next={% url 'social:begin' 'google-oauth2' %}?next={{ next }}">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-warning mb-3">
-                <i class="fa fa-google" aria-hidden="true"></i>
-                Login with Google
-              </button>
-            </form>
-          {% else %}
-            <a class="btn btn-warning mb-3"
-               role="button"
-               href="{% url 'social:begin' 'google-oauth2' %}?next={{ next }}">
-              <i class="fa fa-google" aria-hidden="true"></i>
-              Login with Google
-            </a>
-          {% endif %}
-        </div>
-      {% endif %}
-    </div>
-    <div class="row">
-      <div class="col-auto">
-        {% if form.errors %}
-          <div class="alert alert-danger ps-4">
-            <li>Please enter a correct username and password. Note that both fields may be case-sensitive.</li>
           </div>
-        {% endif %}
+        </div>
+        <div class="row">
+          {% if settings.SOCIAL_AUTH_GITHUB_KEY %}
+            <div class="col-auto">
+              {% if request.user.is_authenticated %}
+                <form method="post"
+                      action="{% url 'logout' %}?next={% url 'social:begin' 'github' %}?next={{ next }}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-info mb-3">
+                    <i class="fa fa-github" aria-hidden="true"></i>
+                    Login with GitHub
+                  </button>
+                </form>
+              {% else %}
+                <a class="btn btn-info mb-3"
+                   role="button"
+                   href="{% url 'social:begin' 'github' %}?next={{ next }}">
+                  <i class="fa fa-github" aria-hidden="true"></i>
+                  Login with GitHub
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+          {% if settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY %}
+            <div class="col-auto">
+              {% if request.user.is_authenticated %}
+                <form method="post"
+                      action="{% url 'logout' %}?next={% url 'social:begin' 'google-oauth2' %}?next={{ next }}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-warning mb-3">
+                    <i class="fa fa-google" aria-hidden="true"></i>
+                    Login with Google
+                  </button>
+                </form>
+              {% else %}
+                <a class="btn btn-warning mb-3"
+                   role="button"
+                   href="{% url 'social:begin' 'google-oauth2' %}?next={{ next }}">
+                  <i class="fa fa-google" aria-hidden="true"></i>
+                  Login with Google
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+        <div class="row">
+          <div class="col-auto">
+            {% if form.errors %}
+              <div class="alert alert-danger ps-4">
+                <li>Please enter a correct username and password. Note that both fields may be case-sensitive.</li>
+              </div>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
   </div>
