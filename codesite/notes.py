@@ -73,6 +73,20 @@ list(problem.solution_set.values_list("language__name", flat=True).distinct())
 
 
 
+
+  
+
+  
+<div class="row justify-content-"
+start
+center
+end
+around
+between
+evenly
+">  
+  
+
 pip install -r /path/to/requirements.txt
 
 

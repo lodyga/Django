@@ -34,3 +34,7 @@ class IndexView(TemplateView):
 
 def contact_view(request):
     return render(request, "core/contact.html")
+
+
+def cohere_stream_view(request):
+    return get_cohere_response_sse(request)

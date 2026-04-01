@@ -2,42 +2,36 @@ document.addEventListener('DOMContentLoaded', () => {
    const aiAssistantButton = document.getElementById('aiAssistantButton');
    const userName = document.getElementById('userName').textContent;
    const chatBox = document.getElementById("chatBox");
+   const aiContainer = document.getElementById("aiContainer");
    const chatHistory = sessionStorage.getItem('chatHistory');
    if (chatHistory) { chatBox.value = chatHistory; };
-   const userInput = document.getElementById("userInput");
+   const chatUserInput = document.getElementById("chatUserInput");
    const sendButton = document.getElementById("sendButton");
+   let activeEventSource = null;
+   let currentAiStartIndex = null;
 
-   function addMessage(role, message) {
-      // const messageElement = document.createElement("div");
-      // messageElement.innerHTML = `<strong>${role}:</strong> ${message}`;
-      // chatBox.appendChild(messageElement);
+   function appendMessage(role, message) {
       chatBox.value += `\n${role}: ${message}`;
-      chatBox.scrollTop = chatBox.scrollHeight;  // Auto-scroll to the bottom
+      chatBox.scrollTop = chatBox.scrollHeight;
       sessionStorage.setItem('chatHistory', chatBox.value)
    }
 
+   function appendToLastMessage(text) {
+      chatBox.value += text;
+      sessionStorage.setItem('chatHistory', chatBox.value)
+   }
 
-   // Get the CSRF token from the cookie.
-   function getCookie(name) {
-      let cookieValue = null;
-      if (document.cookie && document.cookie !== "") {
-         const cookies = document.cookie.split(";");
-         for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.startsWith(name + "=")) {
-               cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-               break;
-            }
-         }
-      }
-      return cookieValue;
+   function replaceLastAiMessage(finalText) {
+      if (currentAiStartIndex === null) return;
+      chatBox.value =
+         chatBox.value.slice(0, currentAiStartIndex) + `\nAI: ${finalText}`;
+      sessionStorage.setItem('chatHistory', chatBox.value)
+      currentAiStartIndex = null;
    }
 
    // Send a message to the backend.
    async function sendMessage() {
-      // Include the CSRF token in the request headers
-      const csrfToken = getCookie("csrftoken");
-      const message = userInput.value.trim();
+      const message = chatUserInput.value.trim();
       if (!message) return;
 
       // Show spinner and disable button
@@ -46,34 +40,56 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('aiSendButtonSpinner').classList.remove("d-none");
 
       // Add the user's message to the chat box.
-      addMessage(userName, message);
-      userInput.value = "";
+      appendMessage(userName, message);
+      chatUserInput.value = "";
 
-      // Send the message to the backend.
-      const response = await fetch("", {
-         method: "POST",
-         headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "X-CSRFToken": csrfToken,  // Add CSRF token for Django
-         },
-         body: `message=${encodeURIComponent(message)}`,
+      // if (activeEventSource) {
+      //    activeEventSource.close();
+      //    activeEventSource = null;
+      // }
+
+      currentAiStartIndex = chatBox.value.length;
+      appendMessage("AI", "");
+
+      const streamUrl = `/chat/stream/?message=${encodeURIComponent(message)}`;
+      activeEventSource = new EventSource(streamUrl);
+
+      activeEventSource.onmessage = (event) => {
+         appendToLastMessage(event.data);
+      };
+
+      activeEventSource.addEventListener("done", (event) => {
+         try {
+            const payload = JSON.parse(event.data);
+            if (payload && typeof payload.final === "string") {
+               replaceLastAiMessage(payload.final);
+            }
+         } catch (e) {
+            // If parsing fails, keep the streamed content as-is.
+         }
+         activeEventSource.close();
+         activeEventSource = null;
+
+         // Hide spinner and re-enable button
+         sendButton.disabled = false;
+         sendButton.firstChild.textContent = "Send";
+         document.getElementById('aiSendButtonSpinner').classList.add('d-none');
       });
 
-      if (response.ok) {
-         const data = await response.json();
-         addMessage("AI", data.response);
-      } else {
-         addMessage("AI", "Error: Could not get a response.");
-      }
-
-      // Hide spinner and re-enable button
-      sendButton.disabled = false;
-      sendButton.firstChild.textContent = "Send";
-      document.getElementById('aiSendButtonSpinner').classList.add('d-none');
+      activeEventSource.onerror = () => {
+         if (activeEventSource) {
+            activeEventSource.close();
+            activeEventSource = null;
+         }
+         appendMessage("AI", "Error: Could not get a streamed response.");
+         sendButton.disabled = false;
+         sendButton.firstChild.textContent = "Send";
+         document.getElementById('aiSendButtonSpinner').classList.add('d-none');
+      };
    }
 
    sendButton.addEventListener('click', sendMessage);
-   userInput.addEventListener('keypress', (event) => {
+   chatUserInput.addEventListener('keypress', (event) => {
       if (event.key === 'Enter') sendMessage();
    });
 
