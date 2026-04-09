@@ -51,7 +51,7 @@ social-auth-core==4.4.2
 sqlparse==0.5.5
 tomli==2.0.1
 tqdm==4.66.4
-typing_extensions==4.12.2
+typing_extensions==4.15.0
 tzdata==2025.1
 urllib3==2.0.7
 whitenoise==6.9.0

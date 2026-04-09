@@ -19,17 +19,16 @@ def format_sse(data, event=None):
     return "\n".join(payload_lines) + "\n\n"
 
 
-def get_cerberas_response(request, model_name):
+def get_cerberas_response(request):
     # Cerebras:
+    user_message = request.GET.get("message")
     model_map = {
         "gpt": "gpt-oss-120b",
         "zai": "zai-glm-4.7",
         "llama": "llama3.1-8b",
         "qwen": "qwen-3-235b-a22b-instruct-2507",
     }
-    model = model_map.get(model_name, model_map["gpt"])
-
-    user_message = request.GET.get("message") or request.POST.get("message")
+    model = model_map[request.GET.get("model_name", "llama")]
     client = Cerebras(api_key=CERBERAS_API_KEY)
     messages = [
         {
@@ -49,7 +48,7 @@ def get_cerberas_response(request, model_name):
             model=model,
             stream=True,
         )
-        # chunk.choices[0].delta.content or "", end=""
+        
         for chunk in stream:
             delta = None
             if hasattr(chunk, "choices"):
@@ -75,7 +74,7 @@ def get_cerberas_response(request, model_name):
 
 def get_cohere_response(request):
     # Cohere: Command
-    user_message = request.GET.get("message") or request.POST.get("message")
+    user_message = request.GET.get("message")
     chat_history = request.session.get("chat_history", [])
     co = cohere.Client(COHERE_API_KEY)
 
@@ -115,7 +114,7 @@ def get_cohere_response(request):
 def get_gemini_response(request):
     # google.genai.errors.ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
     # Google: Gemini Flash 2.5
-    user_message = request.GET.get("message") or request.POST.get("message")
+    user_message = request.GET.get("message")
 
     client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -162,7 +161,7 @@ def get_mistral_response(request):
     # Mistral: Medium
     # Codestral
     # "role": "user", "assistant"
-    user_message = request.GET.get("message") or request.POST.get("message")
+    user_message = request.GET.get("message")
     model = "mistral-medium-latest"
     model = "codestral-latest"
     client = Mistral(api_key=MISTRAL_API_KEY)

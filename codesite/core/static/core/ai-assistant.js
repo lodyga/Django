@@ -46,11 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
       appendMessage(userName, message);
       chatUserInput.value = "";
 
-      // if (activeEventSource) {
-      //    activeEventSource.close();
-      //    activeEventSource = null;
-      // }
-
       currentAiStartIndex = chatBox.value.length;
       appendMessage("AI", "");
 

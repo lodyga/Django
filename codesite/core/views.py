@@ -49,5 +49,4 @@ def mistral_stream_view(request):
 
 
 def cerberas_stream_view(request):
-    model_name = request.GET.get("model_name", "llama")
-    return get_cerberas_response(request, model_name)
+    return get_cerberas_response(request)
