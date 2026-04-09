@@ -3,22 +3,55 @@
     <button class="btn btn-info py-0"
             id="aiAssistantButton"
             title="Use AI to outsource IQ."
-            type="button">AI Assistant</button>
+            type="button">Toggle AI</button>
   </div>
   <div class="container" id="aiContainer">
     <span class="badge bg-secondary">AI Assistant:</span>
-    <textarea id="chatBox" name="chat_box" class="form-control border border-warning overflow-auto" style="height: 500px; max-height: 500px; display: flex; flex-direction: column " readonly>Chat with Cohere AI
-    </textarea>
-    <div class="input-group mb-3">
-      <button class="btn btn-outline-warning" type="button" id="sendButton">
-        Send
-        <span id="aiSendButtonSpinner"
-              class="spinner-border spinner-border-sm d-none"></span>
-      </button>
-      <input class="form-control"
-             id="chatUserInput"
-             placeholder="Type your message here..."
-             type="text">
+    <textarea id="chatBox"
+              name="chat_box"
+              class="form-control border border-warning overflow-auto"
+              style="height: 500px;
+                     max-height: 500px;
+                     display: flex;
+                     flex-direction: column"
+              readonly></textarea>
+    <div class="dropdown">
+      <button class="btn btn-sm btn-secondary rounded-pill py-0 px-2 dropdown-toggle"
+              id="chooseAiModelBtn"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false">Model: Cohere</button>
+      <ul class="dropdown-menu"
+          aria-labelledby="chooseAiModelBtn"
+          id="chooseAiModelMenu">
+        <li>
+          <button class="dropdown-item" type="button" data-model="cohere">Cohere</button>
+        </li>
+        <li>
+          <button class="dropdown-item" type="button" data-model="mistral">Mistral</button>
+        </li>
+        <li>
+          <button class="dropdown-item" type="button" data-model="gemini">Gemini</button>
+        </li>
+        {% comment %} <li>
+          <button class="dropdown-item" type="button" data-model="gpt">GPT</button>
+        </li>
+        <li>
+          <button class="dropdown-item" type="button" data-model="zai">Zai</button>
+        </li> {% endcomment %}
+        <li>
+          <button class="dropdown-item" type="button" data-model="llama">Llama</button>
+        </li>
+        <li>
+          <button class="dropdown-item" type="button" data-model="qwen">Qwen</button>
+        </li>
+      </ul>
     </div>
+    <textarea class="form-control" id="chatUserInput" type="text"></textarea>
+    <button class="btn btn-outline-warning ms-auto" type="button" id="sendButton">
+      Send
+      <span id="aiSendButtonSpinner"
+            class="spinner-border spinner-border-sm d-none"></span>
+    </button>
   </div>
 </div>

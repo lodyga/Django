@@ -109,9 +109,13 @@ def execute_code(source_code, language):
     querystring = {
         "base64_encoded": "false",
         "wait": "true"
-    }  # Wait for execution to finish
+    }
     response = requests.post(
-        submissions_url, json=json, headers=headers, params=querystring).json()
+        submissions_url,
+        json=json,
+        headers=headers,
+        params=querystring
+    ).json()
     token = response["token"]
 
     # Fetch results
@@ -339,5 +343,3 @@ def get_adjacent_slugs(problem, language):
         solution__language=language).first().slug
 
     return (prev_problem_slug, next_problem_slug)
-
-

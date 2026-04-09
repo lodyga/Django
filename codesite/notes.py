@@ -85,7 +85,9 @@ around
 between
 evenly
 ">  
-  
+
+<div class="align-items-center"
+
 
 pip install -r /path/to/requirements.txt
 

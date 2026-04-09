@@ -1,4 +1,5 @@
 asgiref==3.11.1
+cerebras_cloud_sdk==1.67.0
 certifi==2023.7.22
 cffi==1.15.1
 charset-normalizer==3.2.0
@@ -19,6 +20,7 @@ django-taggit==4.0.0
 djangorestframework==3.14.0
 djlint==1.36.4
 EditorConfig==0.17.1
+google-genai==1.70.0
 gunicorn==22.0.0
 html-tag-names==0.1.2
 html-void-elements==0.1.0
@@ -27,6 +29,7 @@ importlib-metadata==6.8.0
 jsbeautifier==1.15.4
 json5==0.13.0
 Markdown==3.7
+mistralai==2.3.1
 mysqlclient==2.2.8
 oauthlib==3.2.2
 packaging==24.2

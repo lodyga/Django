@@ -27,9 +27,9 @@ class IndexView(TemplateView):
         ]
         return context
 
-    def post(self, request, **kwargs):
-        if "message" in request.POST:
-            return get_cohere_response(request)
+    # def post(self, request, **kwargs):
+    #     if "message" in request.POST:
+    #         return get_cohere_response(request)
 
 
 def contact_view(request):
@@ -37,4 +37,17 @@ def contact_view(request):
 
 
 def cohere_stream_view(request):
-    return get_cohere_response_sse(request)
+    return get_cohere_response(request)
+
+
+def gemini_stream_view(request):
+    return get_gemini_response(request)
+
+
+def mistral_stream_view(request):
+    return get_mistral_response(request)
+
+
+def cerberas_stream_view(request):
+    model_name = request.GET.get("model_name", "llama")
+    return get_cerberas_response(request, model_name)

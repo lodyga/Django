@@ -7,8 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
    if (chatHistory) { chatBox.value = chatHistory; };
    const chatUserInput = document.getElementById("chatUserInput");
    const sendButton = document.getElementById("sendButton");
+   const chooseAiModelBtn = document.getElementById("chooseAiModelBtn");
+   const chooseAiModelMenu = document.getElementById("chooseAiModelMenu");
    let activeEventSource = null;
    let currentAiStartIndex = null;
+   let activeModel = "cohere";
 
    function appendMessage(role, message) {
       chatBox.value += `\n${role}: ${message}`;
@@ -51,7 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
       currentAiStartIndex = chatBox.value.length;
       appendMessage("AI", "");
 
-      const streamUrl = `/chat/stream/?message=${encodeURIComponent(message)}`;
+      const cerberasModels = new Set(["gpt", "zai", "llama", "qwen"]);
+      let streamUrl = "";
+      if (cerberasModels.has(activeModel)) {
+         streamUrl = `/chat/cerberas/stream/?model_name=${encodeURIComponent(activeModel)}&message=${encodeURIComponent(message)}`;
+      } else {
+         streamUrl = `/chat/${activeModel}/stream/?message=${encodeURIComponent(message)}`;
+      }
       activeEventSource = new EventSource(streamUrl);
 
       activeEventSource.onmessage = (event) => {
@@ -89,11 +98,33 @@ document.addEventListener('DOMContentLoaded', () => {
    }
 
    sendButton.addEventListener('click', sendMessage);
-   chatUserInput.addEventListener('keypress', (event) => {
-      if (event.key === 'Enter') sendMessage();
+   chatUserInput.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter') return;
+      if (event.shiftKey) return;
+      event.preventDefault();
+      sendMessage();
    });
+
+   if (chooseAiModelMenu) {
+      chooseAiModelMenu.addEventListener("click", (event) => {
+         const item = event.target.closest("[data-model]");
+         if (!item) return;
+         activeModel = item.getAttribute("data-model") || "cohere";
+         const label = item.textContent.trim() || "Model";
+         if (chooseAiModelBtn) {
+            chooseAiModelBtn.textContent = `Model: ${label}`;
+         }
+      });
+   }
 
    aiAssistantButton.addEventListener('click', () => {
       aiContainer.classList.toggle("d-none");
    });
+
+   const autoResize = (element) => {
+      element.style.height = 'auto';
+      element.style.height = element.scrollHeight + 'px';
+   };
+
+   chatUserInput.addEventListener('input', () => autoResize(chatUserInput));
 });

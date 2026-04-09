@@ -94,9 +94,9 @@ class ProblemIndexView(ListView):
 
         return context
 
-    def post(self, request, **kwargs):
-        if "message" in request.POST:
-            return get_cohere_response(request)
+    # def post(self, request, **kwargs):
+    #     if "message" in request.POST:
+    #         return get_cohere_response(request)
 
 class ProblemDetailView(DetailView):
     model = Problem
@@ -195,8 +195,8 @@ class ProblemDetailView(DetailView):
         # is_submit_code_button_pressed = request.POST.get("code_form_action") == "submit"
         is_code_container_filled = "code_container" in request.POST
 
-        if "message" in request.POST:
-            return get_cohere_response(request)
+        # if "message" in request.POST:
+        #     return get_cohere_response(request)
 
         if "language_id" in request.POST:
             language_id = request.POST.get("language_id")
