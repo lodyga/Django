@@ -40,6 +40,7 @@ source djangoenv/bin/activate
 pip install gunicorn
 python manage.py collectstatic
 gunicorn codesite.wsgi
+
 gunicorn --bind 127.0.0.1:8001 codesite.wsgi
 
 # /etc/systemd/system/codesite.service
@@ -92,3 +93,5 @@ python manage.py collectstatic
 sudo chown -R nginx:nginx /var/www/codesite
 sudo chmod -R 755 /var/www/codesite
 sudo -u nginx /home/ukasz/Documents/IT/Django/codesite/django6env/bin/python /home/ukasz/Documents/IT/Django/codesite/manage.py collectstatic
+
+

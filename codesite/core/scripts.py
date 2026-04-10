@@ -48,7 +48,7 @@ def get_cerberas_response(request):
             model=model,
             stream=True,
         )
-        
+
         for chunk in stream:
             delta = None
             if hasattr(chunk, "choices"):

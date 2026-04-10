@@ -87,7 +87,7 @@ evenly
 ">  
 
 <div class="align-items-center"
-
+<div class="col-auto">
 
 pip install -r /path/to/requirements.txt
 

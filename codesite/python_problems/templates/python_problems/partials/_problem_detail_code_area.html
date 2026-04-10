@@ -2,52 +2,51 @@
   <div class="col">
     <div class="row mb-3">
       <div class="col">
-        <span class="badge bg-secondary">Code input:</span>
+        <span class="badge bg-secondary col-auto">Code input:</span>
         <form id="codeForm"
               action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
               method="post"
               class="mb-2">
           {% csrf_token %}
-          <input type="hidden" id="codeFormAction" name="code_form_action" value="">
+          <input id="codeFormAction" name="code_form_action" type="hidden" value="">
           <div class="code-area-container border border-warning">
-            <textarea name="code_container"
-                      id="codeContainer"
-                      cols="80"
-                      rows="20"
-                      >{{ source_code }}</textarea>
+            <textarea cols="80" id="codeContainer" name="code_container" rows="20">{{ source_code }}</textarea>
           </div>
           <div class="row">
             <div class="col-auto">
-              <button id="runCodeButton"
+              <button class="btn btn-warning py-0 {% if language_id > 2 and language_id < 6 %}d-none{% endif %}"
+                      id="runCodeButton"
                       name="run_code_button"
-                      value="True"
+                      title="Ctrl + '"
                       type="button"
-                      title="Run code snippet."
-                      class="btn btn-warning py-0 {% if language_id > 2 and language_id < 6 %}d-none{% endif %}">
+                      value="True">
                 Run
-                <span id="runCodeButtonSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                <span class="spinner-border spinner-border-sm d-none"
+                      id="runCodeButtonSpinner"></span>
               </button>
             </div>
             <div class="col-auto">
-              <button id="testCodeButton"
+              <button class="btn btn-primary py-0 {% if language_id > 2 and language_id < 6 %}d-none{% endif %}"
+                      id="testCodeButton"
                       name="test_code_button"
-                      value="True"
                       type="button"
-                      title="Run against the test cases."
-                      class="btn btn-primary py-0 {% if language_id > 2 and language_id < 6 %}d-none{% endif %}">
+                      title="Ctrl + Enter"
+                      value="True">
                 Test
-                <span id="testCodeButtonSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                <span class="spinner-border spinner-border-sm d-none"
+                      id="testCodeButtonSpinner"></span>
               </button>
             </div>
             <div class="col-auto">
-              <button id="submitCodeButton"
+              <button class="btn btn-success py-0"
+                      id="submitCodeButton"
                       name="submit_code_button"
-                      value="True"
-                      type="button" 
+                      type="button"
                       title="Save the code for posterity."
-                      class="btn btn-success py-0">
+                      value="True">
                 Submit
-                <span id="submitCodeButtonSpinner" class="spinner-border spinner-border-sm d-none"></span>
+                <span class="spinner-border spinner-border-sm d-none"
+                      id="submitCodeButtonSpinner"></span>
               </button>
             </div>
           </div>
@@ -55,12 +54,9 @@
       </div>
     </div>
     <div class="row mb-2">
-      <div class="">
-        <span class="badge bg-secondary">Code output:</span>
-        <div class="form-control mb-2 col-auto" 
-             name="output_container">
-          {{ output_container }}
-        </div>
+      <div>
+        <span class="badge bg-secondary col-auto">Code output:</span>
+        <div class="form-control mb-2 col-auto" name="output_container">{{ output_container }}</div>
       </div>
     </div>
     {% if "TypeError: 'type' object is not subscriptable" in output_container %}
