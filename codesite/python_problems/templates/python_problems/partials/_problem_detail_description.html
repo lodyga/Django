@@ -1,17 +1,17 @@
 {% load linked_list_filters %}
 <div class="row mb-2">
-  <label for="problemDescription" 
-         class="form-label"
-         data-bs-toggle="collapse"
-         data-bs-target="#problemDescription"
-         aria-expanded="true">
+  <button class="btn btn-outline-secondary py-0 mb-2"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#problemDescription"
+          aria-expanded="true"
+          aria-controls="problemDescription">
+    Description:
     <i class="fas fa-chevron-up"></i>
-    <b>Description:</b>
-  </label>
+  </button>
   {% autoescape off %}
-    <pre class="mb-5 collapse show" 
+    <pre class="mb-5 collapse show"
          style="white-space: pre-wrap"
-         id="problemDescription"
-      >{{ problem.description|process_linked_lists }}</pre>
+         id="problemDescription">{{ problem.description|process_linked_lists }}</pre>
   {% endautoescape %}
 </div>

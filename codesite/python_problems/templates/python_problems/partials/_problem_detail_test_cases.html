@@ -1,36 +1,47 @@
 <div class="row mb-2">
-{% if test_cases %}
-  <div class="col-auto" 
-       id="testCasesContainer">
-    {% for test_case in test_cases %}
-      <div id="testCase-{{ forloop.counter }}" 
-           class="test_case_content">
-        <div class="row">
-          <div class="col-auto">
-            <span class="badge bg-secondary col-auto">Test case input:</span>
-            <div class="form-control" rows="1">{{ test_case.0 }}</div>
-          </div>
-          <div class="col-auto">
-            <span class="badge bg-secondary col-auto">Test case output:</span>
-            <div class="form-control" rows="1">{{ test_case.1 }}</div>
-          </div>
-          <div class="col-auto">
-            <button id="copyButton" class="btn btn-secondary mt-4">
-              <i class="far fa-copy"></i> Copy
-            </button>
-          </div>
+  <button class="btn btn-outline-secondary py-0 mb-2"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#problemTestCases"
+          aria-expanded="false"
+          aria-controls="problemTestCases">
+    Test Cases:
+    <i class="fas fa-chevron-up"></i>
+  </button>
+  {% if test_cases %}
+    <div class="row collapse show" id="problemTestCases">
+      <div class="row">
+        <div class="col-auto" id="testCasesContainer">
+          {% for test_case in test_cases %}
+            <div id="testCase-{{ forloop.counter }}" class="testCaseContent">
+              <div class="row">
+                <div class="col-auto">
+                  <span class="badge bg-secondary col-auto">Test case input:</span>
+                  <div class="form-control" rows="1">{{ test_case.0 }}</div>
+                </div>
+                <div class="col-auto">
+                  <span class="badge bg-secondary col-auto">Test case output:</span>
+                  <div class="form-control" rows="1">{{ test_case.1 }}</div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="col-auto">
+          <button id="copyBtn" class="btn btn-secondary mt-4">
+            <i class="far fa-copy"></i> Copy
+          </button>
         </div>
       </div>
-    {% endfor %}
+      <div id="testCaseButtonContainer" class="mb-5">
+        {# Placeholder for JavaScript 'python_problems/test-case-buttons.js' buttons #}
+      </div>
+      {# Test cases to clipboard. #}
+      {% spaceless %}
+        <div id="rawTestCases" class="d-none">
+          <span>{{ raw_test_cases }}</span>
+        </div>
+      {% endspaceless %}
+    {% endif %}
   </div>
-  <div id="buttonsContainer" class="mb-5">
-    {# Placeholder for JavaScript 'python_problems/test-case-buttons.js' buttons #}
-  </div>
-  {# Test cases to clipboard. #}
-  {% spaceless %}
-    <div id="rawTestCases" class="d-none">
-      <span>{{ raw_test_cases }}</span>
-    </div>
-  {% endspaceless %}
-{% endif %}
 </div>

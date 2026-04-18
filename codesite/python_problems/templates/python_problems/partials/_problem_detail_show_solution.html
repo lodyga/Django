@@ -1,17 +1,20 @@
 <div class="row mb-2">
   <div class="col">
     <div class="row">
-      <label id="solutionToggleButton"
-             data-bs-toggle="collapse"
-             data-bs-target="#problemSolution">
+      <button class="btn btn-outline-secondary py-0 mb-2"
+              id="solutionToggleButton"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#problemSolution"
+              aria-expanded="false"
+              aria-controls="problemSolution">
+        Solution:
         <i class="fas fa-chevron-up"></i>
-        <b>Solution:</b>
-      </label>
+      </button>
     </div>
     <div class="row collapse" id="problemSolution">
       <div class="col">
         <div class="row mt-4 mb-4">
-          <hr>
           {% if user == solution.owner %}
             <div class="col-auto mb-2">
               <div class="mb-3">
@@ -56,13 +59,11 @@
               </select>
             </form>
           </div>
-          <hr>
         </div>
       </div>
       <form id="ownerSolutionForm">
         <textarea id="solutionContentContainer">{{ solution.source_code }}</textarea>
       </form>
-      <hr>
     </div>
   </div>
 </div>

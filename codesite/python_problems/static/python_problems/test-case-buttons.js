@@ -1,49 +1,51 @@
-document.addEventListener('DOMContentLoaded', loadTestCaseButtons);
-function loadTestCaseButtons() {
-  const testCaseLength = JSON.parse(document.getElementById('testCaseLength').textContent);
-  const buttonsContainer = document.getElementById('buttonsContainer');
+document.addEventListener('DOMContentLoaded', () => {
+   const testcaseElements = document.getElementsByClassName('testCaseContent');
+   const testCaseLength = testcaseElements.length;
+   const testCaseButtonContainer = document.getElementById('testCaseButtonContainer');
+   const copyBtn = document.getElementById('copyBtn');
+   const rawTestCases = document.getElementById('rawTestCases').innerText;
 
-  // Create buttons
-  for (let index = 1; index < testCaseLength + 1; index++) {
-    // Create a button
-    const button = document.createElement('button');
-    button.className = 'btn btn-secondary btn-sm me-2 py-0 px-3';
-    button.textContent = index;
-    button.onclick = (event) => {
-      showTestCase(index);
-    }
-    buttonsContainer.appendChild(button);
-  };
+   for (let index = 1; index < testCaseLength + 1; index++) {
+      const button = document.createElement('button');
+      button.id = `testCaseButton-${index}`;
+      button.className = 'btn btn-secondary btn-sm me-2 py-0 px-3';
+      button.textContent = `Case ${index}`;
+      button.onclick = (event) => { showTestCase(index); }
+      testCaseButtonContainer.appendChild(button);
+   };
 
-  function showTestCase(index) {
-    // Hide all test cases
-    const testcaseElements = document.getElementsByClassName('test_case_content');
-    for (let testCase of testcaseElements) {
-      testCase.style.display = 'none';
-    }
+   function showTestCase(idx) {
+      for (let testCase of testcaseElements) {
+         testCase.style.display = 'none';
+      }
 
-    // Show selected test case
-    document.getElementById(`testCase-${index}`).style.display = 'block';
-  }
+      document.getElementById(`testCase-${idx}`).style.display = 'block';
 
-  // Show the first test case by default
-  if (testCaseLength > 0) {
-    showTestCase(1);
-  }
-}
+      for (let i = 1; i < testCaseLength + 1; i++) {
+         const btn = document.getElementById(`testCaseButton-${i}`);
 
-document.getElementById('copyButton').addEventListener('click', function () {
-  const rawTestCases = document.getElementById('rawTestCases').innerText;
-  // Copy to clipboard
-  navigator.clipboard.writeText(rawTestCases)
-    .then(() => {
-      // Show success message
-      const copyButton = document.getElementById('copyButton');
-      copyButton.classList.replace('btn-secondary', 'btn-success');
-      copyButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
-      setTimeout(() => {
-        copyButton.innerHTML = '<i class="far fa-copy"></i> Copy';
-        copyButton.classList.replace('btn-success', 'btn-secondary');
-      }, 2000);
-    })
+         if (i === idx) {
+            btn.classList.replace('btn-outline-secondary', 'btn-secondary');
+         } else {
+            btn.classList.replace('btn-secondary', 'btn-outline-secondary');
+         }
+      }
+   };
+
+   if (testCaseLength > 0) {
+      showTestCase(1);
+   }
+
+   copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(rawTestCases)
+         .then(() => {
+            copyBtn.classList.replace('btn-secondary', 'btn-success');
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+               copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+               copyBtn.classList.replace('btn-success', 'btn-secondary');
+            }, 2000);
+         })
+   });
+
 });

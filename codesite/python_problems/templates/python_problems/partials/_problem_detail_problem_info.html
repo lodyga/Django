@@ -1,28 +1,26 @@
-<div class="row mb-3">
+<div class="row mb-2">
   <div class="col">
-    <div class="row align-items-center">
-      <div class="col-auto">      
-      <label data-bs-toggle="collapse"
-             data-bs-target="#problemInfo">
+    <div class="row">
+      <button class="btn btn-outline-secondary py-0 mb-2"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#problemInfo"
+              aria-expanded="false"
+              aria-controls="problemInfo">
+        Info:
         <i class="fas fa-chevron-up"></i>
-        <b>Info:</b>
-      </label>
-    </div>
+      </button>
     </div>
     <div class="row collapse show" id="problemInfo">
       {% if user == solution.owner %}
         <div class="col-auto">
           <div class="row">
             <a href="{% url 'python_problems:solution-update' solution.id %}"
-               class="btn btn-secondary py-0 mb-2 mt-2">
-               Update
-            </a>
+               class="btn btn-secondary py-0 mb-2 mt-2">Update</a>
           </div>
           <div class="row">
             <a href="{% url 'python_problems:solution-delete' solution.id %}"
-               class="btn btn-secondary py-0 mb-2">
-               Delete
-            </a>
+               class="btn btn-secondary py-0 mb-2">Delete</a>
           </div>
         </div>
       {% endif %}
@@ -38,14 +36,11 @@
                   onchange="this.form.submit()">
             {% for owner in owners %}
               <option value="{{ owner.id }}"
-                      {% if owner.id == owner_id %}selected{% endif %}>
-                {{ owner }}
-              </option>
+                      {% if owner.id == owner_id %}selected{% endif %}>{{ owner }}</option>
             {% endfor %}
           </select>
         </form>
       </div>
-
       <div class="col-auto mb-2">
         <form method="post">
           {% csrf_token %}
@@ -58,9 +53,7 @@
                   onchange="this.form.submit()">
             {% for language in solution_languages %}
               <option value="{{ language.id }}"
-                      {% if language.id == language_id %}selected{% endif %}>
-                {{ language }}
-              </option>
+                      {% if language.id == language_id %}selected{% endif %}>{{ language }}</option>
             {% endfor %}
           </select>
         </form>
@@ -70,13 +63,11 @@
           <label for="difficultyName" class="form-label mb-3">
             <b>Difficulty:</b>
           </label>
-          <div id="difficultyName" 
-               class={% if problem.difficulty.name == 'Easy' %}"text-success"{% endif %}
-                     {% if problem.difficulty.name == 'Medium' %}"text-warning"{% endif %}
-                     {% if problem.difficulty.name == 'Hard' %}"text-danger"{% endif %}
-                     {% if problem.difficulty.name == 'Impossible' %}"text-secondary"{% endif %}>
-            {{ problem.difficulty }}
-          </div>
+          <div id="difficultyName"
+               class="{% if problem.difficulty.name == 'Easy' %}" " text-success " {% endif %} {% if problem.difficulty.name == 'Medium' %}"text-warning"{% endif %} {% if problem.difficulty.name == 'Hard' %}"text-danger"{% endif %} {% if problem.difficulty.name == 'Impossible' %}"
+               text-secondary
+               "
+               {% endif %}>{{ problem.difficulty }}</div>
         </form>
       </div>
       <div class="col-auto mb-2">
@@ -87,11 +78,9 @@
           {% for tag in tag_list %}
             <button class="tags btn btn-secondary py-0 px-1"
                     id="tagName"
-                    name="tag_id" 
+                    name="tag_id"
                     type="submit"
-                    value="{{ tag.id }}">
-              {{ tag }}
-            </button>
+                    value="{{ tag.id }}">{{ tag }}</button>
           {% endfor %}
         </form>
       </div>
@@ -100,12 +89,8 @@
           <b>Complexities:</b>
         </label>
         <div class="row" id="complexityName">
-          <div class="col-auto">
-            Time: {{ solution.time_complexity }}
-          </div>
-          <div class="col-auto">
-            Space: {{ solution.space_complexity }}
-          </div>
+          <div class="col-auto">Time: {{ solution.time_complexity }}</div>
+          <div class="col-auto">Space: {{ solution.space_complexity }}</div>
         </div>
       </div>
       <div class="col-auto mb-2">
@@ -113,14 +98,11 @@
           <b>URL:</b>
         </label>
         <div class="url">
-          <a href="{{ problem.url }}" 
-             target="_blank" 
-             class="tags btn btn-secondary py-0 px-1">
-            {{ url }} 
-          </a>
+          <a href="{{ problem.url }}"
+             target="_blank"
+             class="tags btn btn-secondary py-0 px-1">{{ url }}</a>
         </div>
       </div>
-      
     </div>
   </div>
 </div>

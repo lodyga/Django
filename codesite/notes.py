@@ -92,8 +92,10 @@ evenly
 pip install -r /path/to/requirements.txt
 
 
-
-
+btn.classList.remove('btn-secondary');
+btn.classList.add('btn-outline-secondary');
+btn.classList.replace('btn-secondary', 'btn-outline-secondary');
+descriptionToggle.setAttribute('aria-expanded', 'true');
 
 
 # markdown, pygments.css

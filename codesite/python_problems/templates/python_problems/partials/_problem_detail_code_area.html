@@ -1,6 +1,16 @@
-<div class="row mb-5">
+<div class="row mb-2">
+  <button class="btn btn-outline-secondary py-0 mb-2"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#problemCode"
+          aria-expanded="false"
+          aria-controls="problemCode">
+    Code:
+    <i class="fas fa-chevron-up"></i>
+  </button>
+  <div class="row collapse show" id="problemCode">
   <div class="col">
-    <div class="row mb-3">
+    <div class="row">
       <div class="col">
         <span class="badge bg-secondary col-auto">Code input:</span>
         <form id="codeForm"
@@ -65,4 +75,5 @@
       </div>
     {% endif %}
   </div>
+</div>
 </div>
