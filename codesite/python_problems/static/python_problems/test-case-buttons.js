@@ -1,9 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
+   // Test Case buttons.
    const testcaseElements = document.getElementsByClassName('testCaseContent');
    const testCaseLength = testcaseElements.length;
    const testCaseButtonContainer = document.getElementById('testCaseButtonContainer');
    const copyBtn = document.getElementById('copyBtn');
    const rawTestCases = document.getElementById('rawTestCases').innerText;
+
+   // Collapsable paragraph.
+   const testCaseElements = document.getElementById('problemTestCases');
+   const testCaseCollapse = new bootstrap.Collapse(testCaseElements, { toggle: false });
+   const testCaseToggle = document.querySelector('[data-bs-target="#problemTestCases"]');
+   const icon = testCaseToggle.querySelector('i');
+   const isTestCaseVisible = localStorage.getItem('testCaseState') !== 'false';
+   isTestCaseVisible ? testCaseCollapse.show() : testCaseCollapse.hide();
+
+   testCaseElements.addEventListener('shown.bs.collapse', () => {
+      localStorage.setItem('testCaseState', 'true');
+      icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+      testCaseToggle.setAttribute('aria-expanded', 'true');
+   });
+
+   testCaseElements.addEventListener('hidden.bs.collapse', () => {
+      localStorage.setItem('testCaseState', 'false');
+      icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+      testCaseToggle.setAttribute('aria-expanded', 'false');
+   });
 
    for (let index = 1; index < testCaseLength + 1; index++) {
       const button = document.createElement('button');
