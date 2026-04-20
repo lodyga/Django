@@ -8,8 +8,8 @@
     Test Cases:
     <i class="fas fa-chevron-up"></i>
   </button>
-  {% if test_cases %}
-    <div class="row collapse show" id="problemTestCases">
+  <div class="row collapse show" id="problemTestCases">
+    {% if test_cases %}
       <div class="row">
         <div class="col-auto" id="testCasesContainer">
           {% for test_case in test_cases %}

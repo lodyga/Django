@@ -9,9 +9,18 @@
     Description:
     <i class="fas fa-chevron-up"></i>
   </button>
-  {% autoescape off %}
-    <pre class="mb-5 collapse show"
-         style="white-space: pre-wrap"
-         id="problemDescription">{{ problem.description|process_linked_lists }}</pre>
-  {% endautoescape %}
+  <div id="problemDescription" class="collapse show">
+    <pre class="mb-3" style="white-space: pre-wrap">{{ question }}
+  </pre>
+    {% if examples %}
+      <div id="exampleButtonContainer" class="mb-3">
+        {# Placeholder for JavaScript 'python_problems/problem-description.js' buttons #}
+      </div>
+    {% endif %}
+    {% for example in examples %}
+      <pre id="example-{{ forloop.counter }}"
+           class="exampleContent mb-3"
+           style="white-space: pre-wrap">{{ example }}</pre>
+    {% endfor %}
+  </div>
 </div>

@@ -343,3 +343,36 @@ def get_adjacent_slugs(problem, language):
         solution__language=language).first().slug
 
     return (prev_problem_slug, next_problem_slug)
+
+
+def parse_problem_description(problem_description):
+    if not problem_description:
+        return ("", [])
+
+    normalized = problem_description.replace("\r\n", "\n")
+
+    def clean_segment(text):
+        cleaned = re.sub(r"(?i)</?p>", "\n", text)
+        cleaned = re.sub(r"(?i)<br\s*/?>", "\n", cleaned)
+        cleaned = re.sub(r"(?i)</?b>", "", cleaned)
+        lines = [line.strip() for line in cleaned.split("\n")]
+
+        while lines and not lines[0]:
+            lines.pop(0)
+        while lines and not lines[-1]:
+            lines.pop()
+
+        return "\n".join(lines)
+
+    pre_blocks = re.findall(r"(?is)<pre>(.*?)</pre>", normalized)
+    question_raw = normalized.split(
+        "<pre>", 1)[0] if pre_blocks else normalized
+
+    question = clean_segment(question_raw)
+    examples = []
+    for block in pre_blocks:
+        cleaned_block = clean_segment(block)
+        if cleaned_block:
+            examples.append(cleaned_block)
+
+    return (question, examples)

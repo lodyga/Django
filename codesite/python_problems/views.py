@@ -178,7 +178,10 @@ class ProblemDetailView(DetailView):
         prev_problem_slug, next_problem_slug = get_adjacent_slugs(
             problem, language)
 
+        (question, examples) = parse_problem_description(problem.description)
+
         context.update({
+            "examples": examples,
             "language": language,
             "language_id": language_id,
             'next_problem_slug': next_problem_slug,
@@ -186,6 +189,7 @@ class ProblemDetailView(DetailView):
             "owner_id": owner_id,
             "owners": owners,
             'prev_problem_slug': prev_problem_slug,
+            "question": question,
             "raw_test_cases": solution.test_cases,
             "related_problems": related_problems,
             "solution": solution,
