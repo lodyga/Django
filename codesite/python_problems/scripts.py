@@ -362,6 +362,8 @@ def parse_problem_description(problem_description):
         while lines and not lines[-1]:
             lines.pop()
 
+        if lines[0].startswith("Example "):
+            lines.pop(0)
         return "\n".join(lines)
 
     pre_blocks = re.findall(r"(?is)<pre>(.*?)</pre>", normalized)
