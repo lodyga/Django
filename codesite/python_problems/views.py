@@ -67,9 +67,26 @@ class ProblemIndexView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        page_problems = list(context["page_obj"].object_list)
+        problem_ids = [problem.id for problem in page_problems]
+
+        solution_language_rows = (
+            Solution.objects
+            .filter(problem_id__in=problem_ids)
+            .values("problem_id", "language__name")
+            .distinct()
+            # .order_by("problem_id", "language__name")
+        )
+        problem_languages = {}
+        for row in solution_language_rows:
+            problem_id = row["problem_id"]
+            language_name = row["language__name"]
+            problem_languages.setdefault(problem_id, []).append(language_name)
+
         context["difficulty_list"] = Difficulty.objects.all()
         context["problem_list"] = Problem.objects.all()
         context["tag_list"] = Tag.objects.all()
+        context["problem_languages"] = problem_languages
         context["language_list"] = (
             Language.objects
             .annotate(solution_count=Count("solution"))
@@ -94,9 +111,6 @@ class ProblemIndexView(ListView):
 
         return context
 
-    # def post(self, request, **kwargs):
-    #     if "message" in request.POST:
-    #         return get_cohere_response(request)
 
 class ProblemDetailView(DetailView):
     model = Problem

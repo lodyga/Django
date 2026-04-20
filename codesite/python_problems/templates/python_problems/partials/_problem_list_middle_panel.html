@@ -4,10 +4,7 @@
 </div>
 {% if page_obj %}
   <div class="mb-3">
-    <button class="btn btn-secondary px-2 py-0"
-            id="toggleTagsButton">
-      Show tags
-    </button>
+    <button class="btn btn-secondary px-2 py-0" id="toggleTagsButton">Show tags</button>
   </div>
   <ul>
     {% for problem in page_obj %}
@@ -46,10 +43,10 @@
             </div>
             <!-- Problem languages -->
             <div class="col-md-auto">
-              {% for solution in problem.solution_set.all %}
+              {% for language_name in problem_languages|dict_key:problem.id %}
                 <a class="btn btn-link py-0 px-1"
-                   href="{% url 'python_problems:problem-detail' problem.slug solution.language %}"
-                   role="button">{{ solution.language }}</a>
+                   href="{% url 'python_problems:problem-detail' problem.slug language_name %}"
+                   role="button">{{ language_name }}</a>
               {% endfor %}
             </div>
           </div>
