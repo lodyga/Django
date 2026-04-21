@@ -5,7 +5,12 @@
   {% for value in problems_per_page_options %}
     <option value="{{ value }}"
             {% if value == problems_per_page %}selected{% endif %}>
-      {% if value == problem_list|length %}All{% else %}{{ value }}{% endif %} / page
+      {% if value == problem_list|length %}
+        All
+      {% else %}
+        {{ value }}
+      {% endif %}
+      / page
     </option>
   {% endfor %}
 </select>

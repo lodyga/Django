@@ -1,19 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
+   const problemSolutionElement = document.getElementById('problemSolution');
    const infoToggle = document.querySelector('[data-bs-target="#problemSolution"]');
+
+   if (!problemSolutionElement || !infoToggle) {
+      return;
+   }
+
    const icon = infoToggle.querySelector('i');
-   const b = infoToggle.querySelector('b');
-
-   // Get saved state (default to true if not set)
-   const isProblemSolutionVisible = localStorage.getItem('problemSolutionState') === 'true';
-
-   // Initialize Bootstrap collapse
-   const solutionCollapse = new bootstrap.Collapse('#problemSolution', {
-      toggle: false
+   const solutionCollapse = new bootstrap.Collapse(problemSolutionElement, {
+      toggle: false,
    });
 
-   // Set initial icon and aria state
+   const shouldOpenFromHash = window.location.hash === '#problemSolution';
+   const isProblemSolutionVisible = shouldOpenFromHash
+      || localStorage.getItem('problemSolutionState') === 'true';
+
    if (isProblemSolutionVisible) {
       solutionCollapse.show();
+      localStorage.setItem('problemSolutionState', 'true');
       icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
       infoToggle.setAttribute('aria-expanded', 'true');
    } else {
@@ -22,16 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
       infoToggle.setAttribute('aria-expanded', 'false');
    }
 
-   // Update state when collapse event occurs
-   document.getElementById('problemSolution').addEventListener('shown.bs.collapse', () => {
+   problemSolutionElement.addEventListener('shown.bs.collapse', () => {
       localStorage.setItem('problemSolutionState', 'true');
       icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-      // b.textContent = 'Hide Info';
+      infoToggle.setAttribute('aria-expanded', 'true');
    });
 
-   document.getElementById('problemSolution').addEventListener('hidden.bs.collapse', () => {
+   problemSolutionElement.addEventListener('hidden.bs.collapse', () => {
       localStorage.setItem('problemSolutionState', 'false');
       icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-      // b.textContent = 'Show Info';
+      infoToggle.setAttribute('aria-expanded', 'false');
    });
 });
