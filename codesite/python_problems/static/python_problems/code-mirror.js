@@ -23,6 +23,7 @@ function getLanguageId() {
 
 function ensureSolutionViewer() {
    const solutionContentContainer = document.getElementById('solutionContentContainer');
+   
    if (!solutionContentContainer) {
       return;
    }
@@ -44,6 +45,25 @@ function ensureSolutionViewer() {
 
    solutionViewer.refresh();
 }
+
+function setSolutionViewerContent(content) {
+   const solutionContentContainer = document.getElementById('solutionContentContainer');
+
+   if (!solutionContentContainer) {
+      return;
+   }
+
+   solutionContentContainer.value = content;
+   ensureSolutionViewer();
+
+   if (solutionViewer) {
+      solutionViewer.setValue(content);
+      solutionViewer.refresh();
+   }
+}
+
+window.ensureSolutionViewer = ensureSolutionViewer;
+window.setSolutionViewerContent = setSolutionViewerContent;
 
 
 document.addEventListener('DOMContentLoaded', () => {

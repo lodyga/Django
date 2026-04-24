@@ -37,4 +37,46 @@ document.addEventListener('DOMContentLoaded', () => {
       icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
       infoToggle.setAttribute('aria-expanded', 'false');
    });
+
+   const solutionButtonContainer = document.getElementById('solutionButtonContainer');
+   const solutionElements = document.getElementsByClassName('solutionContent');
+   const solutionLength = solutionElements.length;
+
+   if (!solutionButtonContainer || solutionLength === 0) {
+      return;
+   }
+
+   for (let index = 1; index < solutionLength + 1; index++) {
+      const button = document.createElement('button');
+      button.id = `solutionButton-${index}`;
+      button.className = 'btn btn-outline-secondary btn-sm me-2 py-0 px-3';
+      button.textContent = `Solution ${index}`;
+      button.onclick = () => {
+         showSolution(index);
+      };
+      solutionButtonContainer.appendChild(button);
+   }
+
+   function showSolution(idx) {
+      const selectedSolution = document.getElementById(`solution-${idx}`);
+      const selectedContent = selectedSolution?.value || '';
+
+      if (typeof setSolutionViewerContent === 'function') {
+         setSolutionViewerContent(selectedContent);
+      }
+
+      for (let i = 1; i < solutionLength + 1; i++) {
+         const btn = document.getElementById(`solutionButton-${i}`);
+
+         if (i === idx) {
+            btn.classList.replace('btn-outline-secondary', 'btn-secondary');
+         } else {
+            btn.classList.replace('btn-secondary', 'btn-outline-secondary');
+         }
+      }
+   }
+
+   if (solutionLength > 0) {
+      showSolution(1);
+   }
 });

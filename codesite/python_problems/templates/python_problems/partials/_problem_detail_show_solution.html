@@ -61,9 +61,17 @@
           </div>
         </div>
       </div>
-      <form id="ownerSolutionForm">
-        <textarea id="solutionContentContainer">{{ solution.source_code }}</textarea>
-      </form>
+      {% if solution_parts %}
+        <div id="solutionButtonContainer" class="mb-5">
+          {# Placeholder for JavaScript 'python_problems/problem-solution.js' buttons #}
+        </div>
+        <textarea id="solutionContentContainer">{{ solution_parts.0 }}</textarea>
+        {% for solution_part in solution_parts %}
+          <textarea id="solution-{{ forloop.counter }}"
+                    class="solutionContent d-none"
+                    aria-hidden="true">{{ solution_part }}</textarea>
+        {% endfor %}
+        {% endif %}
     </div>
   </div>
 </div>

@@ -130,13 +130,13 @@ class ProblemDetailView(DetailView):
         del language_name
         language_id = language.id
 
-        solutions = Solution.objects.filter(
+        language_solutions = Solution.objects.filter(
             problem=problem,
             language=language)
 
         # Get the list of the owners who have solutions for the problem and language;
         owners = User.objects.filter(
-            id__in=solutions.values_list("owner", flat=True))
+            id__in=language_solutions.values_list("owner", flat=True))
 
         # Get current owner id from the owner form-select
         # (if none selected take the first owner from owners)
@@ -152,15 +152,16 @@ class ProblemDetailView(DetailView):
             .values_list("language", flat=True))
         solution_languages = Language.objects.filter(id__in=language_ids)
 
-        solutions = Solution.objects.filter(
+        owner_language_solutions = Solution.objects.filter(
             problem=problem,
             language=language,
             owner=owner)
 
         # There's only one solution per owner and language
-        solution = solutions.first()
+        selected_solution = owner_language_solutions.first()
+        solution_parts = parse_solutions(selected_solution, language)
 
-        test_cases = clean_test_cases(solution.test_cases)
+        test_cases = clean_test_cases(selected_solution.test_cases)
         url = parse_url(problem.url)
         source_code = get_placeholder_source_code(language.id)
         tag_list = problem.tags.all()
@@ -190,10 +191,11 @@ class ProblemDetailView(DetailView):
             "owners": owners,
             'prev_problem_slug': prev_problem_slug,
             "question": question,
-            "raw_test_cases": solution.test_cases,
+            "raw_test_cases": selected_solution.test_cases,
             "related_problems": related_problems,
-            "solution": solution,
+            "solution": selected_solution,
             "solution_languages": solution_languages,
+            "solution_parts": solution_parts,
             "source_code": source_code,
             "tag_list": tag_list,
             "test_cases": test_cases,
@@ -210,11 +212,7 @@ class ProblemDetailView(DetailView):
             "code_form_action") == "run"
         is_test_code_button_pressed = request.POST.get(
             "code_form_action") == "test"
-        # is_submit_code_button_pressed = request.POST.get("code_form_action") == "submit"
         is_code_container_filled = "code_container" in request.POST
-
-        # if "message" in request.POST:
-        #     return get_cohere_response(request)
 
         if "language_id" in request.POST:
             language_id = request.POST.get("language_id")

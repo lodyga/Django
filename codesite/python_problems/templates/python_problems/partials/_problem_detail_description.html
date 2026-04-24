@@ -16,11 +16,11 @@
       <div id="exampleButtonContainer" class="mb-3">
         {# Placeholder for JavaScript 'python_problems/problem-description.js' buttons #}
       </div>
+      {% for example in examples %}
+        <pre id="example-{{ forloop.counter }}"
+             class="exampleContent mb-3"
+             style="white-space: pre-wrap">{{ example }}</pre>
+      {% endfor %}
     {% endif %}
-    {% for example in examples %}
-      <pre id="example-{{ forloop.counter }}"
-           class="exampleContent mb-3"
-           style="white-space: pre-wrap">{{ example }}</pre>
-    {% endfor %}
   </div>
 </div>
