@@ -357,7 +357,7 @@ def parse_problem_description(problem_description):
         cleaned = re.sub(r"(?i)</?p>", "\n", text)
         cleaned = re.sub(r"(?i)<br\s*/?>", "\n", cleaned)
         cleaned = re.sub(r"(?i)</?b>", "", cleaned)
-        lines = [line.strip() for line in cleaned.split("\n")]
+        lines = [line for line in cleaned.split("\n")]
 
         while lines and not lines[0]:
             lines.pop(0)
