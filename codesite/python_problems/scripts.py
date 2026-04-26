@@ -79,11 +79,45 @@ def is_localhost():
     return hostname == "GF108"
 
 
-def execute_code(source_code, language):
+def get_expected_output_str(source_code, language, button_pressed, test_cases):
+    if button_pressed == "run":
+        return (source_code, "")
+
+    expected_output_str = ""
+
+    for test_case in test_cases:
+        if language == "Python":
+            source_code = source_code + "\r\nprint(" + str(test_case[0]) + ")"
+        elif language == "JavaScript":
+            source_code = source_code + \
+                "\r\nconsole.log(" + str(test_case[0]) + ")"
+        expected_output_str = expected_output_str + str(test_case[1]) + "\n"
+    expected_output_str = re.sub(r"[ \n]", "", expected_output_str)
+
+    return (source_code, expected_output_str)
+
+
+# def runner():
+#     testcases = [
+#         {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]},
+#         {"inputs": [[3, 2, 4], 6], "expected": [1, 2]},
+#     ]
+#
+#     for tc in testcases:
+#         result = Solution().twoSum(*tc["inputs"])
+#         print(result == tc["expected"])
+#
+#     return
+
+
+def execute_code(source_code, language, button_pressed="run", test_cases=""):
     source_code = get_heap_utils(language) + \
         get_binary_tree_utils(language) + \
         get_linked_list_utils(language) + \
         source_code
+
+    (source_code, expected_output_str) = get_expected_output_str(
+        source_code, language, button_pressed, test_cases)
 
     language_name_to_id = {
         "Python": 71,
@@ -91,37 +125,42 @@ def execute_code(source_code, language):
         "Java": 62,
         "C++": 54,
     }
+
     language_id = language_name_to_id[language]
 
     host_url = "http://localhost:2358" if is_localhost() else "https://judge0-ce.p.rapidapi.com"
 
-    # Submit code
     submissions_url = host_url + "/submissions"
     headers = {
         "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
         "x-rapidapi-key": JUDGE0_API_KEY
     }
+
     json = {
         "source_code": source_code,
         "language_id": language_id
     }
+
     querystring = {
         "base64_encoded": "false",
         "wait": "true"
     }
+
+    # Submit code
     response = requests.post(
         submissions_url,
         json=json,
         headers=headers,
         params=querystring
     ).json()
-    token = response["token"]
 
     # Fetch results
-    response_url = f"{submissions_url}/{token}"
-    response = requests.get(response_url, headers=headers).json()
+    # token = response["token"]
+    # response_url = f"{submissions_url}/{token}"
+    # response = requests.get(response_url, headers=headers).json()
 
-    if "error" in response:  # handles C++ response["error"]
+    if "error" in response:
+        # handles C++ response["error"]
         return response["error"]
     # handles Java response["compile_output"]
     elif response["compile_output"] is not None:
@@ -130,72 +169,16 @@ def execute_code(source_code, language):
     status_id = response["status"]["id"]
 
     if status_id == 3:
-        stdout = response["stdout"]
-        return stdout
-    else:
-        stderr = response["stderr"]
-        return stderr
-
-
-def validate_code(source_code, language, test_cases):
-    source_code = get_heap_utils(language) + \
-        get_binary_tree_utils(language) + \
-        get_linked_list_utils(language) + \
-        source_code
-
-    expected_output = ""
-    for test_case in test_cases:
-        if language == "Python":
-            source_code = source_code + "\r\nprint(" + str(test_case[0]) + ")"
-        elif language == "JavaScript":
-            source_code = source_code + \
-                "\r\nconsole.log(" + str(test_case[0]) + ")"
-        expected_output = expected_output + str(test_case[1]) + "\n"
-    expected_output = re.sub(r"[ \n]", "", expected_output)
-
-    host_url = "http://localhost:2358" if is_localhost() else "https://judge0-ce.p.rapidapi.com"
-    submissions_url = host_url + "/submissions"
-    language_name_to_id = {
-        "C++": 54,
-        "Java": 62,
-        "JavaScript": 63,
-        "Python": 71,
-    }
-    language_id = language_name_to_id[language]
-    json = {
-        "language_id": language_id,
-        "source_code": source_code,
-    }
-    headers = {
-        "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
-        "x-rapidapi-key": JUDGE0_API_KEY,
-    }
-    querystring = {
-        "base64_encoded": "false",
-        "wait": "true"
-    }  # Wait for execution to finish
-
-    # Submit code
-    response = requests.post(
-        submissions_url, json=json, headers=headers, params=querystring).json()
-    token = response["token"]
-
-    # Fetch results
-    response_url = f"{submissions_url}/{token}"
-    response = requests.get(response_url, headers=headers).json()
-
-    if "error" in response:  # handles C++ response["error"]
-        return response["error"]
-
-    status_id = response["status"]["id"]
-
-    if status_id == 3:
         stdout_raw = response["stdout"]
+        if button_pressed == "run":
+            return stdout_raw
+
+        # Validate code.
         stdout = re.sub(r"[ \n]", "", stdout_raw) if stdout_raw else stdout_raw
 
         if (
             language == "C++" and not response["stdout"] or
-            stdout.endswith(expected_output) or
+            stdout.endswith(expected_output_str) or
             stdout.find("rue") != -1 and stdout.find("alse") == -1
         ):
             return "Tests passed!"

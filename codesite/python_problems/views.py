@@ -208,10 +208,7 @@ class ProblemDetailView(DetailView):
         context = self.get_context_data(**kwargs)
         User = get_user_model()
 
-        is_run_code_button_pressed = request.POST.get(
-            "code_form_action") == "run"
-        is_test_code_button_pressed = request.POST.get(
-            "code_form_action") == "test"
+        button_pressed = request.POST.get("code_form_action")
         is_code_container_filled = "code_container" in request.POST
 
         if "language_id" in request.POST:
@@ -230,22 +227,14 @@ class ProblemDetailView(DetailView):
             owner=owner,
             language=language).first()
 
-        # Run code
+        # Run or validate code
         if (
-            is_run_code_button_pressed and
+            button_pressed and
             is_code_container_filled
-        ):
+        ):  
             source_code = request.POST.get("code_container")
-            output = execute_code(source_code, language.name)
-            output_container = output
-        # Validate code
-        elif (
-            is_test_code_button_pressed and
-            is_code_container_filled
-        ):
-            source_code = request.POST.get("code_container")
-            test_cases = context["test_cases"]
-            output = validate_code(source_code, language.name, test_cases)
+            test_cases = "" if button_pressed == "run" else context["test_cases"]
+            output = execute_code(source_code, language.name, button_pressed, test_cases)
             output_container = output
         else:
             source_code = context["source_code"]

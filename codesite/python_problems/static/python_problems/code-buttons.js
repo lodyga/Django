@@ -17,17 +17,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // `Test` button
   testCodeButton.addEventListener('click', testCode)
   function testCode() {
-    document.getElementById('codeFormAction').value = 'test';
+    document.getElementById('codeFormAction').value = 'validate';
     const testCodeButtonSpinner = document.getElementById('testCodeButtonSpinner');
     testCodeButton.disabled = true;
-    testCodeButton.firstChild.textContent = 'Testing ';
+    testCodeButton.firstChild.textContent = 'Validating ';
     testCodeButtonSpinner.classList.remove('d-none');
     codeForm.submit();
   }
 
   codeForm.addEventListener('keydown', (event) => {
     if (event.ctrlKey) {
-      if (event.key === "'" || event.code == 'Quote') {
+      // event.code == 'Quote'  || 
+      if (event.key === "'") {
         event.preventDefault();
         runCode();
       }

@@ -2,7 +2,6 @@
 # hints to buttons
 # color code output badge greee/red for pass/fail
 # code mode/browse mode
-# merge validate_code and run_code in scripts.py
 # submit/ >> append, > overwrite
 # user dashboard
 # in detail view back button with filters precerved
