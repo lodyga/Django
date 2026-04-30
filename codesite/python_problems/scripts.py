@@ -68,32 +68,59 @@ def get_solution_test_cases(solution_test_cases):
     return test_cases
 
 
+def serialize(value, language):
+    """
+    [2, 7, 11, 15] => '[2, 7, 11, 15]'
+    """
+    if language == "Python":
+        return repr(value)
+
+    return json.dumps(value)
+
+
 def get_ui_test_cases(problem, solution, language):
     """
-    For problem format
+    Problem TC format
     [('nums = [2, 7, 11, 15]\ntarget = 9', [0, 1]), ...]
     """
-    # Test cases from problem.
     if problem.get_shared_testcases():
-        res = []
-        for test_case in problem.get_shared_testcases():
-            inputs = test_case.data.get("inputs")
-            if not isinstance(inputs, list):
-                inputs = [inputs]
+        ui_test_cases = []
 
-            if problem.argument_names and len(problem.argument_names) == len(inputs):
-                display_input = "\n".join(
-                    f"{name} = {serialize_by_language(value, language)}"
-                    for name, value in zip(problem.argument_names, inputs)
-                )
-            else:
-                display_input = inputs
+        if problem.problem_type == "function":
+            for test_case in problem.get_shared_testcases():
+                inputs = get_field(test_case.data, "inputs")
+                expected = get_field(test_case.data, "expected")
 
-            res.append((
-                display_input,
-                serialize_by_language(test_case.data.get("expected"), language))
-            )
-        return res
+                if (
+                    problem.argument_names and
+                    len(problem.argument_names) == len(inputs)
+                ):
+                    display_input = "\n".join(
+                        f"{name} = {serialize(value, language)}"
+                        for name, value in zip(problem.argument_names, inputs)
+                    )
+                else:
+                    display_input = inputs
+
+                ui_test_cases.append((display_input, expected))
+
+        elif problem.problem_type == "class":
+            for test_case in problem.get_shared_testcases():
+                operations = get_field(test_case.data, "operations")
+                arguments = get_field(test_case.data, "arguments")
+                expected = get_field(test_case.data, "expected")
+
+                if (len(operations) == len(arguments)):
+                    display_input = "\n".join(
+                        f"{op}({", ".join(map(str, ar))})"
+                        for (op, ar) in zip(operations, arguments)
+                    )
+                else:
+                    display_input = (operations, arguments)
+
+                ui_test_cases.append((display_input, expected))
+
+        return ui_test_cases
 
     # Test cases from solution.
     elif solution_test_cases := get_solution_test_cases(solution.test_cases):
@@ -111,14 +138,19 @@ def get_ui_test_cases(problem, solution, language):
         return []
 
 
-def serialize_by_language(value, language):
-    """
-    [2, 7, 11, 15] => '[2, 7, 11, 15]'
-    """
-    if language == "Python":
-        return repr(value)
+def get_field(data, key):
+    if isinstance(data, dict):
+        return data[key]
 
-    return json.dumps(value)
+    elif isinstance(data, list):
+        idx_map = {
+            "inputs": 0,
+            "expected": 1 if len(data) == 2 else 2,
+            "operations": 0,
+            "arguments": 1,
+            # "expected": 2,
+        }
+        return data[idx_map[key]]
 
 
 def build_problem_test_case_expression(problem, test_case_data, language):
@@ -129,14 +161,11 @@ def build_problem_test_case_expression(problem, test_case_data, language):
     if not method_name:
         return None
 
-    inputs = test_case_data.get("inputs", [])
-    if not isinstance(inputs, list):
-        inputs = [inputs]
+    # inputs = test_case_data.get("inputs", [])
+    inputs = get_field(test_case_data, "inputs")
 
     serialized_inputs = ", ".join(
-        repr(value) if language == "Python" else
-        json.dumps(value)
-        # serialize_by_language(value, language)
+        serialize(value, language)
         for value in inputs
     )
     return f"solution.{method_name}({serialized_inputs})"
@@ -155,8 +184,8 @@ def get_problem_test_cases(problem, language):
         if not expression:
             continue
 
-        expected = serialize_by_language(
-            test_case.data.get("expected"),
+        expected = serialize(
+            get_field(test_case.data, "expected"),
             language
         )
         problem_test_cases.append((expression, expected))
@@ -174,16 +203,6 @@ def get_effective_test_cases(problem, solution, language):
         return solution_test_cases
     else:
         return []
-
-
-def get_clipboard_test_cases(problem, solution, language):
-
-    res = get_solution_instance_setup(problem, language)
-
-    return res + "\n" + "\n".join(
-        f"{get_print(language)}({test_case[0]}, {test_case[1]})"
-        for test_case in get_effective_test_cases(problem, solution, language)
-    )
 
 
 def get_print(language):
@@ -206,6 +225,15 @@ def get_solution_instance_setup(problem, language):
             return "\r\nconst solution = new Solution();"
         case _:
             return ""
+
+
+def get_clipboard_test_cases(problem, solution, language):
+    res = get_solution_instance_setup(problem, language)
+
+    return res + "\n" + "\n".join(
+        f"{get_print(language)}({test_case[0]}, {test_case[1]})"
+        for test_case in get_effective_test_cases(problem, solution, language)
+    )
 
 
 def parse_url(raw_url):
@@ -238,6 +266,10 @@ def get_expected_output_str(source_code, language, button_pressed, test_cases):
 
 
 def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
+    # Correct types:
+    #     list => List
+    source_code = re.sub(r" list\[", r" List[", source_code)
+
     source_code = get_heap_utils(language) + \
         get_binary_tree_utils(language) + \
         get_linked_list_utils(language) + \
@@ -398,7 +430,7 @@ def get_placeholder_source_code(language_id):
     """
     match language_id:
         case 1:
-            placeholder_source_code = """# Python (3.8.1)\r\n\r\nfrom typing import Optional, List  # Use types from typing\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
+            placeholder_source_code = """# Python (3.8.1)\r\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
         case 2:
             placeholder_source_code = """// JavaScript (Node.js 12.14.0)\r\n\r\nclass Solution {\r\n  fun(x) {\r\n    return x\r\n  }\r\n}\r\n\r\nconst solution = new Solution();\r\nconsole.log(solution.fun('Hello, World!'))"""
         case 6:

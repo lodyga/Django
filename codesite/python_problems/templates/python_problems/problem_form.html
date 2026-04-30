@@ -30,7 +30,9 @@
             <div>
               <b>Test case format:</b> one JSON object per line.
             </div>
-            <pre class="mb-0 mt-2"><code>{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}</code></pre>
+            <pre class="mb-0"><code>{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}</code></pre>
+            or
+            <pre class="mb-0"><code>[[[2, 7, 11, 15], 9], [0, 1]]</code></pre>
           </div>
           {{ form.problem_type|as_crispy_field }}
           {{ form.method_name|as_crispy_field }}

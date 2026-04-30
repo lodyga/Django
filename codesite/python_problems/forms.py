@@ -71,7 +71,7 @@ class ProblemForm(forms.ModelForm):
     def clean_shared_test_cases(self):
         raw_value = self.cleaned_data.get("shared_test_cases", "")
         lines = [line.strip()
-                 for line in raw_value.splitlines() 
+                 for line in raw_value.splitlines()
                  if line.strip()]
 
         parsed_test_cases = []
@@ -83,15 +83,25 @@ class ProblemForm(forms.ModelForm):
                     f"Line {index} is not valid JSON: {exc.msg}"
                 ) from exc
 
-            if not isinstance(data, dict):
+            if (not isinstance(data, list) and not isinstance(data, dict)):
                 raise ValidationError(
                     f"Line {index} must be a JSON object."
                 )
 
-            # if "inputs" not in data or "expected" not in data:
+            # if (
+            #     isinstance(data, dict) and
+            #     ("inputs" not in data or "expected" not in data)
+            # ):
             #     raise ValidationError(
-            #         f'Line {index} must contain both "inputs" and "expected".'
-            #     )
+            #         f'Line {index} must contain both "inputs" and "expected".')
+
+            # if (
+            #     isinstance(data, list) and
+            #     (not isinstance(data[0], list) or
+            #      not isinstance(data[1], list))
+            # ):
+            #     raise ValidationError(
+            #         f'Line {index} must contain both "inputs" and "expected".')
 
             parsed_test_cases.append(data)
 
@@ -116,7 +126,8 @@ class ProblemForm(forms.ModelForm):
             raise ValidationError("Argument names must be a JSON list.")
 
         if not all(isinstance(name, str) and name.strip() for name in argument_names):
-            raise ValidationError("Each argument name must be a non-empty string.")
+            raise ValidationError(
+                "Each argument name must be a non-empty string.")
 
         return argument_names
 
