@@ -161,7 +161,17 @@ class ProblemDetailView(DetailView):
         selected_solution = owner_language_solutions.first()
         solution_parts = parse_solutions(selected_solution, language)
 
-        test_cases = clean_test_cases(selected_solution.test_cases)
+        ui_test_cases = get_ui_test_cases(problem, selected_solution, language.name)
+        effective_test_cases = get_effective_test_cases(
+            problem,
+            selected_solution,
+            language.name,
+        )
+        clipboard_test_cases = get_clipboard_test_cases(
+            problem,
+            selected_solution,
+            language.name,
+        )
         url = parse_url(problem.url)
         source_code = get_placeholder_source_code(language.id)
         tag_list = problem.tags.all()
@@ -191,14 +201,15 @@ class ProblemDetailView(DetailView):
             "owners": owners,
             'prev_problem_slug': prev_problem_slug,
             "question": question,
-            "raw_test_cases": selected_solution.test_cases,
+            "effective_test_cases": effective_test_cases,
+            "clipboard_test_cases": clipboard_test_cases,
             "related_problems": related_problems,
             "solution": selected_solution,
             "solution_languages": solution_languages,
             "solution_parts": solution_parts,
             "source_code": source_code,
             "tag_list": tag_list,
-            "test_cases": test_cases,
+            "ui_test_cases": ui_test_cases,
             "url": url,
         })
         return context
@@ -233,8 +244,8 @@ class ProblemDetailView(DetailView):
             is_code_container_filled
         ):  
             source_code = request.POST.get("code_container")
-            test_cases = "" if button_pressed == "run" else context["test_cases"]
-            output = execute_code(source_code, language.name, button_pressed, test_cases)
+            test_cases = "" if button_pressed == "run" else context["effective_test_cases"]
+            output = execute_code(problem, source_code, language.name, button_pressed, test_cases)
             output_container = output
         else:
             source_code = context["source_code"]
@@ -242,11 +253,10 @@ class ProblemDetailView(DetailView):
 
         context.update({
             "source_code": source_code,
+            "language": language,
             "language_id": language_id,
             "output_container": output_container,
             "owner_id": owner_id,
-            "raw_test_cases": solution.test_cases,
-            "solution": solution,
         })
         return render(request, self.template_name, context)
 
@@ -275,13 +285,11 @@ class TagDelete(LoginRequiredMixin, DeleteView):
 
 class ProblemCreate(LoginRequiredMixin, CreateView):
     model = Problem
-    form_class = ProblemForm  # Custom form to remove "slug", "owner" fields
+    form_class = ProblemForm
     success_url = reverse_lazy('python_problems:problem-index')
 
     def form_valid(self, form):
-        object = form.save(commit=False)
-        object.owner = self.request.user
-        object.save()
+        form.instance.owner = self.request.user
         return super().form_valid(form)
 
 

@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
    const testcaseElements = document.getElementsByClassName('testCaseContent');
    const testCaseLength = testcaseElements.length;
    const testCaseButtonContainer = document.getElementById('testCaseButtonContainer');
-   const copyBtn = document.getElementById('copyBtn');
-   const rawTestCases = document.getElementById('rawTestCases').innerText;
+   const copyTestCasesBtn = document.getElementById('copyTestCasesBtn');
+   const clipboardTestCases = document.getElementById('clipboardTestCases').innerText;
 
    // Collapsable paragraph.
    const testCaseElements = document.getElementById('problemTestCases');
@@ -57,16 +57,16 @@ document.addEventListener('DOMContentLoaded', () => {
       showTestCase(1);
    }
 
-   copyBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(rawTestCases)
+   copyTestCasesBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(clipboardTestCases)
          .then(() => {
-            copyBtn.classList.replace('btn-secondary', 'btn-success');
-            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            copyTestCasesBtn.classList.replace('btn-secondary', 'btn-success');
+            copyTestCasesBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
             setTimeout(() => {
-               copyBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
-               copyBtn.classList.replace('btn-success', 'btn-secondary');
+               copyTestCasesBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+               copyTestCasesBtn.classList.replace('btn-success', 'btn-secondary');
             }, 2000);
          })
-   });
+   })
 
-});
+})

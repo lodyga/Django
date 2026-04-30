@@ -52,6 +52,9 @@ def get_linked_list_values(root: ListNode) -> List[int]:
 
 
 def are_linked_lists_equeal(root1: ListNode, root2: ListNode) -> bool:
+    """
+    Compare two linked lists value by value.
+    """
     node1 = root1
     node2 = root2
 

@@ -78,6 +78,7 @@ list(problem.solution_set.values_list("language__name", flat=True).distinct())
 
   
 <div class="row justify-content-"
+<div class="d-flex justify-content-"
 start
 center
 end

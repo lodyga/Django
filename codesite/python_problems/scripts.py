@@ -1,4 +1,4 @@
-
+import json
 import re
 import requests
 import socket
@@ -10,9 +10,9 @@ from python_problems.auth.judge0_auth import JUDGE0_API_KEY
 from python_problems.models import Problem
 
 
-def clean_test_cases(solution_test_cases):
+def get_solution_test_cases(solution_test_cases):
     """
-    Clean each test case into (input, output) tuple.
+    Clean each solution test case into (input, expected output) tuple.
     """
     if not solution_test_cases:
         return []
@@ -68,6 +68,146 @@ def clean_test_cases(solution_test_cases):
     return test_cases
 
 
+def get_ui_test_cases(problem, solution, language):
+    """
+    For problem format
+    [('nums = [2, 7, 11, 15]\ntarget = 9', [0, 1]), ...]
+    """
+    # Test cases from problem.
+    if problem.get_shared_testcases():
+        res = []
+        for test_case in problem.get_shared_testcases():
+            inputs = test_case.data.get("inputs")
+            if not isinstance(inputs, list):
+                inputs = [inputs]
+
+            if problem.argument_names and len(problem.argument_names) == len(inputs):
+                display_input = "\n".join(
+                    f"{name} = {serialize_by_language(value, language)}"
+                    for name, value in zip(problem.argument_names, inputs)
+                )
+            else:
+                display_input = inputs
+
+            res.append((
+                display_input,
+                serialize_by_language(test_case.data.get("expected"), language))
+            )
+        return res
+
+    # Test cases from solution.
+    elif solution_test_cases := get_solution_test_cases(solution.test_cases):
+        res = []
+        for test_case in solution_test_cases:
+            inputs, excepted = test_case
+
+            if inputs.startswith("Solution()"):
+                inputs = inputs[11:]
+
+            res.append((inputs, excepted))
+        return res
+
+    else:
+        return []
+
+
+def serialize_by_language(value, language):
+    """
+    [2, 7, 11, 15] => '[2, 7, 11, 15]'
+    """
+    if language == "Python":
+        return repr(value)
+
+    return json.dumps(value)
+
+
+def build_problem_test_case_expression(problem, test_case_data, language):
+    # test_case_data["inputs"] = [[2, 7, 11, 15], 9]
+    # =>
+    # 'solution.twoSum([[2, 7, 11, 15], 9])'
+    method_name = problem.method_name
+    if not method_name:
+        return None
+
+    inputs = test_case_data.get("inputs", [])
+    if not isinstance(inputs, list):
+        inputs = [inputs]
+
+    serialized_inputs = ", ".join(
+        repr(value) if language == "Python" else
+        json.dumps(value)
+        # serialize_by_language(value, language)
+        for value in inputs
+    )
+    return f"solution.{method_name}({serialized_inputs})"
+
+
+def get_problem_test_cases(problem, language):
+    # [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
+    problem_test_cases = []
+
+    for test_case in problem.get_shared_testcases():
+        expression = build_problem_test_case_expression(
+            problem,
+            test_case.data,
+            language,
+        )
+        if not expression:
+            continue
+
+        expected = serialize_by_language(
+            test_case.data.get("expected"),
+            language
+        )
+        problem_test_cases.append((expression, expected))
+
+    return problem_test_cases
+
+
+def get_effective_test_cases(problem, solution, language):
+    """
+    => [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
+    """
+    if problem_test_cases := get_problem_test_cases(problem, language):
+        return problem_test_cases
+    elif solution_test_cases := get_solution_test_cases(solution.test_cases):
+        return solution_test_cases
+    else:
+        return []
+
+
+def get_clipboard_test_cases(problem, solution, language):
+
+    res = get_solution_instance_setup(problem, language)
+
+    return res + "\n" + "\n".join(
+        f"{get_print(language)}({test_case[0]}, {test_case[1]})"
+        for test_case in get_effective_test_cases(problem, solution, language)
+    )
+
+
+def get_print(language):
+    if language == "Python":
+        return "print"
+    elif language == "JavaScript":
+        return "console.log"
+    else:
+        return ""
+
+
+def get_solution_instance_setup(problem, language):
+    if not problem.method_name:
+        return ""
+
+    match language:
+        case "Python":
+            return "\r\nsolution = Solution()"
+        case "JavaScript":
+            return "\r\nconst solution = new Solution();"
+        case _:
+            return ""
+
+
 def parse_url(raw_url):
     return re.search(r"((https?)://)?(www\.)?(app\.)?(\w+\.\w+)(/)?", raw_url).group(5)
 
@@ -97,27 +237,23 @@ def get_expected_output_str(source_code, language, button_pressed, test_cases):
     return (source_code, expected_output_str)
 
 
-# def runner():
-#     testcases = [
-#         {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]},
-#         {"inputs": [[3, 2, 4], 6], "expected": [1, 2]},
-#     ]
-#
-#     for tc in testcases:
-#         result = Solution().twoSum(*tc["inputs"])
-#         print(result == tc["expected"])
-#
-#     return
-
-
-def execute_code(source_code, language, button_pressed="run", test_cases=""):
+def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
     source_code = get_heap_utils(language) + \
         get_binary_tree_utils(language) + \
         get_linked_list_utils(language) + \
         source_code
 
-    (source_code, expected_output_str) = get_expected_output_str(
-        source_code, language, button_pressed, test_cases)
+    expected_output_str = ""
+    if button_pressed != "run":
+        if problem.method_name:
+            source_code += get_solution_instance_setup(problem, language)
+
+        (source_code, expected_output_str) = get_expected_output_str(
+            source_code,
+            language,
+            button_pressed,
+            test_cases,
+        )
 
     language_name_to_id = {
         "Python": 71,

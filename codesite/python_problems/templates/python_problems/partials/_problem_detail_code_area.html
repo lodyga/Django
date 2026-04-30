@@ -14,7 +14,7 @@
       <div class="col">
         <span class="badge bg-secondary col-auto">Code input:</span>
         <form id="codeForm"
-              action="{% url 'python_problems:problem-detail' problem.slug solution.language.name %}"
+              action="{% url 'python_problems:problem-detail' problem.slug language.name %}"
               method="post"
               class="mb-2">
           {% csrf_token %}

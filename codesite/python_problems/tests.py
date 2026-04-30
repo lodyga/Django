@@ -4,7 +4,8 @@ import os
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
-from .models import Complexity, Difficulty, Language, Problem, Solution, Tag
+from .forms import ProblemForm
+from .models import Complexity, Difficulty, Language, Problem, Solution, Tag, TestCase as ProblemTestCase
 from .views import ProblemIndexView
 
 
@@ -90,6 +91,20 @@ def create_sample_solution(
     return solution
 
 
+def create_problem_test_case(problem=None, data=None, is_hidden=False, order=0):
+    if problem is None:
+        problem = create_sample_problem()
+    if data is None:
+        data = {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}
+
+    return ProblemTestCase.objects.create(
+        problem=problem,
+        data=data,
+        is_hidden=is_hidden,
+        order=order,
+    )
+
+
 class BasicModelTests(TestCase):
     def test_create_tag(self):
         """
@@ -164,6 +179,13 @@ class ProblemModelTests(TestCase):
         self.assertEqual(problem.description, description)
         self.assertEqual(problem.owner, owner)
 
+    def test_problem_shared_testcases_exclude_hidden_by_default(self):
+        problem = create_sample_problem()
+        visible = create_problem_test_case(problem=problem, order=1)
+        create_problem_test_case(problem=problem, is_hidden=True, order=2)
+
+        self.assertEqual(list(problem.get_shared_testcases()), [visible])
+
     def test_create_two_problems_with_same_difficulty(self):
         """
         Test creating two Problem instances linked to the same Difficulty instance.
@@ -197,6 +219,111 @@ class ProblemModelTests(TestCase):
         self.assertEqual(problems.count(), 2)
         self.assertEqual(Difficulty.objects.count(), 2)
         self.assertNotEqual(problems[0].difficulty, problems[1].difficulty)
+
+
+class ProblemFormTests(TestCase):
+    def test_problem_form_disables_method_fields_for_class_design(self):
+        form = ProblemForm(initial={"problem_type": Problem.CLASS})
+
+        self.assertEqual(
+            form.fields["method_name"].widget.attrs.get("disabled"),
+            "disabled",
+        )
+        self.assertEqual(
+            form.fields["argument_names"].widget.attrs.get("disabled"),
+            "disabled",
+        )
+
+    def test_problem_form_initial_argument_names_is_json(self):
+        problem = create_sample_problem()
+        problem.argument_names = ["nums", "target"]
+        problem.save(update_fields=["argument_names"])
+
+        form = ProblemForm(instance=problem)
+
+        self.assertEqual(form.initial["argument_names"], '["nums", "target"]')
+
+    def test_problem_form_saves_problem_testcases(self):
+        difficulty = Difficulty.objects.create(name="Easy")
+        tag = Tag.objects.create(name="Array")
+
+        form = ProblemForm(data={
+            "title": "Two Sum",
+            "url": "https://example.com",
+            "difficulty": difficulty.id,
+            "description": "Sample problem description",
+            "tags": [tag.id],
+            "problem_type": Problem.FUNCTION,
+            "method_name": "twoSum",
+            "argument_names": '["nums", "target"]',
+            "shared_test_cases": (
+                '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}\n'
+                '{"inputs": [[3, 2, 4], 6], "expected": [1, 2]}'
+            ),
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+        form.instance.owner = get_user_model().objects.create_user(
+            username="tester"
+        )
+        problem = form.save()
+
+        self.assertEqual(problem.testcases.count(), 2)
+        self.assertEqual(problem.argument_names, ["nums", "target"])
+        self.assertEqual(
+            problem.testcases.first().data,
+            {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]},
+        )
+
+    def test_problem_form_rejects_invalid_argument_names(self):
+        difficulty = Difficulty.objects.create(name="Easy")
+        tag = Tag.objects.create(name="Array")
+
+        form = ProblemForm(data={
+            "title": "Two Sum",
+            "url": "https://example.com",
+            "difficulty": difficulty.id,
+            "description": "Sample problem description",
+            "tags": [tag.id],
+            "problem_type": Problem.FUNCTION,
+            "method_name": "twoSum",
+            "argument_names": '{"nums": 1}',
+            "shared_test_cases": (
+                '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}'
+            ),
+        })
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("Argument names must be a JSON list.", form.errors["argument_names"])
+
+    def test_problem_form_clears_method_fields_for_class_design(self):
+        difficulty = Difficulty.objects.create(name="Easy")
+        tag = Tag.objects.create(name="Array")
+
+        form = ProblemForm(data={
+            "title": "Design Parking System",
+            "url": "https://example.com",
+            "difficulty": difficulty.id,
+            "description": "Sample problem description",
+            "tags": [tag.id],
+            "problem_type": Problem.CLASS,
+            "method_name": "shouldBeIgnored",
+            "argument_names": '["ignored"]',
+            "shared_test_cases": (
+                '{"inputs": [1, 1, 0], "expected": null}'
+            ),
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+        form.instance.owner = get_user_model().objects.create_user(
+            username="class-tester"
+        )
+        problem = form.save()
+
+        self.assertIsNone(problem.method_name)
+        self.assertIsNone(problem.argument_names)
 
 
 class SolutionModelTests(TestCase):
@@ -394,6 +521,58 @@ class SolutionDetailViewTests(TestCase):
         self.assertContains(response, solution.problem.owner)
         self.assertContains(response, solution.language)
         self.assertContains(response, solution.owner)
+
+    def test_problem_level_testcases_override_solution_testcases(self):
+        problem = create_sample_problem()
+        problem.method_name = "twoSum"
+        problem.save(update_fields=["method_name"])
+        solution = create_sample_solution(
+            problem=problem,
+            test_cases='(solution.twoSum([3, 3], 6), [0, 1])'
+        )
+        create_problem_test_case(
+            problem=solution.problem,
+            data={"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]},
+            order=1,
+        )
+
+        url = reverse(
+            "python_problems:problem-detail",
+            kwargs={"slug": solution.problem.slug, "language": solution.language.name},
+        )
+        response = self.client.get(url)
+
+        self.assertContains(response, "solution.twoSum([2, 7, 11, 15], 9)")
+        self.assertNotContains(response, "solution.twoSum([3, 3], 6)")
+        self.assertEqual(
+            response.context["raw_test_cases"],
+            "(solution.twoSum([2, 7, 11, 15], 9), [0, 1])",
+        )
+
+    def test_problem_argument_names_label_ui_testcases(self):
+        problem = create_sample_problem()
+        problem.method_name = "twoSum"
+        problem.argument_names = ["nums", "target"]
+        problem.save(update_fields=["method_name", "argument_names"])
+        solution = create_sample_solution(problem=problem)
+        create_problem_test_case(
+            problem=problem,
+            data={"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]},
+            order=1,
+        )
+
+        url = reverse(
+            "python_problems:problem-detail",
+            kwargs={"slug": problem.slug, "language": solution.language.name},
+        )
+        response = self.client.get(url)
+
+        self.assertContains(response, "nums = [2, 7, 11, 15]")
+        self.assertContains(response, "target = 9")
+        self.assertEqual(
+            response.context["clipboard_test_cases"],
+            "(solution.twoSum([2, 7, 11, 15], 9), [0, 1])",
+        )
 
 
 class SolutionLanguageSwitchTest(TestCase):

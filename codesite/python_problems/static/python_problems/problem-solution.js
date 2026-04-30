@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
    const solutionButtonContainer = document.getElementById('solutionButtonContainer');
    const solutionElements = document.getElementsByClassName('solutionContent');
    const solutionLength = solutionElements.length;
+   const copySolutionBtn = document.getElementById('copySolutionBtn');
+   let clipboardSolution = '';
 
    if (!solutionButtonContainer || solutionLength === 0) {
       return;
@@ -65,6 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
          setSolutionViewerContent(selectedContent);
       }
 
+      clipboardSolution = selectedContent;
+
       for (let i = 1; i < solutionLength + 1; i++) {
          const btn = document.getElementById(`solutionButton-${i}`);
 
@@ -79,4 +83,16 @@ document.addEventListener('DOMContentLoaded', () => {
    if (solutionLength > 0) {
       showSolution(1);
    }
+
+   copySolutionBtn?.addEventListener('click', () => {
+      navigator.clipboard.writeText(clipboardSolution)
+         .then(() => {
+            copySolutionBtn.classList.replace('btn-secondary', 'btn-success');
+            copySolutionBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+               copySolutionBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+               copySolutionBtn.classList.replace('btn-success', 'btn-secondary');
+            }, 2000);
+         })
+   });
 });

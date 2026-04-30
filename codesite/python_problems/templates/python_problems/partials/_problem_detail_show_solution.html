@@ -62,16 +62,24 @@
         </div>
       </div>
       {% if solution_parts %}
-        <div id="solutionButtonContainer" class="mb-5">
+        <div id="solutionButtonContainer">
           {# Placeholder for JavaScript 'python_problems/problem-solution.js' buttons #}
         </div>
-        <textarea id="solutionContentContainer">{{ solution_parts.0 }}</textarea>
+        <div class="position-relative">
+          <button id="copySolutionBtn"
+                  class="btn btn-secondary position-absolute end-0 mt-4 me-5"
+                  type="button"
+                  style="z-index: 10;">
+            <i class="far fa-copy"></i> Copy
+          </button>
+          <textarea id="solutionContentContainer">{{ solution_parts.0 }}</textarea>
+        </div>
         {% for solution_part in solution_parts %}
           <textarea id="solution-{{ forloop.counter }}"
                     class="solutionContent d-none"
                     aria-hidden="true">{{ solution_part }}</textarea>
         {% endfor %}
-        {% endif %}
+      {% endif %}
     </div>
   </div>
 </div>

@@ -40,6 +40,7 @@ class NonStrippingTextField(models.TextField):
     A TextField that does not strip whitespace at the beginning/end of
     it's value. Might be important for markup/code.
     """
+
     def formfield(self, **kwargs):
         kwargs['strip'] = False
         return super().formfield(**kwargs)
@@ -53,6 +54,14 @@ class Language(models.Model):
 
 
 class Problem(models.Model):
+    FUNCTION = "function"
+    CLASS = "class"
+
+    PROBLEM_TYPES = [
+        (FUNCTION, "Function"),
+        (CLASS, "Class Design"),
+    ]
+
     title = models.CharField(unique=True, max_length=200)
     slug = models.SlugField(unique=True, max_length=100)
     tags = models.ManyToManyField("Tag")
@@ -68,9 +77,28 @@ class Problem(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE)
 
+    problem_type = models.CharField(
+        max_length=20,
+        choices=PROBLEM_TYPES,
+        default=FUNCTION,
+    )
+    method_name = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+    argument_names = models.JSONField(
+        blank=True,
+        null=True,
+        help_text='Optional argument labels for positional inputs, e.g. ["nums", "target"]',
+    )
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
+        if self.problem_type == self.CLASS:
+            self.method_name = None
+            self.argument_names = None
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -78,6 +106,30 @@ class Problem(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_shared_testcases(self, include_hidden=False):
+        queryset = self.testcases.all()
+        if not include_hidden:
+            queryset = queryset.filter(is_hidden=False)
+        return queryset
+
+
+class TestCase(models.Model):
+    problem = models.ForeignKey(
+        Problem,
+        on_delete=models.CASCADE,
+        related_name="testcases"
+    )
+
+    data = models.JSONField()
+    is_hidden = models.BooleanField(default=False)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ("order", "id")
+
+    def __str__(self):
+        return f"{self.problem.title} - TestCase {self.order}"
 
 
 class Solution(models.Model):
@@ -115,3 +167,8 @@ class Solution(models.Model):
 
     def __str__(self):
         return f"{self.problem.title} ({self.language.name}) by {self.owner}"
+
+    def get_solution_specific_test_cases(self):
+        from .scripts import get_solution_test_cases
+
+        return get_solution_test_cases(self.test_cases)
