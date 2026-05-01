@@ -159,7 +159,7 @@ class ProblemDetailView(DetailView):
 
         # There's only one solution per owner and language
         selected_solution = owner_language_solutions.first()
-        solution_parts = parse_solutions(selected_solution, language)
+        solution_parts = parse_solution_code(problem.problem_type, selected_solution.source_code, language)
 
         ui_test_cases = get_ui_test_cases(problem, selected_solution, language.name)
         effective_test_cases = get_effective_test_cases(

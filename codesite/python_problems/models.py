@@ -56,10 +56,14 @@ class Language(models.Model):
 class Problem(models.Model):
     FUNCTION = "function"
     CLASS = "class"
+    BINARY_TREE = "binary_tree"
+    LINKED_LIST = "linked_list"
 
     PROBLEM_TYPES = [
         (FUNCTION, "Function"),
         (CLASS, "Class Design"),
+        (BINARY_TREE, "Binary Tree"),
+        (LINKED_LIST, "Linked List"),
     ]
 
     title = models.CharField(unique=True, max_length=200)

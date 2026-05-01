@@ -1,4 +1,3 @@
-# attach # class TreeNode:# class TreeNode: Definition for a binary tree node.
 # binary tree preview in test cases
 
 # import needed only get_heap_utils(language) + get_binary_tree_utils(language) + get_linked_list_utils(language) + source_code

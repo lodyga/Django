@@ -101,25 +101,7 @@ def get_ui_test_cases(problem, solution, language):
     if problem.get_shared_testcases():
         ui_test_cases = []
 
-        if problem.problem_type == "function":
-            for test_case in problem.get_shared_testcases():
-                inputs = get_field(test_case.data, "inputs")
-                expected = serialize(get_field(test_case.data, "expected"), language)
-
-                if (
-                    problem.argument_names and
-                    len(problem.argument_names) == len(inputs)
-                ):
-                    display_input = "\n".join(
-                        f"{name} = {serialize(value, language)}"
-                        for name, value in zip(problem.argument_names, inputs)
-                    )
-                else:
-                    display_input = inputs
-
-                ui_test_cases.append((display_input, expected))
-
-        elif problem.problem_type == "class":
+        if problem.problem_type == "class":
             for test_case in problem.get_shared_testcases():
                 operations = get_field(test_case.data, "operations")
                 arguments = get_field(test_case.data, "arguments")
@@ -132,6 +114,25 @@ def get_ui_test_cases(problem, solution, language):
                     )
                 else:
                     display_input = (operations, arguments)
+
+                ui_test_cases.append((display_input, expected))
+
+        elif problem.problem_type:
+            for test_case in problem.get_shared_testcases():
+                inputs = get_field(test_case.data, "inputs")
+                expected = serialize(
+                    get_field(test_case.data, "expected"), language)
+
+                if (
+                    problem.argument_names and
+                    len(problem.argument_names) == len(inputs)
+                ):
+                    display_input = "\n".join(
+                        f"{name} = {serialize(value, language)}"
+                        for name, value in zip(problem.argument_names, inputs)
+                    )
+                else:
+                    display_input = inputs
 
                 ui_test_cases.append((display_input, expected))
 
@@ -278,7 +279,8 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     expected_output_str = ""
     if button_pressed == "validate":
         if problem.method_name:
-            solution_instance_setup = get_solution_instance_setup(problem, language)
+            solution_instance_setup = get_solution_instance_setup(
+                problem, language)
             if not re.search(solution_instance_setup.strip()[:-3], source_code):
                 source_code += solution_instance_setup
 
@@ -535,19 +537,37 @@ def parse_problem_description(problem_description):
     return (question, examples)
 
 
-def parse_solutions(solution, language):
+def get_header(problem_type, language):
+    """
+    Return problem type definition snippet.
+    """
+    header = ""
+
+    if problem_type == "binary_tree":
+        match language.name:
+            case "Python":
+                header = '''# class TreeNode:\r\n#     """\r\n#     Definition for a binary tree node.\r\n#     """\r\n#     def __init__(self, val=None, left=None, right=None):\r\n#         self.val = val\r\n#         self.left = left\r\n#         self.right = right\r\n#\r\n#\r\n'''
+            case "JavaScript":
+                header = """/**\n * class TreeNode {\n *    constructor(val = null, left = null, right = null) {\n *       this.val = val\n *       this.left = left\n *       this.right = right\n *    };\n * }\n */\n\n\n"""
+
+    return header
+
+
+def parse_solution_code(problem_type, source_code, language):
+    res = []
     match language.name:
         case "Python":
             delimiter = "class Solution:\r\n"
         case "JavaScript":
             delimiter = "class Solution {\r\n"
         case "C++" | "Java":
-            delimiter = "class Solution {"
+            delimiter = "class Solution {\r\n"
         case _:
-            delimiter = "class Solution"
+            delimiter = "class Solution\r\n"
 
-    return [
-        delimiter + code_part.strip("\r\n") + "\r\n"
-        for code_part in solution.source_code.split(delimiter)
-        if code_part
-    ]
+    for code_part in source_code.split(delimiter):
+        if code_part:
+            header = get_header(problem_type, language)
+            res.append(header + delimiter + code_part.strip("\r\n"))
+
+    return res
