@@ -1,3 +1,4 @@
+import binarytree
 import json
 import re
 import requests
@@ -97,6 +98,8 @@ def get_ui_test_cases(problem, solution, language):
     """
     Problem TC format
     [('nums = [2, 7, 11, 15]\ntarget = 9', [0, 1]), ...]
+    For binary tree preview
+    [([...], [...], <serialized binary tree>), ...]
     """
     if problem.get_shared_testcases():
         ui_test_cases = []
@@ -134,7 +137,12 @@ def get_ui_test_cases(problem, solution, language):
                 else:
                     display_input = inputs
 
-                ui_test_cases.append((display_input, expected))
+                # Add binary tree preview.
+                if problem.problem_type == "binary_tree":
+                    bt = binarytree.build2(inputs[0]).__str__()
+                    ui_test_cases.append((display_input, expected, bt))
+                else:
+                    ui_test_cases.append((display_input, expected))
 
         return ui_test_cases
 
