@@ -78,6 +78,21 @@ def serialize(value, language):
     return json.dumps(value)
 
 
+def get_field(data, key):
+    if isinstance(data, dict):
+        return data[key]
+
+    elif isinstance(data, list):
+        idx_map = {
+            "inputs": 0,
+            "expected": 1 if len(data) == 2 else 2,
+            "operations": 0,
+            "arguments": 1,
+            # "expected": 2,
+        }
+        return data[idx_map[key]]
+
+
 def get_ui_test_cases(problem, solution, language):
     """
     Problem TC format
@@ -89,7 +104,7 @@ def get_ui_test_cases(problem, solution, language):
         if problem.problem_type == "function":
             for test_case in problem.get_shared_testcases():
                 inputs = get_field(test_case.data, "inputs")
-                expected = get_field(test_case.data, "expected")
+                expected = serialize(get_field(test_case.data, "expected"), language)
 
                 if (
                     problem.argument_names and
@@ -112,7 +127,7 @@ def get_ui_test_cases(problem, solution, language):
 
                 if (len(operations) == len(arguments)):
                     display_input = "\n".join(
-                        f"{op}({", ".join(map(str, ar))})"
+                        f"{op}({', '.join(map(str, ar))})"
                         for (op, ar) in zip(operations, arguments)
                     )
                 else:
@@ -136,21 +151,6 @@ def get_ui_test_cases(problem, solution, language):
 
     else:
         return []
-
-
-def get_field(data, key):
-    if isinstance(data, dict):
-        return data[key]
-
-    elif isinstance(data, list):
-        idx_map = {
-            "inputs": 0,
-            "expected": 1 if len(data) == 2 else 2,
-            "operations": 0,
-            "arguments": 1,
-            # "expected": 2,
-        }
-        return data[idx_map[key]]
 
 
 def build_problem_test_case_expression(problem, test_case_data, language):
@@ -276,9 +276,11 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
         source_code
 
     expected_output_str = ""
-    if button_pressed != "run":
+    if button_pressed == "validate":
         if problem.method_name:
-            source_code += get_solution_instance_setup(problem, language)
+            solution_instance_setup = get_solution_instance_setup(problem, language)
+            if not re.search(solution_instance_setup.strip()[:-3], source_code):
+                source_code += solution_instance_setup
 
         (source_code, expected_output_str) = get_expected_output_str(
             source_code,
