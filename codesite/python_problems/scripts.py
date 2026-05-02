@@ -94,6 +94,59 @@ def get_field(data, key):
         return data[idx_map[key]]
 
 
+def get_preview_in_ascii(data, problem_type, argument_name):
+    """
+    Wall-like symbols:
+    █  ▓  ▒  ░  #  ║  ╬  ■  ⬛  🧱
+    Water-like symbols:
+    ~  ≈  ∼  ≋  ≀  ·  ○  🌊  💧
+    Land / island-like symbols:
+    ■  ▲  ◆  ●  ⬤  ⛰
+    Gate / special point:
+    G  O  ⊙  ✦  ★
+    """
+    
+    if problem_type == "binary_tree" and isinstance(data, list):
+        bt = binarytree.build2(data).__str__()
+        return (argument_name, bt)
+    
+    elif isinstance(data, list) and isinstance(data[0], list):
+        rows = len(data)
+        cols = len(data[0])
+        chars = set()
+        char_map = {}
+        
+        for line in data:
+            for char in line:
+                chars.add(str(char))
+        match len(chars):
+            case 1 | 2 | 3:
+                char_map = {
+                    "-1": "█",
+                    "0": "·",
+                    "1": "■",
+                    "2147483647": "∞",
+                }
+            case _:
+                char_map = {char: char for char in chars}
+                char_map["-1"] = "█"
+
+        grid = """┌""" + "─" * (cols*2 + 1) + "┐\n"
+
+        for line in data:
+            grid_line = "".join(
+                char_map.get(str(char), "J")
+                for char in line
+            )
+            grid = grid + "│ " + " ".join(grid_line) + " │\n"
+
+        grid = grid + """└""" + "─" * (cols*2 + 1) + "┘"
+        
+        return (argument_name, grid)
+
+    return
+
+
 def get_ui_test_cases(problem, solution, language):
     """
     Problem TC format
@@ -101,11 +154,15 @@ def get_ui_test_cases(problem, solution, language):
     For binary tree preview
     [([...], [...], <serialized binary tree>), ...]
     """
-    if problem.get_shared_testcases():
+    problem_type = problem.problem_type
+    argument_names = problem.argument_names
+    test_cases = problem.get_shared_testcases()
+
+    if test_cases:
         ui_test_cases = []
 
-        if problem.problem_type == "class":
-            for test_case in problem.get_shared_testcases():
+        if problem_type == "class":
+            for test_case in test_cases:
                 operations = get_field(test_case.data, "operations")
                 arguments = get_field(test_case.data, "arguments")
                 expected = get_field(test_case.data, "expected")
@@ -120,29 +177,33 @@ def get_ui_test_cases(problem, solution, language):
 
                 ui_test_cases.append((display_input, expected))
 
-        elif problem.problem_type:
-            for test_case in problem.get_shared_testcases():
+        elif problem_type:
+            for test_case in test_cases:
                 inputs = get_field(test_case.data, "inputs")
-                expected = serialize(
-                    get_field(test_case.data, "expected"), language)
+                expected = get_field(test_case.data, "expected")
 
                 if (
-                    problem.argument_names and
-                    len(problem.argument_names) == len(inputs)
+                    argument_names and
+                    len(argument_names) == len(inputs)
                 ):
                     display_input = "\n".join(
                         f"{name} = {serialize(value, language)}"
-                        for name, value in zip(problem.argument_names, inputs)
+                        for name, value in zip(argument_names, inputs)
                     )
                 else:
                     display_input = inputs
 
-                # Add binary tree preview.
-                if problem.problem_type == "binary_tree":
-                    bt = binarytree.build2(inputs[0]).__str__()
-                    ui_test_cases.append((display_input, expected, bt))
-                else:
-                    ui_test_cases.append((display_input, expected))
+                preview_data = []
+                if inputs:
+                    for data, argument_name in zip(inputs, argument_names):
+                        if preview:= get_preview_in_ascii(data, problem_type, argument_name):
+                            preview_data.append(preview)
+                
+                if preview:= get_preview_in_ascii(expected, problem_type, "res"):
+                    preview_data.append(preview)
+                
+                expected = serialize(expected, language)
+                ui_test_cases.append((display_input, expected, preview_data))
 
         return ui_test_cases
 
@@ -277,7 +338,7 @@ def get_expected_output_str(source_code, language, button_pressed, test_cases):
 def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
     # Correct types:
     #     list => List
-    source_code = re.sub(r" list\[", r" List[", source_code)
+    source_code = re.sub(r"list\[", r"List[", source_code)
 
     source_code = get_heap_utils(language) + \
         get_binary_tree_utils(language) + \

@@ -17,7 +17,7 @@
         <div class="col-auto" id="testCasesContainer">
           {% for test_case in ui_test_cases %}
             <div id="testCase-{{ forloop.counter }}" class="testCaseContent">
-              <div class="row">
+              <div class="row mb-2">
                 <div class="col-auto">
                   <span class="badge bg-secondary col-auto">Input:</span>
                   <div class="form-control" rows="1" style="white-space: pre-wrap"><code class="text-body">{{ test_case.0 }}</code></div>
@@ -29,7 +29,18 @@
                   </div>
                 </div>
               </div>
-              <div class="form-control"><pre>{{ test_case.2 }}</pre></div>
+              {% if test_case.2 %}
+                <div class="row mb-2">
+                  {% for dataPreview in test_case.2 %}
+                    <div class="col-auto">
+                      <span class="badge bg-secondary d-inline-block">{{ dataPreview.0 }}</span>
+                      <div class="border rounded px-3 py-2">
+                        <pre class="mb-0">{{ dataPreview.1 }}</pre>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
             </div>
           {% endfor %}
         </div>

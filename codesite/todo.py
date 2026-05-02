@@ -1,4 +1,6 @@
+# in progress... preview based on data type:  (grid, matrix) preview
 # one slution code for one Solution instance
+# wrap build_binary_tree and other around bt methods
 
 # import needed only get_heap_utils(language) + get_binary_tree_utils(language) + get_linked_list_utils(language) + source_code
 # better light mode
@@ -15,3 +17,38 @@
 # search bar AND OR
 # chanege python to code_problems...
 # selenium for testing darkmode
+
+
+"""
+Preview:
+
+{
+    int: int
+    chr: chr
+    0 or "0"(water): "·"
+    1 or "1"(land): "■"
+    -1: "
+}
+
+┌───────────┐
+│ ■ ■ · · · │
+│ ■ ■ · · · │
+│ · · ■ · · │
+│ · · · ■ ■ │
+└───────────┘
+
+┌─────────────┐
+│  1  3  5  7 │
+│ 10 11 16 20 │
+│ 23 30 34 60 │
+└─────────────┘
+
+┌─────────────┐
+│ # # * . * . │
+│ # # # * . . │
+│ # # # . # . │
+└─────────────┘
+
+"""
+
+

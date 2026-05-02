@@ -76,7 +76,7 @@ list(problem.solution_set.values_list("language__name", flat=True).distinct())
 
   
 
-  
+<span class="border rounded px-3 py-2 d-inline-block col-auto">
 <div class="row justify-content-"
 <div class="d-flex justify-content-"
 start
