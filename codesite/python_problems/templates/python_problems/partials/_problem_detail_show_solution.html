@@ -17,12 +17,20 @@
         <div class="row mt-4 mb-4">
           {% if user == solution.owner %}
             <div class="col-auto mb-2">
-              <div class="mb-3">
-                <a href="{% url 'python_problems:solution-update' solution.id %}">Update</a>
-              </div>
-              <div>
-                <a href="{% url 'python_problems:solution-delete' solution.id %}">Delete</a>
-              </div>
+              {% with first_solution=owner_solutions|first %}
+                {% if first_solution %}
+                  <div class="mb-3">
+                    <a id="solutionUpdateLink"
+                    data-url-template="{% url 'python_problems:solution-update' 0 %}"
+                    href="{% url 'python_problems:solution-update' first_solution.id %}">Update</a>
+                  </div>
+                    <div class="mb-1">
+                    <a id="solutionDeleteLink"
+                       data-url-template="{% url 'python_problems:solution-delete' 0 %}"
+                       href="{% url 'python_problems:solution-delete' first_solution.id %}">Delete</a>
+                  </div>
+                {% endif %}
+              {% endwith %}
             </div>
           {% endif %}
           <div class="col-auto mb-2">
@@ -52,7 +60,8 @@
                       id="languageId"
                       name="language_id"
                       onchange="this.form.submit()">
-                {% for language in solution_languages %}
+                {% comment %} {% for language in solution_languages %} {% endcomment %}
+                {% for language in owner_solution_languages %}
                   <option value="{{ language.id }}"
                           {% if language.id == language_id %}selected{% endif %}>{{ language }}</option>
                 {% endfor %}
@@ -74,10 +83,12 @@
           </button>
           <textarea id="solutionContentContainer">{{ solution_parts.0 }}</textarea>
         </div>
-        {% for solution_part in solution_parts %}
+        {% comment %} {% for solution_part in solution_parts %} {% endcomment %}
+        {% for solution in owner_solutions %}
           <textarea id="solution-{{ forloop.counter }}"
+                    data-solution-id="{{ solution.id }}"
                     class="solutionContent d-none"
-                    aria-hidden="true">{{ solution_part }}</textarea>
+                    aria-hidden="true">{{ solution.source_code }}</textarea>
         {% endfor %}
       {% endif %}
     </div>

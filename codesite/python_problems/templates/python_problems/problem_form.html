@@ -25,14 +25,6 @@
           {{ form.difficulty|as_crispy_field }}
           {{ form.description|as_crispy_field }}
           {{ form.tags|as_crispy_field }}
-          <div class="alert alert-secondary py-2">
-            <div>
-              <b>Test case format:</b> one JSON object per line.
-            </div>
-            <pre class="mb-0"><code>{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}</code></pre>
-            or
-            <pre class="mb-0"><code>[[[2, 7, 11, 15], 9], [0, 1]]</code></pre>
-          </div>
           {{ form.problem_type|as_crispy_field }}
           {{ form.method_name|as_crispy_field }}
           {{ form.argument_names|as_crispy_field }}
@@ -43,6 +35,14 @@
             <pre class="mb-2 mt-2"><code>["nums", "target"]</code></pre>
           </div>
           {{ form.shared_test_cases|as_crispy_field }}
+          <div class="alert alert-secondary py-2">
+            <div>
+              <b>Test case format:</b> one JSON object per line.
+            </div>
+            <pre class="mb-0"><code>{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}</code></pre>
+            or
+            <pre class="mb-0"><code>[[[2, 7, 11, 15], 9], [0, 1]]</code></pre>
+          </div>
           <input type="submit" value="Submit" />
           <input type="submit"
                  onclick="window.location='{% url 'python_problems:problem-index' %}' ; return false;"

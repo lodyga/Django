@@ -42,6 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
    const solutionElements = document.getElementsByClassName('solutionContent');
    const solutionLength = solutionElements.length;
    const copySolutionBtn = document.getElementById('copySolutionBtn');
+   const solutionUpdateLink = document.getElementById('solutionUpdateLink');
+   const solutionDeleteLink = document.getElementById('solutionDeleteLink');
    let clipboardSolution = '';
 
    if (!solutionButtonContainer || solutionLength === 0) {
@@ -62,12 +64,21 @@ document.addEventListener('DOMContentLoaded', () => {
    function showSolution(idx) {
       const selectedSolution = document.getElementById(`solution-${idx}`);
       const selectedContent = selectedSolution?.value || '';
+      const selectedSolutionId = selectedSolution?.dataset.solutionId;
 
       if (typeof setSolutionViewerContent === 'function') {
          setSolutionViewerContent(selectedContent);
       }
 
       clipboardSolution = selectedContent;
+      if (selectedSolutionId) {
+         if (solutionUpdateLink?.dataset.urlTemplate) {
+            solutionUpdateLink.href = solutionUpdateLink.dataset.urlTemplate.replace('/0/', `/${selectedSolutionId}/`);
+         }
+         if (solutionDeleteLink?.dataset.urlTemplate) {
+            solutionDeleteLink.href = solutionDeleteLink.dataset.urlTemplate.replace('/0/', `/${selectedSolutionId}/`);
+         }
+      }
 
       for (let i = 1; i < solutionLength + 1; i++) {
          const btn = document.getElementById(`solutionButton-${i}`);

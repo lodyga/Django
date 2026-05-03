@@ -21,7 +21,11 @@ class TestCaseInline(admin.TabularInline):
     model = TestCase
     extra = 1
 
+class SolutionInline(admin.TabularInline):
+    model = Solution
+    extra = 1
+    exclude = ("test_cases",)
 
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
-    inlines = [TestCaseInline]
+    inlines = [SolutionInline, TestCaseInline]

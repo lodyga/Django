@@ -114,6 +114,9 @@ class Problem(models.Model):
         if not include_hidden:
             queryset = queryset.filter(is_hidden=False)
         return queryset
+    
+    def get_solutions(self):
+        return self.solutions.all()
 
 
 class TestCase(models.Model):
@@ -122,7 +125,6 @@ class TestCase(models.Model):
         on_delete=models.CASCADE,
         related_name="testcases"
     )
-
     data = models.JSONField()
     is_hidden = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
@@ -137,35 +139,39 @@ class TestCase(models.Model):
 class Solution(models.Model):
     problem = models.ForeignKey(
         Problem,
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE,
+        related_name="solutions"
+    )
     language = models.ForeignKey(
         Language,
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE
+    )
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE
+    )
     source_code = models.TextField(blank=True)
     test_cases = models.TextField(
         blank=True,
         null=True,
-        help_text='Format test cases as `([class.?]function(args), expected_result)`, one per line. Example: (reverse_string("hello"), "olleh")')
+        help_text='Format test cases as `([class.?]function(args), expected_result)`, one per line. Example: (reverse_string("hello"), "olleh")'
+    )
     time_complexity = models.ForeignKey(
         "Complexity",
         related_name="solutions_by_time_complexity",
-        on_delete=models.DO_NOTHING)
+        on_delete=models.DO_NOTHING
+    )
     space_complexity = models.ForeignKey(
         "Complexity",
         related_name="solutions_by_space_complexity",
-        on_delete=models.DO_NOTHING)
+        on_delete=models.DO_NOTHING
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    order = models.PositiveIntegerField(default=0)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=('problem', 'language', 'owner'),
-                name='unique_user_solution_per_problem_and_language')
-        ]
+        ordering = ("order", "id")
 
     def __str__(self):
-        return f"{self.problem.title} ({self.language.name}) by {self.owner}"
+        return f"{self.problem.title} ({self.language.name}) by {self.owner} #-{self.order}"

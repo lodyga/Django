@@ -1,4 +1,3 @@
-{% load problem_filters %}
 <div class="my-5 mx-3">
   <h2>Problem list</h2>
 </div>
@@ -43,10 +42,10 @@
             </div>
             <!-- Problem languages -->
             <div class="col-md-auto">
-              {% for language_name in problem_languages|dict_key:problem.id %}
+              {% for language in problem.languages %}
                 <a class="btn btn-link py-0 px-1"
-                   href="{% url 'python_problems:problem-detail' problem.slug language_name %}"
-                   role="button">{{ language_name }}</a>
+                   href="{% url 'python_problems:problem-detail' problem.slug language %}"
+                   role="button">{{ language }}</a>
               {% endfor %}
             </div>
           </div>

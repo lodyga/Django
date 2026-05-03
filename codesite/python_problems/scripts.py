@@ -125,6 +125,7 @@ def get_preview_in_ascii(data, problem_type, argument_name):
                     "-1": "█",
                     "0": "·",
                     "1": "■",
+                    "2": "X",
                     "2147483647": "∞",
                 }
             case _:

@@ -1,7 +1,13 @@
+# jugde0 auth in python_problems/auth?
+# stop <pre></pre> in README.md => test cases
+# add Explanation_field to test case
+
 # one slution code for one Solution instance
 
+# get_adjacent_slugs(problem, language)
 # in progress... preview based on data type:  (grid, matrix) preview
 # wrap build_binary_tree and other around bt methods
+# mutate grid and do not return (None) anything problems
 
 # import needed only get_heap_utils(language) + get_binary_tree_utils(language) + get_linked_list_utils(language) + source_code
 # better light mode

@@ -99,6 +99,12 @@ btn.classList.replace('btn-secondary', 'btn-outline-secondary');
 descriptionToggle.setAttribute('aria-expanded', 'true');
 
 
+
+prefetch_related("tags", "solution_set__language") → prefetch_related("tags", "solutions__language")
+filter(solution__language_id=language_id) → filter(solutions__language_id=language_id)
+
+
+
 # markdown, pygments.css
 <link rel="stylesheet" href="{% static 'css/pygments.css' %}">
       <div class="row mb-2 markdown-content">

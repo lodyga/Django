@@ -12,62 +12,15 @@
       </button>
     </div>
     <div class="row collapse show" id="problemInfo">
-      {% if user == solution.owner %}
-        <div class="col-auto">
-          <div class="row">
-            <a href="{% url 'python_problems:solution-update' solution.id %}"
-               class="btn btn-secondary py-0 mb-2 mt-2">Update</a>
-          </div>
-          <div class="row">
-            <a href="{% url 'python_problems:solution-delete' solution.id %}"
-               class="btn btn-secondary py-0 mb-2">Delete</a>
-          </div>
-        </div>
-      {% endif %}
-      <div class="col-auto mb-2">
-        <form method="post">
-          {% csrf_token %}
-          <label for="ownerId" class="form-label">
-            <b>Author:</b>
-          </label>
-          <select class="form-select"
-                  id="ownerId"
-                  name="owner_id"
-                  onchange="this.form.submit()">
-            {% for owner in owners %}
-              <option value="{{ owner.id }}"
-                      {% if owner.id == owner_id %}selected{% endif %}>{{ owner }}</option>
-            {% endfor %}
-          </select>
-        </form>
-      </div>
-      <div class="col-auto mb-2">
-        <form method="post">
-          {% csrf_token %}
-          <label for="languageId" class="form-label">
-            <b>Language:</b>
-          </label>
-          <select class="form-select"
-                  id="languageId"
-                  name="language_id"
-                  onchange="this.form.submit()">
-            {% for language in solution_languages %}
-              <option value="{{ language.id }}"
-                      {% if language.id == language_id %}selected{% endif %}>{{ language }}</option>
-            {% endfor %}
-          </select>
-        </form>
-      </div>
       <div class="col-auto mb-2">
         <form>
           <label for="difficultyName" class="form-label mb-3">
             <b>Difficulty:</b>
           </label>
           <div id="difficultyName"
-               class="{% if problem.difficulty.name == 'Easy' %}" " text-success " {% endif %} {% if problem.difficulty.name == 'Medium' %}"text-warning"{% endif %} {% if problem.difficulty.name == 'Hard' %}"text-danger"{% endif %} {% if problem.difficulty.name == 'Impossible' %}"
-               text-secondary
-               "
-               {% endif %}>{{ problem.difficulty }}</div>
+               class=" {% if problem.difficulty.name == 'Easy' %}text-success{% endif %} {% if problem.difficulty.name == 'Medium' %}text-warning{% endif %} {% if problem.difficulty.name == 'Hard' %}text-danger{% endif %} {% if problem.difficulty.name == 'Impossible' %}text-secondary{% endif %} ">
+            {{ problem.difficulty }}
+          </div>
         </form>
       </div>
       <div class="col-auto mb-2">
@@ -106,4 +59,3 @@
     </div>
   </div>
 </div>
-{% comment %} <hr> {% endcomment %}

@@ -12,7 +12,7 @@ class ProblemForm(forms.ModelForm):
     )
     shared_test_cases = forms.CharField(
         required=False,
-        widget=forms.Textarea(attrs={"rows": 5}),
+        widget=forms.Textarea(attrs={"rows": 8}),
         help_text=(
             'One JSON test case per line. Example: '
             '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}'
@@ -85,21 +85,6 @@ class ProblemForm(forms.ModelForm):
                     f"Line {index} must be a JSON object."
                 )
 
-            # if (
-            #     isinstance(data, dict) and
-            #     ("inputs" not in data or "expected" not in data)
-            # ):
-            #     raise ValidationError(
-            #         f'Line {index} must contain both "inputs" and "expected".')
-
-            # if (
-            #     isinstance(data, list) and
-            #     (not isinstance(data[0], list) or
-            #      not isinstance(data[1], list))
-            # ):
-            #     raise ValidationError(
-            #         f'Line {index} must contain both "inputs" and "expected".')
-
             parsed_test_cases.append(data)
 
         return parsed_test_cases
@@ -154,13 +139,22 @@ class ProblemForm(forms.ModelForm):
         return problem
 
 
-class SolutionCreateForm(forms.ModelForm):
+class SolutionForm(forms.ModelForm):
+    source_code = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 20}),
+    )
+    test_cases = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 2}),
+    )
+
+
+class SolutionCreateForm(SolutionForm):
     class Meta:
         model = Solution
         exclude = ["owner"]
 
 
-class SolutionUpdateForm(forms.ModelForm):
+class SolutionUpdateForm(SolutionForm):
     class Meta:
         model = Solution
         exclude = ["problem", "language", "owner"]

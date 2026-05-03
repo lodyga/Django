@@ -35,7 +35,7 @@ class ProblemIndexView(ListView):
         queryset = (
             Problem.objects
             .select_related("difficulty", "owner")
-            .prefetch_related("tags", "solution_set__language")
+            .prefetch_related("tags", "solutions__language")
         )
 
         query_text = self.request.GET.get("query_text")
@@ -48,7 +48,7 @@ class ProblemIndexView(ListView):
             queryset = queryset.filter(difficulty_id=difficulty_id)
 
         if language_id and language_id != "0":
-            queryset = queryset.filter(solution__language_id=language_id)
+            queryset = queryset.filter(solutions__language_id=language_id)
 
         if tag_id and tag_id != "0":
             queryset = queryset.filter(tags__id=tag_id)
@@ -66,27 +66,17 @@ class ProblemIndexView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         page_problems = list(context["page_obj"].object_list)
-        problem_ids = [problem.id for problem in page_problems]
 
-        solution_language_rows = (
-            Solution.objects
-            .filter(problem_id__in=problem_ids)
-            .values("problem_id", "language__name")
-            .distinct()
-            # .order_by("problem_id", "language__name")
-        )
-        problem_languages = {}
-        for row in solution_language_rows:
-            problem_id = row["problem_id"]
-            language_name = row["language__name"]
-            problem_languages.setdefault(problem_id, []).append(language_name)
+        for problem in page_problems:
+            problem.languages = {
+                solution.language
+                for solution in problem.solutions.all()
+            }
 
         context["difficulty_list"] = Difficulty.objects.all()
         context["problem_list"] = Problem.objects.all()
         context["tag_list"] = Tag.objects.all()
-        context["problem_languages"] = problem_languages
         context["language_list"] = (
             Language.objects
             .annotate(solution_count=Count("solution"))
@@ -116,6 +106,29 @@ class ProblemDetailView(DetailView):
     model = Problem
     template_name = "python_problems/problem_detail.html"  # needed for post render()
 
+    def _get_owner_solution_context(self, problem, owner, language):
+        owner_solutions = Solution.objects.filter(
+            problem=problem,
+            language=language,
+            owner=owner
+        )
+        owner_all_solutions = Solution.objects.filter(
+            problem=problem,
+            owner=owner
+        )
+        owner_solution_languages = Language.objects.filter(
+            id__in=owner_all_solutions.values_list("language", flat=True)
+        )
+        solution_languages = Language.objects.filter(
+            id__in=owner_all_solutions.values_list("language", flat=True)
+        )
+        return {
+            "solution_languages": solution_languages,
+            "owner_solutions": owner_solutions,
+            "owner_all_solutions": owner_all_solutions,
+            "owner_solution_languages": owner_solution_languages,
+        }
+
     def get_context_data(self, **kwargs):
         # fetch get_context_data() from DetailView
         context = super().get_context_data(**kwargs)
@@ -125,19 +138,16 @@ class ProblemDetailView(DetailView):
         problem = self.get_object()
 
         # Get current language from URL
-        language_name = self.kwargs.get("language")
-        language = Language.objects.get(name=language_name)
-        del language_name
-        language_id = language.id
+        language = Language.objects.get(name=self.kwargs.get("language"))
 
         language_solutions = Solution.objects.filter(
             problem=problem,
-            language=language)
-
+            language=language
+        )
         # Get the list of the owners who have solutions for the problem and language;
         owners = User.objects.filter(
-            id__in=language_solutions.values_list("owner", flat=True))
-
+            id__in=language_solutions.values_list("owner", flat=True)
+        )
         # Get current owner id from the owner form-select
         # (if none selected take the first owner from owners)
         owner_id = owners.first().id
@@ -145,23 +155,23 @@ class ProblemDetailView(DetailView):
         # Get owner from owner id.
         owner = User.objects.get(id=owner_id)
 
-        # Get all languages for owners problem.
-        language_ids = (
-            Solution.objects
-            .filter(problem=problem, owner=owner)
-            .values_list("language", flat=True))
-        solution_languages = Language.objects.filter(id__in=language_ids)
-
-        owner_language_solutions = Solution.objects.filter(
+        owner_solution_data = self._get_owner_solution_context(
             problem=problem,
+            owner=owner,
             language=language,
-            owner=owner)
+        )
+        owner_solutions = owner_solution_data["owner_solutions"]
+        solution_languages = owner_solution_data["solution_languages"]
+        owner_solution_languages = owner_solution_data["owner_solution_languages"]
+        # Multiple solutions are allowed; use the first ordered solution.
+        selected_solution = owner_solutions.first()
 
-        # There's only one solution per owner and language
-        selected_solution = owner_language_solutions.first()
-        solution_parts = parse_solution_code(problem.problem_type, selected_solution.source_code, language)
+        # Solution_parts to be deprecated.
+        solution_parts = parse_solution_code(
+            problem.problem_type, selected_solution.source_code, language)
 
-        ui_test_cases = get_ui_test_cases(problem, selected_solution, language.name)
+        ui_test_cases = get_ui_test_cases(
+            problem, selected_solution, language.name)
         effective_test_cases = get_effective_test_cases(
             problem,
             selected_solution,
@@ -186,18 +196,20 @@ class ProblemDetailView(DetailView):
             .distinct())
 
         # Get adjacent problem slugs
-        prev_problem_slug, next_problem_slug = get_adjacent_slugs(
-            problem, language)
+        # todo; get_adjacent_slugs(problem, language)
+        prev_problem_slug, next_problem_slug = (None, None)
 
         (question, examples) = parse_problem_description(problem.description)
 
         context.update({
             "examples": examples,
             "language": language,
-            "language_id": language_id,
+            "language_id": language.id,
             'next_problem_slug': next_problem_slug,
             "output_container": "null",
             "owner_id": owner_id,
+            "owner_solution_languages": owner_solution_languages,
+            "owner_solutions": owner_solutions,
             "owners": owners,
             'prev_problem_slug': prev_problem_slug,
             "question": question,
@@ -233,6 +245,15 @@ class ProblemDetailView(DetailView):
         owner_id = int(request.POST.get("owner_id", context["owner_id"]))
         owner = get_object_or_404(User, id=owner_id)
 
+        owner_solution_data = self._get_owner_solution_context(
+            problem=problem,
+            owner=owner,
+            language=language,
+        )
+        owner_solutions = owner_solution_data["owner_solutions"]
+        owner_solution_languages = owner_solution_data["owner_solution_languages"]
+        solution_languages = owner_solution_data["solution_languages"]
+
         solution = Solution.objects.filter(
             problem=problem,
             owner=owner,
@@ -242,10 +263,11 @@ class ProblemDetailView(DetailView):
         if (
             button_pressed and
             is_code_container_filled
-        ):  
+        ):
             source_code = request.POST.get("code_container")
             test_cases = "" if button_pressed == "run" else context["effective_test_cases"]
-            output = execute_code(problem, source_code, language.name, button_pressed, test_cases)
+            output = execute_code(problem, source_code,
+                                  language.name, button_pressed, test_cases)
             output_container = output
         else:
             source_code = context["source_code"]
@@ -257,6 +279,9 @@ class ProblemDetailView(DetailView):
             "language_id": language_id,
             "output_container": output_container,
             "owner_id": owner_id,
+            "owner_solution_languages": owner_solution_languages,
+            "owner_solutions": owner_solutions,
+            "solution_languages": solution_languages,
         })
         return render(request, self.template_name, context)
 
