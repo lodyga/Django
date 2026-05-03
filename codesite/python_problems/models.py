@@ -19,7 +19,6 @@ class Difficulty(models.Model):
 
     class Meta:
         verbose_name_plural = "Difficulties"
-        # ordering = ("name", )
 
     def __str__(self) -> str:
         return self.name
@@ -71,7 +70,7 @@ class Problem(models.Model):
     tags = models.ManyToManyField("Tag")
     difficulty = models.ForeignKey(
         Difficulty,
-        related_name="problems_difficulty",
+        related_name="problems",
         on_delete=models.DO_NOTHING)
     url = models.URLField()
     description = NonStrippingTextField(blank=False, null=False)
@@ -89,7 +88,6 @@ class Problem(models.Model):
     method_name = models.CharField(
         max_length=100,
         blank=True,
-        null=True,
     )
     argument_names = models.JSONField(
         blank=True,
@@ -101,7 +99,7 @@ class Problem(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         if self.problem_type == self.CLASS:
-            self.method_name = None
+            self.method_name = ""
             self.argument_names = None
         super().save(*args, **kwargs)
 
@@ -146,18 +144,18 @@ class Solution(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE)
-    source_code = models.TextField(blank=True, null=True)
+    source_code = models.TextField(blank=True)
     test_cases = models.TextField(
         blank=True,
         null=True,
         help_text='Format test cases as `([class.?]function(args), expected_result)`, one per line. Example: (reverse_string("hello"), "olleh")')
     time_complexity = models.ForeignKey(
         "Complexity",
-        related_name="solution_time_complexity",
+        related_name="solutions_by_time_complexity",
         on_delete=models.DO_NOTHING)
     space_complexity = models.ForeignKey(
         "Complexity",
-        related_name="solution_space_complexity",
+        related_name="solutions_by_space_complexity",
         on_delete=models.DO_NOTHING)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -171,8 +169,3 @@ class Solution(models.Model):
 
     def __str__(self):
         return f"{self.problem.title} ({self.language.name}) by {self.owner}"
-
-    def get_solution_specific_test_cases(self):
-        from .scripts import get_solution_test_cases
-
-        return get_solution_test_cases(self.test_cases)

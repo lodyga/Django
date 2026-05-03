@@ -1,8 +1,6 @@
 import json
-
 from django import forms
 from django.core.exceptions import ValidationError
-
 from .models import Problem, Solution, TestCase
 
 
@@ -14,7 +12,7 @@ class ProblemForm(forms.ModelForm):
     )
     shared_test_cases = forms.CharField(
         required=False,
-        widget=forms.Textarea(attrs={"rows": 8}),
+        widget=forms.Textarea(attrs={"rows": 5}),
         help_text=(
             'One JSON test case per line. Example: '
             '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}'
@@ -34,7 +32,6 @@ class ProblemForm(forms.ModelForm):
             "method_name",
             "argument_names",
         ]
-        # exclude = ["slug", "owner"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

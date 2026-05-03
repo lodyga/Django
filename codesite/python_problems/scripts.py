@@ -324,13 +324,15 @@ def get_expected_output_str(source_code, language, button_pressed, test_cases):
     expected_output_str = ""
 
     for test_case in test_cases:
-        if language == "Python":
-            source_code = source_code + "\r\nprint(" + str(test_case[0]) + ")"
-        elif language == "JavaScript":
-            source_code = source_code + \
-                "\r\nconsole.log(" + str(test_case[0]) + ")"
-        expected_output_str = expected_output_str + str(test_case[1]) + "\n"
-    expected_output_str = re.sub(r"[ \n]", "", expected_output_str)
+        source_code = (
+            source_code +
+            get_print(language) + "(" +
+            str(test_case[0]) + ")\n"
+        )
+        
+        expected_output_str = expected_output_str + str(test_case[1])
+    
+    expected_output_str = re.sub(r" ", "", expected_output_str)
 
     return (source_code, expected_output_str)
 
@@ -343,7 +345,7 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     source_code = get_heap_utils(language) + \
         get_binary_tree_utils(language) + \
         get_linked_list_utils(language) + \
-        source_code
+        source_code + "\n"
 
     expected_output_str = ""
     if button_pressed == "validate":
@@ -415,6 +417,9 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
             return stdout_raw
 
         # Validate code.
+        # Python: [0, 1]
+        # JS: [ 0, 1 ]
+        # stdout ends with "\n"
         stdout = re.sub(r"[ \n]", "", stdout_raw) if stdout_raw else stdout_raw
 
         if (

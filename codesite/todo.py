@@ -1,5 +1,6 @@
-# in progress... preview based on data type:  (grid, matrix) preview
 # one slution code for one Solution instance
+
+# in progress... preview based on data type:  (grid, matrix) preview
 # wrap build_binary_tree and other around bt methods
 
 # import needed only get_heap_utils(language) + get_binary_tree_utils(language) + get_linked_list_utils(language) + source_code
