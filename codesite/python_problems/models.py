@@ -114,7 +114,7 @@ class Problem(models.Model):
         if not include_hidden:
             queryset = queryset.filter(is_hidden=False)
         return queryset
-    
+
     def get_solutions(self):
         return self.solutions.all()
 
@@ -127,7 +127,7 @@ class TestCase(models.Model):
     )
     data = models.JSONField()
     is_hidden = models.BooleanField(default=False)
-    order = models.PositiveIntegerField(default=0)
+    order = models.PositiveIntegerField(default=1)
 
     class Meta:
         ordering = ("order", "id")
@@ -168,7 +168,7 @@ class Solution(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    order = models.PositiveIntegerField(default=0)
+    order = models.PositiveIntegerField(default=1)
 
     class Meta:
         ordering = ("order", "id")

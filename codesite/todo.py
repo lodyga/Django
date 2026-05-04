@@ -1,8 +1,9 @@
+# + test case #
 # jugde0 auth in python_problems/auth?
 # stop <pre></pre> in README.md => test cases
 # add Explanation_field to test case
+# redirect after submit to final page
 
-# one slution code for one Solution instance
 
 # get_adjacent_slugs(problem, language)
 # in progress... preview based on data type:  (grid, matrix) preview

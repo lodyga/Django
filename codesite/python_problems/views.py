@@ -202,6 +202,8 @@ class ProblemDetailView(DetailView):
         (question, examples) = parse_problem_description(problem.description)
 
         context.update({
+            "clipboard_test_cases": clipboard_test_cases,
+            "effective_test_cases": effective_test_cases,
             "examples": examples,
             "language": language,
             "language_id": language.id,
@@ -213,8 +215,6 @@ class ProblemDetailView(DetailView):
             "owners": owners,
             'prev_problem_slug': prev_problem_slug,
             "question": question,
-            "effective_test_cases": effective_test_cases,
-            "clipboard_test_cases": clipboard_test_cases,
             "related_problems": related_problems,
             "solution": selected_solution,
             "solution_languages": solution_languages,
@@ -254,10 +254,10 @@ class ProblemDetailView(DetailView):
         owner_solution_languages = owner_solution_data["owner_solution_languages"]
         solution_languages = owner_solution_data["solution_languages"]
 
-        solution = Solution.objects.filter(
-            problem=problem,
-            owner=owner,
-            language=language).first()
+        # solution = Solution.objects.filter(
+        #     problem=problem,
+        #     owner=owner,
+        #     language=language).first()
 
         # Run or validate code
         if (
@@ -332,8 +332,15 @@ class ProblemDelete(LoginRequiredMixin, DeleteView):
 
 class SolutionCreate(LoginRequiredMixin, CreateView):
     model = Solution
-    form_class = SolutionCreateForm  # Custom form to remove "owner" field.
+    form_class = SolutionCreateForm
     success_url = reverse_lazy('python_problems:problem-index')
+
+    def get_initial(self):
+        initial = super().get_initial()
+        for field_name in ("problem", "language", "order"):
+            if value:= self.request.GET.get(field_name):
+                initial[field_name] = value
+        return initial
 
     def form_valid(self, form):
         object = form.save(commit=False)

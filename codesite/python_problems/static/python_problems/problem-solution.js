@@ -61,6 +61,27 @@ document.addEventListener('DOMContentLoaded', () => {
       solutionButtonContainer.appendChild(button);
    }
 
+   const createUrl = solutionButtonContainer.dataset.createUrl;
+   const problemId = solutionButtonContainer.dataset.problemId;
+   const languageSelect = document.getElementById('languageId');
+   const languageId = languageSelect?.value || solutionButtonContainer.dataset.languageId;
+   const createButton = document.createElement('a');
+   createButton.className = 'btn btn-outline-secondary btn-sm py-0 px-3';
+   createButton.textContent = '+';
+
+   if (createUrl && problemId && languageId) {
+      const params = new URLSearchParams({
+         problem: problemId,
+         language: languageId,
+         order: (solutionLength + 1).toString(),
+      });
+      createButton.href = `${createUrl}?${params.toString()}`;
+   } else {
+      createButton.href = createUrl || '#';
+   }
+
+   solutionButtonContainer.appendChild(createButton);
+
    function showSolution(idx) {
       const selectedSolution = document.getElementById(`solution-${idx}`);
       const selectedContent = selectedSolution?.value || '';
