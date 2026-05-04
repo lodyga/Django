@@ -110,7 +110,11 @@ def get_preview_in_ascii(data, problem_type, argument_name):
         bt = binarytree.build2(data).__str__()
         return (argument_name, bt)
 
-    elif isinstance(data, list) and isinstance(data[0], list):
+    elif problem_type == "linked_list" and isinstance(data, list):
+        preview = ("(" + ") -> (".join(map(str, data)) + ")")if data else "null"
+        return (argument_name, preview)
+
+    elif problem_type not in ("binary_tree", "linked_list") and data and isinstance(data, list) and isinstance(data[0], list):
         rows = len(data)
         cols = len(data[0])
         chars = set()

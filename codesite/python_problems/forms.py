@@ -115,11 +115,11 @@ class ProblemForm(forms.ModelForm):
 
     def clean_method_name(self):
         if self.cleaned_data.get("problem_type") == Problem.CLASS:
-            return None
+            return ""
 
         method_name = self.cleaned_data.get("method_name")
         if not method_name:
-            return None
+            return ""
 
         return method_name
 
