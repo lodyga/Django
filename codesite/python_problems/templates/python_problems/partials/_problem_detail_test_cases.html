@@ -10,8 +10,16 @@
   </button>
   <div class="row collapse show" id="problemTestCases">
     {% if ui_test_cases %}
-      <div id="testCaseButtonContainer" class="mb-2">
-        {# Placeholder for JavaScript 'python_problems/test-case-buttons.js' buttons #}
+      <div class="row mb-4">
+        <div class="col-auto">
+          <div id="testCaseButtonContainer">
+            {# Placeholder for JavaScript 'python_problems/test-case-buttons.js' buttons #}</div>
+        </div>
+        <div class="col-auto">
+          <button id="copyTestCasesBtn" class="btn btn-secondary">
+            <i class="far fa-copy"></i> Copy
+          </button>
+        </div>
       </div>
       <div class="row mb-2">
         <div class="col-auto" id="testCasesContainer">
@@ -20,18 +28,25 @@
               <div class="row mb-2">
                 <div class="col-auto">
                   <span class="badge bg-secondary col-auto">Input:</span>
-                  <div class="form-control" rows="1" style="white-space: pre-wrap"><code class="text-body">{{ test_case.0 }}</code></div>
+                  <div class="form-control" rows="1" style="white-space: pre-wrap"><code class="text-body">{{ test_case.input }}</code></div>
                 </div>
                 <div class="col-auto">
                   <span class="badge bg-secondary col-auto">Output:</span>
                   <div class="form-control" rows="1">
-                    <code class="text-body">{{ test_case.1 }}</code>
+                    <code class="text-body">{{ test_case.output }}</code>
                   </div>
                 </div>
+              
+              {% if test_case.explanation %}
+              <div class="col-auto">
+                <span class="badge bg-secondary col-auto">Explanation:</span>
+                <div class="form-control" rows="1" style="white-space: pre-wrap"><code class="text-body">{{ test_case.explanation }}</code></div>
+                </div>
+                {% endif %}
               </div>
-              {% if test_case.2 %}
+              {% if test_case.preview %}
                 <div class="row mb-2">
-                  {% for dataPreview in test_case.2 %}
+                  {% for dataPreview in test_case.preview %}
                     <div class="col-auto">
                       <span class="badge bg-secondary d-inline-block">{{ dataPreview.0 }}</span>
                       <div class="border rounded px-3 py-2">
@@ -43,11 +58,6 @@
               {% endif %}
             </div>
           {% endfor %}
-        </div>
-        <div class="col-auto">
-          <button id="copyTestCasesBtn" class="btn btn-secondary mt-4">
-            <i class="far fa-copy"></i> Copy
-          </button>
         </div>
       </div>
       {# Test cases to clipboard placeholder. #}

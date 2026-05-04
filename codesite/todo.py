@@ -1,7 +1,8 @@
+# + soultion, hide problem & language fields
 # + test case #
+# danger zone: delete from update
 # jugde0 auth in python_problems/auth?
 # stop <pre></pre> in README.md => test cases
-# add Explanation_field to test case
 # redirect after submit to final page
 
 

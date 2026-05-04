@@ -128,6 +128,7 @@ class TestCase(models.Model):
     data = models.JSONField()
     is_hidden = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=1)
+    explanation = models.TextField(blank=True)
 
     class Meta:
         ordering = ("order", "id")

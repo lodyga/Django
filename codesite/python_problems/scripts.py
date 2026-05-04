@@ -105,17 +105,17 @@ def get_preview_in_ascii(data, problem_type, argument_name):
     Gate / special point:
     G  O  ⊙  ✦  ★
     """
-    
+
     if problem_type == "binary_tree" and isinstance(data, list):
         bt = binarytree.build2(data).__str__()
         return (argument_name, bt)
-    
+
     elif isinstance(data, list) and isinstance(data[0], list):
         rows = len(data)
         cols = len(data[0])
         chars = set()
         char_map = {}
-        
+
         for line in data:
             for char in line:
                 chars.add(str(char))
@@ -142,7 +142,7 @@ def get_preview_in_ascii(data, problem_type, argument_name):
             grid = grid + "│ " + " ".join(grid_line) + " │\n"
 
         grid = grid + """└""" + "─" * (cols*2 + 1) + "┘"
-        
+
         return (argument_name, grid)
 
     return
@@ -176,7 +176,10 @@ def get_ui_test_cases(problem, solution, language):
                 else:
                     display_input = (operations, arguments)
 
-                ui_test_cases.append((display_input, expected))
+                ui_test_cases.append({
+                    "input": display_input,
+                    "output": expected,
+                })
 
         elif problem_type:
             for test_case in test_cases:
@@ -197,28 +200,41 @@ def get_ui_test_cases(problem, solution, language):
                 preview_data = []
                 if inputs:
                     for data, argument_name in zip(inputs, argument_names):
-                        if preview:= get_preview_in_ascii(data, problem_type, argument_name):
+                        if preview := get_preview_in_ascii(data, problem_type, argument_name):
                             preview_data.append(preview)
-                
-                if preview:= get_preview_in_ascii(expected, problem_type, "res"):
+
+                if preview := get_preview_in_ascii(expected, problem_type, "res"):
                     preview_data.append(preview)
-                
+
                 expected = serialize(expected, language)
-                ui_test_cases.append((display_input, expected, preview_data))
+                ui_item = {
+                    "input": display_input,
+                    "output": expected,
+                }
+                if preview_data:
+                    ui_item["preview"] = preview_data
+                if test_case.explanation:
+                    ui_item["explanation"] = test_case.explanation
+                ui_test_cases.append(ui_item)
 
         return ui_test_cases
 
     # Test cases from solution.
     elif solution_test_cases := get_solution_test_cases(solution.test_cases):
-        res = []
+        ui_test_cases = []
         for test_case in solution_test_cases:
-            inputs, excepted = test_case
+            inputs, expected = test_case
 
             if inputs.startswith("Solution()"):
                 inputs = inputs[11:]
 
-            res.append((inputs, excepted))
-        return res
+            ui_item = {
+                "input": inputs,
+                "output": expected,
+            }
+
+            ui_test_cases.append(ui_item)
+        return ui_test_cases
 
     else:
         return []
@@ -330,9 +346,9 @@ def get_expected_output_str(source_code, language, button_pressed, test_cases):
             get_print(language) + "(" +
             str(test_case[0]) + ")\n"
         )
-        
+
         expected_output_str = expected_output_str + str(test_case[1])
-    
+
     expected_output_str = re.sub(r" ", "", expected_output_str)
 
     return (source_code, expected_output_str)
