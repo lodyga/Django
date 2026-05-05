@@ -114,15 +114,23 @@ def get_preview_in_ascii(data, problem_type, argument_name):
         preview = ("(" + ") -> (".join(map(str, data)) + ")")if data else "null"
         return (argument_name, preview)
 
+    # for grid-like data
     elif problem_type not in ("binary_tree", "linked_list") and data and isinstance(data, list) and isinstance(data[0], list):
+        # if not rectangelar shape
+        for row in data:
+            if len(row) != len(data[0]):
+                return
+            if not data[0][0]:
+                return
+
         rows = len(data)
         cols = len(data[0])
-        chars = set()
+        chars = {str(char) for line in data for char in line}
         char_map = {}
 
-        for line in data:
-            for char in line:
-                chars.add(str(char))
+        if all(char.isalpha() for char in chars):
+            return
+
         match len(chars):
             case 1 | 2 | 3:
                 char_map = {
@@ -311,9 +319,9 @@ def get_solution_instance_setup(problem, language):
 
     match language:
         case "Python":
-            return "\r\nsolution = Solution()"
+            return "\nsolution = Solution()\n"
         case "JavaScript":
-            return "\r\nconst solution = new Solution();"
+            return "\nconst solution = new Solution();\n"
         case _:
             return ""
 
@@ -354,6 +362,7 @@ def get_expected_output_str(source_code, language, button_pressed, test_cases):
         expected_output_str = expected_output_str + str(test_case[1])
 
     expected_output_str = re.sub(r" ", "", expected_output_str)
+    expected_output_str = re.sub(r"\'", '"', expected_output_str)
 
     return (source_code, expected_output_str)
 
@@ -433,16 +442,20 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     status_id = response["status"]["id"]
 
     if status_id == 3:
-        stdout_raw = response["stdout"]
+        stdout = response["stdout"]
         if button_pressed == "run":
-            return stdout_raw
+            return stdout
 
-        # Validate code.
+        # Clean stdout to compare
         # Python: [0, 1]
         # JS: [ 0, 1 ]
         # stdout ends with "\n"
-        stdout = re.sub(r"[ \n]", "", stdout_raw) if stdout_raw else stdout_raw
+        stdout = re.sub(r"[ \n]", "", stdout)
+        
+        # Compare "'a'" and '"a"'
+        stdout = re.sub(r"\'", '"', stdout)
 
+        # Validate code.
         if (
             language == "C++" and not response["stdout"] or
             stdout.endswith(expected_output_str) or
