@@ -636,33 +636,19 @@ def get_header(problem_type, language):
     """
     Return problem type definition snippet.
     """
-    header = ""
+    match problem_type:
+        case "binary_tree":
+            match language.name:
+                case "Python":
+                    return '''# class TreeNode:\n#     """\n#     Definition for a binary tree node.\n#     """\n#     def __init__(self, val=None, left=None, right=None):\n#         self.val = val\n#         self.left = left\n#         self.right = right\n\n\n'''
+                case "JavaScript":
+                    return """/**\n * class TreeNode {\n *    constructor(val = null, left = null, right = null) {\n *       this.val = val\n *       this.left = left\n *       this.right = right\n *    };\n * }\n */\n\n\n"""
 
-    if problem_type == "binary_tree":
-        match language.name:
-            case "Python":
-                header = '''# class TreeNode:\r\n#     """\r\n#     Definition for a binary tree node.\r\n#     """\r\n#     def __init__(self, val=None, left=None, right=None):\r\n#         self.val = val\r\n#         self.left = left\r\n#         self.right = right\r\n#\r\n#\r\n'''
-            case "JavaScript":
-                header = """/**\n * class TreeNode {\n *    constructor(val = null, left = null, right = null) {\n *       this.val = val\n *       this.left = left\n *       this.right = right\n *    };\n * }\n */\n\n\n"""
+        case "linked_list":
+            match language.name:
+                case "Python":
+                    return '''# class ListNode:\n#     """\n#     Definition for singly-linked list.\n#     """\n#     def __init__(self, val=None, next=None):\n#         self.val = val\n#         self.next = next\n\n\n'''
+                case "JavaScript":
+                    return """/**\n * Represents a node in a singly-linked list.\n * class ListNode {\n *    constructor(val = null, next = null) {\n *       this.val = val;\n *       this.next = next;\n *    }\n * }\n */\n\n\n"""
 
-    return header
-
-
-def parse_solution_code(problem_type, source_code, language):
-    res = []
-    match language.name:
-        case "Python":
-            delimiter = "class Solution:\r\n"
-        case "JavaScript":
-            delimiter = "class Solution {\r\n"
-        case "C++" | "Java":
-            delimiter = "class Solution {\r\n"
-        case _:
-            delimiter = "class Solution\r\n"
-
-    for code_part in source_code.split(delimiter):
-        if code_part:
-            header = get_header(problem_type, language)
-            res.append(header + delimiter + code_part.strip("\r\n"))
-
-    return res
+    return ""

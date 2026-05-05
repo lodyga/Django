@@ -125,7 +125,7 @@ class TestCase(models.Model):
         on_delete=models.CASCADE,
         related_name="testcases"
     )
-    data = models.JSONField()
+    data = models.JSONField(default=list)
     is_hidden = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=1)
     explanation = models.TextField(blank=True)
@@ -138,6 +138,10 @@ class TestCase(models.Model):
 
 
 class Solution(models.Model):
+    def get_default_complexity():
+        obj, _ = Complexity.objects.get_or_create(name="O(n)")
+        return obj.id
+
     problem = models.ForeignKey(
         Problem,
         on_delete=models.CASCADE,
@@ -160,12 +164,14 @@ class Solution(models.Model):
     time_complexity = models.ForeignKey(
         "Complexity",
         related_name="solutions_by_time_complexity",
-        on_delete=models.DO_NOTHING
+        on_delete=models.DO_NOTHING,
+        default=get_default_complexity
     )
     space_complexity = models.ForeignKey(
         "Complexity",
         related_name="solutions_by_space_complexity",
-        on_delete=models.DO_NOTHING
+        on_delete=models.DO_NOTHING,
+        default=get_default_complexity
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

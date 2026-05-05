@@ -144,6 +144,7 @@ class SolutionForm(forms.ModelForm):
         widget=forms.Textarea(attrs={"rows": 20}),
     )
     test_cases = forms.CharField(
+        required=False,
         widget=forms.Textarea(attrs={"rows": 2}),
     )
 

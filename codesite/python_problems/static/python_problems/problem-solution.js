@@ -65,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
    const problemId = solutionButtonContainer.dataset.problemId;
    const languageSelect = document.getElementById('languageId');
    const languageId = languageSelect?.value || solutionButtonContainer.dataset.languageId;
+   const redirectUrl = solutionButtonContainer.dataset.redirectUrl;
    const createButton = document.createElement('a');
    createButton.className = 'btn btn-outline-secondary btn-sm py-0 px-3';
    createButton.textContent = '+';
@@ -74,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
          problem: problemId,
          language: languageId,
          order: (solutionLength + 1).toString(),
+         next: redirectUrl,
       });
       createButton.href = `${createUrl}?${params.toString()}`;
    } else {

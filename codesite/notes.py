@@ -230,10 +230,14 @@ output = cwd
 
 
 
-
-
-
-
+# same button
+<input type="button"
+       class="btn btn-secondary"
+       onclick="window.location='{% url 'python_problems:problem-index' %}'"
+       value="Cancel" />
+<a href="{% url 'python_problems:problem-index' %}" class="btn btn-secondary">
+  Cancel
+</a>
 
 
 

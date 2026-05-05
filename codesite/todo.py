@@ -1,10 +1,11 @@
+# redirect after submit to prev page
+# edit test cases for explanation
 # + soultion, hide problem & language fields
 # + test case #
 # danger zone: delete from update
 # jugde0 auth in python_problems/auth?
 # stop <pre></pre> in README.md => test cases
-# redirect after submit to final page
-
+# <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea> and <textarea id="solution-{{ forloop.counter }}"
 
 # get_adjacent_slugs(problem, language)
 # in progress... preview based on data type:  (grid, matrix) preview

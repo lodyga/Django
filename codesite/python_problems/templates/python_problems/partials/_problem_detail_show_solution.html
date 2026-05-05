@@ -21,11 +21,13 @@
                 {% if first_solution %}
                   <div class="mb-3">
                     <a id="solutionUpdateLink"
+                       class="btn btn-sm btn-secondary"
                        data-url-template="{% url 'python_problems:solution-update' 0 %}"
                        href="{% url 'python_problems:solution-update' first_solution.id %}">Update</a>
                   </div>
                   <div class="mb-1">
                     <a id="solutionDeleteLink"
+                       class="btn btn-sm btn-secondary"
                        data-url-template="{% url 'python_problems:solution-delete' 0 %}"
                        href="{% url 'python_problems:solution-delete' first_solution.id %}">Delete</a>
                   </div>
@@ -69,11 +71,12 @@
           </div>
         </div>
       </div>
-      {% if solution_parts %}
+      {% if owner_solutions %}
         <div id="solutionButtonContainer"
              data-create-url="{% url 'python_problems:solution-create' %}"
              data-problem-id="{{ solution.problem_id }}"
-             data-language-id="{{ language_id }}">
+             data-language-id="{{ language_id }}"
+             data-redirect-url="{% url 'python_problems:problem-detail' problem_slug language %}">
           {# Placeholder for JavaScript 'python_problems/problem-solution.js' buttons #}
         </div>
         <div class="position-relative">
@@ -83,7 +86,7 @@
                   style="z-index: 10">
             <i class="far fa-copy"></i> Copy
           </button>
-          <textarea id="solutionContentContainer">{{ solution_parts.0 }}</textarea>
+          <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea>
         </div>
         {% for solution in owner_solutions %}
           <textarea id="solution-{{ forloop.counter }}"

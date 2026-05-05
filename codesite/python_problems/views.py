@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from rest_framework import viewsets
@@ -122,6 +123,10 @@ class ProblemDetailView(DetailView):
         solution_languages = Language.objects.filter(
             id__in=owner_all_solutions.values_list("language", flat=True)
         )
+        for solution in owner_solutions:
+            solution.source_code = get_header(
+                problem.problem_type, language) + solution.source_code
+
         return {
             "solution_languages": solution_languages,
             "owner_solutions": owner_solutions,
@@ -165,10 +170,6 @@ class ProblemDetailView(DetailView):
         owner_solution_languages = owner_solution_data["owner_solution_languages"]
         # Multiple solutions are allowed; use the first ordered solution.
         selected_solution = owner_solutions.first()
-
-        # Solution_parts to be deprecated.
-        solution_parts = parse_solution_code(
-            problem.problem_type, selected_solution.source_code, language)
 
         ui_test_cases = get_ui_test_cases(
             problem, selected_solution, language.name)
@@ -214,11 +215,11 @@ class ProblemDetailView(DetailView):
             "owner_solutions": owner_solutions,
             "owners": owners,
             'prev_problem_slug': prev_problem_slug,
+            "problem_slug": problem.slug,
             "question": question,
             "related_problems": related_problems,
             "solution": selected_solution,
             "solution_languages": solution_languages,
-            "solution_parts": solution_parts,
             "source_code": source_code,
             "tag_list": tag_list,
             "ui_test_cases": ui_test_cases,
@@ -253,11 +254,6 @@ class ProblemDetailView(DetailView):
         owner_solutions = owner_solution_data["owner_solutions"]
         owner_solution_languages = owner_solution_data["owner_solution_languages"]
         solution_languages = owner_solution_data["solution_languages"]
-
-        # solution = Solution.objects.filter(
-        #     problem=problem,
-        #     owner=owner,
-        #     language=language).first()
 
         # Run or validate code
         if (
@@ -335,18 +331,42 @@ class SolutionCreate(LoginRequiredMixin, CreateView):
     form_class = SolutionCreateForm
     success_url = reverse_lazy('python_problems:problem-index')
 
+    def _get_next_url(self):
+        next_url = (
+            self.request.POST.get("next") or
+            self.request.GET.get("next")
+        )
+        if next_url and url_has_allowed_host_and_scheme(
+            next_url,
+            allowed_hosts={self.request.get_host()},
+            require_https=self.request.is_secure(),
+        ):
+            return next_url
+        return None
+
     def get_initial(self):
         initial = super().get_initial()
         for field_name in ("problem", "language", "order"):
-            if value:= self.request.GET.get(field_name):
+            if value := self.request.GET.get(field_name):
                 initial[field_name] = value
         return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["problem_submit_redirect_url"] = (
+            self._get_next_url() or
+            reverse_lazy("python_problems:problem-index")
+        )
+        return context
 
     def form_valid(self, form):
         object = form.save(commit=False)
         object.owner = self.request.user
         object.save()
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return self._get_next_url() or super().get_success_url()
 
 
 class SolutionUpdate(LoginRequiredMixin, UpdateView):
