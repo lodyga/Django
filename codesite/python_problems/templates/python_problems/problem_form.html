@@ -34,6 +34,14 @@
             </div>
             <pre class="mb-2 mt-2"><code>["nums", "target"]</code></pre>
           </div>
+          {{ form.comparison_type|as_crispy_field }}
+          <div class="alert alert-secondary py-2">
+            <div>
+              <pre class="mb-2 mt-2"><code><b>Exact</b>: compare lists.</code></pre>
+              <pre class="mb-2 mt-2"><code><b>Unordered</b>: compare sets.</code></pre>
+              <pre class="mb-2 mt-2"><code><b>Multiset</b>: compare hash maps.</code></pre>
+            </div>
+          </div>
           {{ form.shared_test_cases|as_crispy_field }}
           <div class="alert alert-secondary py-2">
             <div>

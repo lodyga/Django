@@ -262,8 +262,13 @@ class ProblemDetailView(DetailView):
         ):
             source_code = request.POST.get("code_container")
             test_cases = "" if button_pressed == "run" else context["effective_test_cases"]
-            output = execute_code(problem, source_code,
-                                  language.name, button_pressed, test_cases)
+            output = execute_code(
+                problem,
+                source_code,
+                language.name,
+                button_pressed,
+                test_cases
+            )
             output_container = output
         else:
             source_code = context["source_code"]

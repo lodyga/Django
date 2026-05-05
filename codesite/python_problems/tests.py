@@ -223,7 +223,7 @@ class ProblemModelTests(TestCase):
 
 class ProblemFormTests(TestCase):
     def test_problem_form_disables_method_fields_for_class_design(self):
-        form = ProblemForm(initial={"problem_type": Problem.CLASS})
+        form = ProblemForm(initial={"problem_type": ProblemType.CLASS})
 
         self.assertEqual(
             form.fields["method_name"].widget.attrs.get("disabled"),
@@ -307,7 +307,7 @@ class ProblemFormTests(TestCase):
             "difficulty": difficulty.id,
             "description": "Sample problem description",
             "tags": [tag.id],
-            "problem_type": Problem.CLASS,
+            "problem_type": ProblemType.CLASS,
             "method_name": "shouldBeIgnored",
             "argument_names": '["ignored"]',
             "shared_test_cases": (

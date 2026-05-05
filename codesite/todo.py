@@ -6,6 +6,7 @@
 # jugde0 auth in python_problems/auth?
 # stop <pre></pre> in README.md => test cases
 # <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea> and <textarea id="solution-{{ forloop.counter }}"
+# script to https://eu.pythonanywhere.com/user/ukasz/files/home/ukasz/Django/codesite/db.sqlite3
 
 # get_adjacent_slugs(problem, language)
 # in progress... preview based on data type:  (grid, matrix) preview

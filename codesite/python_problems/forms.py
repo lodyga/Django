@@ -1,7 +1,7 @@
 import json
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Problem, Solution, TestCase
+from .models import Problem, Solution, TestCase, ProblemType
 
 
 class ProblemForm(forms.ModelForm):
@@ -31,6 +31,7 @@ class ProblemForm(forms.ModelForm):
             "problem_type",
             "method_name",
             "argument_names",
+            "comparison_type",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -57,7 +58,7 @@ class ProblemForm(forms.ModelForm):
             if self.is_bound
             else self.initial.get("problem_type", self.instance.problem_type)
         )
-        should_disable = problem_type == Problem.CLASS
+        should_disable = problem_type == ProblemType.CLASS
 
         for field_name in ("method_name", "argument_names"):
             if should_disable:
@@ -90,7 +91,7 @@ class ProblemForm(forms.ModelForm):
         return parsed_test_cases
 
     def clean_argument_names(self):
-        if self.cleaned_data.get("problem_type") == Problem.CLASS:
+        if self.cleaned_data.get("problem_type") == ProblemType.CLASS:
             return None
 
         raw_value = self.cleaned_data.get("argument_names", "").strip()
@@ -114,7 +115,7 @@ class ProblemForm(forms.ModelForm):
         return argument_names
 
     def clean_method_name(self):
-        if self.cleaned_data.get("problem_type") == Problem.CLASS:
+        if self.cleaned_data.get("problem_type") == ProblemType.CLASS:
             return ""
 
         method_name = self.cleaned_data.get("method_name")

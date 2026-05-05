@@ -52,19 +52,20 @@ class Language(models.Model):
         return self.name
 
 
+class ProblemType(models.TextChoices):
+    FUNCTION = ("function", "Function")
+    CLASS = ("class", "Class Design")
+    BINARY_TREE = ("binary_tree", "Binary Tree")
+    LINKED_LIST = ("linked_list", "Linked List")
+
+
+class ComparisonType(models.TextChoices):
+    EXACT = ("exact", "Exact")
+    UNORDERED = ("unordered", "Unordered (unique)")
+    MULTISET = ("multiset", "Unordered (with duplicates)")
+
+
 class Problem(models.Model):
-    FUNCTION = "function"
-    CLASS = "class"
-    BINARY_TREE = "binary_tree"
-    LINKED_LIST = "linked_list"
-
-    PROBLEM_TYPES = [
-        (FUNCTION, "Function"),
-        (CLASS, "Class Design"),
-        (BINARY_TREE, "Binary Tree"),
-        (LINKED_LIST, "Linked List"),
-    ]
-
     title = models.CharField(unique=True, max_length=200)
     slug = models.SlugField(unique=True, max_length=100)
     tags = models.ManyToManyField("Tag")
@@ -82,8 +83,8 @@ class Problem(models.Model):
 
     problem_type = models.CharField(
         max_length=20,
-        choices=PROBLEM_TYPES,
-        default=FUNCTION,
+        choices=ProblemType.choices,
+        default=ProblemType.FUNCTION,
     )
     method_name = models.CharField(
         max_length=100,
@@ -94,11 +95,16 @@ class Problem(models.Model):
         null=True,
         help_text='Optional argument labels for positional inputs, e.g. ["nums", "target"]',
     )
+    comparison_type = models.CharField(
+        max_length=20,
+        choices=ComparisonType.choices,
+        default=ComparisonType.EXACT,
+    )
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
-        if self.problem_type == self.CLASS:
+        if self.problem_type == ProblemType.CLASS:
             self.method_name = ""
             self.argument_names = None
         super().save(*args, **kwargs)

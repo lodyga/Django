@@ -1,14 +1,16 @@
+import ast
 import binarytree
 import json
 import re
 import requests
 import socket
+from collections import Counter
 from time import sleep
 from django.apps import apps
 from django.conf import settings
 from django.templatetags.static import static
 from python_problems.auth.judge0_auth import JUDGE0_API_KEY
-from python_problems.models import Problem
+from python_problems.models import Problem, ComparisonType
 
 
 def get_solution_test_cases(solution_test_cases):
@@ -346,11 +348,10 @@ def is_localhost():
     return hostname == "GF108"
 
 
-def get_expected_output_str(source_code, language, button_pressed, test_cases):
+# todo: return should be list not str
+def get_expected_output(source_code, language, button_pressed, test_cases):
     if button_pressed == "run":
-        return (source_code, "")
-
-    expected_output_str = ""
+        return (source_code, [])
 
     for test_case in test_cases:
         source_code = (
@@ -359,12 +360,37 @@ def get_expected_output_str(source_code, language, button_pressed, test_cases):
             str(test_case[0]) + ")\n"
         )
 
-        expected_output_str = expected_output_str + str(test_case[1])
+        # expected_output = expected_output + str(test_case[1])
 
-    expected_output_str = re.sub(r" ", "", expected_output_str)
-    expected_output_str = re.sub(r"\'", '"', expected_output_str)
+    expected_output = [ast.literal_eval(tc) for _, tc in test_cases]
+    # expected_output = re.sub(r" ", "", expected_output)
+    # expected_output = re.sub(r"\'", '"', expected_output)
 
-    return (source_code, expected_output_str)
+    return (source_code, expected_output)
+
+
+def compare_output_and_expected(output, expected, comparison_type):
+    if len(output) != len(expected):
+        return False
+
+    for raw_item, expeted_item in zip(output, expected):
+        try:
+            item = ast.literal_eval(raw_item)
+        except (ValueError, SyntaxError):
+            return False
+
+        match comparison_type:
+            case ComparisonType.EXACT:
+                if item != expeted_item:
+                    return False
+            case ComparisonType.UNORDERED:
+                if set(item) != set(expeted_item):
+                    return False
+            case ComparisonType.MULTISET:
+                if Counter(item) != Counter(expeted_item):
+                    return False
+
+    return True
 
 
 def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
@@ -377,7 +403,7 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
         get_linked_list_utils(language) + \
         source_code + "\n"
 
-    expected_output_str = ""
+    expected_output = []
     if button_pressed == "validate":
         if problem.method_name:
             solution_instance_setup = get_solution_instance_setup(
@@ -385,7 +411,7 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
             if not re.search(solution_instance_setup.strip()[:-3], source_code):
                 source_code += solution_instance_setup
 
-        (source_code, expected_output_str) = get_expected_output_str(
+        (source_code, expected_output) = get_expected_output(
             source_code,
             language,
             button_pressed,
@@ -446,19 +472,24 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
         if button_pressed == "run":
             return stdout
 
+        stdout_list = [st for st in stdout.split("\n") if st]
+
         # Clean stdout to compare
         # Python: [0, 1]
         # JS: [ 0, 1 ]
         # stdout ends with "\n"
-        stdout = re.sub(r"[ \n]", "", stdout)
-        
-        # Compare "'a'" and '"a"'
-        stdout = re.sub(r"\'", '"', stdout)
+        # stdout = re.sub(r"[ \n]", "", stdout)
 
-        # Validate code.
+        # Compare "'a'" and '"a"'
+        # stdout = re.sub(r"\'", '"', stdout)
+
         if (
             language == "C++" and not response["stdout"] or
-            stdout.endswith(expected_output_str) or
+            compare_output_and_expected(
+                stdout_list[-len(expected_output):],
+                expected_output,
+                problem.comparison_type
+            ) or
             stdout.find("rue") != -1 and stdout.find("alse") == -1
         ):
             return "Tests passed!"
