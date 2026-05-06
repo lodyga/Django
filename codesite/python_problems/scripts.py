@@ -380,10 +380,8 @@ def compare_output_and_expected(output, expected, comparison_type):
     for raw_item, expeted_item in zip(output, expected):
         try:
             item = ast.literal_eval(raw_item)
-        except ValueError:
+        except (ValueError, SyntaxError):
             item = raw_item
-        except SyntaxError:
-            raise
 
         match comparison_type:
             case ComparisonType.EXACT:
@@ -480,7 +478,7 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
         if button_pressed == "run":
             return stdout
 
-        stdout_list = [st for st in stdout.split("\n") if st]
+        stdout_list = [st for st in stdout.split("\n")][:-1]
 
         # Clean stdout to compare
         # Python: [0, 1]
