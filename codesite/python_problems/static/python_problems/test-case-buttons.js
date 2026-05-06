@@ -4,10 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
    const testCaseLength = testcaseElements.length;
    const testCaseButtonContainer = document.getElementById('testCaseButtonContainer');
    const copyTestCasesBtn = document.getElementById('copyTestCasesBtn');
-   const clipboardTestCases = document.getElementById('clipboardTestCases').innerText;
+   const clipboardNode = document.getElementById('clipboardTestCases');
+   const clipboardTestCases = clipboardNode ? clipboardNode.innerText : '';
 
    // Collapsable paragraph.
    const testCaseElements = document.getElementById('problemTestCases');
+   if (!testCaseElements) {
+      return;
+   }
    const testCaseCollapse = new bootstrap.Collapse(testCaseElements, { toggle: false });
    const testCaseToggle = document.querySelector('[data-bs-target="#problemTestCases"]');
    const icon = testCaseToggle.querySelector('i');
@@ -26,14 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
       testCaseToggle.setAttribute('aria-expanded', 'false');
    });
 
-   for (let index = 1; index < testCaseLength + 1; index++) {
-      const button = document.createElement('button');
-      button.id = `testCaseButton-${index}`;
-      button.className = 'btn btn-secondary btn-sm me-2 py-0 px-3';
-      button.textContent = `Case ${index}`;
-      button.onclick = (event) => { showTestCase(index); }
-      testCaseButtonContainer.appendChild(button);
-   };
+   if (testCaseButtonContainer) {
+      for (let index = 1; index < testCaseLength + 1; index++) {
+         const button = document.createElement('button');
+         button.id = `testCaseButton-${index}`;
+         button.className = 'btn btn-secondary btn-sm me-2 py-0 px-3';
+         button.textContent = `Case ${index}`;
+         button.onclick = () => { showTestCase(index); };
+         testCaseButtonContainer.appendChild(button);
+      }
+   }
 
    function showTestCase(idx) {
       for (let testCase of testcaseElements) {
@@ -44,6 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       for (let i = 1; i < testCaseLength + 1; i++) {
          const btn = document.getElementById(`testCaseButton-${i}`);
+         if (!btn) {
+            continue;
+         }
 
          if (i === idx) {
             btn.classList.replace('btn-outline-secondary', 'btn-secondary');
@@ -57,16 +66,39 @@ document.addEventListener('DOMContentLoaded', () => {
       showTestCase(1);
    }
 
-   copyTestCasesBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText(clipboardTestCases)
-         .then(() => {
-            copyTestCasesBtn.classList.replace('btn-secondary', 'btn-success');
-            copyTestCasesBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-            setTimeout(() => {
-               copyTestCasesBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
-               copyTestCasesBtn.classList.replace('btn-success', 'btn-secondary');
-            }, 2000);
-         })
-   })
+   if (copyTestCasesBtn) {
+      copyTestCasesBtn.addEventListener('click', () => {
+         navigator.clipboard.writeText(clipboardTestCases)
+            .then(() => {
+               copyTestCasesBtn.classList.replace('btn-secondary', 'btn-success');
+               copyTestCasesBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+               setTimeout(() => {
+                  copyTestCasesBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+                  copyTestCasesBtn.classList.replace('btn-success', 'btn-secondary');
+               }, 2000);
+            });
+      });
+   }
 
+   const previewContentBtn = document.getElementById('previewContentBtn');
+   const previewContents = document.querySelectorAll('.previewContent');
+
+   if (previewContentBtn) {
+      if (previewContents.length === 0) {
+         previewContentBtn.checked = false;
+         previewContentBtn.disabled = true;
+      }
+
+      const setPreviewVisibility = (isVisible) => {
+         previewContents.forEach((content) => {
+            content.style.display = isVisible ? '' : 'none';
+         });
+      };
+
+      previewContentBtn.addEventListener('change', (event) => {
+         setPreviewVisibility(event.target.checked);
+      });
+
+      setPreviewVisibility(previewContentBtn.checked);
+   }
 })
