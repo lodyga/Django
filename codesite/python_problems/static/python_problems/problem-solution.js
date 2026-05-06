@@ -46,6 +46,31 @@ document.addEventListener('DOMContentLoaded', () => {
    const solutionDeleteLink = document.getElementById('solutionDeleteLink');
    let clipboardSolution = '';
 
+   function buildActionUrl(linkElement, solutionId) {
+      if (!linkElement?.dataset.urlTemplate) {
+         return null;
+      }
+
+      const baseUrl = linkElement.dataset.urlTemplate.replace('/0/', `/${solutionId}/`);
+      const currentHref = linkElement.getAttribute('href') || '';
+      const currentUrl = new URL(currentHref, window.location.origin);
+      const nextUrl = (
+         linkElement.dataset.nextUrl
+         || currentUrl.searchParams.get('next')
+         || window.location.pathname
+      );
+
+      if (!nextUrl) {
+         return baseUrl;
+      }
+
+      const params = new URLSearchParams({
+         next: nextUrl,
+      });
+
+      return `${baseUrl}?${params.toString()}`;
+   }
+
    if (!solutionButtonContainer || solutionLength === 0) {
       return;
    }
@@ -95,11 +120,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       clipboardSolution = selectedContent;
       if (selectedSolutionId) {
-         if (solutionUpdateLink?.dataset.urlTemplate) {
-            solutionUpdateLink.href = solutionUpdateLink.dataset.urlTemplate.replace('/0/', `/${selectedSolutionId}/`);
+         const updateHref = buildActionUrl(solutionUpdateLink, selectedSolutionId);
+         const deleteHref = buildActionUrl(solutionDeleteLink, selectedSolutionId);
+
+         if (updateHref) {
+            solutionUpdateLink.href = updateHref;
          }
-         if (solutionDeleteLink?.dataset.urlTemplate) {
-            solutionDeleteLink.href = solutionDeleteLink.dataset.urlTemplate.replace('/0/', `/${selectedSolutionId}/`);
+         if (deleteHref) {
+            solutionDeleteLink.href = deleteHref;
          }
       }
 

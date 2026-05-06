@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
+from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -331,15 +332,13 @@ class ProblemDelete(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('python_problems:problem-index')
 
 
-class SolutionCreate(LoginRequiredMixin, CreateView):
-    model = Solution
-    form_class = SolutionCreateForm
-    success_url = reverse_lazy('python_problems:problem-index')
+class NextUrlMixin():
+    request: HttpRequest
 
     def _get_next_url(self):
         next_url = (
-            self.request.POST.get("next") or
-            self.request.GET.get("next")
+            self.request.POST.get("next")
+            or self.request.GET.get("next")
         )
         if next_url and url_has_allowed_host_and_scheme(
             next_url,
@@ -349,6 +348,30 @@ class SolutionCreate(LoginRequiredMixin, CreateView):
             return next_url
         return None
 
+    def get_fallback_next_url(self):
+        return None
+
+    def get_redirect_url(self):
+        return (
+            self._get_next_url()
+            or self.get_fallback_next_url()
+            or reverse_lazy("python_problems:problem-index")
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["problem_submit_redirect_url"] = self.get_redirect_url()
+        return context
+
+    def get_success_url(self):
+        return self.get_redirect_url()
+
+
+class SolutionCreate(LoginRequiredMixin, NextUrlMixin, CreateView):
+    model = Solution
+    form_class = SolutionCreateForm
+    success_url = reverse_lazy('python_problems:problem-index')
+
     def get_initial(self):
         initial = super().get_initial()
         for field_name in ("problem", "language", "order"):
@@ -356,29 +379,40 @@ class SolutionCreate(LoginRequiredMixin, CreateView):
                 initial[field_name] = value
         return initial
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["problem_submit_redirect_url"] = (
-            self._get_next_url() or
-            reverse_lazy("python_problems:problem-index")
-        )
-        return context
-
     def form_valid(self, form):
         object = form.save(commit=False)
         object.owner = self.request.user
         object.save()
         return super().form_valid(form)
 
-    def get_success_url(self):
-        return self._get_next_url() or super().get_success_url()
 
-
-class SolutionUpdate(LoginRequiredMixin, UpdateView):
+class SolutionUpdate(LoginRequiredMixin, NextUrlMixin, UpdateView):
     model = Solution
     # Custom form to exclude = ["problem", "language", "owner"] fields.
     form_class = SolutionUpdateForm
     success_url = reverse_lazy('python_problems:problem-index')
+
+    def get_initial(self):
+        initial = super().get_initial()
+        for field_name in ("problem", "language", "order"):
+            if value := self.request.GET.get(field_name):
+                initial[field_name] = value
+        return initial
+
+    def get_fallback_next_url(self):
+        return reverse_lazy(
+            "python_problems:problem-detail",
+            kwargs={
+                "slug": self.object.problem.slug,
+                "language": self.object.language.name,
+            },
+        )
+
+    def form_valid(self, form):
+        object = form.save(commit=False)
+        object.owner = self.request.user
+        object.save()
+        return super().form_valid(form)
 
 
 class SolutionDelete(LoginRequiredMixin, DeleteView):

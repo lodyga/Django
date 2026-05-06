@@ -9,7 +9,7 @@
 # script to https://eu.pythonanywhere.com/user/ukasz/files/home/ukasz/Django/codesite/db.sqlite3
 
 # get_adjacent_slugs(problem, language)
-# in progress... preview based on data type:  (grid, matrix) preview
+# in progress... preview based on data type:  (grid, matrix) preview veritcal preview for heights [1, 4, 6, 7, 6, 7]
 # wrap build_binary_tree and other around bt methods
 # mutate grid and do not return (None) anything problems
 

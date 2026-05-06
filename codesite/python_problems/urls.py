@@ -28,9 +28,9 @@ urlpatterns = [
     path("", views.ProblemIndexView.as_view(), name="problem-index"),
 
     path("problem_create/", views.ProblemCreate.as_view(),
-         name="problem-create"),  # create have to be befre slug
+         name="problem-create"),  # create before slug
     path("solution_create/", views.SolutionCreate.as_view(),
-         name="solution-create"),  # create have to be befre slug
+         name="solution-create"),  # create before slug
     path("language_add/", views.LanguageCreate.as_view(), 
          name="language-create"),
 

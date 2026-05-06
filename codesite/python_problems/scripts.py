@@ -13,6 +13,7 @@ from python_problems.auth.judge0_auth import JUDGE0_API_KEY
 from python_problems.models import Problem, ComparisonType
 
 
+# Remove when all test cases are moved to problem.
 def get_solution_test_cases(solution_test_cases):
     """
     Clean each solution test case into (input, expected output) tuple.
@@ -366,7 +367,10 @@ def get_expected_output(source_code, language, button_pressed, test_cases):
     # expected_output = re.sub(r" ", "", expected_output)
     # expected_output = re.sub(r"\'", '"', expected_output)
 
-    return (source_code, expected_output)
+    return {
+        "source_code": source_code,
+        "expected_output": expected_output
+    }
 
 
 def compare_output_and_expected(output, expected, comparison_type):
@@ -411,12 +415,14 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
             if not re.search(solution_instance_setup.strip()[:-3], source_code):
                 source_code += solution_instance_setup
 
-        (source_code, expected_output) = get_expected_output(
+        expected_output = get_expected_output(
             source_code,
             language,
             button_pressed,
             test_cases,
         )
+        source_code = expected_output["source_code"]
+        expected_output = expected_output["expected_output"]
 
     language_name_to_id = {
         "Python": 71,
