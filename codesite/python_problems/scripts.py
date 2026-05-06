@@ -380,8 +380,10 @@ def compare_output_and_expected(output, expected, comparison_type):
     for raw_item, expeted_item in zip(output, expected):
         try:
             item = ast.literal_eval(raw_item)
-        except (ValueError, SyntaxError):
-            return False
+        except ValueError:
+            item = raw_item
+        except SyntaxError:
+            raise
 
         match comparison_type:
             case ComparisonType.EXACT:
