@@ -9,7 +9,7 @@ from time import sleep
 from django.apps import apps
 from django.conf import settings
 from django.templatetags.static import static
-from python_problems.auth.judge0_auth import JUDGE0_API_KEY
+from codesite.auth.judge0_auth import JUDGE0_API_KEY
 from python_problems.models import Problem, ComparisonType
 
 
@@ -349,7 +349,7 @@ def is_localhost():
     return hostname == "GF108"
 
 
-# todo: return should be list not str
+# todo: return should be list not str... meaby
 def get_expected_output(source_code, language, button_pressed, test_cases):
     if button_pressed == "run":
         return (source_code, [])
@@ -361,11 +361,7 @@ def get_expected_output(source_code, language, button_pressed, test_cases):
             str(test_case[0]) + ")\n"
         )
 
-        # expected_output = expected_output + str(test_case[1])
-
-    expected_output = [ast.literal_eval(tc) for _, tc in test_cases]
-    # expected_output = re.sub(r" ", "", expected_output)
-    # expected_output = re.sub(r"\'", '"', expected_output)
+    expected_output = [tc for _, tc in test_cases]
 
     return {
         "source_code": source_code,
@@ -374,24 +370,39 @@ def get_expected_output(source_code, language, button_pressed, test_cases):
 
 
 def compare_output_and_expected(output, expected, comparison_type):
+    """
+    Need ast.literal_eval() to compare:
+    raw_item: P: '[0, 1]'
+              JS: '[ 0, 1 ]'
+    expected_raw_item: P '[0, 1]'
+                       JS: '[0, 1]'
+    
+    raw_item: P: 'True'
+              JS: 'true'
+    expected_raw_item: P: 'True'
+                      JS: 'true'
+    """
     if len(output) != len(expected):
         return False
 
-    for raw_item, expeted_item in zip(output, expected):
+    for raw_item, expected_raw_item in zip(output, expected):
+        
         try:
             item = ast.literal_eval(raw_item)
+            expected_item = ast.literal_eval(expected_raw_item)
         except (ValueError, SyntaxError):
             item = raw_item
+            expected_item = expected_raw_item
 
         match comparison_type:
             case ComparisonType.EXACT:
-                if item != expeted_item:
+                if item != expected_item:
                     return False
             case ComparisonType.UNORDERED:
-                if set(item) != set(expeted_item):
+                if set(item) != set(expected_item):
                     return False
             case ComparisonType.MULTISET:
-                if Counter(item) != Counter(expeted_item):
+                if Counter(item) != Counter(expected_item):
                     return False
 
     return True

@@ -144,19 +144,15 @@ class SolutionForm(forms.ModelForm):
     source_code = forms.CharField(
         widget=forms.Textarea(attrs={"rows": 20}),
     )
-    test_cases = forms.CharField(
-        required=False,
-        widget=forms.Textarea(attrs={"rows": 2}),
-    )
 
 
 class SolutionCreateForm(SolutionForm):
     class Meta:
         model = Solution
-        exclude = ["owner"]
+        exclude = ["owner", "test_cases"]
 
 
 class SolutionUpdateForm(SolutionForm):
     class Meta:
         model = Solution
-        exclude = ["problem", "language", "owner"]
+        exclude = ["problem", "language", "owner", "test_cases"]

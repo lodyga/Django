@@ -1,3 +1,5 @@
+
+# validate all test cases
 # redirect after submit to prev page
 # edit test cases for explanation
 # + soultion, hide problem & language fields
@@ -8,10 +10,16 @@
 # <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea> and <textarea id="solution-{{ forloop.counter }}"
 # script to https://eu.pythonanywhere.com/user/ukasz/files/home/ukasz/Django/codesite/db.sqlite3
 
+
+
 # get_adjacent_slugs(problem, language)
 # in progress... preview based on data type:  (grid, matrix) preview veritcal preview for heights [1, 4, 6, 7, 6, 7]
 # wrap build_binary_tree and other around bt methods
-# mutate grid and do not return (None) anything problems
+# handle mutate grid and do not return (None) anything problems 
+
+# for later
+# problem add, focus on that problem, exclude Problem, Language, Order fields
+
 
 # import needed only get_heap_utils(language) + get_binary_tree_utils(language) + get_linked_list_utils(language) + source_code
 # better light mode
