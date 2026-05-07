@@ -19,20 +19,11 @@
             <div class="col-auto mb-2">
               {% with first_solution=owner_solutions|first %}
                 {% if first_solution %}
-                  <div class="mb-3">
-                    <a id="solutionUpdateLink"
-                       class="btn btn-sm btn-secondary"
-                       data-url-template="{% url 'python_problems:solution-update' 0 %}"
-                       data-next-url="{{ request.get_full_path }}"
-                       href="{% url 'python_problems:solution-update' first_solution.id %}?next={{ request.get_full_path|urlencode }}">Update</a>
-                  </div>
-                  <div class="mb-1">
-                    <a id="solutionDeleteLink"
-                       class="btn btn-sm btn-secondary"
-                       data-url-template="{% url 'python_problems:solution-delete' 0 %}"
-                       data-next-url="{{ request.get_full_path }}"
-                       href="{% url 'python_problems:solution-delete' first_solution.id %}?next={{ request.get_full_path|urlencode }}">Delete</a>
-                  </div>
+                  <a id="solutionUpdateLink"
+                     class="btn btn-sm btn-secondary"
+                     data-url-template="{% url 'python_problems:solution-update' 0 %}"
+                     data-next-url="{{ request.get_full_path }}"
+                     href="{% url 'python_problems:solution-update' first_solution.id %}?next={{ request.get_full_path|urlencode }}">Update</a>
                 {% endif %}
               {% endwith %}
             </div>

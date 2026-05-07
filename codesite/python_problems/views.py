@@ -415,10 +415,19 @@ class SolutionUpdate(LoginRequiredMixin, NextUrlMixin, UpdateView):
         return super().form_valid(form)
 
 
-class SolutionDelete(LoginRequiredMixin, DeleteView):
+class SolutionDelete(LoginRequiredMixin, NextUrlMixin, DeleteView):
     model = Solution
     fields = "__all__"
     success_url = reverse_lazy('python_problems:problem-index')
+
+    def get_fallback_next_url(self):
+        return reverse_lazy(
+            "python_problems:problem-detail",
+            kwargs={
+                "slug": self.object.problem.slug,
+                "language": self.object.language.name,
+            },
+        )
 
 
 class LanguageCreate(LoginRequiredMixin, CreateView):

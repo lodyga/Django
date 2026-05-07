@@ -1,24 +1,20 @@
-
-# validate all test cases
-# redirect after submit to prev page
-# edit test cases for explanation
-# + soultion, hide problem & language fields
-# + test case #
-# danger zone: delete from update
-# jugde0 auth in python_problems/auth?
-# stop <pre></pre> in README.md => test cases
-# <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea> and <textarea id="solution-{{ forloop.counter }}"
-# script to https://eu.pythonanywhere.com/user/ukasz/files/home/ukasz/Django/codesite/db.sqlite3
-
-
-
 # get_adjacent_slugs(problem, language)
+
+# edit only own solutions
+# validate all test cases
+# edit test cases for explanation
+# + test case #
+# <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea> and <textarea id="solution-{{ forloop.counter }}"
+
+
 # in progress... preview based on data type:  (grid, matrix) preview veritcal preview for heights [1, 4, 6, 7, 6, 7]
 # wrap build_binary_tree and other around bt methods
 # handle mutate grid and do not return (None) anything problems 
 
 # for later
 # problem add, focus on that problem, exclude Problem, Language, Order fields
+# + soultion, hide problem & language fields
+# stop <pre></pre> in README.md => test cases
 
 
 # import needed only get_heap_utils(language) + get_binary_tree_utils(language) + get_linked_list_utils(language) + source_code

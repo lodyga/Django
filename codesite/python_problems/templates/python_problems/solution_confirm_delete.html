@@ -14,9 +14,10 @@
         <p>Are you sure you want to delete the solution: {{ solution }}?</p>
         <form action="" method="POST">
           {% csrf_token %}
+          <input type="hidden" name="next" value="{{ problem_submit_redirect_url }}">
           <input type="submit" value="Yes, delete." />
           <input type="submit"
-                 onclick="window.location='{% url 'python_problems:problem-index' %}' ; return false;"
+                 onclick="window.location='{{ problem_submit_redirect_url }}' ; return false;"
                  value="Cancel" />
         </form>
       </div>

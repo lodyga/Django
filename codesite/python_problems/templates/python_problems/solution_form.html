@@ -10,7 +10,7 @@
            class="btn btn-secondary px-3 py-0 m-1">Back</a>
       </div>
       <div class="col-md-8">
-        <form action="" method="post">
+        <form action="" method="post" class="mb-5">
           {% csrf_token %}
           {% load crispy_forms_tags %}
           <input type="hidden" name="next" value="{{ problem_submit_redirect_url }}">
@@ -27,6 +27,26 @@
                  onclick="window.location='{{ problem_submit_redirect_url }}' ; return false;"
                  value="Cancel" />
         </form>
+        {% if object.pk %}
+          <label for="dangerZone">
+            <b>Danger Zone</b>
+          </label>
+          <div class="alert alert-danger py-2" id="angerZone">
+            <div class="row">
+              <div class="col">
+                <b>Delete this solution</b>
+                <pre class="mb-2 mt-2"><code>Once you delete a solution, there is no going back. Please be certain. </code></pre>
+              </div>
+              <div class="col-auto">
+                <a id="solutionDeleteLink"
+                   class="btn btn-sm btn-secondary"
+                   data-url-template="{% url 'python_problems:solution-delete' 0 %}"
+                   data-next-url="{{ problem_submit_redirect_url }}"
+                   href="{% url 'python_problems:solution-delete' object.pk %}?next={{ problem_submit_redirect_url|urlencode }}">Delete</a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
       </div>
       <div class="col-md-2"></div>
     </div>
