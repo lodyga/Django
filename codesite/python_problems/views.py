@@ -436,6 +436,26 @@ class LanguageCreate(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('python_problems:problem-index')
 
 
+class TestCaseCreate(LoginRequiredMixin, CreateView):
+    model = TestCase
+    form_class = TestCaseCreateForm
+    success_url = reverse_lazy('python_problems:problem-index')
+
+
+class TestCaseUpdate(LoginRequiredMixin, UpdateView):
+    model = TestCase
+    form_class = TestCaseUpdateForm
+    success_url = reverse_lazy('python_problems:problem-index')
+
+    def get_queryset(self):
+        return TestCase.objects.filter(owner=self.request.user)
+
+
+class TestCaseDelete(LoginRequiredMixin, DeleteView):
+    model = TestCase
+    success_url = reverse_lazy('python_problems:problem-index')
+
+
 # REST API
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()

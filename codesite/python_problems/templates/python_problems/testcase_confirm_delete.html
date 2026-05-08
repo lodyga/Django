@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+{% block title %}
+  Test Case delete
+{% endblock title %}
+{% block head %}
+  {% load static %}
+  <link rel="stylesheet"
+        type="text/css"
+        href="{% static 'python_problems/styles.css' %}">
+{% endblock head %}
+{% block content %}
+  <div class="container m-4">
+    <h1>Delete test case</h1>
+    <p>Are you sure you want to delete test case {{ object.order }} for {{ object.problem.title }}?</p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="submit" value="Yes, delete." />
+    </form>
+  </div>
+{% endblock content %}

@@ -197,6 +197,9 @@ def get_ui_test_cases(problem, solution, language):
                     display_input = (operations, arguments)
 
                 ui_test_cases.append({
+                    "id": test_case.id,
+                    "owner_id": test_case.owner_id,
+                    "source": "shared",
                     "input": display_input,
                     "output": expected,
                 })
@@ -228,6 +231,9 @@ def get_ui_test_cases(problem, solution, language):
 
                 expected = serialize(expected, language)
                 ui_item = {
+                    "id": test_case.id,
+                    "owner_id": test_case.owner_id,
+                    "source": "shared",
                     "input": display_input,
                     "output": expected,
                 }
@@ -249,6 +255,9 @@ def get_ui_test_cases(problem, solution, language):
                 inputs = inputs[11:]
 
             ui_item = {
+                "id": None,
+                "owner_id": None,
+                "source": "solution_fallback",
                 "input": inputs,
                 "output": expected,
             }
@@ -365,7 +374,7 @@ def is_localhost():
 
 # todo: return should be list not str... meaby
 #   and remane it
-def get_expected_output(source_code, language, button_pressed, test_cases):
+def attach_validation(source_code, language, button_pressed, test_cases):
     if button_pressed == "run":
         return (source_code, [])
 
@@ -465,14 +474,14 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
             if not re.search(solution_instance_setup.strip()[:-3], source_code):
                 source_code += solution_instance_setup
 
-        expected_output = get_expected_output(
+        attached_validation = attach_validation(
             source_code,
             language,
             button_pressed,
             test_cases,
         )
-        source_code = expected_output["source_code"]
-        expected_output = expected_output["expected_output"]
+        source_code = attached_validation["source_code"]
+        expected_output = attached_validation["expected_output"]
 
     language_name_to_id = {
         "Python": 71,
@@ -525,27 +534,15 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
 
     if status_id == 3:
         stdout = response["stdout"]
-        outputs = stdout.strip().splitlines()
         
         if button_pressed == "run":
             return stdout
         
+        outputs = stdout.strip().splitlines()
         parsed_outputs = [
             json.loads(line) 
             for line in outputs[-len(expected_output):]
         ]
-
-        # stdout_list = [st for st in stdout.split("\n")][:-1]
-        pass
-
-        # Clean stdout to compare
-        # Python: [0, 1]
-        # JS: [ 0, 1 ]
-        # stdout ends with "\n"
-        # stdout = re.sub(r"[ \n]", "", stdout)
-
-        # Compare "'a'" and '"a"'
-        # stdout = re.sub(r"\'", '"', stdout)
 
         if (
             language == "C++" and not response["stdout"] or

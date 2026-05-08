@@ -5,7 +5,6 @@
 # setup cursor with proper method name
 # edit only own solutions
 # validate all test cases
-# edit test cases for explanation
 # + test case #
 # <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea> and <textarea id="solution-{{ forloop.counter }}"
 
@@ -18,6 +17,7 @@
 # problem add, focus on that problem, exclude Problem, Language, Order fields
 # + soultion, hide problem & language fields
 # stop <pre></pre> in README.md => test cases
+# fix all redirects / back
 
 
 # import needed only get_heap_utils(language) + get_binary_tree_utils(language) + get_linked_list_utils(language) + source_code

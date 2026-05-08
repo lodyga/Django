@@ -12,25 +12,39 @@
     {% if ui_test_cases %}
       <div class="row mb-4">
         <div class="col-auto">
-          <div id="testCaseButtonContainer">
-            {# Placeholder for JavaScript 'python_problems/test-case-buttons.js' buttons #}</div>
+          <div id="testCaseButtonContainer">{# Placeholder for JavaScript 'python_problems/test-case-buttons.js' buttons #}</div>
         </div>
         <div class="col-auto">
-          <button id="copyTestCasesBtn" class="btn btn-secondary">
+          <button id="copyTestCasesBtn" class="btn btn-sm btn-secondary">
             <i class="far fa-copy"></i> Copy
           </button>
         </div>
+        <div class="col-auto">
+          {% if user.is_authenticated %}
+            <a id="testCaseUpdateLink"
+               class="btn btn-sm btn-secondary d-none"
+               data-current-user-id="{{ user.id }}"
+               data-url-template="{% url 'python_problems:test_case-update' 0 %}"
+               data-next-url="{{ request.get_full_path }}"
+               href="{% url 'python_problems:test_case-update' 0 %}?next={{ request.get_full_path|urlencode }}"><i class="far fa-copy"></i> Edit</a>
+          {% endif %}
+        </div>
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="previewContentBtn" checked>
-          <label class="form-check-label" for="previewContentBtn">
-            Preview
-          </label>
+          <input class="form-check-input"
+                 type="checkbox"
+                 id="previewContentBtn"
+                 checked>
+          <label class="form-check-label" for="previewContentBtn">Preview</label>
         </div>
       </div>
       <div class="row mb-2">
         <div class="col-auto" id="testCasesContainer">
           {% for test_case in ui_test_cases %}
-            <div id="testCase-{{ forloop.counter }}" class="testCaseContent">
+            <div id="testCase-{{ forloop.counter }}"
+                 class="testCaseContent"
+                 data-test-case-id="{{ test_case.id }}"
+                 data-owner-id="{{ test_case.owner_id }}"
+                 data-source="{{ test_case.source }}">
               <div class="row mb-2">
                 <div class="col-auto">
                   <span class="badge bg-secondary col-auto">Input:</span>
@@ -42,12 +56,11 @@
                     <code class="text-body">{{ test_case.output }}</code>
                   </div>
                 </div>
-              
-              {% if test_case.explanation %}
-              <div class="col-auto">
-                <span class="badge bg-secondary col-auto">Explanation:</span>
-                <div class="form-control" rows="1" style="white-space: pre-wrap"><code class="text-body">{{ test_case.explanation }}</code></div>
-                </div>
+                {% if test_case.explanation %}
+                  <div class="col-auto">
+                    <span class="badge bg-secondary col-auto">Explanation:</span>
+                    <div class="form-control" rows="1" style="white-space: pre-wrap"><code class="text-body">{{ test_case.explanation }}</code></div>
+                  </div>
                 {% endif %}
               </div>
               {% if test_case.preview %}

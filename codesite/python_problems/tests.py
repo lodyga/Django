@@ -1,11 +1,12 @@
 import django
 import html
+import json
 import os
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from .forms import ProblemForm
-from .models import Complexity, Difficulty, Language, Problem, Solution, Tag, TestCase as ProblemTestCase
+from .models import Complexity, Difficulty, Language, Problem, ProblemType, Solution, Tag, TestCase as ProblemTestCase
 from .views import ProblemIndexView
 
 
@@ -324,6 +325,86 @@ class ProblemFormTests(TestCase):
 
         self.assertIsNone(problem.method_name)
         self.assertIsNone(problem.argument_names)
+
+
+class TestCaseCrudViewTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user = User.objects.create_user(
+            username="testcase-user",
+            password="testpass123",
+        )
+        self.client.force_login(self.user)
+
+        self.problem = create_sample_problem(
+            title="Test Case CRUD Problem",
+            owner=self.user,
+        )
+        self.test_case = create_problem_test_case(
+            problem=self.problem,
+            data={"inputs": [1], "expected": 1},
+            order=1,
+        )
+
+    def test_create_test_case(self):
+        response = self.client.post(
+            reverse("python_problems:test_case-create"),
+            data={
+                "problem": self.problem.id,
+                "data": json.dumps({"inputs": [2], "expected": 2}),
+                "is_hidden": True,
+                "order": 2,
+                "explanation": "Hidden edge case",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("python_problems:problem-index"))
+
+        created = ProblemTestCase.objects.get(problem=self.problem, order=2)
+        self.assertEqual(created.data, {"inputs": [2], "expected": 2})
+        self.assertTrue(created.is_hidden)
+        self.assertEqual(created.explanation, "Hidden edge case")
+
+    def test_update_test_case(self):
+        response = self.client.post(
+            reverse("python_problems:test_case-update", kwargs={"pk": self.test_case.pk}),
+            data={
+                "problem": self.problem.id,
+                "data": json.dumps({"inputs": [10], "expected": 10}),
+                "is_hidden": False,
+                "order": 3,
+                "explanation": "Updated testcase",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("python_problems:problem-index"))
+
+        self.test_case.refresh_from_db()
+        self.assertEqual(self.test_case.data, {"inputs": [10], "expected": 10})
+        self.assertFalse(self.test_case.is_hidden)
+        self.assertEqual(self.test_case.order, 3)
+        self.assertEqual(self.test_case.explanation, "Updated testcase")
+
+    def test_delete_test_case(self):
+        response = self.client.post(
+            reverse("python_problems:test_case-delete", kwargs={"pk": self.test_case.pk}),
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("python_problems:problem-index"))
+        self.assertFalse(
+            ProblemTestCase.objects.filter(pk=self.test_case.pk).exists()
+        )
+
+    def test_create_requires_authentication(self):
+        self.client.logout()
+
+        response = self.client.get(reverse("python_problems:test_case-create"))
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response.url)
 
 
 class SolutionModelTests(TestCase):

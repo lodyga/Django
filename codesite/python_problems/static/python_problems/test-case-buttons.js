@@ -6,29 +6,56 @@ document.addEventListener('DOMContentLoaded', () => {
    const copyTestCasesBtn = document.getElementById('copyTestCasesBtn');
    const clipboardNode = document.getElementById('clipboardTestCases');
    const clipboardTestCases = clipboardNode ? clipboardNode.innerText : '';
+   const testCaseUpdateLink = document.getElementById('testCaseUpdateLink');
+   const currentUserId = testCaseUpdateLink?.dataset.currentUserId || '';
 
    // Collapsable paragraph.
-   const testCaseElements = document.getElementById('problemTestCases');
-   if (!testCaseElements) {
+   const testCasesWrapper = document.getElementById('problemTestCases');
+   if (!testCasesWrapper) {
       return;
    }
-   const testCaseCollapse = new bootstrap.Collapse(testCaseElements, { toggle: false });
+   const testCaseCollapse = new bootstrap.Collapse(testCasesWrapper, { toggle: false });
    const testCaseToggle = document.querySelector('[data-bs-target="#problemTestCases"]');
    const icon = testCaseToggle.querySelector('i');
    const isTestCaseVisible = localStorage.getItem('testCaseState') !== 'false';
    isTestCaseVisible ? testCaseCollapse.show() : testCaseCollapse.hide();
 
-   testCaseElements.addEventListener('shown.bs.collapse', () => {
+   testCasesWrapper.addEventListener('shown.bs.collapse', () => {
       localStorage.setItem('testCaseState', 'true');
       icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
       testCaseToggle.setAttribute('aria-expanded', 'true');
    });
 
-   testCaseElements.addEventListener('hidden.bs.collapse', () => {
+   testCasesWrapper.addEventListener('hidden.bs.collapse', () => {
       localStorage.setItem('testCaseState', 'false');
       icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
       testCaseToggle.setAttribute('aria-expanded', 'false');
    });
+
+   function buildActionUrl(linkElement, testCaseId) {
+      if (!linkElement?.dataset.urlTemplate) {
+         return null;
+      }
+
+      const baseUrl = linkElement.dataset.urlTemplate.replace('/0/', `/${testCaseId}/`);
+      const currentHref = linkElement.getAttribute('href') || '';
+      const currentUrl = new URL(currentHref, window.location.origin);
+      const nextUrl = (
+         linkElement.dataset.nextUrl
+         || currentUrl.searchParams.get('next')
+         || window.location.pathname
+      );
+
+      if (!nextUrl) {
+         return baseUrl;
+      }
+
+      const params = new URLSearchParams({
+         next: nextUrl,
+      });
+
+      return `${baseUrl}?${params.toString()}`;
+   }
 
    if (testCaseButtonContainer) {
       for (let index = 1; index < testCaseLength + 1; index++) {
@@ -46,7 +73,29 @@ document.addEventListener('DOMContentLoaded', () => {
          testCase.style.display = 'none';
       }
 
-      document.getElementById(`testCase-${idx}`).style.display = 'block';
+      const selectedTestCase = document.getElementById(`testCase-${idx}`);
+      selectedTestCase.style.display = 'block';
+
+      if (testCaseUpdateLink) {
+         const selectedTestCaseId = selectedTestCase?.dataset.testCaseId || '';
+         const selectedOwnerId = selectedTestCase?.dataset.ownerId || '';
+         const selectedSource = selectedTestCase?.dataset.source || '';
+         const isCurrentUserOwner = (
+            Boolean(currentUserId)
+            && currentUserId === selectedOwnerId
+         );
+         const isSharedCase = selectedSource === 'shared';
+
+         if (isSharedCase && isCurrentUserOwner && selectedTestCaseId) {
+            testCaseUpdateLink.classList.remove('d-none');
+            const updateHref = buildActionUrl(testCaseUpdateLink, selectedTestCaseId);
+            if (updateHref) {
+               testCaseUpdateLink.href = updateHref;
+            }
+         } else {
+            testCaseUpdateLink.classList.add('d-none');
+         }
+      }
 
       for (let i = 1; i < testCaseLength + 1; i++) {
          const btn = document.getElementById(`testCaseButton-${i}`);

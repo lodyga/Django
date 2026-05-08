@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
    const solutionLength = solutionElements.length;
    const copySolutionBtn = document.getElementById('copySolutionBtn');
    const solutionUpdateLink = document.getElementById('solutionUpdateLink');
-   const solutionDeleteLink = document.getElementById('solutionDeleteLink');
+   const currentUserId = solutionUpdateLink?.dataset.currentUserId || '';
    let clipboardSolution = '';
 
-   function buildActionUrl(linkElement, solutionId) {
+   function buildSolutionActionUrl(linkElement, solutionId) {
       if (!linkElement?.dataset.urlTemplate) {
          return null;
       }
@@ -113,21 +113,29 @@ document.addEventListener('DOMContentLoaded', () => {
       const selectedSolution = document.getElementById(`solution-${idx}`);
       const selectedContent = selectedSolution?.value || '';
       const selectedSolutionId = selectedSolution?.dataset.solutionId;
+      const selectedSolutionOwnerId = selectedSolution?.dataset.ownerId || '';
+      const isCurrentUserOwner = (
+         Boolean(solutionUpdateLink)
+         && Boolean(currentUserId)
+         && currentUserId === selectedSolutionOwnerId
+      );
 
       if (typeof setSolutionViewerContent === 'function') {
          setSolutionViewerContent(selectedContent);
       }
 
       clipboardSolution = selectedContent;
-      if (selectedSolutionId) {
-         const updateHref = buildActionUrl(solutionUpdateLink, selectedSolutionId);
-         const deleteHref = buildActionUrl(solutionDeleteLink, selectedSolutionId);
+      
+      if (solutionUpdateLink) {
+         if (isCurrentUserOwner && selectedSolutionId) {
+            solutionUpdateLink.classList.remove('d-none');
+            const updateHref = buildSolutionActionUrl(solutionUpdateLink, selectedSolutionId);
 
-         if (updateHref) {
-            solutionUpdateLink.href = updateHref;
-         }
-         if (deleteHref) {
-            solutionDeleteLink.href = deleteHref;
+            if (updateHref) {
+               solutionUpdateLink.href = updateHref;
+            }
+         } else {
+            solutionUpdateLink.classList.add('d-none');
          }
       }
 

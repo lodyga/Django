@@ -31,8 +31,11 @@ urlpatterns = [
          name="problem-create"),  # create before slug
     path("solution_create/", views.SolutionCreate.as_view(),
          name="solution-create"),  # create before slug
-    path("language_add/", views.LanguageCreate.as_view(), 
+    path("language_add/", views.LanguageCreate.as_view(),
          name="language-create"),
+    path("test_case_create/", views.TestCaseCreate.as_view(),
+         name="test_case-create"),
+
 
     path("<slug:slug>/<str:language>/",
          views.ProblemDetailView.as_view(), name="problem-detail"),
@@ -45,5 +48,9 @@ urlpatterns = [
          views.SolutionUpdate.as_view(), name="solution-update"),
     path("solution/<int:pk>/delete/",
          views.SolutionDelete.as_view(), name="solution-delete"),
-
+    
+    path("test_case/<int:pk>/update/",
+         views.TestCaseUpdate.as_view(), name="test_case-update"),
+    path("test_case/<int:pk>/delete/",
+         views.TestCaseDelete.as_view(), name="test_case-delete"),
 ]

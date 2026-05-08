@@ -132,6 +132,10 @@ class TestCase(models.Model):
         related_name="testcases"
     )
     data = models.JSONField(default=list)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
     is_hidden = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=1)
     explanation = models.TextField(blank=True)

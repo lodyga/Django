@@ -156,3 +156,15 @@ class SolutionUpdateForm(SolutionForm):
     class Meta:
         model = Solution
         exclude = ["problem", "language", "owner", "test_cases"]
+
+
+class TestCaseCreateForm(forms.ModelForm):
+    class Meta:
+        model = TestCase
+        fields = '__all__'
+
+
+class TestCaseUpdateForm(forms.ModelForm):
+    class Meta:
+        model = TestCase
+        fields = '__all__'
