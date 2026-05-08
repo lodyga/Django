@@ -14,9 +14,13 @@ from python_problems.models import Problem, ComparisonType
 
 
 # Remove when all test cases are moved to problem.
+# todo output to json
 def get_solution_test_cases(solution_test_cases):
     """
     Clean each solution test case into (input, expected output) tuple.
+    str: 'print(Solution().twoSum([2, 7, 11, 15], 9) == [0, 1])\r\n'
+    =>
+    list: [('Solution().twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
     """
     if not solution_test_cases:
         return []
@@ -117,13 +121,13 @@ def get_preview_in_ascii(data, problem_type, argument_name):
         preview = ("(" + ") -> (".join(map(str, data)) + ")")if data else "null"
         return (argument_name, preview)
 
-    # for grid-like data
+    # for grid/matrix/board-like data
     elif problem_type not in ("binary_tree", "linked_list") and data and isinstance(data, list) and isinstance(data[0], list):
         # if not rectangelar shape
         for row in data:
             if len(row) != len(data[0]):
                 return
-            if not data[0][0]:
+            if not row:
                 return
 
         rows = len(data)
@@ -184,10 +188,11 @@ def get_ui_test_cases(problem, solution, language):
                 expected = get_field(test_case.data, "expected")
 
                 if (len(operations) == len(arguments)):
-                    display_input = "\n".join(
+                    display_input = ", ".join(
                         f"{op}({', '.join(map(str, ar))})"
                         for (op, ar) in zip(operations, arguments)
                     )
+                    display_input = "(" + display_input + ")"
                 else:
                     display_input = (operations, arguments)
 
@@ -307,11 +312,20 @@ def get_effective_test_cases(problem, solution, language):
         return []
 
 
-def get_print(language):
+def attach_print(test_case, language):
     if language == "Python":
-        return "print"
+        return "print(" + test_case + ")"
     elif language == "JavaScript":
-        return "console.log"
+        return "console.log(" + test_case + ")"
+    else:
+        return ""
+
+
+def attach_serialize(test_case, language):
+    if language == "Python":
+        return "json.dumps(" + test_case + ")"
+    elif language == "JavaScript":
+        return "JSON.stringify(" + test_case + ")"
     else:
         return ""
 
@@ -333,7 +347,7 @@ def get_clipboard_test_cases(problem, solution, language):
     res = get_solution_instance_setup(problem, language)
 
     return res + "\n" + "\n".join(
-        f"{get_print(language)}({test_case[0]}, {test_case[1]})"
+        attach_print(f"{test_case[0]}, {test_case[1]}", language)
         for test_case in get_effective_test_cases(problem, solution, language)
     )
 
@@ -350,6 +364,7 @@ def is_localhost():
 
 
 # todo: return should be list not str... meaby
+#   and remane it
 def get_expected_output(source_code, language, button_pressed, test_cases):
     if button_pressed == "run":
         return (source_code, [])
@@ -357,8 +372,10 @@ def get_expected_output(source_code, language, button_pressed, test_cases):
     for test_case in test_cases:
         source_code = (
             source_code +
-            get_print(language) + "(" +
-            str(test_case[0]) + ")\n"
+            attach_print(
+                attach_serialize(str(test_case[0]), language),
+                language
+            ) + "\n"
         )
 
     expected_output = [tc for _, tc in test_cases]
@@ -369,6 +386,19 @@ def get_expected_output(source_code, language, button_pressed, test_cases):
     }
 
 
+def freeze(value):
+    if isinstance(value, list):
+        return tuple(freeze(item) for item in value)
+
+    if isinstance(value, dict):
+        return tuple(sorted(
+            (key, freeze(val))
+            for key, val in value.items()
+        ))
+
+    return value
+
+
 def compare_output_and_expected(output, expected, comparison_type):
     """
     Need ast.literal_eval() to compare:
@@ -376,7 +406,7 @@ def compare_output_and_expected(output, expected, comparison_type):
               JS: '[ 0, 1 ]'
     expected_raw_item: P '[0, 1]'
                        JS: '[0, 1]'
-    
+
     raw_item: P: 'True'
               JS: 'true'
     expected_raw_item: P: 'True'
@@ -385,13 +415,12 @@ def compare_output_and_expected(output, expected, comparison_type):
     if len(output) != len(expected):
         return False
 
-    for raw_item, expected_raw_item in zip(output, expected):
-        
+    for item, expected_raw_item in zip(output, expected):
         try:
-            item = ast.literal_eval(raw_item)
+            # item = ast.literal_eval(raw_item)
             expected_item = ast.literal_eval(expected_raw_item)
         except (ValueError, SyntaxError):
-            item = raw_item
+            # item = raw_item
             expected_item = expected_raw_item
 
         match comparison_type:
@@ -399,10 +428,20 @@ def compare_output_and_expected(output, expected, comparison_type):
                 if item != expected_item:
                     return False
             case ComparisonType.UNORDERED:
-                if set(item) != set(expected_item):
+                if (
+                    {freeze(x) for x in item}
+                    !=
+                    {freeze(x) for x in expected_item}
+                ):
                     return False
+                else:
+                    continue
             case ComparisonType.MULTISET:
-                if Counter(item) != Counter(expected_item):
+                if (
+                    Counter(freeze(x) for x in item)
+                    !=
+                    Counter(freeze(x) for x in expected_item)
+                ):
                     return False
 
     return True
@@ -452,7 +491,7 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
         "x-rapidapi-key": JUDGE0_API_KEY
     }
 
-    json = {
+    serialized_code = {
         "source_code": source_code,
         "language_id": language_id
     }
@@ -465,7 +504,7 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     # Submit code
     response = requests.post(
         submissions_url,
-        json=json,
+        json=serialized_code,
         headers=headers,
         params=querystring
     ).json()
@@ -486,10 +525,18 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
 
     if status_id == 3:
         stdout = response["stdout"]
+        outputs = stdout.strip().splitlines()
+        
         if button_pressed == "run":
             return stdout
+        
+        parsed_outputs = [
+            json.loads(line) 
+            for line in outputs[-len(expected_output):]
+        ]
 
-        stdout_list = [st for st in stdout.split("\n")][:-1]
+        # stdout_list = [st for st in stdout.split("\n")][:-1]
+        pass
 
         # Clean stdout to compare
         # Python: [0, 1]
@@ -503,7 +550,7 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
         if (
             language == "C++" and not response["stdout"] or
             compare_output_and_expected(
-                stdout_list[-len(expected_output):],
+                parsed_outputs,
                 expected_output,
                 problem.comparison_type
             ) or
@@ -590,7 +637,7 @@ def get_placeholder_source_code(language_id):
     """
     match language_id:
         case 1:
-            placeholder_source_code = """# Python (3.8.1)\r\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
+            placeholder_source_code = """# Python (3.8.1)\r\n\r\nimport json\r\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
         case 2:
             placeholder_source_code = """// JavaScript (Node.js 12.14.0)\r\n\r\nclass Solution {\r\n  fun(x) {\r\n    return x\r\n  }\r\n}\r\n\r\nconst solution = new Solution();\r\nconsole.log(solution.fun('Hello, World!'))"""
         case 6:

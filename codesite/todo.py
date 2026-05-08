@@ -1,5 +1,8 @@
+# min stack
 # get_adjacent_slugs(problem, language)
+# preview to heights
 
+# setup cursor with proper method name
 # edit only own solutions
 # validate all test cases
 # edit test cases for explanation
