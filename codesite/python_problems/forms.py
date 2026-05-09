@@ -14,8 +14,10 @@ class ProblemForm(forms.ModelForm):
         required=False,
         widget=forms.Textarea(attrs={"rows": 8}),
         help_text=(
-            'One JSON test case per line. Example: '
-            '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}'
+            'One JSON test case per line. Either raw data, e.g. '
+            '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}, '
+            'or object with attributes, e.g. '
+            '{"data": {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}, "is_hidden": false, "explanation": ""}'
         ),
         label="Test cases",
     )
@@ -35,6 +37,7 @@ class ProblemForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
+        self.current_user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
 
         self._set_problem_type_dependent_fields()
@@ -45,11 +48,21 @@ class ProblemForm(forms.ModelForm):
             )
 
         if self.instance.pk:
-            self.fields["shared_test_cases"].initial = "\n".join(
-                json.dumps(test_case.data)
-                for test_case in self.instance.get_shared_testcases(
-                    include_hidden=True
+            shared_test_cases = self.instance.get_shared_testcases(
+                include_hidden=True
+            )
+            if self.current_user and self.current_user.is_authenticated:
+                shared_test_cases = shared_test_cases.filter(
+                    owner=self.current_user
                 )
+
+            self.fields["shared_test_cases"].initial = "\n".join(
+                json.dumps({
+                    "data": test_case.data,
+                    "is_hidden": test_case.is_hidden,
+                    "explanation": test_case.explanation,
+                })
+                for test_case in shared_test_cases
             )
 
     def _set_problem_type_dependent_fields(self):
@@ -83,10 +96,40 @@ class ProblemForm(forms.ModelForm):
 
             if (not isinstance(data, list) and not isinstance(data, dict)):
                 raise ValidationError(
-                    f"Line {index} must be a JSON object."
+                    f"Line {index} must be a JSON list or object."
                 )
 
-            parsed_test_cases.append(data)
+            # Backward compatible format: raw test case payload as list/dict.
+            if isinstance(data, list) or "data" not in data:
+                parsed_test_cases.append({
+                    "data": data,
+                    "is_hidden": False,
+                    "explanation": "",
+                })
+                continue
+
+            test_case_data = data.get("data")
+            is_hidden = data.get("is_hidden", False)
+            explanation = data.get("explanation", "")
+
+            if not isinstance(test_case_data, (list, dict)):
+                raise ValidationError(
+                    f"Line {index} key `data` must be a JSON list or object."
+                )
+            if not isinstance(is_hidden, bool):
+                raise ValidationError(
+                    f"Line {index} key `is_hidden` must be true/false."
+                )
+            if not isinstance(explanation, str):
+                raise ValidationError(
+                    f"Line {index} key `explanation` must be a string."
+                )
+
+            parsed_test_cases.append({
+                "data": test_case_data,
+                "is_hidden": is_hidden,
+                "explanation": explanation,
+            })
 
         return parsed_test_cases
 
@@ -129,10 +172,21 @@ class ProblemForm(forms.ModelForm):
         problem = super().save(commit=commit)
 
         if commit:
-            problem.testcases.all().delete()
+            test_case_owner = self.current_user or problem.owner
+            if not test_case_owner:
+                raise ValidationError("Problem owner is required to save test cases.")
+
+            problem.testcases.filter(owner=test_case_owner).delete()
             TestCase.objects.bulk_create([
-                TestCase(problem=problem, data=data, order=index)
-                for index, data in enumerate(parsed_test_cases, start=1)
+                TestCase(
+                    problem=problem,
+                    owner=test_case_owner,
+                    data=test_case_payload["data"],
+                    is_hidden=test_case_payload["is_hidden"],
+                    explanation=test_case_payload["explanation"],
+                    order=index,
+                )
+                for index, test_case_payload in enumerate(parsed_test_cases, start=1)
             ])
         else:
             self._pending_shared_test_cases = parsed_test_cases

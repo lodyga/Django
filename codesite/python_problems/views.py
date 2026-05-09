@@ -315,6 +315,11 @@ class ProblemCreate(LoginRequiredMixin, CreateView):
     form_class = ProblemForm
     success_url = reverse_lazy('python_problems:problem-index')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
@@ -324,6 +329,11 @@ class ProblemUpdate(LoginRequiredMixin, UpdateView):
     model = Problem
     form_class = ProblemForm
     success_url = reverse_lazy('python_problems:problem-index')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
 
 class ProblemDelete(LoginRequiredMixin, DeleteView):

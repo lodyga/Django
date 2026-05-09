@@ -176,7 +176,7 @@ def get_ui_test_cases(problem, solution, language):
     """
     problem_type = problem.problem_type
     argument_names = problem.argument_names
-    test_cases = problem.get_shared_testcases()
+    test_cases = problem.get_shared_testcases(include_hidden=True)
 
     if test_cases:
         ui_test_cases = []
@@ -291,7 +291,7 @@ def get_problem_test_cases(problem, language):
     # [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
     problem_test_cases = []
 
-    for test_case in problem.get_shared_testcases():
+    for test_case in problem.get_shared_testcases(include_hidden=True):
         expression = build_problem_test_case_expression(
             problem,
             test_case.data,
