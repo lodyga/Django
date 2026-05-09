@@ -103,14 +103,7 @@ def get_field(data, key):
 
 def get_preview_in_ascii(data, problem_type, argument_name):
     """
-    Wall-like symbols:
-    █  ▓  ▒  ░  #  ║  ╬  ■  ⬛  🧱
-    Water-like symbols:
-    ~  ≈  ∼  ≋  ≀  ·  ○  🌊  💧
-    Land / island-like symbols:
-    ■  ▲  ◆  ●  ⬤  ⛰
-    Gate / special point:
-    G  O  ⊙  ✦  ★
+    █▓▒░#║╬■⬛🧱~≈∼≋≀·○🌊💧■▲◆●⬤⛰GO⊙✦★
     """
 
     if problem_type == "binary_tree" and isinstance(data, list):
@@ -321,44 +314,14 @@ def get_effective_test_cases(problem, solution, language):
         return []
 
 
-def attach_print(test_case, language):
-    if language == "Python":
-        return "print(" + test_case + ")"
-    elif language == "JavaScript":
-        return "console.log(" + test_case + ")"
-    else:
-        return ""
-
-
-def attach_serialize(test_case, language):
-    if language == "Python":
-        return "json.dumps(" + test_case + ")"
-    elif language == "JavaScript":
-        return "JSON.stringify(" + test_case + ")"
-    else:
-        return ""
-
-
-def get_solution_instance_setup(problem, language):
-    if not problem.method_name:
-        return ""
-
-    match language:
-        case "Python":
-            return "\nsolution = Solution()\n"
-        case "JavaScript":
-            return "\nconst solution = new Solution();\n"
-        case _:
-            return ""
-
-
 def get_clipboard_test_cases(problem, solution, language):
-    res = get_solution_instance_setup(problem, language)
+    config = LANGUAGE_CONFIG[language]
+    solution_instance_setup = config["instance"]
 
-    return res + "\n" + "\n".join(
-        attach_print(f"{test_case[0]}, {test_case[1]}", language)
-        for test_case in get_effective_test_cases(problem, solution, language)
-    )
+    return solution_instance_setup + "\n".join(
+        f'{config["print"]}({test_input}, {expected})'
+        for test_input, expected in get_effective_test_cases(problem, solution, language)
+    ) + "\n"
 
 
 def parse_url(raw_url):
@@ -372,26 +335,47 @@ def is_localhost():
     return hostname == "GF108"
 
 
-# todo: return should be list not str... meaby
-#   and remane it
-def attach_validation(source_code, language, button_pressed, test_cases):
-    if button_pressed == "run":
-        return (source_code, [])
+LANGUAGE_CONFIG = {
+    "Python": {
+        "print": "print",
+        "serialize": "json.dumps",
+        "instance": "\nsolution = Solution()\n",
+        "binary_tree_utils": "binary_tree_utils.py",
+        "linked_list_utils": "linked_list_utils.py",
+    },
+    "JavaScript": {
+        "print": "console.log",
+        "serialize": "JSON.stringify",
+        "instance": "\nconst solution = new Solution();\n",
+        "binary_tree_utils": "binary-tree-utils.js",
+        "linked_list_utils": "linked-list-utils.js",
+        "heap": "heap-utils.js",
+    },
+}
 
-    for test_case in test_cases:
-        source_code = (
-            source_code +
-            attach_print(
-                attach_serialize(str(test_case[0]), language),
-                language
-            ) + "\n"
+
+def build_validation_payload(source_code, language, button_pressed, test_cases):
+    # todo: return should be list not str... meaby
+    #   and remane it
+    if button_pressed == "run":
+        return {
+            "source_code": source_code,
+            "expected_output": []
+        }
+
+    config = LANGUAGE_CONFIG[language]
+    lines = []
+
+    for input_data, _ in test_cases:
+        lines.append(
+            f'{config["print"]}({config["serialize"]}({input_data}))'
         )
 
-    expected_output = [tc for _, tc in test_cases]
+    updated_code = source_code + "\n" + "\n".join(lines) + "\n"
 
     return {
-        "source_code": source_code,
-        "expected_output": expected_output
+        "source_code": updated_code,
+        "expected_output": [expected for _, expected in test_cases]
     }
 
 
@@ -456,32 +440,65 @@ def compare_output_and_expected(output, expected, comparison_type):
     return True
 
 
-def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
-    # Correct types:
-    #     list => List
+def get_utility(utility_type, language):
+    config = LANGUAGE_CONFIG[language]
+    filename = config[utility_type]
+
+    file_path = settings \
+        .BASE_DIR \
+        / "python_problems/utils" \
+        / filename
+
+    with open(file_path, "r") as file:
+        utility = file.read()
+
+    return utility
+
+
+def attach_utils(source_code, language):
     source_code = re.sub(r"list\[", r"List[", source_code)
 
-    source_code = get_heap_utils(language) + \
-        get_binary_tree_utils(language) + \
-        get_linked_list_utils(language) + \
-        source_code + "\n"
+    source_code = (
+        get_utility("binary_tree_utils", language)
+        + get_utility("linked_list_utils", language)
+        + source_code
+    )
+
+    match language:
+        case "Python":
+            source_code = (
+                "import json\n"
+                + "from typing import Optional, List\n"
+                + source_code
+            )
+        case "JavaScript":
+            source_code = (
+                get_utility("heap", language)
+                + source_code
+            )
+
+    return source_code
+
+
+def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
+    source_code = attach_utils(source_code, language)
 
     expected_output = []
     if button_pressed == "validate":
         if problem.method_name:
-            solution_instance_setup = get_solution_instance_setup(
-                problem, language)
+            config = LANGUAGE_CONFIG[language]
+            solution_instance_setup = config["instance"]
             if not re.search(solution_instance_setup.strip()[:-3], source_code):
                 source_code += solution_instance_setup
 
-        attached_validation = attach_validation(
+        attached_validation_test_cases = build_validation_payload(
             source_code,
             language,
             button_pressed,
             test_cases,
         )
-        source_code = attached_validation["source_code"]
-        expected_output = attached_validation["expected_output"]
+        source_code = attached_validation_test_cases["source_code"]
+        expected_output = attached_validation_test_cases["expected_output"]
 
     language_name_to_id = {
         "Python": 71,
@@ -534,13 +551,13 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
 
     if status_id == 3:
         stdout = response["stdout"]
-        
+
         if button_pressed == "run":
             return stdout
-        
+
         outputs = stdout.strip().splitlines()
         parsed_outputs = [
-            json.loads(line) 
+            json.loads(line)
             for line in outputs[-len(expected_output):]
         ]
 
@@ -561,80 +578,13 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
         return stderr
 
 
-def get_binary_tree_utils(language):
-    """
-    Utility functions for binary tree operations.
-    """
-    match language:
-        case "Python":
-            file_name = "binary_tree_utils.py"
-        case "JavaScript":
-            file_name = "binary-tree-utils.js"
-        case _:
-            return ""
-
-    file_path = settings \
-        .BASE_DIR \
-        / "python_problems/utils" \
-        / file_name
-
-    with open(file_path, "r") as file:
-        utils = file.read()
-
-    return utils
-
-
-def get_heap_utils(language):
-    """
-    Utility functions for binary tree operations.
-    """
-    match language:
-        case "JavaScript":
-            file_name = "heap-utils.js"
-        case _:
-            return ""
-
-    file_path = settings \
-        .BASE_DIR \
-        / "python_problems/utils" \
-        / file_name
-
-    with open(file_path, "r") as file:
-        utils = file.read()
-
-    return utils
-
-
-def get_linked_list_utils(language):
-    """
-    Utility functions for linked list operations.
-    """
-    match language:
-        case "Python":
-            file_name = "linked_list_utils.py"
-        case "JavaScript":
-            file_name = "linked-list-utils.js"
-        case _:
-            return ""
-
-    file_path = settings \
-        .BASE_DIR \
-        / "python_problems/utils" \
-        / file_name
-
-    with open(file_path, "r") as file:
-        utils = file.read()
-
-    return utils
-
-
 def get_placeholder_source_code(language_id):
     """
     Set default `Hello, world!` source code.
     """
     match language_id:
         case 1:
-            placeholder_source_code = """# Python (3.8.1)\r\n\r\nimport json\r\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
+            placeholder_source_code = """# Python (3.8.1)\r\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
         case 2:
             placeholder_source_code = """// JavaScript (Node.js 12.14.0)\r\n\r\nclass Solution {\r\n  fun(x) {\r\n    return x\r\n  }\r\n}\r\n\r\nconst solution = new Solution();\r\nconsole.log(solution.fun('Hello, World!'))"""
         case 6:
@@ -650,34 +600,6 @@ def get_placeholder_source_code(language_id):
         case _:
             placeholder_source_code = """Not known programming language."""
     return placeholder_source_code
-
-
-def get_problems_languages(page_number, problem_list, problems_per_page):
-    """
-    Returns a dictionary mapping problems to their available languages
-    for the current page.
-
-    Args:
-        problem_list: Queryset of Problem objects
-        page_number: Current page number (1-based)
-        problems_per_page: Number of items per page
-
-    Returns:
-        Dict: {Problem: [Language, ...]}
-    """
-    Solution = apps.get_model("python_problems", "Solution")
-    Language = apps.get_model("python_problems", "Language")
-    start = (page_number - 1) * problems_per_page
-    end = start + problems_per_page
-    problems_languages = {}
-    for problem in problem_list[start:end]:
-        language_indexes = (
-            Solution.objects
-            .filter(problem=problem)
-            .values_list("language", flat=True))
-        language_list = Language.objects.filter(id__in=language_indexes)
-        problems_languages[problem] = language_list
-    return problems_languages
 
 
 def get_adjacent_slugs(problem, language):
@@ -737,7 +659,7 @@ def parse_problem_description(problem_description):
     return (question, examples)
 
 
-def get_header(problem_type, language):
+def get_problem_type_header(problem_type, language):
     """
     Return problem type definition snippet.
     """

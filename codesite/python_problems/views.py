@@ -125,8 +125,10 @@ class ProblemDetailView(DetailView):
             id__in=owner_all_solutions.values_list("language", flat=True)
         )
         for solution in owner_solutions:
-            solution.source_code = get_header(
-                problem.problem_type, language) + solution.source_code
+            solution.source_code = get_problem_type_header(
+                problem.problem_type, 
+                language
+                ) + solution.source_code
 
         return {
             "solution_languages": solution_languages,
