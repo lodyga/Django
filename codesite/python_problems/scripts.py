@@ -13,8 +13,32 @@ from codesite.auth.judge0_auth import JUDGE0_API_KEY
 from python_problems.models import Problem, ComparisonType
 
 
-# Remove when all test cases are moved to problem.
-# todo output to json
+LANGUAGE_CONFIG = {
+    "Python": {
+        "print": "print",
+        "serialize": "json.dumps",
+        "instance": "\nsolution = Solution()\n",
+        "instance_pattern": r"solution\s*=\s*Solution\(\)\s*",
+        "binary_tree_utils": "binary_tree_utils.py",
+        "linked_list_utils": "linked_list_utils.py",
+        "build_tree": "build_tree",
+        "serialize_tree": "serialize_tree",
+    },
+    "JavaScript": {
+        "print": "console.log",
+        "serialize": "JSON.stringify",
+        "instance": "\nconst solution = new Solution();\n",
+        "instance_pattern": r"const\s+solution\s*=\s*new\s+Solution\(\)\s*;?",
+        "binary_tree_utils": "binary-tree-utils.js",
+        "linked_list_utils": "linked-list-utils.js",
+        "heap": "heap-utils.js",
+        "build_tree": "buildTree",
+        "serialize_tree": "serializeTree",
+    },
+}
+
+
+# Remove this abomination when all test cases are moved to problem.
 def get_solution_test_cases(solution_test_cases):
     """
     Clean each solution test case into (input, expected output) tuple.
@@ -263,21 +287,63 @@ def get_ui_test_cases(problem, solution, language):
 
 
 def build_problem_test_case_expression(problem, test_case_data, language):
-    # test_case_data["inputs"] = [[2, 7, 11, 15], 9]
-    # =>
-    # 'solution.twoSum([[2, 7, 11, 15], 9])'
-    method_name = problem.method_name
-    if not method_name:
-        return None
+    """
+    # todo
+    test_case_data["inputs"] = [[2, 7, 11, 15], 9]
+    =>
+    'solution.twoSum([[2, 7, 11, 15], 9])'
 
-    # inputs = test_case_data.get("inputs", [])
-    inputs = get_field(test_case_data, "inputs")
+    'solution.inverTree((binary_tree[2, 7, 11, 15]))'
+    """
 
-    serialized_inputs = ", ".join(
-        serialize(value, language)
-        for value in inputs
-    )
-    return f"solution.{method_name}({serialized_inputs})"
+    config = LANGUAGE_CONFIG[language]
+
+    if problem.metadata:
+        metadata = problem.metadata
+        if not metadata["parameters"] or not metadata["method_name"] or not metadata["return_type"]:
+            return None
+
+        inputs = get_field(test_case_data, "inputs")
+        parameters = metadata["parameters"]
+        method_name = metadata["method_name"]
+        return_type = metadata["return_type"]
+        lines = []
+
+        for value, parameters in zip(inputs, metadata["parameters"]):
+            name, data_type = parameters["name"], parameters["type"]
+
+            match data_type:
+                case "binary_tree":
+                    line = serialize(value, language)
+                    line = f"{config["build_tree"]}({line})"
+                    lines.append(line)
+                case "int" | "list[int]":
+                    line = serialize(value, language)
+                    lines.append(line)
+
+        serialized_inputs = ", ".join(lines)
+
+        match return_type:
+            case "binary_tree":
+                res = f"{config["serialize_tree"]}(solution.{metadata["method_name"]}({serialized_inputs}))"
+            case _:
+                res = f"solution.{metadata["method_name"]}({serialized_inputs})"
+
+        return res
+
+    else:
+        method_name = problem.method_name
+        if not method_name:
+            return None
+
+        inputs = get_field(test_case_data, "inputs")
+
+        serialized_inputs = ", ".join(
+            serialize(value, language)
+            for value in inputs
+        )
+        res = f"solution.{method_name}({serialized_inputs})"
+        return res
 
 
 def get_problem_test_cases(problem, language):
@@ -328,55 +394,85 @@ def parse_url(raw_url):
     return re.search(r"((https?)://)?(www\.)?(app\.)?(\w+\.\w+)(/)?", raw_url).group(5)
 
 
+def convert_types(source_code):
+    """Convert types to match Python 3.8"""
+    source_code = re.sub(r"list\[", "List[", source_code)
+    source_code = re.sub(r"TreeNode\s*\|\s*None\s*",
+                         "Optional[TreeNode]", source_code)
+    return source_code
+
+
+def get_utility(utility_type, language):
+    config = LANGUAGE_CONFIG[language]
+    filename = config[utility_type]
+
+    file_path = settings \
+        .BASE_DIR \
+        / "python_problems/utils" \
+        / filename
+
+    with open(file_path, "r") as file:
+        utility = file.read()
+
+    return utility
+
+
+def attach_utils(source_code, problem, language):
+    # problem.meta to attach right utility
+
+    source_code = (
+        get_utility("binary_tree_utils", language)
+        + get_utility("linked_list_utils", language)
+        + source_code
+    )
+
+    match language:
+        case "Python":
+            source_code = (
+                "import json\n"
+                + "from typing import Optional, List\n"
+                + source_code
+            )
+        case "JavaScript":
+            source_code = (
+                get_utility("heap", language)
+                + source_code
+            )
+
+    return source_code
+
+
+def add_solution_instance_setup(source_code, method_name, language):
+    if method_name:
+        config = LANGUAGE_CONFIG[language]
+
+        if not re.search(config["instance_pattern"], source_code):
+            source_code += config["instance"]
+
+    return source_code
+
+
+def build_validation_payload(source_code, language, test_cases, metadata):
+    # ('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]')
+    # =>
+    # 'print(json.dumps(solution.twoSum([2, 7, 11, 15], 9)))'
+
+    config = LANGUAGE_CONFIG[language]
+    test_case_expressions = [
+        f'{config["print"]}({config["serialize"]}({input_data}))'
+        for input_data, _ in test_cases
+    ]
+    updated_code = source_code.rstrip() + "\n" + "\n".join(test_case_expressions) + "\n"
+    expected_output = [expected for _, expected in test_cases]
+
+    return updated_code, expected_output
+
+
 def is_localhost():
     # localhost_list = ["127.0.0.1", "127.0.1.1", "::1"]
     hostname = socket.gethostname()
     # host_ip = socket.gethostbyname(hostname)
     return hostname == "GF108"
-
-
-LANGUAGE_CONFIG = {
-    "Python": {
-        "print": "print",
-        "serialize": "json.dumps",
-        "instance": "\nsolution = Solution()\n",
-        "binary_tree_utils": "binary_tree_utils.py",
-        "linked_list_utils": "linked_list_utils.py",
-    },
-    "JavaScript": {
-        "print": "console.log",
-        "serialize": "JSON.stringify",
-        "instance": "\nconst solution = new Solution();\n",
-        "binary_tree_utils": "binary-tree-utils.js",
-        "linked_list_utils": "linked-list-utils.js",
-        "heap": "heap-utils.js",
-    },
-}
-
-
-def build_validation_payload(source_code, language, button_pressed, test_cases):
-    # todo: return should be list not str... meaby
-    #   and remane it
-    if button_pressed == "run":
-        return {
-            "source_code": source_code,
-            "expected_output": []
-        }
-
-    config = LANGUAGE_CONFIG[language]
-    lines = []
-
-    for input_data, _ in test_cases:
-        lines.append(
-            f'{config["print"]}({config["serialize"]}({input_data}))'
-        )
-
-    updated_code = source_code + "\n" + "\n".join(lines) + "\n"
-
-    return {
-        "source_code": updated_code,
-        "expected_output": [expected for _, expected in test_cases]
-    }
 
 
 def freeze(value):
@@ -410,10 +506,8 @@ def compare_output_and_expected(output, expected, comparison_type):
 
     for item, expected_raw_item in zip(output, expected):
         try:
-            # item = ast.literal_eval(raw_item)
             expected_item = ast.literal_eval(expected_raw_item)
         except (ValueError, SyntaxError):
-            # item = raw_item
             expected_item = expected_raw_item
 
         match comparison_type:
@@ -440,65 +534,23 @@ def compare_output_and_expected(output, expected, comparison_type):
     return True
 
 
-def get_utility(utility_type, language):
-    config = LANGUAGE_CONFIG[language]
-    filename = config[utility_type]
-
-    file_path = settings \
-        .BASE_DIR \
-        / "python_problems/utils" \
-        / filename
-
-    with open(file_path, "r") as file:
-        utility = file.read()
-
-    return utility
-
-
-def attach_utils(source_code, language):
-    source_code = re.sub(r"list\[", r"List[", source_code)
-
-    source_code = (
-        get_utility("binary_tree_utils", language)
-        + get_utility("linked_list_utils", language)
-        + source_code
-    )
-
-    match language:
-        case "Python":
-            source_code = (
-                "import json\n"
-                + "from typing import Optional, List\n"
-                + source_code
-            )
-        case "JavaScript":
-            source_code = (
-                get_utility("heap", language)
-                + source_code
-            )
-
-    return source_code
-
-
 def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
-    source_code = attach_utils(source_code, language)
-
+    source_code = convert_types(source_code)
+    source_code = attach_utils(source_code, problem, language)
     expected_output = []
-    if button_pressed == "validate":
-        if problem.method_name:
-            config = LANGUAGE_CONFIG[language]
-            solution_instance_setup = config["instance"]
-            if not re.search(solution_instance_setup.strip()[:-3], source_code):
-                source_code += solution_instance_setup
 
-        attached_validation_test_cases = build_validation_payload(
+    if button_pressed == "validate":
+        source_code = add_solution_instance_setup(
+            source_code,
+            problem.method_name,
+            language
+        )
+        source_code, expected_output = build_validation_payload(
             source_code,
             language,
-            button_pressed,
             test_cases,
+            problem.metadata
         )
-        source_code = attached_validation_test_cases["source_code"]
-        expected_output = attached_validation_test_cases["expected_output"]
 
     language_name_to_id = {
         "Python": 71,
@@ -527,18 +579,12 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
         "wait": "true"
     }
 
-    # Submit code
     response = requests.post(
         submissions_url,
         json=serialized_code,
         headers=headers,
         params=querystring
     ).json()
-
-    # Fetch results
-    # token = response["token"]
-    # response_url = f"{submissions_url}/{token}"
-    # response = requests.get(response_url, headers=headers).json()
 
     if "error" in response:
         # handles C++ response["error"]

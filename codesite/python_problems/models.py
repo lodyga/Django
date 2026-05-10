@@ -81,6 +81,11 @@ class Problem(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE)
 
+    metadata = models.JSONField(
+        blank=True,
+        null=True,
+        help_text='Problem metadata',
+    )
     problem_type = models.CharField(
         max_length=20,
         choices=ProblemType.choices,

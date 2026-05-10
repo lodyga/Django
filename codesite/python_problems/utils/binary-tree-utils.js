@@ -102,7 +102,7 @@ const buildTree = (nodeList, { withLookup = false } = {}) => {
  * @param {*} root 
  * @returns 
  */
-const getTreeValues = (root) => {
+const serializeTree = (root) => {
    if (!root) {
       return []
    }

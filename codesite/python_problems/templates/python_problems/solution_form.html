@@ -21,9 +21,8 @@
             <div>Test cases are fetched from Problem.</div>
           </div>
           {{ form|crispy }}
-          <input type="submit" class="btn btn-sm btn-secondary me-2" value="Submit" />
+          <input type="submit" class="me-2" value="Submit" />
           <input type="submit"
-                 class="btn btn-sm btn-secondary"
                  onclick="window.location='{{ problem_submit_redirect_url }}' ; return false;"
                  value="Cancel" />
         </form>

@@ -30,6 +30,7 @@ class ProblemForm(forms.ModelForm):
             "difficulty",
             "description",
             "tags",
+            "metadata",
             "problem_type",
             "method_name",
             "argument_names",

@@ -8,11 +8,11 @@ Utility functions for binary tree operations in Python.
 Provides:
 - `TreeNode`: Basic binary tree node structure.
 - `build_tree()`: Constructs a tree from a level-order traversal list.
-- `get_tree_values()`: Returns tree values in level-order sequence.
+- `serialize_tree()`: Returns tree values in level-order sequence.
 
 Example:
     >>> root = build_tree([1, 2, 3, None, 4])
-    >>> get_tree_values(root)
+    >>> serialize_tree(root)
     [1, 2, 3, None, 4]
 """
 
@@ -81,7 +81,7 @@ def build_tree(node_list: List[int], node_type: TreeNode = TreeNode, with_lookup
     return (root, lookup) if with_lookup else root
 
 
-def get_tree_values(root: TreeNode) -> List[int]:
+def serialize_tree(root: TreeNode) -> List[int]:
     """
     Return tree node values in level order traversal format.
     """

@@ -77,6 +77,68 @@ Test Cases:
 {"data": {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}, "is_hidden": false, "explanation": ""}
 
 
+{
+  "method_name": "invertTree",
+  "parameters": [
+    {
+      "name": "root",
+      "type": "binary_tree"
+    }
+  ],
+  "return_type": "binary_tree",
+  "comparison": "binar_tree_equal"
+}
+
+
+{
+  "method_name": "twoSum",
+  "parameters": [
+    {
+      "name": "nums",
+      "type": "list[int]"
+    },
+    {
+      "name": "target",
+      "type": "int"
+    }
+  ],
+  "return_type": "list[int]",
+  "comparison": "deep_equal",
+  "constraints": {
+    "nums.length": [2, 10000]
+  }
+}
+
+
+{
+  "problem_type": "class",
+  "class_name": "TimeMap",
+
+  "constructor": {
+    "parameters": []
+  },
+
+  "methods": [
+    {
+      "name": "set",
+      "parameters": [
+        {"name": "key", "type": "string"},
+        {"name": "value", "type": "string"},
+        {"name": "timestamp", "type": "int"}
+      ],
+      "return_type": "void"
+    },
+    {
+      "name": "get",
+      "parameters": [
+        {"name": "key", "type": "string"},
+        {"name": "timestamp", "type": "int"}
+      ],
+      "return_type": "string"
+    }
+  ]
+}
+
 """
 
 
