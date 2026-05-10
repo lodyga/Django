@@ -213,7 +213,7 @@ def get_ui_test_cases(problem, solution, language):
 
                 if (parameters and len(parameters) == len(inputs)):
                     display_input = "\n".join(
-                        f"{parameter["name"]} = {serialize(value, language)}"
+                        f'{parameter["name"]} = {serialize(value, language)}'
                         for parameter, value in zip(parameters, inputs)
                     )
                 else:
@@ -555,7 +555,7 @@ def freeze(value):
     return value
 
 
-def compare_output_and_expected(output, expected, comparison_type):
+def compare_output_and_expected(output, expected, comparison_type, language):
     """
     Need ast.literal_eval() to compare:
     raw_item: P: '[0, 1]'
@@ -572,13 +572,24 @@ def compare_output_and_expected(output, expected, comparison_type):
         return False
 
     for item, expected_raw_item in zip(output, expected):
-        try:
-            expected_item = ast.literal_eval(expected_raw_item)
-        except (ValueError, SyntaxError):
-            expected_item = expected_raw_item
+        # todo
+
+        match language:
+            # "True" => True
+            case "Python":
+                try:
+                    expected_item = ast.literal_eval(expected_raw_item)
+                except (ValueError, SyntaxError):
+                    expected_item = expected_raw_item
+            # "true" => True
+            case _:
+                try:
+                    expected_item = json.loads(expected_raw_item)
+                except (ValueError, SyntaxError):
+                    expected_item = expected_raw_item
 
         match comparison_type:
-            case ComparisonType.EXACT:
+            case ComparisonType.EXACT | "equal":
                 if item != expected_item:
                     return False
             case ComparisonType.UNORDERED:
@@ -679,7 +690,8 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
             compare_output_and_expected(
                 parsed_outputs,
                 expected_output,
-                problem.comparison_type
+                problem.metadata["comparison"] if problem.metadata else problem.comparison_type,
+                language
             ) or
             stdout.find("rue") != -1 and stdout.find("alse") == -1
         ):
