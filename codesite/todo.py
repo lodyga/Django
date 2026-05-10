@@ -76,6 +76,7 @@ Test Cases:
 {"data": {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}}
 {"data": {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}, "is_hidden": false, "explanation": ""}
 
+{"problem_type": "binary_tree", "method_name": "invertTree", "parameters": [{"name": "root", "type": "binary_tree"}], "return_type": "binary_tree", "comparison": "equal"}
 
 {
   "method_name": "invertTree",

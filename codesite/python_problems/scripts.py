@@ -125,18 +125,23 @@ def get_field(data, key):
         return data[idx_map[key]]
 
 
-def get_preview_in_ascii(data, problem_type, argument_name):
+def get_preview_in_ascii(data, problem_type, parameter_name, parameter_type):
     """
     █▓▒░#║╬■⬛🧱~≈∼≋≀·○🌊💧■▲◆●⬤⛰GO⊙✦★
     """
+    match parameter_type:
+        case "binary_tree":
+            bt = binarytree.build2(data).__str__()
+            parameter_name = parameter_name or "root"
+            return (parameter_name, bt)
 
     if problem_type == "binary_tree" and isinstance(data, list):
         bt = binarytree.build2(data).__str__()
-        return (argument_name, bt)
+        return (parameter_name, bt)
 
     elif problem_type == "linked_list" and isinstance(data, list):
         preview = ("(" + ") -> (".join(map(str, data)) + ")")if data else "null"
-        return (argument_name, preview)
+        return (parameter_name, preview)
 
     # for grid/matrix/board-like data
     elif problem_type not in ("binary_tree", "linked_list") and data and isinstance(data, list) and isinstance(data[0], list):
@@ -179,7 +184,7 @@ def get_preview_in_ascii(data, problem_type, argument_name):
 
         grid = grid + """└""" + "─" * (cols*2 + 1) + "┘"
 
-        return (argument_name, grid)
+        return (parameter_name, grid)
 
     return
 
@@ -191,12 +196,67 @@ def get_ui_test_cases(problem, solution, language):
     For binary tree preview
     [([...], [...], <serialized binary tree>), ...]
     """
-    problem_type = problem.problem_type
-    argument_names = problem.argument_names
+
     test_cases = problem.get_shared_testcases(include_hidden=True)
 
     if test_cases:
         ui_test_cases = []
+
+        if problem.metadata:
+            metadata = problem.metadata
+            problem_type = metadata["problem_type"]
+            parameters = metadata["parameters"]
+
+            for test_case in test_cases:
+                inputs = get_field(test_case.data, "inputs")
+                expected = get_field(test_case.data, "expected")
+
+                if (parameters and len(parameters) == len(inputs)):
+                    display_input = "\n".join(
+                        f"{parameter["name"]} = {serialize(value, language)}"
+                        for parameter, value in zip(parameters, inputs)
+                    )
+                else:
+                    display_input = inputs
+
+                preview_data = []
+                if inputs:
+                    for data, parameter in zip(inputs, parameters):
+                        if preview := get_preview_in_ascii(
+                            data,
+                            problem_type,
+                            parameter["name"],
+                            parameter["type"],
+                        ):
+                            preview_data.append(preview)
+
+                if preview := get_preview_in_ascii(
+                    expected,
+                    problem_type,
+                    None,
+                    metadata["return_type"],
+                ):
+                    preview_data.append(preview)
+
+                expected = serialize(expected, language)
+                ui_item = {
+                    "id": test_case.id,
+                    "owner_id": test_case.owner_id,
+                    "source": "shared",
+                    "input": display_input,
+                    "output": expected,
+                }
+
+                if preview_data:
+                    ui_item["preview"] = preview_data
+                if test_case.explanation:
+                    ui_item["explanation"] = test_case.explanation
+                ui_test_cases.append(ui_item)
+
+            return ui_test_cases
+
+        problem_type = problem.problem_type
+        argument_names = problem.argument_names
 
         if problem_type == "class":
             for test_case in test_cases:
@@ -226,10 +286,7 @@ def get_ui_test_cases(problem, solution, language):
                 inputs = get_field(test_case.data, "inputs")
                 expected = get_field(test_case.data, "expected")
 
-                if (
-                    argument_names and
-                    len(argument_names) == len(inputs)
-                ):
+                if (argument_names and len(argument_names) == len(inputs)):
                     display_input = "\n".join(
                         f"{name} = {serialize(value, language)}"
                         for name, value in zip(argument_names, inputs)
@@ -240,10 +297,20 @@ def get_ui_test_cases(problem, solution, language):
                 preview_data = []
                 if inputs:
                     for data, argument_name in zip(inputs, argument_names):
-                        if preview := get_preview_in_ascii(data, problem_type, argument_name):
+                        if preview := get_preview_in_ascii(
+                            data,
+                            problem_type,
+                            argument_name,
+                            None
+                        ):
                             preview_data.append(preview)
 
-                if preview := get_preview_in_ascii(expected, problem_type, "res"):
+                if preview := get_preview_in_ascii(
+                    expected,
+                    problem_type,
+                    "res",
+                    None
+                ):
                     preview_data.append(preview)
 
                 expected = serialize(expected, language)
@@ -254,6 +321,7 @@ def get_ui_test_cases(problem, solution, language):
                     "input": display_input,
                     "output": expected,
                 }
+
                 if preview_data:
                     ui_item["preview"] = preview_data
                 if test_case.explanation:
@@ -288,7 +356,6 @@ def get_ui_test_cases(problem, solution, language):
 
 def build_problem_test_case_expression(problem, test_case_data, language):
     """
-    # todo
     test_case_data["inputs"] = [[2, 7, 11, 15], 9]
     =>
     'solution.twoSum([[2, 7, 11, 15], 9])'
@@ -315,9 +382,9 @@ def build_problem_test_case_expression(problem, test_case_data, language):
             match data_type:
                 case "binary_tree":
                     line = serialize(value, language)
-                    line = f"{config["build_tree"]}({line})"
+                    line = f'{config["build_tree"]}({line})'
                     lines.append(line)
-                case "int" | "list[int]":
+                case _:
                     line = serialize(value, language)
                     lines.append(line)
 
@@ -325,9 +392,9 @@ def build_problem_test_case_expression(problem, test_case_data, language):
 
         match return_type:
             case "binary_tree":
-                res = f"{config["serialize_tree"]}(solution.{metadata["method_name"]}({serialized_inputs}))"
+                res = f'{config["serialize_tree"]}(solution.{metadata["method_name"]}({serialized_inputs}))'
             case _:
-                res = f"solution.{metadata["method_name"]}({serialized_inputs})"
+                res = f'solution.{metadata["method_name"]}({serialized_inputs})'
 
         return res
 
