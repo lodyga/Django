@@ -76,9 +76,10 @@ Test Cases:
 {"data": {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}}
 {"data": {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}, "is_hidden": false, "explanation": ""}
 
-{"problem_type": "binary_tree", "method_name": "invertTree", "parameters": [{"name": "root", "type": "binary_tree"}], "return_type": "binary_tree", "comparison": "equal"}
+{"problem_type": "binary_tree", "method_name": "invertTree", "parameters": [{"name": "root", "type": "binary_tree"}], "return_type": "binary_tree", "comparison_type": "equal"}
 
 {
+  "problem_type": "binary_tree", 
   "method_name": "invertTree",
   "parameters": [
     {
@@ -87,11 +88,12 @@ Test Cases:
     }
   ],
   "return_type": "binary_tree",
-  "comparison": "binar_tree_equal"
+  "comparison_type": "binar_tree_equal"
 }
 
 
 {
+  "problem_type": "function", 
   "method_name": "twoSum",
   "parameters": [
     {
@@ -104,7 +106,7 @@ Test Cases:
     }
   ],
   "return_type": "list[int]",
-  "comparison": "deep_equal",
+  "comparison_type": "deep_equal",
   "constraints": {
     "nums.length": [2, 10000]
   }

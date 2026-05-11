@@ -20,9 +20,11 @@ LANGUAGE_CONFIG = {
         "instance": "\nsolution = Solution()\n",
         "instance_pattern": r"solution\s*=\s*Solution\(\)\s*",
         "binary_tree_utils": "binary_tree_utils.py",
-        "linked_list_utils": "linked_list_utils.py",
         "build_tree": "build_tree",
         "serialize_tree": "serialize_tree",
+        "linked_list_utils": "linked_list_utils.py",
+        "build_list": "build_list",
+        "serialize_list": "serialize_list",
     },
     "JavaScript": {
         "print": "console.log",
@@ -30,10 +32,12 @@ LANGUAGE_CONFIG = {
         "instance": "\nconst solution = new Solution();\n",
         "instance_pattern": r"const\s+solution\s*=\s*new\s+Solution\(\)\s*;?",
         "binary_tree_utils": "binary-tree-utils.js",
-        "linked_list_utils": "linked-list-utils.js",
         "heap": "heap-utils.js",
         "build_tree": "buildTree",
         "serialize_tree": "serializeTree",
+        "linked_list_utils": "linked-list-utils.js",
+        "build_list": "buildList",
+        "serialize_list": "serializeList",
     },
 }
 
@@ -125,68 +129,93 @@ def get_field(data, key):
         return data[idx_map[key]]
 
 
-def get_preview_in_ascii(data, problem_type, parameter_name, parameter_type):
+def is_grid_shape(data):
+    if not data:
+        return
+
+    for row in data:
+        if len(row) != len(data[0]):
+            return
+        if not row:
+            return
+
+    return True
+
+
+def draw_grid(data, parameter_name):
+    if not is_grid_shape(data):
+        return
+
+    rows = len(data)
+    cols = len(data[0])
+    chars = {str(char) for line in data for char in line}
+    char_map = {}
+
+    if all(char.isalpha() for char in chars):
+        return
+
+    match len(chars):
+        case 1 | 2 | 3:
+            char_map = {
+                "-1": "█",
+                "0": "·",
+                "1": "■",
+                "2": "X",
+                "2147483647": "∞",
+            }
+        case _:
+            char_map = {char: char for char in chars}
+            char_map["-1"] = "█"
+
+    grid = """┌""" + "─" * (cols*2 + 1) + "┐\n"
+
+    for line in data:
+        grid_line = "".join(
+            char_map.get(str(char), "J")
+            for char in line
+        )
+        grid = grid + "│ " + " ".join(grid_line) + " │\n"
+
+    grid = grid + """└""" + "─" * (cols*2 + 1) + "┘"
+
+    return (parameter_name, grid)
+
+
+def draw_tree(data, parameter_name):
+    bt = binarytree.build2(data).__str__()
+    parameter_name = parameter_name or "root"
+    return (parameter_name, bt)
+
+
+def draw_list(data, parameter_name):
+    preview = ("(" + ") -> (".join(map(str, data)) + ")")if data else "null"
+    return (parameter_name, preview)
+
+
+def draw_ascii(data, problem_type, parameter_name, parameter_type):
     """
     █▓▒░#║╬■⬛🧱~≈∼≋≀·○🌊💧■▲◆●⬤⛰GO⊙✦★
     """
     match parameter_type:
         case "binary_tree":
-            bt = binarytree.build2(data).__str__()
-            parameter_name = parameter_name or "root"
-            return (parameter_name, bt)
+            return draw_tree(data, parameter_name)
+        case "linked_list":
+            return draw_list(data, parameter_name)
+        # todo grid?
+        case "list[list[int]]":
+            return draw_grid(data, parameter_name)
 
     if problem_type == "binary_tree" and isinstance(data, list):
         bt = binarytree.build2(data).__str__()
         return (parameter_name, bt)
+        return draw_tree(data, parameter_name)
 
     elif problem_type == "linked_list" and isinstance(data, list):
-        preview = ("(" + ") -> (".join(map(str, data)) + ")")if data else "null"
-        return (parameter_name, preview)
+        return draw_list(data, parameter_name)
 
     # for grid/matrix/board-like data
     elif problem_type not in ("binary_tree", "linked_list") and data and isinstance(data, list) and isinstance(data[0], list):
-        # if not rectangelar shape
-        for row in data:
-            if len(row) != len(data[0]):
-                return
-            if not row:
-                return
-
-        rows = len(data)
-        cols = len(data[0])
-        chars = {str(char) for line in data for char in line}
-        char_map = {}
-
-        if all(char.isalpha() for char in chars):
-            return
-
-        match len(chars):
-            case 1 | 2 | 3:
-                char_map = {
-                    "-1": "█",
-                    "0": "·",
-                    "1": "■",
-                    "2": "X",
-                    "2147483647": "∞",
-                }
-            case _:
-                char_map = {char: char for char in chars}
-                char_map["-1"] = "█"
-
-        grid = """┌""" + "─" * (cols*2 + 1) + "┐\n"
-
-        for line in data:
-            grid_line = "".join(
-                char_map.get(str(char), "J")
-                for char in line
-            )
-            grid = grid + "│ " + " ".join(grid_line) + " │\n"
-
-        grid = grid + """└""" + "─" * (cols*2 + 1) + "┘"
-
-        return (parameter_name, grid)
-
-    return
+        return draw_grid(data, parameter_name)
 
 
 def get_ui_test_cases(problem, solution, language):
@@ -222,7 +251,7 @@ def get_ui_test_cases(problem, solution, language):
                 preview_data = []
                 if inputs:
                     for data, parameter in zip(inputs, parameters):
-                        if preview := get_preview_in_ascii(
+                        if preview := draw_ascii(
                             data,
                             problem_type,
                             parameter["name"],
@@ -230,7 +259,7 @@ def get_ui_test_cases(problem, solution, language):
                         ):
                             preview_data.append(preview)
 
-                if preview := get_preview_in_ascii(
+                if preview := draw_ascii(
                     expected,
                     problem_type,
                     None,
@@ -297,7 +326,7 @@ def get_ui_test_cases(problem, solution, language):
                 preview_data = []
                 if inputs:
                     for data, argument_name in zip(inputs, argument_names):
-                        if preview := get_preview_in_ascii(
+                        if preview := draw_ascii(
                             data,
                             problem_type,
                             argument_name,
@@ -305,7 +334,7 @@ def get_ui_test_cases(problem, solution, language):
                         ):
                             preview_data.append(preview)
 
-                if preview := get_preview_in_ascii(
+                if preview := draw_ascii(
                     expected,
                     problem_type,
                     "res",
@@ -360,7 +389,8 @@ def build_problem_test_case_expression(problem, test_case_data, language):
     =>
     'solution.twoSum([[2, 7, 11, 15], 9])'
 
-    'solution.inverTree((binary_tree[2, 7, 11, 15]))'
+    'serialize_tree(solution.invertTree(build_tree([4, 2, 7, 1, 3, 6, 9])))'
+    'serialize_list(solution.reverseList(build_list([1, 2, 3, 4, 5])))'
     """
 
     config = LANGUAGE_CONFIG[language]
@@ -383,16 +413,21 @@ def build_problem_test_case_expression(problem, test_case_data, language):
                 case "binary_tree":
                     line = serialize(value, language)
                     line = f'{config["build_tree"]}({line})'
-                    lines.append(line)
+                case "linked_list":
+                    line = serialize(value, language)
+                    line = f'{config["build_list"]}({line})'
                 case _:
                     line = serialize(value, language)
-                    lines.append(line)
+
+            lines.append(line)
 
         serialized_inputs = ", ".join(lines)
 
         match return_type:
             case "binary_tree":
                 res = f'{config["serialize_tree"]}(solution.{metadata["method_name"]}({serialized_inputs}))'
+            case "linked_list":
+                res = f'{config["serialize_list"]}(solution.{metadata["method_name"]}({serialized_inputs}))'
             case _:
                 res = f'solution.{metadata["method_name"]}({serialized_inputs})'
 
@@ -465,7 +500,11 @@ def convert_types(source_code):
     """Convert types to match Python 3.8"""
     source_code = re.sub(r"list\[", "List[", source_code)
     source_code = re.sub(r"TreeNode\s*\|\s*None\s*",
-                         "Optional[TreeNode]", source_code)
+                         "Optional[TreeNode]",
+                         source_code)
+    source_code = re.sub(r"ListNode\s*\|\s*None\s*",
+                         "Optional[ListNode]",
+                         source_code)
     return source_code
 
 
@@ -490,6 +529,7 @@ def attach_utils(source_code, problem, language):
     source_code = (
         get_utility("binary_tree_utils", language)
         + get_utility("linked_list_utils", language)
+        + "\n"
         + source_code
     )
 
@@ -589,7 +629,7 @@ def compare_output_and_expected(output, expected, comparison_type, language):
                     expected_item = expected_raw_item
 
         match comparison_type:
-            case ComparisonType.EXACT | "equal":
+            case ComparisonType.EXACT | "equal" | "exact":
                 if item != expected_item:
                     return False
             case ComparisonType.UNORDERED:
@@ -620,7 +660,7 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     if button_pressed == "validate":
         source_code = add_solution_instance_setup(
             source_code,
-            problem.method_name,
+            problem.method_name or problem.metadata["method_name"],
             language
         )
         source_code, expected_output = build_validation_payload(
@@ -690,7 +730,7 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
             compare_output_and_expected(
                 parsed_outputs,
                 expected_output,
-                problem.metadata["comparison"] if problem.metadata else problem.comparison_type,
+                problem.metadata["comparison_type"] if problem.metadata else problem.comparison_type,
                 language
             ) or
             stdout.find("rue") != -1 and stdout.find("alse") == -1

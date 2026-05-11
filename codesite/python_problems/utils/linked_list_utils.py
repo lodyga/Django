@@ -11,24 +11,14 @@ class ListNode:
         self.next = next
 
 
-def build_linked_list_deprecated(numbers: List[int]) -> ListNode:
-    """
-    Build linked list from list.
-    """
-    node = None
-    for number in reversed(numbers):
-        node = ListNode(number, node)
-    return node
-
-
-def build_linked_list(numbers: List[int], cycle_position: int = -1) -> ListNode:
+def build_list(nums: List[int], cycle_position: int = -1) -> ListNode:
     """
     Build linked list with cycle from list.
     """
     anchor = node = ListNode()
     has_cycle = False
 
-    for position, number in enumerate(numbers):
+    for position, number in enumerate(nums):
         node.next = ListNode(number)
         node = node.next
         if position == cycle_position:
@@ -40,7 +30,7 @@ def build_linked_list(numbers: List[int], cycle_position: int = -1) -> ListNode:
     return anchor.next
 
 
-def get_linked_list_values(root: ListNode) -> List[int]:
+def serialize_list(root: ListNode) -> List[int]:
     """
     Return linked list values in list.
     """
@@ -51,7 +41,7 @@ def get_linked_list_values(root: ListNode) -> List[int]:
     return values
 
 
-def are_linked_lists_equeal(root1: ListNode, root2: ListNode) -> bool:
+def are_lists_equeal(root1: ListNode, root2: ListNode) -> bool:
     """
     Compare two linked lists value by value.
     """

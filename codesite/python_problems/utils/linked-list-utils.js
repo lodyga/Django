@@ -20,7 +20,7 @@ class ListNode {
  * @param {number[]} numbers
  * @returns {ListNode}
  */
-const buildLinkedList = (numbers, { cyclePosition = -1 } = {}) => {
+const buildList = (numbers, { cyclePosition = -1 } = {}) => {
    let node = new ListNode();
    const anchor = node;
    let hasCycle = false;
@@ -48,7 +48,7 @@ const buildLinkedList = (numbers, { cyclePosition = -1 } = {}) => {
  * @param {ListNode} node
  * @returns {Array<number>}
  */
-const getLinkedListValues = (node) => {
+const serializeList = (node) => {
    const values = [];
    while (node) {
       values.push(node.val);
