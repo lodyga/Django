@@ -10,7 +10,7 @@ from django.apps import apps
 from django.conf import settings
 from django.templatetags.static import static
 from codesite.auth.judge0_auth import JUDGE0_API_KEY
-from python_problems.models import Problem, ComparisonType
+from python_problems.models import Problem, ComparisonType, ProblemType
 
 
 LANGUAGE_CONFIG = {
@@ -25,6 +25,7 @@ LANGUAGE_CONFIG = {
         "linked_list_utils": "linked_list_utils.py",
         "build_list": "build_list",
         "serialize_list": "serialize_list",
+        "class_design_utils": "class_design_utils.py",
     },
     "JavaScript": {
         "print": "console.log",
@@ -38,6 +39,7 @@ LANGUAGE_CONFIG = {
         "linked_list_utils": "linked-list-utils.js",
         "build_list": "buildList",
         "serialize_list": "serializeList",
+        "class_design_utils": "class-design-utils.js",
     },
 }
 
@@ -124,7 +126,6 @@ def get_field(data, key):
             "expected": 1 if len(data) == 2 else 2,
             "operations": 0,
             "arguments": 1,
-            # "expected": 2,
         }
         return data[idx_map[key]]
 
@@ -187,9 +188,37 @@ def draw_tree(data, parameter_name):
     return (parameter_name, bt)
 
 
-def draw_list(data, parameter_name):
+def draw_linked_list(data, parameter_name):
     preview = ("(" + ") -> (".join(map(str, data)) + ")")if data else "null"
     return (parameter_name, preview)
+
+
+def draw_list(heights, parameter_name):
+    if not heights:
+        return ""
+
+    fill = "█"
+    max_height = max(heights)
+    lines = []
+
+    for level in range(max_height, 0, -1):
+        row = f"{level:>2} | "
+
+        for h in heights:
+            if h >= level:
+                row += f"{fill} "
+            else:
+                row += "  "
+
+        lines.append(row.rstrip())
+
+    axis = "   +" + "-" * (2 * len(heights) + 1)
+    indexes = "     " + " ".join(str(i) for i in range(len(heights)))
+
+    lines.append(axis)
+    lines.append(indexes)
+
+    return (parameter_name, "\n".join(lines))
 
 
 def draw_ascii(data, problem_type, parameter_name, parameter_type):
@@ -197,25 +226,186 @@ def draw_ascii(data, problem_type, parameter_name, parameter_type):
     █▓▒░#║╬■⬛🧱~≈∼≋≀·○🌊💧■▲◆●⬤⛰GO⊙✦★
     """
     match parameter_type:
-        case "binary_tree":
+        case ProblemType.BINARY_TREE:
             return draw_tree(data, parameter_name)
-        case "linked_list":
+        case ProblemType.LINKED_LIST:
+            return draw_linked_list(data, parameter_name)
+        case "list[int]":
             return draw_list(data, parameter_name)
         # todo grid?
-        case "list[list[int]]":
+        case "list[list[int]]" | "grid":
             return draw_grid(data, parameter_name)
 
-    if problem_type == "binary_tree" and isinstance(data, list):
+    if problem_type == ProblemType.BINARY_TREE and isinstance(data, list):
         bt = binarytree.build2(data).__str__()
         return (parameter_name, bt)
-        return draw_tree(data, parameter_name)
 
-    elif problem_type == "linked_list" and isinstance(data, list):
-        return draw_list(data, parameter_name)
+    elif problem_type == ProblemType.LINKED_LIST and isinstance(data, list):
+        return draw_linked_list(data, parameter_name)
 
     # for grid/matrix/board-like data
-    elif problem_type not in ("binary_tree", "linked_list") and data and isinstance(data, list) and isinstance(data[0], list):
+    elif problem_type not in (ProblemType.BINARY_TREE, ProblemType.LINKED_LIST) and data and isinstance(data, list) and isinstance(data[0], list):
         return draw_grid(data, parameter_name)
+
+
+def get_class_ui_test_cases(problem, solution, language, test_cases):
+    ui_test_cases = []
+
+    for test_case in test_cases:
+        operations = get_field(test_case.data, "operations")
+        arguments = get_field(test_case.data, "arguments")
+        expected = get_field(test_case.data, "expected")
+
+        if (len(operations) == len(arguments)):
+            display_input = ", ".join(
+                f"{op}({', '.join(map(str, ar))})"
+                for (op, ar) in zip(operations, arguments)
+            )
+            display_input = "(" + display_input + ")"
+        else:
+            display_input = (operations, arguments)
+
+        ui_test_cases.append({
+            "id": test_case.id,
+            "owner_id": test_case.owner_id,
+            "source": "shared",
+            "input": display_input,
+            "output": expected,
+        })
+
+    return ui_test_cases
+
+
+def get_meta_ui_test_cases(problem, solution, language, test_cases):
+    ui_test_cases = []
+    metadata = problem.metadata
+    problem_type = metadata["problem_type"]
+    parameters = metadata["parameters"]
+
+    for test_case in test_cases:
+        inputs = get_field(test_case.data, "inputs")
+        expected = get_field(test_case.data, "expected")
+
+        if (parameters and len(parameters) == len(inputs)):
+            display_input = "\n".join(
+                f'{parameter["name"]} = {serialize(value, language)}'
+                for parameter, value in zip(parameters, inputs)
+            )
+        else:
+            display_input = inputs
+
+        preview_data = []
+        if inputs:
+            for data, parameter in zip(inputs, parameters):
+                if preview := draw_ascii(
+                    data,
+                    problem_type,
+                    parameter["name"],
+                    parameter["type"],
+                ):
+                    preview_data.append(preview)
+
+        if preview := draw_ascii(
+            expected,
+            problem_type,
+            None,
+            metadata["return_type"],
+        ):
+            preview_data.append(preview)
+
+        expected = serialize(expected, language)
+        ui_item = {
+            "id": test_case.id,
+            "owner_id": test_case.owner_id,
+            "source": "shared",
+            "input": display_input,
+            "output": expected,
+        }
+
+        if preview_data:
+            ui_item["preview"] = preview_data
+        if test_case.explanation:
+            ui_item["explanation"] = test_case.explanation
+        ui_test_cases.append(ui_item)
+
+    return ui_test_cases
+
+
+def get_no_meta_ui_test_cases(problem, solution, language, test_cases):
+    ui_test_cases = []
+    problem_type = problem.problem_type
+    argument_names = problem.argument_names
+
+    for test_case in test_cases:
+        inputs = get_field(test_case.data, "inputs")
+        expected = get_field(test_case.data, "expected")
+
+        if (argument_names and len(argument_names) == len(inputs)):
+            display_input = "\n".join(
+                f"{name} = {serialize(value, language)}"
+                for name, value in zip(argument_names, inputs)
+            )
+        else:
+            display_input = inputs
+
+        preview_data = []
+        if inputs:
+            for data, argument_name in zip(inputs, argument_names):
+                if preview := draw_ascii(
+                    data,
+                    problem_type,
+                    argument_name,
+                    None
+                ):
+                    preview_data.append(preview)
+
+        if preview := draw_ascii(
+            expected,
+            problem_type,
+            "res",
+            None
+        ):
+            preview_data.append(preview)
+
+        expected = serialize(expected, language)
+        ui_item = {
+            "id": test_case.id,
+            "owner_id": test_case.owner_id,
+            "source": "shared",
+            "input": display_input,
+            "output": expected,
+        }
+
+        if preview_data:
+            ui_item["preview"] = preview_data
+        if test_case.explanation:
+            ui_item["explanation"] = test_case.explanation
+        ui_test_cases.append(ui_item)
+
+    return ui_test_cases
+
+
+def get_solution_ui_test_cases(problem, solution, language, test_cases):
+    solution_test_cases = get_solution_test_cases(solution.test_cases)
+    ui_test_cases = []
+
+    for test_case in solution_test_cases:
+        inputs, expected = test_case
+
+        if inputs.startswith("Solution()"):
+            inputs = inputs[11:]
+
+        ui_item = {
+            "id": None,
+            "owner_id": None,
+            "source": "solution_fallback",
+            "input": inputs,
+            "output": expected,
+        }
+
+        ui_test_cases.append(ui_item)
+
+    return ui_test_cases
 
 
 def get_ui_test_cases(problem, solution, language):
@@ -229,158 +419,24 @@ def get_ui_test_cases(problem, solution, language):
     test_cases = problem.get_shared_testcases(include_hidden=True)
 
     if test_cases:
-        ui_test_cases = []
-
-        if problem.metadata:
-            metadata = problem.metadata
-            problem_type = metadata["problem_type"]
-            parameters = metadata["parameters"]
-
-            for test_case in test_cases:
-                inputs = get_field(test_case.data, "inputs")
-                expected = get_field(test_case.data, "expected")
-
-                if (parameters and len(parameters) == len(inputs)):
-                    display_input = "\n".join(
-                        f'{parameter["name"]} = {serialize(value, language)}'
-                        for parameter, value in zip(parameters, inputs)
-                    )
-                else:
-                    display_input = inputs
-
-                preview_data = []
-                if inputs:
-                    for data, parameter in zip(inputs, parameters):
-                        if preview := draw_ascii(
-                            data,
-                            problem_type,
-                            parameter["name"],
-                            parameter["type"],
-                        ):
-                            preview_data.append(preview)
-
-                if preview := draw_ascii(
-                    expected,
-                    problem_type,
-                    None,
-                    metadata["return_type"],
-                ):
-                    preview_data.append(preview)
-
-                expected = serialize(expected, language)
-                ui_item = {
-                    "id": test_case.id,
-                    "owner_id": test_case.owner_id,
-                    "source": "shared",
-                    "input": display_input,
-                    "output": expected,
-                }
-
-                if preview_data:
-                    ui_item["preview"] = preview_data
-                if test_case.explanation:
-                    ui_item["explanation"] = test_case.explanation
-                ui_test_cases.append(ui_item)
-
-            return ui_test_cases
-
         problem_type = problem.problem_type
-        argument_names = problem.argument_names
 
-        if problem_type == "class":
-            for test_case in test_cases:
-                operations = get_field(test_case.data, "operations")
-                arguments = get_field(test_case.data, "arguments")
-                expected = get_field(test_case.data, "expected")
+        if problem_type == ProblemType.CLASS:
+            return get_class_ui_test_cases(problem, solution, language, test_cases)
 
-                if (len(operations) == len(arguments)):
-                    display_input = ", ".join(
-                        f"{op}({', '.join(map(str, ar))})"
-                        for (op, ar) in zip(operations, arguments)
-                    )
-                    display_input = "(" + display_input + ")"
-                else:
-                    display_input = (operations, arguments)
-
-                ui_test_cases.append({
-                    "id": test_case.id,
-                    "owner_id": test_case.owner_id,
-                    "source": "shared",
-                    "input": display_input,
-                    "output": expected,
-                })
+        elif problem.metadata:
+            return get_meta_ui_test_cases(problem, solution, language, test_cases)
 
         elif problem_type:
-            for test_case in test_cases:
-                inputs = get_field(test_case.data, "inputs")
-                expected = get_field(test_case.data, "expected")
+            return get_no_meta_ui_test_cases(problem, solution, language, test_cases)
 
-                if (argument_names and len(argument_names) == len(inputs)):
-                    display_input = "\n".join(
-                        f"{name} = {serialize(value, language)}"
-                        for name, value in zip(argument_names, inputs)
-                    )
-                else:
-                    display_input = inputs
+        else:
+            return []
 
-                preview_data = []
-                if inputs:
-                    for data, argument_name in zip(inputs, argument_names):
-                        if preview := draw_ascii(
-                            data,
-                            problem_type,
-                            argument_name,
-                            None
-                        ):
-                            preview_data.append(preview)
+    elif solution.test_cases:
+        return get_solution_ui_test_cases(problem, solution, language, test_cases)
 
-                if preview := draw_ascii(
-                    expected,
-                    problem_type,
-                    "res",
-                    None
-                ):
-                    preview_data.append(preview)
-
-                expected = serialize(expected, language)
-                ui_item = {
-                    "id": test_case.id,
-                    "owner_id": test_case.owner_id,
-                    "source": "shared",
-                    "input": display_input,
-                    "output": expected,
-                }
-
-                if preview_data:
-                    ui_item["preview"] = preview_data
-                if test_case.explanation:
-                    ui_item["explanation"] = test_case.explanation
-                ui_test_cases.append(ui_item)
-
-        return ui_test_cases
-
-    # Test cases from solution.
-    elif solution_test_cases := get_solution_test_cases(solution.test_cases):
-        ui_test_cases = []
-        for test_case in solution_test_cases:
-            inputs, expected = test_case
-
-            if inputs.startswith("Solution()"):
-                inputs = inputs[11:]
-
-            ui_item = {
-                "id": None,
-                "owner_id": None,
-                "source": "solution_fallback",
-                "input": inputs,
-                "output": expected,
-            }
-
-            ui_test_cases.append(ui_item)
-        return ui_test_cases
-
-    else:
-        return []
+    return []
 
 
 def build_problem_test_case_expression(problem, test_case_data, language):
@@ -410,10 +466,10 @@ def build_problem_test_case_expression(problem, test_case_data, language):
             name, data_type = parameters["name"], parameters["type"]
 
             match data_type:
-                case "binary_tree":
+                case ProblemType.BINARY_TREE:
                     line = serialize(value, language)
                     line = f'{config["build_tree"]}({line})'
-                case "linked_list":
+                case ProblemType.LINKED_LIST:
                     line = serialize(value, language)
                     line = f'{config["build_list"]}({line})'
                 case _:
@@ -424,9 +480,9 @@ def build_problem_test_case_expression(problem, test_case_data, language):
         serialized_inputs = ", ".join(lines)
 
         match return_type:
-            case "binary_tree":
+            case ProblemType.BINARY_TREE:
                 res = f'{config["serialize_tree"]}(solution.{metadata["method_name"]}({serialized_inputs}))'
-            case "linked_list":
+            case ProblemType.LINKED_LIST:
                 res = f'{config["serialize_list"]}(solution.{metadata["method_name"]}({serialized_inputs}))'
             case _:
                 res = f'solution.{metadata["method_name"]}({serialized_inputs})'
@@ -449,10 +505,21 @@ def build_problem_test_case_expression(problem, test_case_data, language):
 
 
 def get_problem_test_cases(problem, language):
-    # [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
-    problem_test_cases = []
+    """
+    [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
+    or
 
-    for test_case in problem.get_shared_testcases(include_hidden=True):
+    """
+    test_cases = problem.get_shared_testcases(include_hidden=True)
+    problem_test_cases = []
+    operations_list = []
+    arguments_list = []
+    expected_output_list = []
+    # todo
+    # if problem.problem_type == ProblemType.CLASS:
+    #     pass
+
+    for test_case in test_cases:
         expression = build_problem_test_case_expression(
             problem,
             test_case.data,
@@ -470,11 +537,18 @@ def get_problem_test_cases(problem, language):
     return problem_test_cases
 
 
+def get_class_test_cases(problem, language):
+    return []
+
+
 def get_effective_test_cases(problem, solution, language):
     """
     => [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
     """
-    if problem_test_cases := get_problem_test_cases(problem, language):
+    # todo
+    if problem.problem_type == ProblemType.CLASS:
+        return get_class_test_cases(problem, language)
+    elif problem_test_cases := get_problem_test_cases(problem, language):
         return problem_test_cases
     elif solution_test_cases := get_solution_test_cases(solution.test_cases):
         return solution_test_cases
@@ -496,15 +570,23 @@ def parse_url(raw_url):
     return re.search(r"((https?)://)?(www\.)?(app\.)?(\w+\.\w+)(/)?", raw_url).group(5)
 
 
-def convert_types(source_code):
+def clean_types(source_code):
     """Convert types to match Python 3.8"""
-    source_code = re.sub(r"list\[", "List[", source_code)
-    source_code = re.sub(r"TreeNode\s*\|\s*None\s*",
-                         "Optional[TreeNode]",
-                         source_code)
-    source_code = re.sub(r"ListNode\s*\|\s*None\s*",
-                         "Optional[ListNode]",
-                         source_code)
+    source_code = re.sub(
+        r"list\[",
+        "List[",
+        source_code
+    )
+    source_code = re.sub(
+        r"TreeNode\s*\|\s*None\s*",
+        "Optional[TreeNode]",
+        source_code
+    )
+    source_code = re.sub(
+        r"ListNode\s*\|\s*None\s*",
+        "Optional[ListNode]",
+        source_code
+    )
     return source_code
 
 
@@ -523,15 +605,21 @@ def get_utility(utility_type, language):
     return utility
 
 
-def attach_utils(source_code, problem, language):
+def attach_utils(source_code, language, problem_type):
     # problem.meta to attach right utility
 
-    source_code = (
-        get_utility("binary_tree_utils", language)
-        + get_utility("linked_list_utils", language)
-        + "\n"
-        + source_code
-    )
+    match problem_type:
+        case ProblemType.BINARY_TREE:
+            source_code = get_utility(
+                "binary_tree_utils", language) + "\n" + source_code
+        case ProblemType.LINKED_LIST:
+            source_code = get_utility(
+                "linked_list_utils", language) + "\n" + source_code
+        case ProblemType.CLASS:
+            class_utils = get_utility("class_design_utils", language)
+            cleaned_utils = clean_types(class_utils)
+            source_code = source_code + "\n" + cleaned_utils
+                
 
     match language:
         case "Python":
@@ -612,8 +700,6 @@ def compare_output_and_expected(output, expected, comparison_type, language):
         return False
 
     for item, expected_raw_item in zip(output, expected):
-        # todo
-
         match language:
             # "True" => True
             case "Python":
@@ -652,24 +738,7 @@ def compare_output_and_expected(output, expected, comparison_type, language):
     return True
 
 
-def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
-    source_code = convert_types(source_code)
-    source_code = attach_utils(source_code, problem, language)
-    expected_output = []
-
-    if button_pressed == "validate":
-        source_code = add_solution_instance_setup(
-            source_code,
-            problem.method_name or problem.metadata["method_name"],
-            language
-        )
-        source_code, expected_output = build_validation_payload(
-            source_code,
-            language,
-            test_cases,
-            problem.metadata
-        )
-
+def run_judge0(source_code, language):
     language_name_to_id = {
         "Python": 71,
         "JavaScript": 63,
@@ -703,6 +772,75 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
         headers=headers,
         params=querystring
     ).json()
+
+    return response
+
+
+def build_validation_class_payload(source_code, language, test_cases, metadata):
+    config = LANGUAGE_CONFIG[language]
+    operations_list = []
+    arguments_list = []
+    expected_list = []
+
+    for test_case in test_cases.all():
+        operations_list.append(get_field(test_case.data, "operations"))
+        arguments_list.append(get_field(test_case.data, "arguments"))
+        expected_list.append(get_field(test_case.data, "expected"))
+
+    updated_code = (
+        f"operations_list = {serialize(operations_list, language)}\n"
+        f"arguments_list = {serialize(arguments_list, language)}\n"
+        f"{source_code.rstrip()}\n"
+        f'json.dumps(run_tests({metadata["class_name"]}, '
+        f"operations_list, arguments_list))\n"
+    )
+        # f'print(json.dumps(run_tests({metadata["class_name"]}, '
+        # f"operations_list, arguments_list)))\n"
+
+    # todoo
+    # expected_output = serialize(expected_list, language)
+    expected_output = [serialize(expected, language) for expected in expected_list]
+
+    return updated_code, expected_output
+
+
+def attach_validation_payload(source_code, problem, language, test_cases, button_pressed):
+    # Need test_cases from view because legacy test cases base on solution test cases.
+
+    if problem.problem_type and problem.problem_type == ProblemType.CLASS:
+        source_code, expected_output = build_validation_class_payload(
+            source_code,
+            language,
+            problem.testcases,
+            problem.metadata
+        )
+
+    elif button_pressed == "validate":
+        source_code = add_solution_instance_setup(
+            source_code,
+            problem.method_name or problem.metadata["method_name"],
+            language
+        )
+        source_code, expected_output = build_validation_payload(
+            source_code,
+            language,
+            test_cases,
+            problem.metadata
+        )
+    else:
+        expected_output = []
+
+    return source_code, expected_output
+
+
+def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
+    # test_cases are get_effective_test_cases
+    source_code = clean_types(source_code)
+    source_code = attach_utils(source_code, language, problem.problem_type)
+    source_code, expected_output = attach_validation_payload(
+        source_code, problem, language, test_cases, button_pressed
+    )
+    response = run_judge0(source_code, language)
 
     if "error" in response:
         # handles C++ response["error"]
@@ -829,14 +967,14 @@ def get_problem_type_header(problem_type, language):
     Return problem type definition snippet.
     """
     match problem_type:
-        case "binary_tree":
+        case ProblemType.BINARY_TREE:
             match language.name:
                 case "Python":
                     return '''# class TreeNode:\n#     """\n#     Definition for a binary tree node.\n#     """\n#     def __init__(self, val=None, left=None, right=None):\n#         self.val = val\n#         self.left = left\n#         self.right = right\n\n\n'''
                 case "JavaScript":
                     return """/**\n * class TreeNode {\n *    constructor(val = null, left = null, right = null) {\n *       this.val = val\n *       this.left = left\n *       this.right = right\n *    };\n * }\n */\n\n\n"""
 
-        case "linked_list":
+        case ProblemType.LINKED_LIST:
             match language.name:
                 case "Python":
                     return '''# class ListNode:\n#     """\n#     Definition for singly-linked list.\n#     """\n#     def __init__(self, val=None, next=None):\n#         self.val = val\n#         self.next = next\n\n\n'''

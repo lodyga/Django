@@ -126,9 +126,9 @@ class ProblemDetailView(DetailView):
         )
         for solution in owner_solutions:
             solution.source_code = get_problem_type_header(
-                problem.problem_type, 
+                problem.problem_type,
                 language
-                ) + solution.source_code
+            ) + solution.source_code
 
         return {
             "solution_languages": solution_languages,
@@ -175,7 +175,8 @@ class ProblemDetailView(DetailView):
         selected_solution = owner_solutions.first()
 
         ui_test_cases = get_ui_test_cases(
-            problem, selected_solution, language.name)
+            problem, selected_solution, language.name
+        )
         effective_test_cases = get_effective_test_cases(
             problem,
             selected_solution,
@@ -264,13 +265,12 @@ class ProblemDetailView(DetailView):
             is_code_container_filled
         ):
             source_code = request.POST.get("code_container")
-            test_cases = "" if button_pressed == "run" else context["effective_test_cases"]
             output = execute_code(
                 problem,
                 source_code,
                 language.name,
                 button_pressed,
-                test_cases
+                context["effective_test_cases"]
             )
             output_container = output
         else:

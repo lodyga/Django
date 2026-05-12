@@ -1,6 +1,5 @@
-# min stack
 # get_adjacent_slugs(problem, language)
-# preview to heights
+# Python 3.8 doesn't support match / case statements.
 
 # setup cursor with proper method name
 # edit only own solutions
@@ -76,6 +75,14 @@ Test Cases:
 {"data": {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}}
 {"data": {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}, "is_hidden": false, "explanation": ""}
 
+# operations, arguments, expected 
+{"data": [["TimeMap", "set", "get", "get", "set", "get", "get"], [[], ["foo", "bar", 1], ["foo", 1], ["foo", 3], ["foo", "bar2", 4], ["foo", 4], ["foo", 5]], [null, null, "bar", "bar", null, "bar2", "bar2"]], "is_hidden": false, "explanation": ""}
+
+
+
+
+
+metadata
 {"problem_type": "binary_tree", "method_name": "invertTree", "parameters": [{"name": "root", "type": "binary_tree"}], "return_type": "binary_tree", "comparison_type": "equal"}
 
 {
