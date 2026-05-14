@@ -28,6 +28,9 @@ LANGUAGE_CONFIG = {
         "run_tests": "run_tests",
         "inputs_list": "inputs_list",
         "class_design_utils": "class_design_utils.py",
+        "operations_list": "operations_list",
+        "arguments_list": "arguments_list",
+        "expected_list": "expected_list",
         "in_place_utils": "in_place_utils.py",
     },
     "JavaScript": {
@@ -45,6 +48,9 @@ LANGUAGE_CONFIG = {
         "run_tests": "runTests",
         "inputs_list": "inputsList",
         "class_design_utils": "class-design-utils.js",
+        "operations_list": "operationsList",
+        "arguments_list": "argumentsList",
+        "expected_list": "expectedList",
         "in_place_utils": "in-place-utils.js",
     },
 }
@@ -789,9 +795,9 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
 
     updated_code = (
         f"{source_code.rstrip()}\n"
-        f"operations_list = {serialize(operations_list, language)}\n"
-        f"arguments_list = {serialize(arguments_list, language)}\n"
-        f'{config["run_tests"]}({metadata["class_name"]}, 'f"operations_list, arguments_list)\n"
+        f"{config["operations_list"]} = {serialize(operations_list, language)}\n"
+        f"{config["arguments_list"]} = {serialize(arguments_list, language)}\n"
+        f'{config["run_tests"]}({metadata["class_name"]}, 'f"{config["operations_list"]}, {config["arguments_list"]})\n"
     )
     expected_output = [serialize(expected, language)
                        for expected in expected_list]
@@ -815,7 +821,7 @@ def build_validation_in_place_payload(source_code, language, test_cases, method_
     )
     updated_code = (
         f"{updated_code.rstrip()}\n"
-        f"{config["inputs_list"]} = {serialize(inputs_list, language)}\n"
+        f'{config["inputs_list"]} = {serialize(inputs_list, language)}\n'
         f'{config["run_tests"]}(solution.{method_name})\n'
     )
     expected_output = [serialize(expected, language)

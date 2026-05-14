@@ -1,47 +1,52 @@
-/** 
+/**
+ * @param {Function} cls
  * @param {string[]} operations
- * @param {number[][]} args
- * @return {number[][]}
+ * @param {Array<Array<any>>} args
+ * @return {Array<any>}
  */
-const testInput = (operations, args) => {
-   const output = []
-   let timeMap;
+const testInput = (cls, operations, args) => {
+   const output = [];
+   let instance;
 
-   for (let index = 0; index < operations.length; index++) {
-      const operation = operations[index];
-      const argument = args[index];
+   for (let idx = 0; idx < operations.length; idx++) {
+      const operation = operations[idx];
+      const argument = args[idx];
 
-      if (operation === 'TimeMap') {
-         timeMap = new TimeMap(...argument);
+      // Constructor
+      if (operation === cls.name) {
+         instance = new cls(...argument);
          output.push(null);
-      } else if (operation === 'set') {
-         timeMap.set(...argument);
-         output.push(null);
-      } else if (operation === 'get') {
-         output.push(timeMap.get(...argument));
+         continue;
       }
-   };
-   return output
+
+      // Method call
+      // method = instance[operation];
+      // result = method(...argument);
+      // can break when the method uses this.
+      const result = instance[operation](...argument);
+      output.push(result);
+   }
+
+   return output;
 }
 
 // Run tests
 /**
- * Run a batch of TimeMap tests and compare outputs with expected results.
- * If show_output is True, returns [(actual, expected), ...] instead of booleans.
+ * @param {Function} cls
  * @param {string[][]} operationsList 
  * @param {number[][][]} argumentsList 
  * @returns {boolean}
  */
-const runTests = (operationsList, argumentsList, expectedOutputList, showOutput) => {
+const runTests = (cls, operationsList, argumentsList) => {
    const output = [];
 
-   for (let index = 0; index < operationsList.length; index++) {
-      const operations = operationsList[index];
-      const args = argumentsList[index];
-         output.push([testInput(operations, args)])
+   for (let idx = 0; idx < operationsList.length; idx++) {
+      const operations = operationsList[idx];
+      const args = argumentsList[idx];
+      console.log(JSON.stringify(testInput(cls, operations, args)));
    }
-   return output
+
+   return output;
 }
 
-runTests(operationsList, argumentsList, expectedOutputList)
-
+// runTests(MinStack, operationsList, argumentsList)

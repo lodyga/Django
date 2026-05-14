@@ -1,20 +1,20 @@
 # def test_input(cls, operations: list[str], arguments: list[list]) -> list[str | int | None]:
 def test_input(cls, operations: list[str], arguments: list[list]):
-    res = []
+    output = []
 
     for operation, argument in zip(operations, arguments):
         # Constructor
         if operation == cls.__name__:
             instance = cls(*argument)
-            res.append(None)
+            output.append(None)
             continue
 
         # Method call
         method = getattr(instance, operation)
         result = method(*argument)
-        res.append(result)
+        output.append(result)
 
-    return res
+    return output
 
 # Run tests
 def run_tests(
