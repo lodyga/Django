@@ -25,7 +25,10 @@ LANGUAGE_CONFIG = {
         "linked_list_utils": "linked_list_utils.py",
         "build_list": "build_list",
         "serialize_list": "serialize_list",
+        "run_tests": "run_tests",
+        "inputs_list": "inputs_list",
         "class_design_utils": "class_design_utils.py",
+        "in_place_utils": "in_place_utils.py",
     },
     "JavaScript": {
         "print": "console.log",
@@ -39,7 +42,10 @@ LANGUAGE_CONFIG = {
         "linked_list_utils": "linked-list-utils.js",
         "build_list": "buildList",
         "serialize_list": "serializeList",
+        "run_tests": "runTests",
+        "inputs_list": "inputsList",
         "class_design_utils": "class-design-utils.js",
+        "in_place_utils": "in-place-utils.js",
     },
 }
 
@@ -510,21 +516,15 @@ def get_problem_test_cases(problem, language):
     or
 
     """
-    test_cases = problem.get_shared_testcases(include_hidden=True)
     problem_test_cases = []
-    operations_list = []
-    arguments_list = []
-    expected_output_list = []
-    # todo
-    # if problem.problem_type == ProblemType.CLASS:
-    #     pass
 
-    for test_case in test_cases:
+    for test_case in problem.get_shared_testcases(include_hidden=True):
         expression = build_problem_test_case_expression(
             problem,
             test_case.data,
             language,
         )
+
         if not expression:
             continue
 
@@ -545,7 +545,6 @@ def get_effective_test_cases(problem, solution, language):
     """
     => [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
     """
-    # todo
     if problem.problem_type == ProblemType.CLASS:
         return get_class_test_cases(problem, language)
     elif problem_test_cases := get_problem_test_cases(problem, language):
@@ -605,8 +604,10 @@ def get_utility(utility_type, language):
     return utility
 
 
-def attach_utils(source_code, language, problem_type):
-    # problem.meta to attach right utility
+def attach_utils(source_code, language, problem_type, is_in_place):
+    if is_in_place:
+        source_code = source_code.rstrip() + "\n" + get_utility(
+            "in_place_utils", language).rstrip() + "\n"
 
     match problem_type:
         case ProblemType.BINARY_TREE:
@@ -619,7 +620,6 @@ def attach_utils(source_code, language, problem_type):
             class_utils = get_utility("class_design_utils", language)
             cleaned_utils = clean_types(class_utils)
             source_code = source_code + "\n" + cleaned_utils
-                
 
     match language:
         case "Python":
@@ -788,18 +788,38 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
         expected_list.append(get_field(test_case.data, "expected"))
 
     updated_code = (
+        f"{source_code.rstrip()}\n"
         f"operations_list = {serialize(operations_list, language)}\n"
         f"arguments_list = {serialize(arguments_list, language)}\n"
-        f"{source_code.rstrip()}\n"
-        f'json.dumps(run_tests({metadata["class_name"]}, '
-        f"operations_list, arguments_list))\n"
+        f'{config["run_tests"]}({metadata["class_name"]}, 'f"operations_list, arguments_list)\n"
     )
-        # f'print(json.dumps(run_tests({metadata["class_name"]}, '
-        # f"operations_list, arguments_list)))\n"
+    expected_output = [serialize(expected, language)
+                       for expected in expected_list]
 
-    # todoo
-    # expected_output = serialize(expected_list, language)
-    expected_output = [serialize(expected, language) for expected in expected_list]
+    return updated_code, expected_output
+
+
+def build_validation_in_place_payload(source_code, language, test_cases, method_name):
+    config = LANGUAGE_CONFIG[language]
+    inputs_list = []
+    expected_list = []
+
+    for test_case in test_cases.all():
+        inputs_list.append(get_field(test_case.data, "inputs"))
+        expected_list.append(get_field(test_case.data, "expected"))
+
+    updated_code = add_solution_instance_setup(
+        source_code,
+        method_name,
+        language
+    )
+    updated_code = (
+        f"{updated_code.rstrip()}\n"
+        f"{config["inputs_list"]} = {serialize(inputs_list, language)}\n"
+        f'{config["run_tests"]}(solution.{method_name})\n'
+    )
+    expected_output = [serialize(expected, language)
+                       for expected in expected_list]
 
     return updated_code, expected_output
 
@@ -807,41 +827,42 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
 def attach_validation_payload(source_code, problem, language, test_cases, button_pressed):
     # Need test_cases from view because legacy test cases base on solution test cases.
 
-    if problem.problem_type and problem.problem_type == ProblemType.CLASS:
-        source_code, expected_output = build_validation_class_payload(
-            source_code,
-            language,
-            problem.testcases,
-            problem.metadata
-        )
+    if button_pressed == "validate":
+        if problem.metadata and problem.metadata.get("in_place", False):
+            source_code, expected_output = build_validation_in_place_payload(
+                source_code,
+                language,
+                problem.testcases,
+                problem.metadata["method_name"]
+            )
 
-    elif button_pressed == "validate":
-        source_code = add_solution_instance_setup(
-            source_code,
-            problem.method_name or problem.metadata["method_name"],
-            language
-        )
-        source_code, expected_output = build_validation_payload(
-            source_code,
-            language,
-            test_cases,
-            problem.metadata
-        )
+        elif problem.problem_type and problem.problem_type == ProblemType.CLASS:
+            source_code, expected_output = build_validation_class_payload(
+                source_code,
+                language,
+                problem.testcases,
+                problem.metadata
+            )
+
+        else:
+            source_code = add_solution_instance_setup(
+                source_code,
+                problem.method_name or problem.metadata["method_name"],
+                language
+            )
+            source_code, expected_output = build_validation_payload(
+                source_code,
+                language,
+                test_cases,
+                problem.metadata
+            )
     else:
         expected_output = []
 
     return source_code, expected_output
 
 
-def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
-    # test_cases are get_effective_test_cases
-    source_code = clean_types(source_code)
-    source_code = attach_utils(source_code, language, problem.problem_type)
-    source_code, expected_output = attach_validation_payload(
-        source_code, problem, language, test_cases, button_pressed
-    )
-    response = run_judge0(source_code, language)
-
+def check_for_response_error(response):
     if "error" in response:
         # handles C++ response["error"]
         return response["error"]
@@ -852,38 +873,56 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     status_id = response["status"]["id"]
 
     if status_id == 3:
-        stdout = response["stdout"]
-
-        if button_pressed == "run":
-            return stdout
-
-        outputs = stdout.strip().splitlines()
-        parsed_outputs = [
-            json.loads(line)
-            for line in outputs[-len(expected_output):]
-        ]
-
-        if (
-            language == "C++" and not response["stdout"] or
-            compare_output_and_expected(
-                parsed_outputs,
-                expected_output,
-                problem.metadata["comparison_type"] if problem.metadata else problem.comparison_type,
-                language
-            ) or
-            stdout.find("rue") != -1 and stdout.find("alse") == -1
-        ):
-            return "Tests passed!"
-        else:
-            return "Tests failed!"
+        return 3
     else:
-        stderr = response["stderr"]
-        return stderr
+        return response["stderr"]
+
+
+def get_results(expected_output, problem, language, response):
+    stdout = response["stdout"]
+    outputs = stdout.strip().splitlines()
+    parsed_outputs = [
+        json.loads(line)
+        for line in outputs[-len(expected_output):]
+    ]
+
+    if (
+        compare_output_and_expected(
+            parsed_outputs,
+            expected_output,
+            problem.metadata["comparison_type"] if problem.metadata else problem.comparison_type,
+            language
+        ) or
+        language == "C++" and not response["stdout"] or
+        stdout.find("rue") != -1 and stdout.find("alse") == -1
+    ):
+        return "Tests passed!"
+    else:
+        return "Tests failed!"
+
+
+def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
+    is_in_place = problem.metadata.get("in_place", False)
+    source_code = clean_types(source_code)
+    source_code = attach_utils(
+        source_code, language, problem.problem_type, is_in_place)
+    source_code, expected_output = attach_validation_payload(
+        source_code, problem, language, test_cases, button_pressed
+    )
+    response = run_judge0(source_code, language)
+
+    if (err := check_for_response_error(response)) != 3:
+        return err
+
+    if button_pressed == "run":
+        return response["stdout"]
+
+    return get_results(expected_output, problem, language, response)
 
 
 def get_placeholder_source_code(language_id):
     """
-    Set default `Hello, world!` source code.
+    Set default `Hello, world!` placeholder.
     """
     match language_id:
         case 1:
@@ -905,24 +944,22 @@ def get_placeholder_source_code(language_id):
     return placeholder_source_code
 
 
-def get_adjacent_slugs(problem, language):
-    problem_list = Problem.objects.filter(
-        difficulty=problem.difficulty,
-        solution__language=language)
+def get_adjacent_slugs(problem):
+    problem_list = Problem.objects.filter()
 
     problem_ids = list(problem_list.values_list("id", flat=True))
 
     problem_index = problem_ids.index(problem.id)
 
     prev_problem_id = problem_ids[problem_index - 1]
+
     next_problem_id = problem_ids[(problem_index + 1) % len(problem_ids)]
 
     prev_problem_slug = Problem.objects.filter(
-        id=prev_problem_id,
-        solution__language=language).first().slug
+        id=prev_problem_id).first().slug
+
     next_problem_slug = Problem.objects.filter(
-        id=next_problem_id,
-        solution__language=language).first().slug
+        id=next_problem_id).first().slug
 
     return (prev_problem_slug, next_problem_slug)
 

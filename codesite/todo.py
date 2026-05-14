@@ -1,5 +1,7 @@
+# fix next slug
 # get_adjacent_slugs(problem, language)
 # Python 3.8 doesn't support match / case statements.
+# Do not return anything, modify nums1 in-place instead. Merge Sorted Array
 
 # setup cursor with proper method name
 # edit only own solutions

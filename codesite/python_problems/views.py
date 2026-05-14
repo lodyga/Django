@@ -200,9 +200,7 @@ class ProblemDetailView(DetailView):
             .exclude(pk=problem.pk)
             .distinct())
 
-        # Get adjacent problem slugs
-        # todo; get_adjacent_slugs(problem, language)
-        prev_problem_slug, next_problem_slug = (None, None)
+        prev_problem_slug, next_problem_slug = get_adjacent_slugs(problem)
 
         (question, examples) = parse_problem_description(problem.description)
 
