@@ -16,6 +16,8 @@ class ProblemForm(forms.ModelForm):
         help_text=(
             'One JSON test case per line. Either raw data, e.g. '
             '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}, '
+            'or linked-list payload with cycle metadata, e.g. '
+            '{"inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}], "expected": true}, '
             'or object with attributes, e.g. '
             '{"data": {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}, "is_hidden": false, "explanation": ""}'
         ),

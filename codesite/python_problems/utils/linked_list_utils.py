@@ -11,12 +11,12 @@ class ListNode:
         self.next = next
 
 
-def build_list(nums: List[int], cycle_position: int = -1) -> ListNode:
+def build_linked_list(nums: List[int], cycle_position: int = -1) -> ListNode:
     """
     Build linked list with cycle from list.
     """
     anchor = node = ListNode()
-    has_cycle = False
+    cycle_node = None
 
     for position, num in enumerate(nums):
         node.next = ListNode(num)
@@ -24,15 +24,14 @@ def build_list(nums: List[int], cycle_position: int = -1) -> ListNode:
 
         if position == cycle_position:
             cycle_node = node
-            has_cycle = True
 
-    if has_cycle:
+    if cycle_node is not None:
         node.next = cycle_node
 
     return anchor.next
 
 
-def serialize_list(root: ListNode) -> List[int]:
+def serialize_linked_list(root: ListNode) -> List[int]:
     """
     Return linked list values in list.
     """

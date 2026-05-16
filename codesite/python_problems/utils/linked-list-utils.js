@@ -20,10 +20,9 @@ class ListNode {
  * @param {number[]} nums
  * @returns {ListNode}
  */
-const buildList = (nums, { cyclePosition = -1 } = {}) => {
+const buildLinkedList = (nums, { cyclePosition = -1 } = {}) => {
    let node = new ListNode();
    const anchor = node;
-   let hasCycle = false;
    let cycleNode;
 
    for (let position = 0; position < nums.length; position++) {
@@ -33,11 +32,10 @@ const buildList = (nums, { cyclePosition = -1 } = {}) => {
 
       if (position === cyclePosition) {
          cycleNode = node;
-         hasCycle = true;
       }
    }
-   
-   if (hasCycle) {
+
+   if (cycleNode) {
       node.next = cycleNode;
    }
 
@@ -50,13 +48,15 @@ const buildList = (nums, { cyclePosition = -1 } = {}) => {
  * @param {ListNode} node
  * @returns {Array<number>}
  */
-const serializeList = (node) => {
+const serializeLinkedList = (node) => {
    const values = [];
+
    while (node) {
       values.push(node.val);
       node = node.next;
    }
-   return values
+
+   return values;
 }
 
 

@@ -23,8 +23,8 @@ LANGUAGE_CONFIG = {
         "build_tree": "build_tree",
         "serialize_tree": "serialize_tree",
         "linked_list_utils": "linked_list_utils.py",
-        "build_list": "build_list",
-        "serialize_list": "serialize_list",
+        "build_linked_list": "build_linked_list",
+        "serialize_linked_list": "serialize_linked_list",
         "run_tests": "run_tests",
         "inputs_list": "inputs_list",
         "class_design_utils": "class_design_utils.py",
@@ -43,8 +43,8 @@ LANGUAGE_CONFIG = {
         "build_tree": "buildTree",
         "serialize_tree": "serializeTree",
         "linked_list_utils": "linked-list-utils.js",
-        "build_list": "buildList",
-        "serialize_list": "serializeList",
+        "build_linked_list": "buildLinkedList",
+        "serialize_linked_list": "serializeLinkedList",
         "run_tests": "runTests",
         "inputs_list": "inputsList",
         "class_design_utils": "class-design-utils.js",
@@ -200,8 +200,43 @@ def draw_tree(data, parameter_name):
     return (parameter_name, bt)
 
 
+def unpack_linked_list_payload(data):
+    if not isinstance(data, dict):
+        return data, -1
+
+    values = None
+    for key in ("values", "nodes", "list"):
+        if key in data:
+            values = data[key]
+            break
+
+    cycle_position = -1
+    for key in ("cycle_position", "cyclePosition", "pos"):
+        if key in data:
+            cycle_position = data[key]
+            break
+
+    if values is None:
+        return data, -1
+
+    if not isinstance(cycle_position, int):
+        cycle_position = -1
+
+    return values, cycle_position
+
+
 def draw_linked_list(data, parameter_name):
-    preview = ("(" + ") -> (".join(map(str, data)) + ")")if data else "null"
+    values, cycle_position = unpack_linked_list_payload(data)
+
+    if not isinstance(values, list):
+        preview = str(data)
+        return (parameter_name, preview)
+
+    preview = ("(" + ") -> (".join(map(str, values)) + ")") if values else "null"
+
+    if 0 <= cycle_position < len(values):
+        preview += f" -> ↺ index {cycle_position} ({values[cycle_position]})"
+
     return (parameter_name, preview)
 
 
@@ -470,7 +505,7 @@ def build_problem_test_case_expression(problem, test_case_data, language):
     'solution.twoSum([[2, 7, 11, 15], 9])'
 
     'serialize_tree(solution.invertTree(build_tree([4, 2, 7, 1, 3, 6, 9])))'
-    'serialize_list(solution.reverseList(build_list([1, 2, 3, 4, 5])))'
+    'serialize_linked_list(solution.reverseList(build_linked_list([1, 2, 3, 4, 5])))'
     """
 
     config = LANGUAGE_CONFIG[language]
@@ -494,8 +529,21 @@ def build_problem_test_case_expression(problem, test_case_data, language):
                     line = serialize(value, language)
                     line = f'{config["build_tree"]}({line})'
                 case ProblemType.LINKED_LIST:
-                    line = serialize(value, language)
-                    line = f'{config["build_list"]}({line})'
+                    values, cycle_position = unpack_linked_list_payload(value)
+                    line = serialize(values, language)
+
+                    if language == "JavaScript" and cycle_position != -1:
+                        line = (
+                            f'{config["build_linked_list"]}'
+                            f'({line}, {{ cyclePosition: {serialize(cycle_position, language)} }})'
+                        )
+                    elif cycle_position != -1:
+                        line = (
+                            f'{config["build_linked_list"]}'
+                            f'({line}, {serialize(cycle_position, language)})'
+                        )
+                    else:
+                        line = f'{config["build_linked_list"]}({line})'
                 case _:
                     line = serialize(value, language)
 
@@ -507,7 +555,7 @@ def build_problem_test_case_expression(problem, test_case_data, language):
             case ProblemType.BINARY_TREE:
                 res = f'{config["serialize_tree"]}(solution.{metadata["method_name"]}({serialized_inputs}))'
             case ProblemType.LINKED_LIST:
-                res = f'{config["serialize_list"]}(solution.{metadata["method_name"]}({serialized_inputs}))'
+                res = f'{config["serialize_linked_list"]}(solution.{metadata["method_name"]}({serialized_inputs}))'
             case _:
                 res = f'solution.{metadata["method_name"]}({serialized_inputs})'
 

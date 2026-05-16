@@ -7,6 +7,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from .forms import ProblemForm
 from .models import Complexity, Difficulty, Language, Problem, ProblemType, Solution, Tag, TestCase as ProblemTestCase
+from .scripts import build_problem_test_case_expression, draw_linked_list
 from .views import ProblemIndexView
 
 
@@ -325,6 +326,107 @@ class ProblemFormTests(TestCase):
 
         self.assertIsNone(problem.method_name)
         self.assertIsNone(problem.argument_names)
+
+    def test_problem_form_accepts_cycle_linked_list_testcases(self):
+        difficulty = Difficulty.objects.create(name="Medium")
+        tag = Tag.objects.create(name="Linked List")
+
+        form = ProblemForm(data={
+            "title": "Linked List Cycle",
+            "url": "https://example.com",
+            "difficulty": difficulty.id,
+            "description": "Detect a cycle in a linked list.",
+            "tags": [tag.id],
+            "problem_type": ProblemType.LINKED_LIST,
+            "method_name": "hasCycle",
+            "argument_names": '["head"]',
+            "comparison_type": "exact",
+            "shared_test_cases": (
+                '{"inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}], "expected": true}'
+            ),
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+        form.instance.owner = get_user_model().objects.create_user(
+            username="cycle-tester"
+        )
+        problem = form.save()
+
+        self.assertEqual(
+            problem.testcases.first().data,
+            {
+                "inputs": [
+                    {"values": [3, 2, 0, -4], "cycle_position": 1}
+                ],
+                "expected": True,
+            },
+        )
+
+
+class ProblemScriptTests(TestCase):
+    def test_build_problem_test_case_expression_supports_linked_list_cycles_python(self):
+        problem = create_sample_problem(title="Linked List Cycle Python")
+        problem.metadata = {
+            "problem_type": ProblemType.LINKED_LIST,
+            "method_name": "hasCycle",
+            "parameters": [{"name": "head", "type": ProblemType.LINKED_LIST}],
+            "return_type": "bool",
+        }
+        problem.save(update_fields=["metadata"])
+
+        expression = build_problem_test_case_expression(
+            problem,
+            {
+                "inputs": [
+                    {"values": [3, 2, 0, -4], "cycle_position": 1}
+                ],
+                "expected": True,
+            },
+            "Python",
+        )
+
+        self.assertEqual(
+            expression,
+            "solution.hasCycle(build_list([3, 2, 0, -4], 1))",
+        )
+
+    def test_build_problem_test_case_expression_supports_linked_list_cycles_javascript(self):
+        problem = create_sample_problem(title="Linked List Cycle JavaScript")
+        problem.metadata = {
+            "problem_type": ProblemType.LINKED_LIST,
+            "method_name": "hasCycle",
+            "parameters": [{"name": "head", "type": ProblemType.LINKED_LIST}],
+            "return_type": "bool",
+        }
+        problem.save(update_fields=["metadata"])
+
+        expression = build_problem_test_case_expression(
+            problem,
+            {
+                "inputs": [
+                    {"values": [3, 2, 0, -4], "pos": 1}
+                ],
+                "expected": True,
+            },
+            "JavaScript",
+        )
+
+        self.assertEqual(
+            expression,
+            'solution.hasCycle(buildList([3, 2, 0, -4], { cyclePosition: 1 }))',
+        )
+
+    def test_draw_linked_list_displays_cycle_preview(self):
+        preview = draw_linked_list(
+            {"values": [3, 2, 0, -4], "cycle_position": 1},
+            "head",
+        )
+
+        self.assertEqual(
+            preview,
+            ("head", "(3) -> (2) -> (0) -> (-4) -> ↺ index 1 (2)"),
+        )
 
 
 class TestCaseCrudViewTests(TestCase):
