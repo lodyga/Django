@@ -260,7 +260,7 @@ def draw_ascii(data, problem_type, parameter_name, parameter_type):
         return draw_grid(data, parameter_name)
 
 
-def get_class_ui_test_cases(problem, solution, language, test_cases):
+def get_class_ui_test_cases(test_cases):
     ui_test_cases = []
 
     for test_case in test_cases:
@@ -288,10 +288,10 @@ def get_class_ui_test_cases(problem, solution, language, test_cases):
     return ui_test_cases
 
 
-def get_meta_ui_test_cases(problem, solution, language, test_cases):
+def get_meta_ui_test_cases(problem, language, test_cases):
     ui_test_cases = []
-    metadata = problem.metadata
-    problem_type = metadata["problem_type"]
+    metadata = get_problem_metadata(problem)
+    problem_type = get_problem_type_name(problem)
     parameters = metadata["parameters"]
 
     for test_case in test_cases:
@@ -343,9 +343,21 @@ def get_meta_ui_test_cases(problem, solution, language, test_cases):
     return ui_test_cases
 
 
-def get_no_meta_ui_test_cases(problem, solution, language, test_cases):
+def get_problem_metadata(problem):
+    return problem.metadata or {}
+
+
+def get_problem_type_name(problem):
+    metadata = get_problem_metadata(problem)
+
+    if metadata:
+        return metadata.get("problem_type") or problem.problem_type
+    return problem.problem_type
+
+
+def get_no_meta_ui_test_cases(problem, language, test_cases):
     ui_test_cases = []
-    problem_type = problem.problem_type
+    problem_type = get_problem_type_name(problem)
     argument_names = problem.argument_names
 
     for test_case in test_cases:
@@ -397,7 +409,7 @@ def get_no_meta_ui_test_cases(problem, solution, language, test_cases):
     return ui_test_cases
 
 
-def get_solution_ui_test_cases(problem, solution, language, test_cases):
+def get_solution_ui_test_cases(solution):
     solution_test_cases = get_solution_test_cases(solution.test_cases)
     ui_test_cases = []
 
@@ -431,22 +443,22 @@ def get_ui_test_cases(problem, solution, language):
     test_cases = problem.get_shared_testcases(include_hidden=True)
 
     if test_cases:
-        problem_type = problem.problem_type
+        problem_type = get_problem_type_name(problem)
 
         if problem_type == ProblemType.CLASS:
-            return get_class_ui_test_cases(problem, solution, language, test_cases)
+            return get_class_ui_test_cases(test_cases)
 
-        elif problem.metadata:
-            return get_meta_ui_test_cases(problem, solution, language, test_cases)
+        elif get_problem_metadata(problem):
+            return get_meta_ui_test_cases(problem, language, test_cases)
 
         elif problem_type:
-            return get_no_meta_ui_test_cases(problem, solution, language, test_cases)
+            return get_no_meta_ui_test_cases(problem, language, test_cases)
 
         else:
             return []
 
     elif solution.test_cases:
-        return get_solution_ui_test_cases(problem, solution, language, test_cases)
+        return get_solution_ui_test_cases(solution)
 
     return []
 
@@ -462,9 +474,9 @@ def build_problem_test_case_expression(problem, test_case_data, language):
     """
 
     config = LANGUAGE_CONFIG[language]
+    metadata = get_problem_metadata(problem)
 
-    if problem.metadata:
-        metadata = problem.metadata
+    if metadata:
         if not metadata["parameters"] or not metadata["method_name"] or not metadata["return_type"]:
             return None
 
@@ -543,16 +555,12 @@ def get_problem_test_cases(problem, language):
     return problem_test_cases
 
 
-def get_class_test_cases(problem, language):
-    return []
-
-
 def get_effective_test_cases(problem, solution, language):
     """
     => [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
     """
-    if problem.problem_type == ProblemType.CLASS:
-        return get_class_test_cases(problem, language)
+    if get_problem_type_name(problem) == ProblemType.CLASS:
+        return []
     elif problem_test_cases := get_problem_test_cases(problem, language):
         return problem_test_cases
     elif solution_test_cases := get_solution_test_cases(solution.test_cases):
@@ -653,7 +661,7 @@ def add_solution_instance_setup(source_code, method_name, language):
     return source_code
 
 
-def build_validation_payload(source_code, language, test_cases, metadata):
+def build_validation_payload(source_code, language, test_cases):
     # ('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]')
     # =>
     # 'print(json.dumps(solution.twoSum([2, 7, 11, 15], 9)))'
@@ -795,9 +803,9 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
 
     updated_code = (
         f"{source_code.rstrip()}\n"
-        f"{config["operations_list"]} = {serialize(operations_list, language)}\n"
-        f"{config["arguments_list"]} = {serialize(arguments_list, language)}\n"
-        f'{config["run_tests"]}({metadata["class_name"]}, 'f"{config["operations_list"]}, {config["arguments_list"]})\n"
+        f'{config["operations_list"]} = {serialize(operations_list, language)}\n'
+        f'{config["arguments_list"]} = {serialize(arguments_list, language)}\n'
+        f'{config["run_tests"]}({metadata["class_name"]}, 'f'{config["operations_list"]}, {config["arguments_list"]})\n'
     )
     expected_output = [serialize(expected, language)
                        for expected in expected_list]
@@ -831,39 +839,39 @@ def build_validation_in_place_payload(source_code, language, test_cases, method_
 
 
 def attach_validation_payload(source_code, problem, language, test_cases, button_pressed):
-    # Need test_cases from view because legacy test cases base on solution test cases.
+    if button_pressed == "run":
+        return source_code, []
 
-    if button_pressed == "validate":
-        if problem.metadata and problem.metadata.get("in_place", False):
-            source_code, expected_output = build_validation_in_place_payload(
-                source_code,
-                language,
-                problem.testcases,
-                problem.metadata["method_name"]
-            )
+    problem_type = get_problem_type_name(problem)
+    metadata = get_problem_metadata(problem)
 
-        elif problem.problem_type and problem.problem_type == ProblemType.CLASS:
-            source_code, expected_output = build_validation_class_payload(
-                source_code,
-                language,
-                problem.testcases,
-                problem.metadata
-            )
+    if metadata.get("in_place", False):
+        source_code, expected_output = build_validation_in_place_payload(
+            source_code,
+            language,
+            problem.testcases,
+            metadata["method_name"]
+        )
 
-        else:
-            source_code = add_solution_instance_setup(
-                source_code,
-                problem.method_name or problem.metadata["method_name"],
-                language
-            )
-            source_code, expected_output = build_validation_payload(
-                source_code,
-                language,
-                test_cases,
-                problem.metadata
-            )
+    elif problem_type == ProblemType.CLASS:
+        source_code, expected_output = build_validation_class_payload(
+            source_code,
+            language,
+            problem.testcases,
+            metadata
+        )
+
     else:
-        expected_output = []
+        source_code = add_solution_instance_setup(
+            source_code,
+            problem.method_name or metadata["method_name"],
+            language
+        )
+        source_code, expected_output = build_validation_payload(
+            source_code,
+            language,
+            test_cases,
+        )
 
     return source_code, expected_output
 
@@ -887,6 +895,7 @@ def check_for_response_error(response):
 def get_results(expected_output, problem, language, response):
     stdout = response["stdout"]
     outputs = stdout.strip().splitlines()
+    metadata = get_problem_metadata(problem)
     parsed_outputs = [
         json.loads(line)
         for line in outputs[-len(expected_output):]
@@ -896,7 +905,7 @@ def get_results(expected_output, problem, language, response):
         compare_output_and_expected(
             parsed_outputs,
             expected_output,
-            problem.metadata["comparison_type"] if problem.metadata else problem.comparison_type,
+            metadata.get("comparison_type", problem.comparison_type),
             language
         ) or
         language == "C++" and not response["stdout"] or
@@ -908,10 +917,13 @@ def get_results(expected_output, problem, language, response):
 
 
 def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
-    is_in_place = problem.metadata.get("in_place", False)
+    problem_type = get_problem_type_name(problem)
+    metadata = get_problem_metadata(problem)
+    is_in_place = metadata.get("in_place", False)
+
     source_code = clean_types(source_code)
     source_code = attach_utils(
-        source_code, language, problem.problem_type, is_in_place)
+        source_code, language, problem_type, is_in_place)
     source_code, expected_output = attach_validation_payload(
         source_code, problem, language, test_cases, button_pressed
     )

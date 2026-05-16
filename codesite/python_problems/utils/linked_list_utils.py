@@ -18,15 +18,17 @@ def build_list(nums: List[int], cycle_position: int = -1) -> ListNode:
     anchor = node = ListNode()
     has_cycle = False
 
-    for position, number in enumerate(nums):
-        node.next = ListNode(number)
+    for position, num in enumerate(nums):
+        node.next = ListNode(num)
         node = node.next
+
         if position == cycle_position:
             cycle_node = node
             has_cycle = True
 
     if has_cycle:
         node.next = cycle_node
+
     return anchor.next
 
 

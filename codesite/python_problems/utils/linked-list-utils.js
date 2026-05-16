@@ -17,18 +17,18 @@ class ListNode {
 
 /**
  * Converts an array of values into a linked list
- * @param {number[]} numbers
+ * @param {number[]} nums
  * @returns {ListNode}
  */
-const buildList = (numbers, { cyclePosition = -1 } = {}) => {
+const buildList = (nums, { cyclePosition = -1 } = {}) => {
    let node = new ListNode();
    const anchor = node;
    let hasCycle = false;
    let cycleNode;
 
-   for (let position = 0; position < numbers.length; position++) {
-      const number = numbers[position];
-      node.next = new ListNode(number);
+   for (let position = 0; position < nums.length; position++) {
+      const num = nums[position];
+      node.next = new ListNode(num);
       node = node.next;
 
       if (position === cyclePosition) {
@@ -36,10 +36,12 @@ const buildList = (numbers, { cyclePosition = -1 } = {}) => {
          hasCycle = true;
       }
    }
+   
    if (hasCycle) {
       node.next = cycleNode;
    }
-   return anchor.next
+
+   return anchor.next;
 }
 
 
