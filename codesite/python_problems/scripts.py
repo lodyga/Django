@@ -833,7 +833,7 @@ def run_judge0(source_code, language):
         json=serialized_code,
         headers=headers,
         params=querystring
-    ).json()
+    ).json() or None
 
     return response
 
@@ -925,17 +925,20 @@ def attach_validation_payload(source_code, problem, language, test_cases, button
 
 
 def check_for_response_error(response):
-    if "error" in response:
-        # handles C++ response["error"]
+    if not response:
+        return "No response from judge0."
+    
+    # handles C++ response["error"]
+    elif "error" in response:
         return response["error"]
+    
     # handles Java response["compile_output"]
     elif response["compile_output"] is not None:
         return response["compile_output"]
 
-    status_id = response["status"]["id"]
-
-    if status_id == 3:
-        return 3
+    elif response["status"]["id"] in (1, 2, 3, 4, 5, 6):
+        return response["status"]["description"]
+    
     else:
         return response["stderr"]
 
@@ -977,7 +980,7 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     )
     response = run_judge0(source_code, language)
 
-    if (err := check_for_response_error(response)) != 3:
+    if (err := check_for_response_error(response)) != "Accepted":
         return err
 
     if button_pressed == "run":
