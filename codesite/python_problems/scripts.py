@@ -393,7 +393,7 @@ def get_problem_type_name(problem):
 def get_no_meta_ui_test_cases(problem, language, test_cases):
     ui_test_cases = []
     problem_type = get_problem_type_name(problem)
-    argument_names = problem.argument_names
+    argument_names = problem.argument_names or []
 
     for test_case in test_cases:
         inputs = get_field(test_case.data, "inputs")
@@ -408,7 +408,7 @@ def get_no_meta_ui_test_cases(problem, language, test_cases):
             display_input = inputs
 
         preview_data = []
-        if inputs:
+        if inputs and argument_names:
             for data, argument_name in zip(inputs, argument_names):
                 if preview := draw_ascii(
                     data,

@@ -218,10 +218,10 @@ class SolutionUpdateForm(SolutionForm):
 class TestCaseCreateForm(forms.ModelForm):
     class Meta:
         model = TestCase
-        fields = '__all__'
+        fields = ["problem", "data", "is_hidden", "order", "explanation"]
 
 
 class TestCaseUpdateForm(forms.ModelForm):
     class Meta:
         model = TestCase
-        fields = '__all__'
+        fields = ["problem", "data", "is_hidden", "order", "explanation"]

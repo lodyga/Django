@@ -451,6 +451,10 @@ class TestCaseCreate(LoginRequiredMixin, CreateView):
     form_class = TestCaseCreateForm
     success_url = reverse_lazy('python_problems:problem-index')
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
 
 class TestCaseUpdate(LoginRequiredMixin, UpdateView):
     model = TestCase
@@ -460,10 +464,17 @@ class TestCaseUpdate(LoginRequiredMixin, UpdateView):
     def get_queryset(self):
         return TestCase.objects.filter(owner=self.request.user)
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
 
 class TestCaseDelete(LoginRequiredMixin, DeleteView):
     model = TestCase
     success_url = reverse_lazy('python_problems:problem-index')
+
+    def get_queryset(self):
+        return TestCase.objects.filter(owner=self.request.user)
 
 
 # REST API

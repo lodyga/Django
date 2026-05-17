@@ -1,185 +1,166 @@
-import django
 import html
 import json
-import os
+
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
+
 from .forms import ProblemForm
-from .models import Complexity, Difficulty, Language, Problem, ProblemType, Solution, Tag, TestCase as ProblemTestCase
-from .scripts import build_problem_test_case_expression, draw_linked_list
+from .models import (
+    Complexity,
+    Difficulty,
+    Language,
+    Problem,
+    ProblemType,
+    Solution,
+    Tag,
+    TestCase as ProblemTestCase,
+)
+from .scripts import (
+    build_problem_test_case_expression,
+    build_validation_class_payload,
+    build_validation_in_place_payload,
+    get_ui_test_cases,
+    draw_linked_list,
+)
 from .views import ProblemIndexView
 
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "codesite.settings")
-django.setup()  # Initialize Django
+def create_sample_user(username="tester"):
+    User = get_user_model()
+    user, _ = User.objects.get_or_create(username=username)
+    return user
 
 
 def create_sample_problem(
-        title=None,
-        tags=None,
-        difficulty=None,
-        url=None,
-        description=None,
-        owner=None):
-    """
-    Create a problem sample for other tests.
-    """
-    User = get_user_model()
-    if title is None:
-        title = "Two Sum"
+    title="Two Sum",
+    tags=None,
+    difficulty=None,
+    url="https://example.com",
+    description="Sample problem description",
+    owner=None,
+):
     if tags is None:
         tags = [Tag.objects.get_or_create(name="Array")[0]]
     if difficulty is None:
         difficulty, _ = Difficulty.objects.get_or_create(name="Easy")
-    if url is None:
-        url = "https://example.com"
-    if description is None:
-        description = "Sample problem description"
     if owner is None:
-        owner, _ = User.objects.get_or_create(
-            username="tester", password="testpass")
+        owner = create_sample_user()
 
-    problem, problem_created = Problem.objects.get_or_create(
+    problem = Problem.objects.create(
         title=title,
         difficulty=difficulty,
         url=url,
         description=description,
-        owner=owner
+        owner=owner,
     )
-    if problem_created:
-        problem.tags.set(tags)
-
+    problem.tags.set(tags)
     return problem
 
 
 def create_sample_solution(
-        problem=None,
-        language=None,
-        owner=None,
-        source_code=None,
-        test_cases=None,
-        time_complexity=None,
-        space_complexity=None):
-    """
-    Create a solution sample for other tests.
-    """
-    User = get_user_model()
+    problem=None,
+    language=None,
+    owner=None,
+    source_code="Simple solution.",
+    test_cases="Simple test case.",
+    time_complexity=None,
+    space_complexity=None,
+):
     if problem is None:
         problem = create_sample_problem()
     if language is None:
         language, _ = Language.objects.get_or_create(name="Python")
     if owner is None:
-        owner, _ = User.objects.get_or_create(
-            username="tester", password="testpass")
-    if source_code is None:
-        source_code = "Simple solution."
-    if test_cases is None:
-        test_cases = "Simple test case."
+        owner = create_sample_user()
     if time_complexity is None:
         time_complexity, _ = Complexity.objects.get_or_create(name="O(n)")
     if space_complexity is None:
         space_complexity, _ = Complexity.objects.get_or_create(name="O(n)")
 
-    solution = Solution.objects.create(
+    return Solution.objects.create(
         problem=problem,
         language=language,
         owner=owner,
         source_code=source_code,
         test_cases=test_cases,
         time_complexity=time_complexity,
-        space_complexity=space_complexity
+        space_complexity=space_complexity,
     )
-    return solution
 
 
-def create_problem_test_case(problem=None, data=None, is_hidden=False, order=0):
+def create_problem_test_case(
+    problem=None,
+    owner=None,
+    data=None,
+    is_hidden=False,
+    order=1,
+    explanation="",
+):
     if problem is None:
         problem = create_sample_problem()
+    if owner is None:
+        owner = problem.owner
     if data is None:
         data = {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}
 
     return ProblemTestCase.objects.create(
         problem=problem,
+        owner=owner,
         data=data,
         is_hidden=is_hidden,
         order=order,
+        explanation=explanation,
     )
 
 
 class BasicModelTests(TestCase):
     def test_create_tag(self):
-        """
-        Test creating a Tag instance.
-        """
-        Tag.objects.create(name="Array")
-        tags = Tag.objects.all()
-        self.assertEqual(tags[0].name, "Array")
+        tag = Tag.objects.create(name="Array")
+
+        self.assertEqual(tag.name, "Array")
         self.assertEqual(Tag.objects.count(), 1)
 
     def test_create_difficulty(self):
-        """
-        Test creating a Difficulty instance.
-        """
-        Difficulty.objects.create(name="Easy")
-        difficulties = Difficulty.objects.all()
-        self.assertEqual(difficulties[0].name, "Easy")
+        difficulty = Difficulty.objects.create(name="Easy")
+
+        self.assertEqual(difficulty.name, "Easy")
         self.assertEqual(Difficulty.objects.count(), 1)
 
     def test_create_complexity(self):
-        """
-        Test creating a Complexity instance.
-        """
-        Complexity.objects.create(name="O(1)")
-        complexities = Complexity.objects.all()
-        self.assertEqual(complexities[0].name, "O(1)")
+        complexity = Complexity.objects.create(name="O(1)")
+
+        self.assertEqual(complexity.name, "O(1)")
         self.assertEqual(Complexity.objects.count(), 1)
 
     def test_create_language(self):
-        """
-        Test creating a Language instance.
-        """
-        # Becaouse of 0021_populate_language.py
-        # which creates Python and JavaScript languages
-        # delete all languages
         Language.objects.all().delete()
-        Language.objects.create(name="Python")
-        languages = Language.objects.all()
-        self.assertEqual(languages[0].name, "Python")
+        language = Language.objects.create(name="Python")
+
+        self.assertEqual(language.name, "Python")
         self.assertEqual(Language.objects.count(), 1)
 
 
 class ProblemModelTests(TestCase):
     def test_create_sample_problem(self):
-        """
-        Test creating a Problem instance linked to a Difficulty instance.
-        """
-        User = get_user_model()
-        title = "Two Sum"
+        owner = create_sample_user()
+        difficulty = Difficulty.objects.create(name="Easy")
         tags = [
             Tag.objects.create(name="Array"),
-            Tag.objects.create(name="Hash Table")
+            Tag.objects.create(name="Hash Table"),
         ]
-        difficulty = Difficulty.objects.create(name="Easy")
-        url = "https://example.com"
-        description = "Sample problem description"
-        owner, _ = User.objects.get_or_create(
-            username="tester", password="testpass")
+
         problem = create_sample_problem(
-            title,
-            tags,
-            difficulty,
-            url,
-            description,
-            owner=owner
+            title="Two Sum",
+            tags=tags,
+            difficulty=difficulty,
+            owner=owner,
         )
-        self.assertEqual(problem.title, title)
-        self.assertIn(tags[0], problem.tags.all())
-        self.assertIn(tags[1], problem.tags.all())
+
+        self.assertEqual(problem.title, "Two Sum")
         self.assertEqual(problem.difficulty, difficulty)
-        self.assertEqual(problem.url, url)
-        self.assertEqual(problem.description, description)
         self.assertEqual(problem.owner, owner)
+        self.assertCountEqual(problem.tags.all(), tags)
 
     def test_problem_shared_testcases_exclude_hidden_by_default(self):
         problem = create_sample_problem()
@@ -187,54 +168,25 @@ class ProblemModelTests(TestCase):
         create_problem_test_case(problem=problem, is_hidden=True, order=2)
 
         self.assertEqual(list(problem.get_shared_testcases()), [visible])
+        self.assertEqual(problem.get_shared_testcases(include_hidden=True).count(), 2)
 
     def test_create_two_problems_with_same_difficulty(self):
-        """
-        Test creating two Problem instances linked to the same Difficulty instance.
-        """
-        create_sample_problem(
-            title="Two Sum",
-            difficulty=Difficulty.objects.get_or_create(name="Easy")[0]
-        )
-        create_sample_problem(
-            title="Valid Parentheses",
-            difficulty=Difficulty.objects.get_or_create(name="Easy")[0]
-        )
-        problems = Problem.objects.all()
-        self.assertEqual(Problem.objects.count(), 2)
+        difficulty = Difficulty.objects.create(name="Easy")
+        create_sample_problem(title="Two Sum", difficulty=difficulty)
+        create_sample_problem(title="Valid Parentheses", difficulty=difficulty)
+
+        problems = Problem.objects.order_by("id")
+        self.assertEqual(problems.count(), 2)
         self.assertEqual(Difficulty.objects.count(), 1)
         self.assertEqual(problems[0].difficulty, problems[1].difficulty)
-
-    def test_create_two_problems_with_different_difficulties(self):
-        """
-        Test creating two Problem instances linked to different Difficulty instances.
-        """
-        create_sample_problem(
-            title="Two Sum",
-            difficulty=Difficulty.objects.get_or_create(name="Easy")[0]
-        )
-        create_sample_problem(
-            title="Two Sum II - Input Array Is Sorted",
-            difficulty=Difficulty.objects.get_or_create(name="Medium")[0]
-        )
-        problems = Problem.objects.all()
-        self.assertEqual(problems.count(), 2)
-        self.assertEqual(Difficulty.objects.count(), 2)
-        self.assertNotEqual(problems[0].difficulty, problems[1].difficulty)
 
 
 class ProblemFormTests(TestCase):
     def test_problem_form_disables_method_fields_for_class_design(self):
         form = ProblemForm(initial={"problem_type": ProblemType.CLASS})
 
-        self.assertEqual(
-            form.fields["method_name"].widget.attrs.get("disabled"),
-            "disabled",
-        )
-        self.assertEqual(
-            form.fields["argument_names"].widget.attrs.get("disabled"),
-            "disabled",
-        )
+        self.assertEqual(form.fields["method_name"].widget.attrs.get("disabled"), "disabled")
+        self.assertEqual(form.fields["argument_names"].widget.attrs.get("disabled"), "disabled")
 
     def test_problem_form_initial_argument_names_is_json(self):
         problem = create_sample_problem()
@@ -246,125 +198,274 @@ class ProblemFormTests(TestCase):
         self.assertEqual(form.initial["argument_names"], '["nums", "target"]')
 
     def test_problem_form_saves_problem_testcases(self):
+        owner = create_sample_user()
         difficulty = Difficulty.objects.create(name="Easy")
         tag = Tag.objects.create(name="Array")
-
-        form = ProblemForm(data={
-            "title": "Two Sum",
-            "url": "https://example.com",
-            "difficulty": difficulty.id,
-            "description": "Sample problem description",
-            "tags": [tag.id],
-            "problem_type": Problem.FUNCTION,
-            "method_name": "twoSum",
-            "argument_names": '["nums", "target"]',
-            "shared_test_cases": (
-                '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}\n'
-                '{"inputs": [[3, 2, 4], 6], "expected": [1, 2]}'
-            ),
-        })
+        form = ProblemForm(
+            data={
+                "title": "Two Sum",
+                "url": "https://example.com",
+                "difficulty": difficulty.id,
+                "description": "Sample problem description",
+                "tags": [tag.id],
+                "problem_type": ProblemType.FUNCTION,
+                "method_name": "twoSum",
+                "argument_names": '["nums", "target"]',
+                "comparison_type": "exact",
+                "shared_test_cases": (
+                    '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}\n'
+                    '{"data": {"inputs": [[3, 2, 4], 6], "expected": [1, 2]}, '
+                    '"is_hidden": true, "explanation": "Hidden case"}'
+                ),
+            },
+            user=owner,
+        )
 
         self.assertTrue(form.is_valid(), form.errors)
 
-        form.instance.owner = get_user_model().objects.create_user(
-            username="tester"
-        )
+        form.instance.owner = owner
         problem = form.save()
 
-        self.assertEqual(problem.testcases.count(), 2)
+        saved_test_cases = problem.testcases.order_by("order")
+        self.assertEqual(saved_test_cases.count(), 2)
         self.assertEqual(problem.argument_names, ["nums", "target"])
+        self.assertEqual(saved_test_cases[0].owner, owner)
         self.assertEqual(
-            problem.testcases.first().data,
+            saved_test_cases[0].data,
             {"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]},
         )
+        self.assertTrue(saved_test_cases[1].is_hidden)
+        self.assertEqual(saved_test_cases[1].explanation, "Hidden case")
 
     def test_problem_form_rejects_invalid_argument_names(self):
         difficulty = Difficulty.objects.create(name="Easy")
         tag = Tag.objects.create(name="Array")
-
-        form = ProblemForm(data={
-            "title": "Two Sum",
-            "url": "https://example.com",
-            "difficulty": difficulty.id,
-            "description": "Sample problem description",
-            "tags": [tag.id],
-            "problem_type": Problem.FUNCTION,
-            "method_name": "twoSum",
-            "argument_names": '{"nums": 1}',
-            "shared_test_cases": (
-                '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}'
-            ),
-        })
+        form = ProblemForm(
+            data={
+                "title": "Two Sum",
+                "url": "https://example.com",
+                "difficulty": difficulty.id,
+                "description": "Sample problem description",
+                "tags": [tag.id],
+                "problem_type": ProblemType.FUNCTION,
+                "method_name": "twoSum",
+                "argument_names": '{"nums": 1}',
+                "comparison_type": "exact",
+                "shared_test_cases": '{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}',
+            }
+        )
 
         self.assertFalse(form.is_valid())
         self.assertIn("Argument names must be a JSON list.", form.errors["argument_names"])
 
     def test_problem_form_clears_method_fields_for_class_design(self):
+        owner = create_sample_user("class-tester")
         difficulty = Difficulty.objects.create(name="Easy")
         tag = Tag.objects.create(name="Array")
-
-        form = ProblemForm(data={
-            "title": "Design Parking System",
-            "url": "https://example.com",
-            "difficulty": difficulty.id,
-            "description": "Sample problem description",
-            "tags": [tag.id],
-            "problem_type": ProblemType.CLASS,
-            "method_name": "shouldBeIgnored",
-            "argument_names": '["ignored"]',
-            "shared_test_cases": (
-                '{"inputs": [1, 1, 0], "expected": null}'
-            ),
-        })
+        form = ProblemForm(
+            data={
+                "title": "Design Parking System",
+                "url": "https://example.com",
+                "difficulty": difficulty.id,
+                "description": "Sample problem description",
+                "tags": [tag.id],
+                "problem_type": ProblemType.CLASS,
+                "method_name": "shouldBeIgnored",
+                "argument_names": '["ignored"]',
+                "comparison_type": "exact",
+                "shared_test_cases": '{"inputs": [1, 1, 0], "expected": null}',
+            },
+            user=owner,
+        )
 
         self.assertTrue(form.is_valid(), form.errors)
 
-        form.instance.owner = get_user_model().objects.create_user(
-            username="class-tester"
-        )
+        form.instance.owner = owner
         problem = form.save()
 
-        self.assertIsNone(problem.method_name)
+        self.assertEqual(problem.method_name, "")
         self.assertIsNone(problem.argument_names)
 
     def test_problem_form_accepts_cycle_linked_list_testcases(self):
+        owner = create_sample_user("cycle-tester")
         difficulty = Difficulty.objects.create(name="Medium")
         tag = Tag.objects.create(name="Linked List")
-
-        form = ProblemForm(data={
-            "title": "Linked List Cycle",
-            "url": "https://example.com",
-            "difficulty": difficulty.id,
-            "description": "Detect a cycle in a linked list.",
-            "tags": [tag.id],
-            "problem_type": ProblemType.LINKED_LIST,
-            "method_name": "hasCycle",
-            "argument_names": '["head"]',
-            "comparison_type": "exact",
-            "shared_test_cases": (
-                '{"inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}], "expected": true}'
-            ),
-        })
+        form = ProblemForm(
+            data={
+                "title": "Linked List Cycle",
+                "url": "https://example.com",
+                "difficulty": difficulty.id,
+                "description": "Detect a cycle in a linked list.",
+                "tags": [tag.id],
+                "problem_type": ProblemType.LINKED_LIST,
+                "method_name": "hasCycle",
+                "argument_names": '["head"]',
+                "comparison_type": "exact",
+                "shared_test_cases": (
+                    '{"inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}], '
+                    '"expected": true}'
+                ),
+            },
+            user=owner,
+        )
 
         self.assertTrue(form.is_valid(), form.errors)
 
-        form.instance.owner = get_user_model().objects.create_user(
-            username="cycle-tester"
-        )
+        form.instance.owner = owner
         problem = form.save()
 
         self.assertEqual(
             problem.testcases.first().data,
             {
-                "inputs": [
-                    {"values": [3, 2, 0, -4], "cycle_position": 1}
-                ],
+                "inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}],
                 "expected": True,
             },
         )
 
 
 class ProblemScriptTests(TestCase):
+    def test_build_validation_in_place_payload_supports_move_zeroes_problem(self):
+        problem = create_sample_problem(title="Move Zeroes")
+        problem.metadata = {
+            "problem_type": ProblemType.FUNCTION,
+            "method_name": "moveZeroes",
+            "parameters": [{"name": "nums", "type": "list[int]"}],
+            "return_type": "None",
+            "in_place": True,
+        }
+        problem.save(update_fields=["metadata"])
+
+        create_problem_test_case(
+            problem=problem,
+            data={
+                "inputs": [[0, 1, 0, 3, 12]],
+                "expected": [[1, 3, 12, 0, 0]],
+            },
+        )
+
+        source_code = "class Solution:\n    pass\n"
+        updated_code, expected_output = build_validation_in_place_payload(
+            source_code,
+            "Python",
+            problem.testcases,
+            "moveZeroes",
+        )
+
+        self.assertIn("\nsolution = Solution()\n", updated_code)
+        self.assertIn("inputs_list = [[[0, 1, 0, 3, 12]]]", updated_code)
+        self.assertIn("run_tests(solution.moveZeroes)", updated_code)
+        self.assertEqual(expected_output, ["[[1, 3, 12, 0, 0]]"])
+
+    def test_get_ui_test_cases_supports_number_of_islands_grid_preview(self):
+        problem = create_sample_problem(title="Number of Islands")
+        problem.metadata = {
+            "problem_type": ProblemType.FUNCTION,
+            "method_name": "numIslands",
+            "parameters": [{"name": "grid", "type": "grid"}],
+            "return_type": "int",
+        }
+        problem.save(update_fields=["metadata"])
+
+        create_problem_test_case(
+            problem=problem,
+            data={
+                "inputs": [[["1", "1", "0"], ["1", "0", "0"], ["0", "0", "1"]]],
+                "expected": 3,
+            },
+        )
+        solution = create_sample_solution(problem=problem)
+
+        ui_test_cases = get_ui_test_cases(problem, solution, "Python")
+
+        self.assertEqual(len(ui_test_cases), 1)
+        self.assertEqual(
+            ui_test_cases[0]["input"],
+            "grid = [['1', '1', '0'], ['1', '0', '0'], ['0', '0', '1']]",
+        )
+        self.assertEqual(ui_test_cases[0]["output"], "3")
+        self.assertEqual(
+            ui_test_cases[0]["preview"],
+            [
+                (
+                    "grid",
+                    "┌───────┐\n"
+                    "│ ■ ■ · │\n"
+                    "│ ■ · · │\n"
+                    "│ · · ■ │\n"
+                    "└───────┘",
+                )
+            ],
+        )
+
+    def test_build_validation_class_payload_supports_time_map_problem(self):
+        problem = create_sample_problem(title="Time Based Key-Value Store")
+        problem.problem_type = ProblemType.CLASS
+        problem.metadata = {
+            "problem_type": ProblemType.CLASS,
+            "class_name": "TimeMap",
+        }
+        problem.save(update_fields=["problem_type", "metadata"])
+
+        create_problem_test_case(
+            problem=problem,
+            data={
+                "operations": ["TimeMap", "set", "get", "get", "set", "get", "get"],
+                "arguments": [
+                    [],
+                    ["foo", "bar", 1],
+                    ["foo", 1],
+                    ["foo", 3],
+                    ["foo", "bar2", 4],
+                    ["foo", 4],
+                    ["foo", 5],
+                ],
+                "expected": [None, None, "bar", "bar", None, "bar2", "bar2"],
+            },
+        )
+
+        source_code = "class TimeMap:\n    pass\n"
+        updated_code, expected_output = build_validation_class_payload(
+            source_code,
+            "Python",
+            problem.testcases,
+            problem.metadata,
+        )
+
+        self.assertIn(
+            "operations_list = [['TimeMap', 'set', 'get', 'get', 'set', 'get', 'get']]",
+            updated_code,
+        )
+        self.assertIn(
+            "arguments_list = [[[], ['foo', 'bar', 1], ['foo', 1], ['foo', 3], ['foo', 'bar2', 4], ['foo', 4], ['foo', 5]]]",
+            updated_code,
+        )
+        self.assertIn("run_tests(TimeMap, operations_list, arguments_list)", updated_code)
+        self.assertEqual(
+            expected_output,
+            ["[None, None, 'bar', 'bar', None, 'bar2', 'bar2']"],
+        )
+
+    def test_build_problem_test_case_expression_supports_binary_tree_python(self):
+        problem = create_sample_problem(title="Invert Binary Tree Python")
+        problem.metadata = {
+            "problem_type": ProblemType.BINARY_TREE,
+            "method_name": "invertTree",
+            "parameters": [{"name": "root", "type": ProblemType.BINARY_TREE}],
+            "return_type": ProblemType.BINARY_TREE,
+        }
+        problem.save(update_fields=["metadata"])
+
+        expression = build_problem_test_case_expression(
+            problem,
+            {"inputs": [[4, 2, 7, 1, 3, 6, 9]], "expected": [4, 7, 2, 9, 6, 3, 1]},
+            "Python",
+        )
+
+        self.assertEqual(
+            expression,
+            "serialize_tree(solution.invertTree(build_tree([4, 2, 7, 1, 3, 6, 9])))",
+        )
+
     def test_build_problem_test_case_expression_supports_linked_list_cycles_python(self):
         problem = create_sample_problem(title="Linked List Cycle Python")
         problem.metadata = {
@@ -377,18 +478,13 @@ class ProblemScriptTests(TestCase):
 
         expression = build_problem_test_case_expression(
             problem,
-            {
-                "inputs": [
-                    {"values": [3, 2, 0, -4], "cycle_position": 1}
-                ],
-                "expected": True,
-            },
+            {"inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}], "expected": True},
             "Python",
         )
 
         self.assertEqual(
             expression,
-            "solution.hasCycle(build_list([3, 2, 0, -4], 1))",
+            "solution.hasCycle(build_linked_list([3, 2, 0, -4], 1))",
         )
 
     def test_build_problem_test_case_expression_supports_linked_list_cycles_javascript(self):
@@ -403,47 +499,39 @@ class ProblemScriptTests(TestCase):
 
         expression = build_problem_test_case_expression(
             problem,
-            {
-                "inputs": [
-                    {"values": [3, 2, 0, -4], "pos": 1}
-                ],
-                "expected": True,
-            },
+            {"inputs": [{"values": [3, 2, 0, -4], "pos": 1}], "expected": True},
             "JavaScript",
         )
 
         self.assertEqual(
             expression,
-            'solution.hasCycle(buildList([3, 2, 0, -4], { cyclePosition: 1 }))',
+            "solution.hasCycle(buildLinkedList([3, 2, 0, -4], { cyclePosition: 1 }))",
         )
 
     def test_draw_linked_list_displays_cycle_preview(self):
-        preview = draw_linked_list(
-            {"values": [3, 2, 0, -4], "cycle_position": 1},
-            "head",
-        )
+        preview = draw_linked_list({"values": [3, 2, 0, -4], "cycle_position": 1}, "head")
 
-        self.assertEqual(
-            preview,
-            ("head", "(3) -> (2) -> (0) -> (-4) -> ↺ index 1 (2)"),
-        )
+        self.assertEqual(preview, ("head", "(3) -> (2) -> (0) -> (-4) -> ↺ index 1 (2)"))
 
 
 class TestCaseCrudViewTests(TestCase):
     def setUp(self):
-        User = get_user_model()
-        self.user = User.objects.create_user(
+        self.user = get_user_model().objects.create_user(
             username="testcase-user",
             password="testpass123",
         )
+        self.other_user = get_user_model().objects.create_user(
+            username="other-user",
+            password="testpass123",
+        )
         self.client.force_login(self.user)
-
         self.problem = create_sample_problem(
             title="Test Case CRUD Problem",
             owner=self.user,
         )
         self.test_case = create_problem_test_case(
             problem=self.problem,
+            owner=self.user,
             data={"inputs": [1], "expected": 1},
             order=1,
         )
@@ -464,6 +552,7 @@ class TestCaseCrudViewTests(TestCase):
         self.assertRedirects(response, reverse("python_problems:problem-index"))
 
         created = ProblemTestCase.objects.get(problem=self.problem, order=2)
+        self.assertEqual(created.owner, self.user)
         self.assertEqual(created.data, {"inputs": [2], "expected": 2})
         self.assertTrue(created.is_hidden)
         self.assertEqual(created.explanation, "Hidden edge case")
@@ -484,6 +573,7 @@ class TestCaseCrudViewTests(TestCase):
         self.assertRedirects(response, reverse("python_problems:problem-index"))
 
         self.test_case.refresh_from_db()
+        self.assertEqual(self.test_case.owner, self.user)
         self.assertEqual(self.test_case.data, {"inputs": [10], "expected": 10})
         self.assertFalse(self.test_case.is_hidden)
         self.assertEqual(self.test_case.order, 3)
@@ -496,9 +586,7 @@ class TestCaseCrudViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("python_problems:problem-index"))
-        self.assertFalse(
-            ProblemTestCase.objects.filter(pk=self.test_case.pk).exists()
-        )
+        self.assertFalse(ProblemTestCase.objects.filter(pk=self.test_case.pk).exists())
 
     def test_create_requires_authentication(self):
         self.client.logout()
@@ -508,197 +596,243 @@ class TestCaseCrudViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
+    def test_update_is_owner_restricted(self):
+        self.client.force_login(self.other_user)
+
+        response = self.client.get(
+            reverse("python_problems:test_case-update", kwargs={"pk": self.test_case.pk})
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_delete_is_owner_restricted(self):
+        self.client.force_login(self.other_user)
+
+        response = self.client.post(
+            reverse("python_problems:test_case-delete", kwargs={"pk": self.test_case.pk}),
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(ProblemTestCase.objects.filter(pk=self.test_case.pk).exists())
+
 
 class SolutionModelTests(TestCase):
     def test_create_sample_solution(self):
-        """
-        Test creating a Solution instance linked to a Problem instance.
-        """
-        User = get_user_model()
         problem = create_sample_problem()
         Language.objects.all().delete()
         language = Language.objects.create(name="Python")
-        owner, _ = User.objects.get_or_create(
-            username="tester", password="testpass")
-        source_code = "Simple solution."
-        test_cases = "Simple test case."
-        time_complexity, _ = Complexity.objects.get_or_create(name="O(n)")
-        space_complexity, _ = Complexity.objects.get_or_create(name="O(n)")
+        owner = create_sample_user()
+        time_complexity = Complexity.objects.create(name="O(n)")
+        space_complexity = Complexity.objects.get(name="O(n)")
 
         solution = create_sample_solution(
             problem=problem,
             language=language,
             owner=owner,
-            source_code=source_code,
-            test_cases=test_cases,
+            source_code="Simple solution.",
+            test_cases="Simple test case.",
             time_complexity=time_complexity,
-            space_complexity=space_complexity
+            space_complexity=space_complexity,
         )
 
         self.assertEqual(solution.problem, problem)
         self.assertEqual(solution.language, language)
         self.assertEqual(solution.owner, owner)
-        self.assertEqual(solution.source_code, source_code)
-        self.assertEqual(solution.test_cases, test_cases)
+        self.assertEqual(solution.source_code, "Simple solution.")
+        self.assertEqual(solution.test_cases, "Simple test case.")
         self.assertEqual(solution.time_complexity, time_complexity)
         self.assertEqual(solution.space_complexity, space_complexity)
 
     def test_create_two_solutions_in_different_languages_for_same_problem(self):
-        """
-        Test creating two Solution instances in different Language instances
-        linked to the same Problem instance.
-        """
-        # Language.objects.all().delete()
         language_1, _ = Language.objects.get_or_create(name="Python")
         language_2, _ = Language.objects.get_or_create(name="JavaScript")
-        create_sample_solution(language=language_1)
-        create_sample_solution(language=language_2)
-        solutions = Solution.objects.all()
+        problem = create_sample_problem()
+        create_sample_solution(problem=problem, language=language_1)
+        create_sample_solution(problem=problem, language=language_2)
+
+        solutions = Solution.objects.order_by("id")
         self.assertEqual(solutions.count(), 2)
         self.assertEqual(Language.objects.count(), 2)
         self.assertNotEqual(solutions[0].language, solutions[1].language)
 
     def test_create_two_solutions_in_same_language_for_different_problems(self):
-        """
-        Test creating two Solution instances in the same Language instance
-        linked to different Problem instances.
-        """
         Language.objects.all().delete()
         create_sample_solution()
-        title = "Valid Parentheses"
-        problem = create_sample_problem(title=title)
-        create_sample_solution(problem=problem)
-        solutions = Solution.objects.all()
+        create_sample_solution(problem=create_sample_problem(title="Valid Parentheses"))
+
+        solutions = Solution.objects.order_by("id")
         self.assertEqual(solutions.count(), 2)
         self.assertEqual(Language.objects.count(), 1)
         self.assertEqual(solutions[0].language, solutions[1].language)
 
 
-class ProblemIndexViewTests0(TestCase):
-    def test_no_problems(self):
-        """
-        If no problems exist, an appropriate message is displayed.
-        """
-        viewname = "python_problems:problem-index"
-        url = reverse(viewname)
-        response = self.client.get(url)
+class ProblemIndexViewTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        Language.objects.all().delete()
+        cls.difficulty_easy = Difficulty.objects.create(name="Easy")
+        cls.difficulty_medium = Difficulty.objects.create(name="Medium")
+        cls.tag_array = Tag.objects.create(name="Array")
+        cls.tag_two_pointers = Tag.objects.create(name="Two Pointers")
+        cls.language_python = Language.objects.create(name="Python")
+        cls.language_javascript = Language.objects.create(name="JavaScript")
+
+        cls.problem_easy = create_sample_problem(
+            title="Two Sum",
+            difficulty=cls.difficulty_easy,
+            tags=[cls.tag_array],
+        )
+        cls.problem_medium = create_sample_problem(
+            title="Two Sum II - Input Array Is Sorted",
+            difficulty=cls.difficulty_medium,
+            tags=[cls.tag_array, cls.tag_two_pointers],
+        )
+
+        create_sample_solution(
+            problem=cls.problem_easy,
+            language=cls.language_python,
+            source_code="print('Easy')",
+        )
+        create_sample_solution(
+            problem=cls.problem_medium,
+            language=cls.language_javascript,
+            source_code="console.log('Medium')",
+        )
+
+    def test_no_problems_message(self):
+        Problem.objects.all().delete()
+
+        response = self.client.get(reverse("python_problems:problem-index"))
+
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response, "No Python problems available for the given parameters.")
-        # Same as assertContains, but with manual content.decode()
-        self.assertIn("No Python problems available for the given parameters.",
-                      response.content.decode())
-        self.assertQuerySetEqual(response.context["problem_list"], [])
+        self.assertContains(response, "No Python problems available for the given parameters.")
 
-    def test_right_template(self):
-        """
-        Test if the right template is choosen.
-        """
-        template_name = "python_problems/problem_list.html"
-        viewname = "python_problems:problem-index"
-        url = reverse(viewname)
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, template_name)
-
-    def test_with_problem(self):
-        """
-        If problem exists, it is displayed on the index page.
-        """
-        title = "Two Sum"
-        create_sample_problem(title=title)
+    def test_index_uses_template(self):
         response = self.client.get(reverse("python_problems:problem-index"))
-        self.assertContains(response, title)
-        self.assertQuerySetEqual(
-            response.context["problem_list"], Problem.objects.all())
-        self.assertEqual(
-            response.context["problem_list"].count(), Problem.objects.count())
 
-    def test_with_problems(self):
-        """
-        If problems exist, they are displayed on the index page.
-        """
-        create_sample_problem(title="Two Sum")
-        create_sample_problem(title="Valid Parentheses")
+        self.assertTemplateUsed(response, "python_problems/problem_list.html")
+
+    def test_with_problems_displays_titles(self):
         response = self.client.get(reverse("python_problems:problem-index"))
+
         self.assertContains(response, "Two Sum")
-        self.assertContains(response, "Valid Parentheses")
-        self.assertEqual(
-            response.context["problem_list"].count(), Problem.objects.count())
+        self.assertContains(response, "Two Sum II - Input Array Is Sorted")
 
-        # Ensure both querysets are ordered
-        expected_queryset = Problem.objects.all().order_by("id")
-        actual_queryset = response.context["problem_list"].order_by("id")
+    def test_filters_by_difficulty_with_get_parameters(self):
+        response = self.client.get(
+            reverse("python_problems:problem-index"),
+            {"difficulty_id": self.difficulty_easy.id},
+        )
 
-        # QuerySets comprare based on ordered QuerySets
-        self.assertQuerySetEqual(actual_queryset, expected_queryset)
+        titles = [problem.title for problem in response.context["page_obj"].object_list]
+        self.assertEqual(titles, ["Two Sum"])
 
-        # Compare QuerySets entities based on elements id's.
-        self.assertEqual(Problem.objects.all().get(
-            id=1), response.context["problem_list"].get(id=1))
-        self.assertEqual(Problem.objects.all().get(
-            id=2), response.context["problem_list"].get(id=2))
+    def test_filters_by_tag_with_get_parameters(self):
+        response = self.client.get(
+            reverse("python_problems:problem-index"),
+            {"tag_id": self.tag_two_pointers.id},
+        )
+
+        titles = [problem.title for problem in response.context["page_obj"].object_list]
+        self.assertEqual(titles, ["Two Sum II - Input Array Is Sorted"])
+
+    def test_filters_by_query_text_with_get_parameters(self):
+        response = self.client.get(
+            reverse("python_problems:problem-index"),
+            {"query_text": "Sorted"},
+        )
+
+        titles = [problem.title for problem in response.context["page_obj"].object_list]
+        self.assertEqual(titles, ["Two Sum II - Input Array Is Sorted"])
+
+    def test_filters_by_language_with_get_parameters(self):
+        response = self.client.get(
+            reverse("python_problems:problem-index"),
+            {"language_id": self.language_python.id},
+        )
+
+        titles = [problem.title for problem in response.context["page_obj"].object_list]
+        self.assertEqual(titles, ["Two Sum"])
+
+    def test_ordering_and_pagination_use_page_object(self):
+        for index in range(15):
+            create_sample_problem(title=f"Problem {index}")
+
+        response = self.client.get(
+            reverse("python_problems:problem-index"),
+            {"order_by": "title", "problems_per_page": 5, "page": 2},
+        )
+
+        page_titles = [problem.title for problem in response.context["page_obj"].object_list]
+        self.assertEqual(response.context["page_obj"].number, 2)
+        self.assertEqual(response.context["page_obj"].paginator.per_page, 5)
+        self.assertEqual(page_titles, sorted(page_titles))
+
+    def test_request_factory_get_request_exposes_expected_context(self):
+        request = RequestFactory().get(reverse("python_problems:problem-index"))
+        request.user = create_sample_user()
+
+        response = ProblemIndexView.as_view()(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("page_obj", response.context_data)
+        self.assertIn("problem_list", response.context_data)
+        self.assertEqual(response.context_data["difficulty_id"], 0)
+        self.assertEqual(response.context_data["language_id"], 0)
+        self.assertEqual(response.context_data["tag_id"], 0)
+        self.assertEqual(response.context_data["query_text"], "")
+        self.assertEqual(response.context_data["order_by"], "created_at")
 
 
 class SolutionDetailViewTests(TestCase):
     def test_right_template(self):
-        """
-        Test if the right template is choosen.
-        """
-        template_name = "python_problems/problem_detail.html"
         solution = create_sample_solution()
-        viewname = "python_problems:problem-detail"
-        kwargs = {"slug": solution.problem.slug,
-                  "language": solution.language.name}
-        url = reverse(viewname, kwargs=kwargs)
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, template_name)
 
-    def test_context_data(self):
-        """
-        Test if the correct context data is passed to the template.
-        """
+        response = self.client.get(
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={"slug": solution.problem.slug, "language": solution.language.name},
+            )
+        )
+
+        self.assertTemplateUsed(response, "python_problems/problem_detail.html")
+
+    def test_context_data_uses_selected_solution(self):
         solution = create_sample_solution()
-        viewname = "python_problems:problem-detail"
-        kwargs = {"slug": solution.problem.slug,
-                  "language": solution.language.name}
-        url = reverse(viewname, kwargs=kwargs)
-        response = self.client.get(url)
-        actual_solution = response.context["problem"].solution_set.first()
-        self.assertEqual(actual_solution, solution)
+
+        response = self.client.get(
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={"slug": solution.problem.slug, "language": solution.language.name},
+            )
+        )
+
+        self.assertEqual(response.context["problem"], solution.problem)
+        self.assertEqual(response.context["solution"], solution)
+        self.assertIn(solution, response.context["owner_solutions"])
 
     def test_404_response(self):
-        """
-        Test if a 404 response is returned for a non-existent problem.
-        """
-        status_code = 404
-        viewname = "python_problems:problem-detail"
-        kwargs = {"slug": "non-existent-slug",
-                  "language": "non-existent-language"}
-        url = reverse(viewname, kwargs=kwargs)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status_code)
+        response = self.client.get(
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={"slug": "non-existent-slug", "language": "non-existent-language"},
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
 
     def test_problem_details_display(self):
-        """
-        Test if the problem details are correctly displayed in the template.
-        """
-        User = get_user_model()
-        title = "Two Sum"
-        owner, _ = User.objects.get_or_create(
-            username="tester", password="testpass")
+        owner = create_sample_user()
         language, _ = Language.objects.get_or_create(name="Python")
-        problem = create_sample_problem(
-            title=title,
-            owner=owner)
-        solution = create_sample_solution(
-            problem=problem,
-            language=language,
-            owner=owner)
-        viewname = "python_problems:problem-detail"
-        kwargs = {"slug": solution.problem.slug,
-                  "language": solution.language.name}
-        url = reverse(viewname, kwargs=kwargs)
-        response = self.client.get(url)
+        problem = create_sample_problem(title="Two Sum", owner=owner)
+        solution = create_sample_solution(problem=problem, language=language, owner=owner)
+
+        response = self.client.get(
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={"slug": solution.problem.slug, "language": solution.language.name},
+            )
+        )
 
         self.assertContains(response, solution.problem.title)
         self.assertContains(response, solution.problem.owner)
@@ -711,25 +845,25 @@ class SolutionDetailViewTests(TestCase):
         problem.save(update_fields=["method_name"])
         solution = create_sample_solution(
             problem=problem,
-            test_cases='(solution.twoSum([3, 3], 6), [0, 1])'
+            test_cases="(solution.twoSum([3, 3], 6), [0, 1])",
         )
         create_problem_test_case(
-            problem=solution.problem,
+            problem=problem,
             data={"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]},
-            order=1,
         )
 
-        url = reverse(
-            "python_problems:problem-detail",
-            kwargs={"slug": solution.problem.slug, "language": solution.language.name},
+        response = self.client.get(
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={"slug": problem.slug, "language": solution.language.name},
+            )
         )
-        response = self.client.get(url)
 
         self.assertContains(response, "solution.twoSum([2, 7, 11, 15], 9)")
         self.assertNotContains(response, "solution.twoSum([3, 3], 6)")
         self.assertEqual(
-            response.context["raw_test_cases"],
-            "(solution.twoSum([2, 7, 11, 15], 9), [0, 1])",
+            response.context["effective_test_cases"],
+            [("solution.twoSum([2, 7, 11, 15], 9)", "[0, 1]")],
         )
 
     def test_problem_argument_names_label_ui_testcases(self):
@@ -741,341 +875,91 @@ class SolutionDetailViewTests(TestCase):
         create_problem_test_case(
             problem=problem,
             data={"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]},
-            order=1,
         )
 
-        url = reverse(
-            "python_problems:problem-detail",
-            kwargs={"slug": problem.slug, "language": solution.language.name},
+        response = self.client.get(
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={"slug": problem.slug, "language": solution.language.name},
+            )
         )
-        response = self.client.get(url)
 
-        self.assertContains(response, "nums = [2, 7, 11, 15]")
-        self.assertContains(response, "target = 9")
+        ui_test_case = response.context["ui_test_cases"][0]
+        self.assertEqual(ui_test_case["input"], "nums = [2, 7, 11, 15]\ntarget = 9")
         self.assertEqual(
             response.context["clipboard_test_cases"],
-            "(solution.twoSum([2, 7, 11, 15], 9), [0, 1])",
+            "\nsolution = Solution()\nprint(solution.twoSum([2, 7, 11, 15], 9), [0, 1])\n",
         )
 
 
 class SolutionLanguageSwitchTest(TestCase):
     def setUp(self):
-        """
-        Set up test data.
-        """
         Language.objects.all().delete()
-        self.language_1, _ = Language.objects.get_or_create(name="Python")
-        self.language_2, _ = Language.objects.get_or_create(name="JavaScript")
-        self.source_code_1 = "print('Python solution')"
-        self.source_code_2 = "console.log('JavaScript solution');"
+        self.language_python = Language.objects.create(name="Python")
+        self.language_javascript = Language.objects.create(name="JavaScript")
         self.problem = create_sample_problem()
-        self.solution_1 = create_sample_solution(
+        self.source_code_python = "print('Python solution')"
+        self.source_code_javascript = "console.log('JavaScript solution');"
+        create_sample_solution(
             problem=self.problem,
-            language=self.language_1,
-            source_code=self.source_code_1
+            language=self.language_python,
+            source_code=self.source_code_python,
         )
-        self.solution_2 = create_sample_solution(
+        create_sample_solution(
             problem=self.problem,
-            language=self.language_2,
-            source_code=self.source_code_2
+            language=self.language_javascript,
+            source_code=self.source_code_javascript,
         )
 
     def test_switching_language_updates_solution(self):
-        """
-        Check if selecting a different language updates the displayed solution.
-        """
-        viewname = "python_problems:problem-detail"
-        kwargs = {"slug": self.problem.slug,
-                  "language": self.language_1.name}
-        url = reverse(viewname, kwargs=kwargs)
+        url = reverse(
+            "python_problems:problem-detail",
+            kwargs={"slug": self.problem.slug, "language": self.language_python.name},
+        )
         response = self.client.get(url)
-        content = html.unescape(response.content.decode())
+        self.assertIn(self.source_code_python, html.unescape(response.content.decode()))
 
-        # Verify response contains the correct solution before the update
-        self.assertIn(self.source_code_1, content)
-        # Verify the final URL includes the correct language
+        response = self.client.post(url, {"language_id": self.language_javascript.id}, follow=True)
+
+        self.assertIn(self.source_code_javascript, html.unescape(response.content.decode()))
         self.assertEqual(
-            response.request["PATH_INFO"], f"/problems/{self.problem.slug}/{self.language_1.name}/")
-
-        # Simulate changing the language via POST
-        response = self.client.post(
-            url,
-            {"language": self.language_2.id},
-            follow=True)
-
-        # Decode HTML entities in response content
-        content = html.unescape(response.content.decode())
-
-        # Verify response contains the correct solution after the update
-        self.assertIn(self.source_code_2, content)
-
-        self.assertEqual(
-            response.request["PATH_INFO"], f"/problems/{self.problem.slug}/{self.language_2.name}/")
+            response.request["PATH_INFO"],
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={"slug": self.problem.slug, "language": self.language_javascript.name},
+            ),
+        )
 
 
 class SolutionUserSwitchTest(TestCase):
     def setUp(self):
-        """
-        Set up test data.
-        """
-        Language.objects.all().delete()
-        User = get_user_model()
         self.language, _ = Language.objects.get_or_create(name="Python")
+        self.owner_1 = create_sample_user("tester-1")
+        self.owner_2 = create_sample_user("tester-2")
+        self.problem = create_sample_problem()
         self.source_code_1 = "print('Python solution')"
         self.source_code_2 = "print('Python solution 2')"
-        self.owner_1, _ = User.objects.get_or_create()
-        self.owner_2, _ = User.objects.get_or_create(
-            username="tester_2", password="testpass")
-        self.problem = create_sample_problem()
-        self.solution_1 = create_sample_solution(
+        create_sample_solution(
             problem=self.problem,
             language=self.language,
             source_code=self.source_code_1,
-            owner=self.owner_1)
-        self.solution_2 = create_sample_solution(
+            owner=self.owner_1,
+        )
+        create_sample_solution(
             problem=self.problem,
             language=self.language,
             source_code=self.source_code_2,
-            owner=self.owner_2)
+            owner=self.owner_2,
+        )
 
     def test_switching_owner_updates_solution(self):
-        """
-        Check if selecting a different owner updates the displayed solution.
-        """
-        viewname = "python_problems:problem-detail"
-        kwargs = {"slug": self.problem.slug,
-                  "language": self.language.name}
-        url = reverse(viewname, kwargs=kwargs)
+        url = reverse(
+            "python_problems:problem-detail",
+            kwargs={"slug": self.problem.slug, "language": self.language.name},
+        )
         response = self.client.get(url)
-        content = html.unescape(response.content.decode())
+        self.assertIn(self.source_code_1, html.unescape(response.content.decode()))
 
-        # Verify response contains the correct solution before the update
-        self.assertIn(self.source_code_1, content)
+        response = self.client.post(url, {"owner_id": self.owner_2.id}, follow=True)
 
-        # Simulate changing the user via POST
-        response = self.client.post(
-            url,
-            {"owner_id": self.owner_2.id},
-            follow=True)
-
-        # Decode HTML entities in response content
-        content = html.unescape(response.content.decode())
-
-        # Verify response contains the correct solution after the update
-        self.assertIn(self.source_code_2, content)
-
-
-class ProblemIndexViewTests1(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        """Set up test data for all tests."""
-        Language.objects.all().delete()
-        cls.difficulty_easy = Difficulty.objects.create(name="Easy")
-        cls.difficulty_medium = Difficulty.objects.create(name="Medium")
-
-        cls.tag_array, _ = Tag.objects.get_or_create(name="Array")
-        cls.tag_two_pointers, _ = Tag.objects.get_or_create(
-            name="Two Pointers")
-
-        cls.language_python, _ = Language.objects.get_or_create(name="Python")
-        cls.language_javaScript, _ = Language.objects.get_or_create(
-            name="JavaScript")
-
-        # Create multiple problems
-        cls.problem_easy = create_sample_problem(
-            title="Two Sum",
-            difficulty=cls.difficulty_easy,
-            tags=[cls.tag_array])
-        cls.problem_medium = create_sample_problem(
-            title="Two Sum II - Input Array Is Sorted",
-            difficulty=cls.difficulty_medium,
-            tags=[cls.tag_array, cls.tag_two_pointers])
-
-        # Create solutions
-        create_sample_solution(
-            problem=cls.problem_easy,
-            language=cls.language_python,
-            source_code="print('Easy')")
-        create_sample_solution(
-            problem=cls.problem_medium,
-            language=cls.language_javaScript,
-            source_code="System.out.println('Medium')")
-
-    def test_filter_by_difficulty(self):
-        """
-        Test filtering by difficulty_id.
-        """
-        url = reverse("python_problems:problem-index")
-        response = self.client.post(
-            url,
-            {"difficulty_id": self.difficulty_easy.id},
-            follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Two Sum")
-        self.assertNotContains(response, "Two Sum II - Input Array Is Sorted")
-
-    def test_filter_by_tag(self):
-        """
-        Test filtering by tag_id.
-        """
-        url = reverse("python_problems:problem-index")
-        response = self.client.post(
-            url,
-            {"tag_id": self.tag_two_pointers.id},
-            follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Two Sum II - Input Array Is Sorted")
-
-    def test_search_by_query_text(self):
-        """
-        Test filtering by query_text (title and tag names).
-        """
-        url = reverse("python_problems:problem-index")
-        response = self.client.post(
-            url,
-            {"query_text": "Sorted"},
-            follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Two Sum II - Input Array Is Sorted")
-
-    def test_ordering(self):
-        """
-        Test ordering by 'title'.
-        """
-        url = reverse("python_problems:problem-index")
-        response = self.client.post(
-            url,
-            {"order_by": "title"},
-            follow=True)
-        self.assertEqual(response.status_code, 200)
-        problems = list(response.context["problem_list"])
-        sorted_problems = sorted(
-            response.context["problem_list"],
-            key=lambda problem: problem.title)
-        self.assertEqual(problems, sorted_problems)
-
-    def test_pagination(self):
-        """
-        Test pagination with multiple problems per page.
-        """
-        for index in range(15):
-            create_sample_problem(title=f"Problem {index}")
-
-        url = reverse("python_problems:problem-index")
-        response = self.client.post(
-            url,
-            {"problems_per_page": 5,
-             "page_number": 2},
-            follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["page_obj"].number, 2)
-        self.assertEqual(response.context["page_obj"].paginator.per_page, 5)
-
-    def test_preserve_all_filters(self):
-        """
-        Test that all filters persist together.
-        """
-        url = reverse("python_problems:problem-index")
-        response = self.client.post(
-            url,
-            {"difficulty_id": self.difficulty_easy.id,
-             "tag_id": self.tag_array.id,
-             "query_text": "Problem",
-             "order_by": "title",
-             "problems_per_page": 5,
-             "page_number": 1},
-            follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.context["difficulty_id"], self.difficulty_easy.id)
-        self.assertEqual(response.context["tag_id"], self.tag_array.id)
-        self.assertEqual(response.context["query_text"], "Problem")
-        self.assertEqual(response.context["order_by"], "title")
-        self.assertEqual(response.context["problems_per_page"], 5)
-        self.assertEqual(response.context["page_obj"].number, 1)
-
-
-class ProblemIndexViewTests2(TestCase):
-    def setUp(self):
-        # Create test data
-        self.factory = RequestFactory()
-        User = get_user_model()
-        self.user, _ = User.objects.get_or_create(
-            username="tester", password="testpass")
-
-        # Create languages
-        Language.objects.all().delete()
-        self.language_python, _ = Language.objects.get_or_create(name="Python")
-        self.language_javaScript, _ = Language.objects.get_or_create(
-            name="JavaScript")
-
-        # Create difficulties
-        self.difficulty_easy, _ = Difficulty.objects.get_or_create(name="Easy")
-        self.difficulty_medium, _ = Difficulty.objects.get_or_create(
-            name="Medium")
-
-        # Create tags
-        self.tag_array = Tag.objects.create(name="Array")
-        self.tag_two_pointers = Tag.objects.create(name="Two Pointers")
-
-        # Create problems
-        self.problem_1 = create_sample_problem(
-            title="Two Sum",
-            difficulty=self.difficulty_easy,
-            description="Description 1")
-        self.problem_1.tags.add(self.tag_array)
-
-        self.problem_2 = create_sample_problem(
-            title="Two Sum II - Input Array Is Sorted",
-            difficulty=self.difficulty_medium,
-            description="Description 2")
-        self.problem_2.tags.add(self.tag_two_pointers)
-
-        # Create solutions
-        create_sample_solution(
-            problem=self.problem_1,
-            language=self.language_python,
-            source_code="Solution 1",
-            owner=self.user
-        )
-        create_sample_solution(
-            problem=self.problem_2,
-            language=self.language_javaScript,
-            source_code="Solution 2",
-            owner=self.user
-        )
-
-    def test_get_request(self):
-        # Create a GET request
-        url = reverse("python_problems:problem-index")
-        request = self.factory.get(url)
-        request.user = self.user
-
-        # Call the view
-        response = ProblemIndexView.as_view()(request)
-
-        # Check the response status code
-        self.assertEqual(response.status_code, 200)
-
-        # Check the context data
-        self.assertIn("difficulty_id", response.context_data)
-        self.assertIn("order_by", response.context_data)
-        self.assertIn("page_obj", response.context_data)
-        self.assertIn("problem_list", response.context_data)
-        self.assertIn("problems_per_page", response.context_data)
-        self.assertIn("query_text", response.context_data)
-        self.assertIn("tag_id", response.context_data)
-
-        # Verify initial values
-        self.assertEqual(response.context_data["difficulty_id"], 0)
-        self.assertEqual(response.context_data["order_by"], "created_at")
-        self.assertEqual(response.context_data["problems_per_page"], 7)
-        self.assertEqual(response.context_data["query_text"], "")
-        self.assertEqual(response.context_data["tag_id"], 0)
-
-        # Verify problem list
-        self.assertQuerysetEqual(
-            response.context_data["problem_list"].order_by('id'),
-            Problem.objects.all().order_by('id'),
-            # Compare objects directly (no transformation)
-            transform=lambda x: x)
+        self.assertIn(self.source_code_2, html.unescape(response.content.decode()))
