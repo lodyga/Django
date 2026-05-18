@@ -1,26 +1,17 @@
-# fix next slug
-# get_adjacent_slugs(problem, language)
+# fix next slug # get_adjacent_slugs(problem, language)
+# add js heap to metadata
 # Python 3.8 doesn't support match / case statements.
-# Do not return anything, modify nums1 in-place instead. Merge Sorted Array
-
 # setup cursor with proper method name
 # edit only own solutions
 # validate all test cases
-# + test case #
 # <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea> and <textarea id="solution-{{ forloop.counter }}"
-
-
 # in progress... preview based on data type:  (grid, matrix) preview veritcal preview for heights [1, 4, 6, 7, 6, 7]
 # wrap build_binary_tree and other around bt methods
-# handle mutate grid and do not return (None) anything problems 
-
 # for later
 # problem add, focus on that problem, exclude Problem, Language, Order fields
 # + soultion, hide problem & language fields
 # stop <pre></pre> in README.md => test cases
 # fix all redirects / back
-
-
 # import needed only get_heap_utils(language) + get_binary_tree_utils(language) + get_linked_list_utils(language) + source_code
 # better light mode
 # hints to buttons

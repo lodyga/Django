@@ -51,7 +51,7 @@ class TreeNode {
  * @param {*} nodeList 
  * @returns 
  */
-const buildTree = (nodeList, { withLookup = false } = {}) => {
+const buildBinaryTree = (nodeList, { withLookup = false } = {}) => {
    while (
       nodeList.length &&
       nodeList[nodeList.length - 1] === null
@@ -102,7 +102,7 @@ const buildTree = (nodeList, { withLookup = false } = {}) => {
  * @param {*} root 
  * @returns 
  */
-const serializeTree = (root) => {
+const serializeBinaryTree = (root) => {
    if (!root) {
       return []
    }

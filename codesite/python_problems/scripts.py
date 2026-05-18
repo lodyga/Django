@@ -5,6 +5,7 @@ import re
 import requests
 import socket
 from collections import Counter
+from dataclasses import dataclass
 from time import sleep
 from django.apps import apps
 from django.conf import settings
@@ -13,51 +14,135 @@ from codesite.auth.judge0_auth import JUDGE0_API_KEY
 from python_problems.models import Problem, ComparisonType, ProblemType
 
 
+@dataclass(frozen=True)
+class NamingConvention:
+    inputs_list: str
+    operations_list: str
+    arguments_list: str
+    expected_list: str
+
+
+@dataclass(frozen=True)
+class BinaryTreeConfig:
+    utils_file: str
+    build: str
+    serialize: str
+
+
+@dataclass(frozen=True)
+class LinkedListConfig:
+    utils_file: str
+    build: str
+    serialize: str
+
+
+@dataclass(frozen=True)
+class ClassDesignConfig:
+    utils_file: str
+
+
+@dataclass(frozen=True)
+class SolutionConfig:
+    instance_code: str
+    instance_pattern: str
+
+
+@dataclass(frozen=True)
+class LanguageConfig:
+    print: str
+    serialize: str
+
+    solution: SolutionConfig
+    binary_tree: BinaryTreeConfig
+    linked_list: LinkedListConfig
+    class_design: ClassDesignConfig
+
+    naming: NamingConvention
+
+    run_tests_function: str
+    in_place_utils_file: str
+    heap_utils_file: str = ""
+
+
 LANGUAGE_CONFIG = {
-    "Python": {
-        "print": "print",
-        "serialize": "json.dumps",
-        "instance": "\nsolution = Solution()\n",
-        "instance_pattern": r"solution\s*=\s*Solution\(\)\s*",
-        "binary_tree_utils": "binary_tree_utils.py",
-        "build_tree": "build_tree",
-        "serialize_tree": "serialize_tree",
-        "linked_list_utils": "linked_list_utils.py",
-        "build_linked_list": "build_linked_list",
-        "serialize_linked_list": "serialize_linked_list",
-        "run_tests": "run_tests",
-        "inputs_list": "inputs_list",
-        "class_design_utils": "class_design_utils.py",
-        "operations_list": "operations_list",
-        "arguments_list": "arguments_list",
-        "expected_list": "expected_list",
-        "in_place_utils": "in_place_utils.py",
-    },
-    "JavaScript": {
-        "print": "console.log",
-        "serialize": "JSON.stringify",
-        "instance": "\nconst solution = new Solution();\n",
-        "instance_pattern": r"const\s+solution\s*=\s*new\s+Solution\(\)\s*;?",
-        "binary_tree_utils": "binary-tree-utils.js",
-        "heap": "heap-utils.js",
-        "build_tree": "buildTree",
-        "serialize_tree": "serializeTree",
-        "linked_list_utils": "linked-list-utils.js",
-        "build_linked_list": "buildLinkedList",
-        "serialize_linked_list": "serializeLinkedList",
-        "run_tests": "runTests",
-        "inputs_list": "inputsList",
-        "class_design_utils": "class-design-utils.js",
-        "operations_list": "operationsList",
-        "arguments_list": "argumentsList",
-        "expected_list": "expectedList",
-        "in_place_utils": "in-place-utils.js",
-    },
+    "Python": LanguageConfig(
+        print="print",
+        serialize="json.dumps",
+
+        solution=SolutionConfig(
+            instance_code="\nsolution = Solution()\n",
+            instance_pattern=r"solution\s*=\s*Solution\(\)\s*",
+        ),
+
+        binary_tree=BinaryTreeConfig(
+            utils_file="binary_tree_utils.py",
+            build="build_binary_tree",
+            serialize="serialize_binary_tree",
+        ),
+
+        linked_list=LinkedListConfig(
+            utils_file="linked_list_utils.py",
+            build="build_linked_list",
+            serialize="serialize_linked_list",
+        ),
+
+        class_design=ClassDesignConfig(
+            utils_file="class_design_utils.py"
+        ),
+
+        naming=NamingConvention(
+            inputs_list="inputs_list",
+            operations_list="operations_list",
+            arguments_list="arguments_list",
+            expected_list="expected_list",
+        ),
+
+        run_tests_function="run_tests",
+        in_place_utils_file="in_place_utils.py",
+    ),
+
+    "JavaScript": LanguageConfig(
+        print="console.log",
+        serialize="JSON.stringify",
+
+        solution=SolutionConfig(
+            instance_code="\nconst solution = new Solution();\n",
+            instance_pattern=r"const\s+solution\s*=\s*new\s+Solution\(\)\s*;?",
+        ),
+
+        binary_tree=BinaryTreeConfig(
+            utils_file="binary-tree-utils.js",
+            build="buildBinaryTree",
+            serialize="serializeBinaryTree",
+        ),
+
+        linked_list=LinkedListConfig(
+            utils_file="linked-list-utils.js",
+            build="buildLinkedList",
+            serialize="serializeLinkedList",
+        ),
+
+        class_design=ClassDesignConfig(
+            utils_file="class-design-utils.js"
+        ),
+
+        naming=NamingConvention(
+            inputs_list="inputsList",
+            operations_list="operationsList",
+            arguments_list="argumentsList",
+            expected_list="expectedList",
+        ),
+
+        run_tests_function="runTests",
+        in_place_utils_file="in-place-utils.js",
+        heap_utils_file="heap-utils.js",
+    ),
+
 }
 
 
-# Remove this abomination when all test cases are moved to problem.
 def get_solution_test_cases(solution_test_cases):
+    # Remove this abomination when all test cases are moved to problem.
     """
     Clean each solution test case into (input, expected output) tuple.
     str: 'print(Solution().twoSum([2, 7, 11, 15], 9) == [0, 1])\r\n'
@@ -504,7 +589,7 @@ def build_problem_test_case_expression(problem, test_case_data, language):
     =>
     'solution.twoSum([[2, 7, 11, 15], 9])'
 
-    'serialize_tree(solution.invertTree(build_tree([4, 2, 7, 1, 3, 6, 9])))'
+    'serialize_binary_tree(solution.invertTree(build_binary_tree([4, 2, 7, 1, 3, 6, 9])))'
     'serialize_linked_list(solution.reverseList(build_linked_list([1, 2, 3, 4, 5])))'
     """
 
@@ -527,23 +612,23 @@ def build_problem_test_case_expression(problem, test_case_data, language):
             match data_type:
                 case ProblemType.BINARY_TREE:
                     line = serialize(value, language)
-                    line = f'{config["build_tree"]}({line})'
+                    line = f'{config.binary_tree.build}({line})'
                 case ProblemType.LINKED_LIST:
                     values, cycle_position = unpack_linked_list_payload(value)
                     line = serialize(values, language)
 
                     if language == "JavaScript" and cycle_position != -1:
                         line = (
-                            f'{config["build_linked_list"]}'
+                            f'{config.linked_list.build}'
                             f'({line}, {{ cyclePosition: {serialize(cycle_position, language)} }})'
                         )
                     elif cycle_position != -1:
                         line = (
-                            f'{config["build_linked_list"]}'
+                            f'{config.linked_list.build}'
                             f'({line}, {serialize(cycle_position, language)})'
                         )
                     else:
-                        line = f'{config["build_linked_list"]}({line})'
+                        line = f'{config.linked_list.build}({line})'
                 case _:
                     line = serialize(value, language)
 
@@ -553,9 +638,9 @@ def build_problem_test_case_expression(problem, test_case_data, language):
 
         match return_type:
             case ProblemType.BINARY_TREE:
-                res = f'{config["serialize_tree"]}(solution.{metadata["method_name"]}({serialized_inputs}))'
+                res = f'{config.binary_tree.serialize}(solution.{metadata["method_name"]}({serialized_inputs}))'
             case ProblemType.LINKED_LIST:
-                res = f'{config["serialize_linked_list"]}(solution.{metadata["method_name"]}({serialized_inputs}))'
+                res = f'{config.linked_list.serialize}(solution.{metadata["method_name"]}({serialized_inputs}))'
             case _:
                 res = f'solution.{metadata["method_name"]}({serialized_inputs})'
 
@@ -619,10 +704,10 @@ def get_effective_test_cases(problem, solution, language):
 
 def get_clipboard_test_cases(problem, solution, language):
     config = LANGUAGE_CONFIG[language]
-    solution_instance_setup = config["instance"]
+    solution_instance_setup = config.solution.instance_code
 
     return solution_instance_setup + "\n".join(
-        f'{config["print"]}({test_input}, {expected})'
+        f'{config.print}({test_input}, {expected})'
         for test_input, expected in get_effective_test_cases(problem, solution, language)
     ) + "\n"
 
@@ -651,10 +736,7 @@ def clean_types(source_code):
     return source_code
 
 
-def get_utility(utility_type, language):
-    config = LANGUAGE_CONFIG[language]
-    filename = config[utility_type]
-
+def get_utility(filename):
     file_path = settings \
         .BASE_DIR \
         / "python_problems/utils" \
@@ -667,19 +749,27 @@ def get_utility(utility_type, language):
 
 
 def attach_utils(source_code, language, problem_type, is_in_place):
+    config = LANGUAGE_CONFIG[language]
+
     if is_in_place:
-        source_code = source_code.rstrip() + "\n" + get_utility(
-            "in_place_utils", language).rstrip() + "\n"
+        source_code = source_code.rstrip() + "\n" + \
+            get_utility(
+            config.in_place_utils_file
+        ).rstrip() + "\n"
 
     match problem_type:
         case ProblemType.BINARY_TREE:
             source_code = get_utility(
-                "binary_tree_utils", language) + "\n" + source_code
+                config.binary_tree.utils_file
+            ) + "\n" + source_code
         case ProblemType.LINKED_LIST:
             source_code = get_utility(
-                "linked_list_utils", language) + "\n" + source_code
+                config.linked_list.utils_file
+            ) + "\n" + source_code
         case ProblemType.CLASS:
-            class_utils = get_utility("class_design_utils", language)
+            class_utils = get_utility(
+                config.class_design.utils_file
+            )
             cleaned_utils = clean_types(class_utils)
             source_code = source_code + "\n" + cleaned_utils
 
@@ -690,9 +780,9 @@ def attach_utils(source_code, language, problem_type, is_in_place):
                 + "from typing import Optional, List\n"
                 + source_code
             )
-        case "JavaScript":
+        case "JavaScript" if config.heap_utils_file:
             source_code = (
-                get_utility("heap", language)
+                get_utility(config.heap_utils_file)
                 + source_code
             )
 
@@ -703,8 +793,8 @@ def add_solution_instance_setup(source_code, method_name, language):
     if method_name:
         config = LANGUAGE_CONFIG[language]
 
-        if not re.search(config["instance_pattern"], source_code):
-            source_code += config["instance"]
+        if not re.search(config.solution.instance_pattern, source_code):
+            source_code += config.solution.instance_code
 
     return source_code
 
@@ -716,7 +806,7 @@ def build_validation_payload(source_code, language, test_cases):
 
     config = LANGUAGE_CONFIG[language]
     test_case_expressions = [
-        f'{config["print"]}({config["serialize"]}({input_data}))'
+        f'{config.print}({config.serialize}({input_data}))'
         for input_data, _ in test_cases
     ]
     updated_code = source_code.rstrip() + "\n" + "\n".join(test_case_expressions) + "\n"
@@ -851,9 +941,9 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
 
     updated_code = (
         f"{source_code.rstrip()}\n"
-        f'{config["operations_list"]} = {serialize(operations_list, language)}\n'
-        f'{config["arguments_list"]} = {serialize(arguments_list, language)}\n'
-        f'{config["run_tests"]}({metadata["class_name"]}, 'f'{config["operations_list"]}, {config["arguments_list"]})\n'
+        f'{config.naming.operations_list} = {serialize(operations_list, language)}\n'
+        f'{config.naming.arguments_list} = {serialize(arguments_list, language)}\n'
+        f'{config.run_tests_function}({metadata["class_name"]}, 'f'{config.naming.operations_list}, {config.naming.arguments_list})\n'
     )
     expected_output = [serialize(expected, language)
                        for expected in expected_list]
@@ -877,8 +967,8 @@ def build_validation_in_place_payload(source_code, language, test_cases, method_
     )
     updated_code = (
         f"{updated_code.rstrip()}\n"
-        f'{config["inputs_list"]} = {serialize(inputs_list, language)}\n'
-        f'{config["run_tests"]}(solution.{method_name})\n'
+        f'{config.naming.inputs_list} = {serialize(inputs_list, language)}\n'
+        f'{config.run_tests_function}(solution.{method_name})\n'
     )
     expected_output = [serialize(expected, language)
                        for expected in expected_list]
@@ -927,18 +1017,18 @@ def attach_validation_payload(source_code, problem, language, test_cases, button
 def check_for_response_error(response):
     if not response:
         return "No response from judge0."
-    
+
     # handles C++ response["error"]
     elif "error" in response:
         return response["error"]
-    
+
     # handles Java response["compile_output"]
     elif response["compile_output"] is not None:
         return response["compile_output"]
 
     elif response["status"]["id"] in (1, 2, 3, 4, 5, 6):
         return response["status"]["description"]
-    
+
     else:
         return response["stderr"]
 

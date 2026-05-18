@@ -463,7 +463,7 @@ class ProblemScriptTests(TestCase):
 
         self.assertEqual(
             expression,
-            "serialize_tree(solution.invertTree(build_tree([4, 2, 7, 1, 3, 6, 9])))",
+            "serialize_binary_tree(solution.invertTree(build_binary_tree([4, 2, 7, 1, 3, 6, 9])))",
         )
 
     def test_build_problem_test_case_expression_supports_linked_list_cycles_python(self):
