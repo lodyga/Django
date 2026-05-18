@@ -180,15 +180,15 @@ class ProblemDetailView(DetailView):
         effective_test_cases = get_effective_test_cases(
             problem,
             selected_solution,
-            language.name,
+            language,
         )
         clipboard_test_cases = get_clipboard_test_cases(
             problem,
             selected_solution,
-            language.name,
+            language,
         )
         url = parse_url(problem.url)
-        source_code = get_placeholder_source_code(language.id)
+        source_code = get_placeholder_source_code(language)
         tag_list = problem.tags.all()
 
         # Get related problems.

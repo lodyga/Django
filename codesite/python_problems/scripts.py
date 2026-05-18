@@ -12,6 +12,7 @@ from django.conf import settings
 from django.templatetags.static import static
 from codesite.auth.judge0_auth import JUDGE0_API_KEY
 from python_problems.models import Problem, ComparisonType, ProblemType
+from abc import ABC
 
 
 @dataclass(frozen=True)
@@ -64,80 +65,120 @@ class LanguageConfig:
     heap_utils_file: str = ""
 
 
-LANGUAGE_CONFIG = {
-    "Python": LanguageConfig(
+def get_language_name(language):
+    return language.name if hasattr(language, "name") else language
+
+
+class LanguageAdapter(ABC):
+    config: LanguageConfig
+
+    @property
+    def solution(self) -> SolutionConfig:
+        return self.config.solution
+
+    @property
+    def binary_tree(self) -> BinaryTreeConfig:
+        return self.config.binary_tree
+
+    @property
+    def linked_list(self) -> LinkedListConfig:
+        return self.config.linked_list
+
+    @property
+    def class_design(self) -> ClassDesignConfig:
+        return self.config.class_design
+
+    @property
+    def naming(self) -> NamingConvention:
+        return self.config.naming
+
+    @property
+    def run_tests_function(self) -> str:
+        return self.config.run_tests_function
+
+    @property
+    def in_place_utils_file(self) -> str:
+        return self.config.in_place_utils_file
+
+    @property
+    def heap_utils_file(self) -> str:
+        return self.config.heap_utils_file
+
+    def print_call(self, expression: str) -> str:
+        return f"{self.config.print}({expression})"
+
+    def serialize_call(self, expression: str) -> str:
+        return f"{self.config.serialize}({expression})"
+
+
+class PythonAdapter(LanguageAdapter):
+    config = LanguageConfig(
         print="print",
         serialize="json.dumps",
-
         solution=SolutionConfig(
             instance_code="\nsolution = Solution()\n",
             instance_pattern=r"solution\s*=\s*Solution\(\)\s*",
         ),
-
         binary_tree=BinaryTreeConfig(
             utils_file="binary_tree_utils.py",
             build="build_binary_tree",
             serialize="serialize_binary_tree",
         ),
-
         linked_list=LinkedListConfig(
             utils_file="linked_list_utils.py",
             build="build_linked_list",
             serialize="serialize_linked_list",
         ),
-
         class_design=ClassDesignConfig(
-            utils_file="class_design_utils.py"
+            utils_file="class_design_utils.py",
         ),
-
         naming=NamingConvention(
             inputs_list="inputs_list",
             operations_list="operations_list",
             arguments_list="arguments_list",
             expected_list="expected_list",
         ),
-
         run_tests_function="run_tests",
         in_place_utils_file="in_place_utils.py",
-    ),
+    )
 
-    "JavaScript": LanguageConfig(
+
+class JavaScriptAdapter(LanguageAdapter):
+    config = LanguageConfig(
         print="console.log",
         serialize="JSON.stringify",
-
         solution=SolutionConfig(
             instance_code="\nconst solution = new Solution();\n",
             instance_pattern=r"const\s+solution\s*=\s*new\s+Solution\(\)\s*;?",
         ),
-
         binary_tree=BinaryTreeConfig(
             utils_file="binary-tree-utils.js",
             build="buildBinaryTree",
             serialize="serializeBinaryTree",
         ),
-
         linked_list=LinkedListConfig(
             utils_file="linked-list-utils.js",
             build="buildLinkedList",
             serialize="serializeLinkedList",
         ),
-
         class_design=ClassDesignConfig(
-            utils_file="class-design-utils.js"
+            utils_file="class-design-utils.js",
         ),
-
         naming=NamingConvention(
             inputs_list="inputsList",
             operations_list="operationsList",
             arguments_list="argumentsList",
             expected_list="expectedList",
         ),
-
         run_tests_function="runTests",
         in_place_utils_file="in-place-utils.js",
         heap_utils_file="heap-utils.js",
-    ),
+    )
 
+
+LANGUAGE_ADAPTERS = {
+    "Python": PythonAdapter(),
+    "JavaScript": JavaScriptAdapter(),
 }
 
 
@@ -207,7 +248,9 @@ def serialize(value, language):
     """
     [2, 7, 11, 15] => '[2, 7, 11, 15]'
     """
-    if language == "Python":
+    language_name = get_language_name(language)
+
+    if language_name == "Python":
         return repr(value)
 
     return json.dumps(value)
@@ -593,7 +636,8 @@ def build_problem_test_case_expression(problem, test_case_data, language):
     'serialize_linked_list(solution.reverseList(build_linked_list([1, 2, 3, 4, 5])))'
     """
 
-    config = LANGUAGE_CONFIG[language]
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
     metadata = get_problem_metadata(problem)
 
     if metadata:
@@ -612,23 +656,24 @@ def build_problem_test_case_expression(problem, test_case_data, language):
             match data_type:
                 case ProblemType.BINARY_TREE:
                     line = serialize(value, language)
-                    line = f'{config.binary_tree.build}({line})'
+                    line = f'{adapter.binary_tree.build}({line})'
+
                 case ProblemType.LINKED_LIST:
                     values, cycle_position = unpack_linked_list_payload(value)
                     line = serialize(values, language)
 
-                    if language == "JavaScript" and cycle_position != -1:
+                    if language_name == "JavaScript" and cycle_position != -1:
                         line = (
-                            f'{config.linked_list.build}'
+                            f'{adapter.linked_list.build}'
                             f'({line}, {{ cyclePosition: {serialize(cycle_position, language)} }})'
                         )
                     elif cycle_position != -1:
                         line = (
-                            f'{config.linked_list.build}'
+                            f'{adapter.linked_list.build}'
                             f'({line}, {serialize(cycle_position, language)})'
                         )
                     else:
-                        line = f'{config.linked_list.build}({line})'
+                        line = f'{adapter.linked_list.build}({line})'
                 case _:
                     line = serialize(value, language)
 
@@ -638,9 +683,9 @@ def build_problem_test_case_expression(problem, test_case_data, language):
 
         match return_type:
             case ProblemType.BINARY_TREE:
-                res = f'{config.binary_tree.serialize}(solution.{metadata["method_name"]}({serialized_inputs}))'
+                res = f'{adapter.binary_tree.serialize}(solution.{metadata["method_name"]}({serialized_inputs}))'
             case ProblemType.LINKED_LIST:
-                res = f'{config.linked_list.serialize}(solution.{metadata["method_name"]}({serialized_inputs}))'
+                res = f'{adapter.linked_list.serialize}(solution.{metadata["method_name"]}({serialized_inputs}))'
             case _:
                 res = f'solution.{metadata["method_name"]}({serialized_inputs})'
 
@@ -703,11 +748,12 @@ def get_effective_test_cases(problem, solution, language):
 
 
 def get_clipboard_test_cases(problem, solution, language):
-    config = LANGUAGE_CONFIG[language]
-    solution_instance_setup = config.solution.instance_code
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
+    solution_instance_setup = adapter.solution.instance_code
 
     return solution_instance_setup + "\n".join(
-        f'{config.print}({test_input}, {expected})'
+        adapter.print_call(f"{test_input}, {expected}")
         for test_input, expected in get_effective_test_cases(problem, solution, language)
     ) + "\n"
 
@@ -749,40 +795,41 @@ def get_utility(filename):
 
 
 def attach_utils(source_code, language, problem_type, is_in_place):
-    config = LANGUAGE_CONFIG[language]
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
 
     if is_in_place:
         source_code = source_code.rstrip() + "\n" + \
             get_utility(
-            config.in_place_utils_file
+            adapter.in_place_utils_file
         ).rstrip() + "\n"
 
     match problem_type:
         case ProblemType.BINARY_TREE:
             source_code = get_utility(
-                config.binary_tree.utils_file
+                adapter.binary_tree.utils_file
             ) + "\n" + source_code
         case ProblemType.LINKED_LIST:
             source_code = get_utility(
-                config.linked_list.utils_file
+                adapter.linked_list.utils_file
             ) + "\n" + source_code
         case ProblemType.CLASS:
             class_utils = get_utility(
-                config.class_design.utils_file
+                adapter.class_design.utils_file
             )
             cleaned_utils = clean_types(class_utils)
             source_code = source_code + "\n" + cleaned_utils
 
-    match language:
+    match language_name:
         case "Python":
             source_code = (
                 "import json\n"
                 + "from typing import Optional, List\n"
                 + source_code
             )
-        case "JavaScript" if config.heap_utils_file:
+        case "JavaScript" if adapter.heap_utils_file:
             source_code = (
-                get_utility(config.heap_utils_file)
+                get_utility(adapter.heap_utils_file)
                 + source_code
             )
 
@@ -791,10 +838,11 @@ def attach_utils(source_code, language, problem_type, is_in_place):
 
 def add_solution_instance_setup(source_code, method_name, language):
     if method_name:
-        config = LANGUAGE_CONFIG[language]
+        language_name = get_language_name(language)
+        adapter = LANGUAGE_ADAPTERS[language_name]
 
-        if not re.search(config.solution.instance_pattern, source_code):
-            source_code += config.solution.instance_code
+        if not re.search(adapter.solution.instance_pattern, source_code):
+            source_code += adapter.solution.instance_code
 
     return source_code
 
@@ -804,9 +852,10 @@ def build_validation_payload(source_code, language, test_cases):
     # =>
     # 'print(json.dumps(solution.twoSum([2, 7, 11, 15], 9)))'
 
-    config = LANGUAGE_CONFIG[language]
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
     test_case_expressions = [
-        f'{config.print}({config.serialize}({input_data}))'
+        adapter.print_call(adapter.serialize_call(input_data))
         for input_data, _ in test_cases
     ]
     updated_code = source_code.rstrip() + "\n" + "\n".join(test_case_expressions) + "\n"
@@ -848,11 +897,13 @@ def compare_output_and_expected(output, expected, comparison_type, language):
     expected_raw_item: P: 'True'
                       JS: 'true'
     """
+    language_name = get_language_name(language)
+
     if len(output) != len(expected):
         return False
 
     for item, expected_raw_item in zip(output, expected):
-        match language:
+        match language_name:
             # "True" => True
             case "Python":
                 try:
@@ -929,7 +980,8 @@ def run_judge0(source_code, language):
 
 
 def build_validation_class_payload(source_code, language, test_cases, metadata):
-    config = LANGUAGE_CONFIG[language]
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
     operations_list = []
     arguments_list = []
     expected_list = []
@@ -941,9 +993,10 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
 
     updated_code = (
         f"{source_code.rstrip()}\n"
-        f'{config.naming.operations_list} = {serialize(operations_list, language)}\n'
-        f'{config.naming.arguments_list} = {serialize(arguments_list, language)}\n'
-        f'{config.run_tests_function}({metadata["class_name"]}, 'f'{config.naming.operations_list}, {config.naming.arguments_list})\n'
+        # todo
+        f'{adapter.naming.operations_list} = {serialize(operations_list, language)}\n'
+        f'{adapter.naming.arguments_list} = {serialize(arguments_list, language)}\n'
+        f'{adapter.run_tests_function}({metadata["class_name"]}, 'f'{adapter.naming.operations_list}, {adapter.naming.arguments_list})\n'
     )
     expected_output = [serialize(expected, language)
                        for expected in expected_list]
@@ -952,7 +1005,8 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
 
 
 def build_validation_in_place_payload(source_code, language, test_cases, method_name):
-    config = LANGUAGE_CONFIG[language]
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
     inputs_list = []
     expected_list = []
 
@@ -967,8 +1021,8 @@ def build_validation_in_place_payload(source_code, language, test_cases, method_
     )
     updated_code = (
         f"{updated_code.rstrip()}\n"
-        f'{config.naming.inputs_list} = {serialize(inputs_list, language)}\n'
-        f'{config.run_tests_function}(solution.{method_name})\n'
+        f'{adapter.naming.inputs_list} = {serialize(inputs_list, language)}\n'
+        f'{adapter.run_tests_function}(solution.{method_name})\n'
     )
     expected_output = [serialize(expected, language)
                        for expected in expected_list]
@@ -1079,11 +1133,11 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     return get_results(expected_output, problem, language, response)
 
 
-def get_placeholder_source_code(language_id):
+def get_placeholder_source_code(language):
     """
     Set default `Hello, world!` placeholder.
     """
-    match language_id:
+    match language.id:
         case 1:
             placeholder_source_code = """# Python (3.8.1)\r\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
         case 2:
@@ -1162,16 +1216,18 @@ def get_problem_type_header(problem_type, language):
     """
     Return problem type definition snippet.
     """
+    language_name = get_language_name(language)
+
     match problem_type:
         case ProblemType.BINARY_TREE:
-            match language.name:
+            match language_name:
                 case "Python":
                     return '''# class TreeNode:\n#     """\n#     Definition for a binary tree node.\n#     """\n#     def __init__(self, val=None, left=None, right=None):\n#         self.val = val\n#         self.left = left\n#         self.right = right\n\n\n'''
                 case "JavaScript":
                     return """/**\n * class TreeNode {\n *    constructor(val = null, left = null, right = null) {\n *       this.val = val\n *       this.left = left\n *       this.right = right\n *    };\n * }\n */\n\n\n"""
 
         case ProblemType.LINKED_LIST:
-            match language.name:
+            match language_name:
                 case "Python":
                     return '''# class ListNode:\n#     """\n#     Definition for singly-linked list.\n#     """\n#     def __init__(self, val=None, next=None):\n#         self.val = val\n#         self.next = next\n\n\n'''
                 case "JavaScript":
