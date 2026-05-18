@@ -1,7 +1,14 @@
 from django.urls import path, include
 # REST API
 from rest_framework.routers import DefaultRouter
-from .views import TagViewSet, DifficultyViewSet, ComplexityViewSet, LanguageViewSet, ProblemViewSet, SolutionViewSet
+from .views import (
+    TagViewSet,
+    DifficultyViewSet,
+    ComplexityViewSet,
+    LanguageViewSet,
+    ProblemViewSet,
+    SolutionViewSet
+)
 from . import views
 
 app_name = "python_problems"
@@ -48,7 +55,7 @@ urlpatterns = [
          views.SolutionUpdate.as_view(), name="solution-update"),
     path("solution/<int:pk>/delete/",
          views.SolutionDelete.as_view(), name="solution-delete"),
-    
+
     path("test_case/<int:pk>/update/",
          views.TestCaseUpdate.as_view(), name="test_case-update"),
     path("test_case/<int:pk>/delete/",

@@ -1,4 +1,3 @@
-# from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
@@ -10,11 +9,45 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from rest_framework import viewsets
-from .forms import *
-from .models import *
-from .serializers import *
-from .scripts import *
-from core.scripts import *
+from .forms import (
+    ProblemForm,
+    SolutionCreateForm,
+    SolutionUpdateForm,
+    TestCaseCreateForm,
+    TestCaseUpdateForm,
+)
+from .models import (
+    Problem,
+    Tag,
+    Solution,
+    Language,
+    TestCase,
+    Difficulty,
+    Complexity,
+)
+from .serializers import (
+    TagSerializer,
+    DifficultySerializer,
+    ComplexitySerializer,
+    LanguageSerializer,
+    ProblemSerializer,
+    SolutionSerializer,
+)
+from .services.ui_test_cases import (
+    get_ui_test_cases,
+    get_effective_test_cases,
+    get_clipboard_test_cases
+)
+from .services.code_assembly import (
+    get_problem_type_header, 
+    get_placeholder_source_code
+)
+from .services.judge0 import execute_code
+from .services.problem_helpers import (
+    parse_url,
+    get_adjacent_slugs,
+    parse_problem_description
+)
 
 
 def tag_graph_view(request):

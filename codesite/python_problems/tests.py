@@ -16,12 +16,14 @@ from .models import (
     Tag,
     TestCase as ProblemTestCase,
 )
-from .scripts import (
-    build_problem_test_case_expression,
+from .services.code_assembly import (
     build_validation_class_payload,
     build_validation_in_place_payload,
+)
+from .services.previews import draw_linked_list
+from .services.ui_test_cases import (
+    build_problem_test_case_expression,
     get_ui_test_cases,
-    draw_linked_list,
 )
 from .views import ProblemIndexView
 

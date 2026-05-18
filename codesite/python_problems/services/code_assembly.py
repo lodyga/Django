@@ -1,0 +1,245 @@
+import re
+from django.conf import settings
+from python_problems.models import ProblemType
+from .languages import get_language_name, LANGUAGE_ADAPTERS
+from .test_case_parsing import get_field, serialize
+from .ui_test_cases import get_problem_type_name, get_problem_metadata
+
+
+def clean_types(source_code):
+    """Convert types to match Python 3.8"""
+    source_code = re.sub(
+        r"list\[",
+        "List[",
+        source_code
+    )
+    source_code = re.sub(
+        r"TreeNode\s*\|\s*None\s*",
+        "Optional[TreeNode]",
+        source_code
+    )
+    source_code = re.sub(
+        r"ListNode\s*\|\s*None\s*",
+        "Optional[ListNode]",
+        source_code
+    )
+    return source_code
+
+
+def get_utility(filename):
+    file_path = settings \
+        .BASE_DIR \
+        / "python_problems/utils" \
+        / filename
+
+    with open(file_path, "r") as file:
+        utility = file.read()
+
+    return utility
+
+
+def attach_utils(source_code, language, problem_type, is_in_place):
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
+
+    if is_in_place:
+        source_code = source_code.rstrip() + "\n" + \
+            get_utility(
+            adapter.in_place_utils_file
+        ).rstrip() + "\n"
+
+    match problem_type:
+        case ProblemType.BINARY_TREE:
+            source_code = get_utility(
+                adapter.binary_tree.utils_file
+            ) + "\n" + source_code
+        case ProblemType.LINKED_LIST:
+            source_code = get_utility(
+                adapter.linked_list.utils_file
+            ) + "\n" + source_code
+        case ProblemType.CLASS:
+            class_utils = get_utility(
+                adapter.class_design.utils_file
+            )
+            cleaned_utils = clean_types(class_utils)
+            source_code = source_code + "\n" + cleaned_utils
+
+    match language_name:
+        case "Python":
+            source_code = (
+                "import json\n"
+                + "from typing import Optional, List\n"
+                + source_code
+            )
+        case "JavaScript" if adapter.heap_utils_file:
+            source_code = (
+                get_utility(adapter.heap_utils_file)
+                + source_code
+            )
+
+    return source_code
+
+
+def add_solution_instance_setup(source_code, method_name, language):
+    if method_name:
+        language_name = get_language_name(language)
+        adapter = LANGUAGE_ADAPTERS[language_name]
+
+        if not re.search(adapter.solution.instance_pattern, source_code):
+            source_code += adapter.solution.instance_code
+
+    return source_code
+
+
+def build_validation_payload(source_code, language, test_cases):
+    # ('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]')
+    # =>
+    # 'print(json.dumps(solution.twoSum([2, 7, 11, 15], 9)))'
+
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
+    test_case_expressions = [
+        adapter.print_call(adapter.serialize_call(input_data))
+        for input_data, _ in test_cases
+    ]
+    updated_code = source_code.rstrip() + "\n" + "\n".join(test_case_expressions) + "\n"
+    expected_output = [expected for _, expected in test_cases]
+
+    return updated_code, expected_output
+
+
+def build_validation_class_payload(source_code, language, test_cases, metadata):
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
+    operations_list = []
+    arguments_list = []
+    expected_list = []
+
+    for test_case in test_cases.all():
+        operations_list.append(get_field(test_case.data, "operations"))
+        arguments_list.append(get_field(test_case.data, "arguments"))
+        expected_list.append(get_field(test_case.data, "expected"))
+
+    updated_code = (
+        f"{source_code.rstrip()}\n"
+        # todo
+        f'{adapter.naming.operations_list} = {serialize(operations_list, language)}\n'
+        f'{adapter.naming.arguments_list} = {serialize(arguments_list, language)}\n'
+        f'{adapter.run_tests_function}({metadata["class_name"]}, 'f'{adapter.naming.operations_list}, {adapter.naming.arguments_list})\n'
+    )
+    expected_output = [serialize(expected, language)
+                       for expected in expected_list]
+
+    return updated_code, expected_output
+
+
+def build_validation_in_place_payload(source_code, language, test_cases, method_name):
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
+    inputs_list = []
+    expected_list = []
+
+    for test_case in test_cases.all():
+        inputs_list.append(get_field(test_case.data, "inputs"))
+        expected_list.append(get_field(test_case.data, "expected"))
+
+    updated_code = add_solution_instance_setup(
+        source_code,
+        method_name,
+        language
+    )
+    updated_code = (
+        f"{updated_code.rstrip()}\n"
+        f'{adapter.naming.inputs_list} = {serialize(inputs_list, language)}\n'
+        f'{adapter.run_tests_function}(solution.{method_name})\n'
+    )
+    expected_output = [serialize(expected, language)
+                       for expected in expected_list]
+
+    return updated_code, expected_output
+
+
+def attach_validation_payload(source_code, problem, language, test_cases, button_pressed):
+    if button_pressed == "run":
+        return source_code, []
+
+    problem_type = get_problem_type_name(problem)
+    metadata = get_problem_metadata(problem)
+
+    if metadata.get("in_place", False):
+        source_code, expected_output = build_validation_in_place_payload(
+            source_code,
+            language,
+            problem.testcases,
+            metadata["method_name"]
+        )
+
+    elif problem_type == ProblemType.CLASS:
+        source_code, expected_output = build_validation_class_payload(
+            source_code,
+            language,
+            problem.testcases,
+            metadata
+        )
+
+    else:
+        source_code = add_solution_instance_setup(
+            source_code,
+            problem.method_name or metadata["method_name"],
+            language
+        )
+        source_code, expected_output = build_validation_payload(
+            source_code,
+            language,
+            test_cases,
+        )
+
+    return source_code, expected_output
+
+
+def get_problem_type_header(problem_type, language):
+    """
+    Return problem type definition snippet.
+    """
+    language_name = get_language_name(language)
+
+    match problem_type:
+        case ProblemType.BINARY_TREE:
+            match language_name:
+                case "Python":
+                    return '''# class TreeNode:\n#     """\n#     Definition for a binary tree node.\n#     """\n#     def __init__(self, val=None, left=None, right=None):\n#         self.val = val\n#         self.left = left\n#         self.right = right\n\n\n'''
+                case "JavaScript":
+                    return """/**\n * class TreeNode {\n *    constructor(val = null, left = null, right = null) {\n *       this.val = val\n *       this.left = left\n *       this.right = right\n *    };\n * }\n */\n\n\n"""
+
+        case ProblemType.LINKED_LIST:
+            match language_name:
+                case "Python":
+                    return '''# class ListNode:\n#     """\n#     Definition for singly-linked list.\n#     """\n#     def __init__(self, val=None, next=None):\n#         self.val = val\n#         self.next = next\n\n\n'''
+                case "JavaScript":
+                    return """/**\n * Represents a node in a singly-linked list.\n * class ListNode {\n *    constructor(val = null, next = null) {\n *       this.val = val;\n *       this.next = next;\n *    }\n * }\n */\n\n\n"""
+
+    return ""
+
+
+def get_placeholder_source_code(language):
+    """
+    Set default `Hello, world!` placeholder.
+    """
+    match language.id:
+        case 1:
+            placeholder_source_code = """# Python (3.8.1)\r\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
+        case 2:
+            placeholder_source_code = """// JavaScript (Node.js 12.14.0)\r\n\r\nclass Solution {\r\n  fun(x) {\r\n    return x\r\n  }\r\n}\r\n\r\nconst solution = new Solution();\r\nconsole.log(solution.fun('Hello, World!'))"""
+        case 6:
+            placeholder_source_code = """// Java (OpenJDK 13.0.1)\r\nimport java.util.*;\r\n\r\npublic class Main {\r\n    public static void main(String[] args) {\r\n        System.out.println("Hello, World!");\r\n    }\r\n}"""
+        case 7:
+            placeholder_source_code = """// C++ (GCC 9.2.0)\r\n\r\n#include <iostream>\r\nusing namespace std;\r\n\r\nint main() {\r\n  cout << "Hello, World!";\r\n  return 0;\r\n}"""
+        case 3:
+            placeholder_source_code = """# Python (3.8.1)\r\nimport pandas as pd\r\n\r\n"""
+        case 4:
+            placeholder_source_code = """SELECT *\r\nFROM *\r\nWHERE *"""
+        case 5:
+            placeholder_source_code = """SELECT *\r\nFROM *\r\nWHERE *"""
+        case _:
+            placeholder_source_code = """Not known programming language."""
+    return placeholder_source_code
