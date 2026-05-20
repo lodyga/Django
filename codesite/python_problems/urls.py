@@ -28,8 +28,8 @@ urlpatterns = [
     path("tag/create/", views.TagCreate.as_view(), name="tag-create"),
 
     # Tag update/delete
-    # path("tag/<int:pk>/update/", views.TagUpdate.as_view(), name="tag-update"),
-    # path("tag/<int:pk>/delete/", views.TagDelete.as_view(), name="tag-delete"),
+    path("tag/<int:pk>/update/", views.TagUpdate.as_view(), name="tag-update"),
+    path("tag/<int:pk>/delete/", views.TagDelete.as_view(), name="tag-delete"),
 
     path("tag/graph/", views.tag_graph_view, name="tag-graph"),
     path("", views.ProblemIndexView.as_view(), name="problem-index"),
@@ -40,7 +40,7 @@ urlpatterns = [
          name="solution-create"),  # create before slug
     path("language_add/", views.LanguageCreate.as_view(),
          name="language-create"),
-    path("test_case_create/", views.TestCaseCreate.as_view(),
+    path("test_case_create/", views.ProblemTestCaseCreate.as_view(),
          name="test_case-create"),
 
 
@@ -57,7 +57,7 @@ urlpatterns = [
          views.SolutionDelete.as_view(), name="solution-delete"),
 
     path("test_case/<int:pk>/update/",
-         views.TestCaseUpdate.as_view(), name="test_case-update"),
+         views.ProblemTestCaseUpdate.as_view(), name="test_case-update"),
     path("test_case/<int:pk>/delete/",
-         views.TestCaseDelete.as_view(), name="test_case-delete"),
+         views.ProblemTestCaseDelete.as_view(), name="test_case-delete"),
 ]

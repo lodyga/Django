@@ -2,8 +2,8 @@ import json
 import requests
 import socket
 from codesite.auth.judge0_auth import JUDGE0_API_KEY
-from .ui_test_cases import get_problem_metadata, get_problem_type_name
-from .test_case_parsing import compare_output_and_expected
+from .ui_problem_test_cases import get_problem_metadata, get_problem_type_name
+from .problem_test_case_parsing import compare_output_and_expected
 from .code_assembly import clean_types, attach_utils, attach_validation_payload
 
 def is_localhost():

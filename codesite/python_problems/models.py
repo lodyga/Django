@@ -130,7 +130,7 @@ class Problem(models.Model):
         return self.solutions.all()
 
 
-class TestCase(models.Model):
+class ProblemTestCase(models.Model):
     problem = models.ForeignKey(
         Problem,
         on_delete=models.CASCADE,
@@ -149,7 +149,7 @@ class TestCase(models.Model):
         ordering = ("order", "id")
 
     def __str__(self):
-        return f"{self.problem.title} - TestCase {self.order}"
+        return f"{self.problem.title} - Problem  {self.order}"
 
 
 class Solution(models.Model):

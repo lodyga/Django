@@ -104,8 +104,12 @@ def draw_list(heights, parameter_name):
     if not heights:
         return ""
 
-    fill = "█"
     max_height = max(heights)
+    
+    if max_height > 1000:
+        return ""
+    
+    fill = "█"
     lines = []
 
     for level in range(max_height, 0, -1):

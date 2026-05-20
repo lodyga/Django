@@ -1,43 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
    // Test Case buttons.
-   const testcaseElements = document.getElementsByClassName('testCaseContent');
-   const testCaseLength = testcaseElements.length;
-   const testCaseButtonContainer = document.getElementById('testCaseButtonContainer');
-   const copyTestCasesBtn = document.getElementById('copyTestCasesBtn');
-   const clipboardNode = document.getElementById('clipboardTestCases');
-   const clipboardTestCases = clipboardNode ? clipboardNode.innerText : '';
-   const testCaseUpdateLink = document.getElementById('testCaseUpdateLink');
-   const currentUserId = testCaseUpdateLink?.dataset.currentUserId || '';
+   const problemTestCaseElements = document.getElementsByClassName('problemTestCaseContent');
+   const problemTestCaseLength = problemTestCaseElements.length;
+   const problemTestCaseButtonContainer = document.getElementById('problemTestCaseButtonContainer');
+   const copyProblemTestCasesBtn = document.getElementById('copyProblemTestCasesBtn');
+   const clipboardNode = document.getElementById('clipboardProblemTestCases');
+   const clipboardProblemTestCases = clipboardNode ? clipboardNode.innerText : '';
+   const problemTestCaseUpdateLink = document.getElementById('problemTestCaseUpdateLink');
+   const currentUserId = problemTestCaseUpdateLink?.dataset.currentUserId || '';
 
    // Collapsable paragraph.
-   const testCasesWrapper = document.getElementById('problemTestCases');
-   if (!testCasesWrapper) {
+   const problemTestCasesWrapper = document.getElementById('problemTestCases');
+   if (!problemTestCasesWrapper) {
       return;
    }
-   const testCaseCollapse = new bootstrap.Collapse(testCasesWrapper, { toggle: false });
-   const testCaseToggle = document.querySelector('[data-bs-target="#problemTestCases"]');
-   const icon = testCaseToggle.querySelector('i');
-   const isTestCaseVisible = localStorage.getItem('testCaseState') !== 'false';
-   isTestCaseVisible ? testCaseCollapse.show() : testCaseCollapse.hide();
+   const problemTestCaseCollapse = new bootstrap.Collapse(problemTestCasesWrapper, { toggle: false });
+   const problemTestCaseToggle = document.querySelector('[data-bs-target="#problemTestCases"]');
+   const icon = problemTestCaseToggle.querySelector('i');
+   const isProblemTestCaseVisible = localStorage.getItem('problemTestCaseState') !== 'false';
+   isProblemTestCaseVisible ? problemTestCaseCollapse.show() : problemTestCaseCollapse.hide();
 
-   testCasesWrapper.addEventListener('shown.bs.collapse', () => {
-      localStorage.setItem('testCaseState', 'true');
+   problemTestCasesWrapper.addEventListener('shown.bs.collapse', () => {
+      localStorage.setItem('problemTestCaseState', 'true');
       icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-      testCaseToggle.setAttribute('aria-expanded', 'true');
+      problemTestCaseToggle.setAttribute('aria-expanded', 'true');
    });
 
-   testCasesWrapper.addEventListener('hidden.bs.collapse', () => {
-      localStorage.setItem('testCaseState', 'false');
+   problemTestCasesWrapper.addEventListener('hidden.bs.collapse', () => {
+      localStorage.setItem('problemTestCaseState', 'false');
       icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-      testCaseToggle.setAttribute('aria-expanded', 'false');
+      problemTestCaseToggle.setAttribute('aria-expanded', 'false');
    });
 
-   function buildActionUrl(linkElement, testCaseId) {
+   function buildActionUrl(linkElement, problemTestCaseId) {
       if (!linkElement?.dataset.urlTemplate) {
          return null;
       }
 
-      const baseUrl = linkElement.dataset.urlTemplate.replace('/0/', `/${testCaseId}/`);
+      const baseUrl = linkElement.dataset.urlTemplate.replace('/0/', `/${problemTestCaseId}/`);
       const currentHref = linkElement.getAttribute('href') || '';
       const currentUrl = new URL(currentHref, window.location.origin);
       const nextUrl = (
@@ -57,48 +57,48 @@ document.addEventListener('DOMContentLoaded', () => {
       return `${baseUrl}?${params.toString()}`;
    }
 
-   if (testCaseButtonContainer) {
-      for (let index = 1; index < testCaseLength + 1; index++) {
+   if (problemTestCaseButtonContainer) {
+      for (let index = 1; index < problemTestCaseLength + 1; index++) {
          const button = document.createElement('button');
-         button.id = `testCaseButton-${index}`;
+         button.id = `problemTestCaseButton-${index}`;
          button.className = 'btn btn-secondary btn-sm me-2 py-0 px-3';
          button.textContent = `Case ${index}`;
-         button.onclick = () => { showTestCase(index); };
-         testCaseButtonContainer.appendChild(button);
+         button.onclick = () => { showProblemTestCase(index); };
+         problemTestCaseButtonContainer.appendChild(button);
       }
    }
 
-   function showTestCase(idx) {
-      for (let testCase of testcaseElements) {
-         testCase.style.display = 'none';
+   function showProblemTestCase(idx) {
+      for (let problemTestCase of problemTestCaseElements) {// problem
+         problemTestCase.style.display = 'none';
       }
 
-      const selectedTestCase = document.getElementById(`testCase-${idx}`);
-      selectedTestCase.style.display = 'block';
+      const selectedProblemTestCase = document.getElementById(`problemTestCase-${idx}`);
+      selectedProblemTestCase.style.display = 'block';
 
-      if (testCaseUpdateLink) {
-         const selectedTestCaseId = selectedTestCase?.dataset.testCaseId || '';
-         const selectedOwnerId = selectedTestCase?.dataset.ownerId || '';
-         const selectedSource = selectedTestCase?.dataset.source || '';
+      if (problemTestCaseUpdateLink) {
+         const selectedProblemTestCaseId = selectedProblemTestCase?.dataset.problemTestCaseId || '';
+         const selectedOwnerId = selectedProblemTestCase?.dataset.ownerId || '';
+         const selectedSource = selectedProblemTestCase?.dataset.source || '';
          const isCurrentUserOwner = (
             Boolean(currentUserId)
             && currentUserId === selectedOwnerId
          );
          const isSharedCase = selectedSource === 'shared';
 
-         if (isSharedCase && isCurrentUserOwner && selectedTestCaseId) {
-            testCaseUpdateLink.classList.remove('d-none');
-            const updateHref = buildActionUrl(testCaseUpdateLink, selectedTestCaseId);
+         if (isSharedCase && isCurrentUserOwner && selectedProblemTestCaseId) {
+            problemTestCaseUpdateLink.classList.remove('d-none');
+            const updateHref = buildActionUrl(problemTestCaseUpdateLink, selectedProblemTestCaseId);
             if (updateHref) {
-               testCaseUpdateLink.href = updateHref;
+               problemTestCaseUpdateLink.href = updateHref;
             }
          } else {
-            testCaseUpdateLink.classList.add('d-none');
+            problemTestCaseUpdateLink.classList.add('d-none');
          }
       }
 
-      for (let i = 1; i < testCaseLength + 1; i++) {
-         const btn = document.getElementById(`testCaseButton-${i}`);
+      for (let i = 1; i < problemTestCaseLength + 1; i++) {
+         const btn = document.getElementById(`problemTestCaseButton-${i}`);
          if (!btn) {
             continue;
          }
@@ -111,19 +111,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
    };
 
-   if (testCaseLength > 0) {
-      showTestCase(1);
+   if (problemTestCaseLength > 0) {
+      showProblemTestCase(1);
    }
 
-   if (copyTestCasesBtn) {
-      copyTestCasesBtn.addEventListener('click', () => {
-         navigator.clipboard.writeText(clipboardTestCases)
+   if (copyProblemTestCasesBtn) {
+      copyProblemTestCasesBtn.addEventListener('click', () => {
+         navigator.clipboard.writeText(clipboardProblemTestCases)
             .then(() => {
-               copyTestCasesBtn.classList.replace('btn-secondary', 'btn-success');
-               copyTestCasesBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+               copyProblemTestCasesBtn.classList.replace('btn-secondary', 'btn-success');
+               copyProblemTestCasesBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
                setTimeout(() => {
-                  copyTestCasesBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
-                  copyTestCasesBtn.classList.replace('btn-success', 'btn-secondary');
+                  copyProblemTestCasesBtn.innerHTML = '<i class="far fa-copy"></i> Copy';
+                  copyProblemTestCasesBtn.classList.replace('btn-success', 'btn-secondary');
                }, 2000);
             });
       });

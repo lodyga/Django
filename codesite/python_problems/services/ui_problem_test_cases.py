@@ -1,16 +1,16 @@
 from python_problems.models import ProblemType
-from .test_case_parsing import get_field, serialize, get_solution_test_cases
+from .problem_test_case_parsing import get_field, serialize, get_solution_problem_test_cases
 from .previews import draw_ascii, unpack_linked_list_payload
 from .languages import get_language_name, LANGUAGE_ADAPTERS
 
 
-def get_class_ui_test_cases(test_cases):
-    ui_test_cases = []
+def get_class_ui_problem_test_cases(problem_test_cases):
+    ui_problem_test_cases = []
 
-    for test_case in test_cases:
-        operations = get_field(test_case.data, "operations")
-        arguments = get_field(test_case.data, "arguments")
-        expected = get_field(test_case.data, "expected")
+    for problem_test_case in problem_test_cases:
+        operations = get_field(problem_test_case.data, "operations")
+        arguments = get_field(problem_test_case.data, "arguments")
+        expected = get_field(problem_test_case.data, "expected")
 
         if (len(operations) == len(arguments)):
             display_input = ", ".join(
@@ -21,26 +21,26 @@ def get_class_ui_test_cases(test_cases):
         else:
             display_input = (operations, arguments)
 
-        ui_test_cases.append({
-            "id": test_case.id,
-            "owner_id": test_case.owner_id,
+        ui_problem_test_cases.append({
+            "id": problem_test_case.id,
+            "owner_id": problem_test_case.owner_id,
             "source": "shared",
             "input": display_input,
             "output": expected,
         })
 
-    return ui_test_cases
+    return ui_problem_test_cases
 
 
-def get_meta_ui_test_cases(problem, language, test_cases):
-    ui_test_cases = []
+def get_meta_ui_problem_test_cases(problem, language, problem_test_cases):
+    ui_problem_test_cases = []
     metadata = get_problem_metadata(problem)
     problem_type = get_problem_type_name(problem)
     parameters = metadata["parameters"]
 
-    for test_case in test_cases:
-        inputs = get_field(test_case.data, "inputs")
-        expected = get_field(test_case.data, "expected")
+    for problem_test_case in problem_test_cases:
+        inputs = get_field(problem_test_case.data, "inputs")
+        expected = get_field(problem_test_case.data, "expected")
 
         if (parameters and len(parameters) == len(inputs)):
             display_input = "\n".join(
@@ -71,8 +71,8 @@ def get_meta_ui_test_cases(problem, language, test_cases):
 
         expected = serialize(expected, language)
         ui_item = {
-            "id": test_case.id,
-            "owner_id": test_case.owner_id,
+            "id": problem_test_case.id,
+            "owner_id": problem_test_case.owner_id,
             "source": "shared",
             "input": display_input,
             "output": expected,
@@ -80,11 +80,11 @@ def get_meta_ui_test_cases(problem, language, test_cases):
 
         if preview_data:
             ui_item["preview"] = preview_data
-        if test_case.explanation:
-            ui_item["explanation"] = test_case.explanation
-        ui_test_cases.append(ui_item)
+        if problem_test_case.explanation:
+            ui_item["explanation"] = problem_test_case.explanation
+        ui_problem_test_cases.append(ui_item)
 
-    return ui_test_cases
+    return ui_problem_test_cases
 
 
 def get_problem_metadata(problem):
@@ -99,14 +99,14 @@ def get_problem_type_name(problem):
     return problem.problem_type
 
 
-def get_no_meta_ui_test_cases(problem, language, test_cases):
-    ui_test_cases = []
+def get_no_meta_ui_problem_test_cases(problem, language, problem_test_cases):
+    ui_problem_test_cases = []
     problem_type = get_problem_type_name(problem)
     argument_names = problem.argument_names or []
 
-    for test_case in test_cases:
-        inputs = get_field(test_case.data, "inputs")
-        expected = get_field(test_case.data, "expected")
+    for problem_test_case in problem_test_cases:
+        inputs = get_field(problem_test_case.data, "inputs")
+        expected = get_field(problem_test_case.data, "expected")
 
         if (argument_names and len(argument_names) == len(inputs)):
             display_input = "\n".join(
@@ -137,8 +137,8 @@ def get_no_meta_ui_test_cases(problem, language, test_cases):
 
         expected = serialize(expected, language)
         ui_item = {
-            "id": test_case.id,
-            "owner_id": test_case.owner_id,
+            "id": problem_test_case.id,
+            "owner_id": problem_test_case.owner_id,
             "source": "shared",
             "input": display_input,
             "output": expected,
@@ -146,19 +146,19 @@ def get_no_meta_ui_test_cases(problem, language, test_cases):
 
         if preview_data:
             ui_item["preview"] = preview_data
-        if test_case.explanation:
-            ui_item["explanation"] = test_case.explanation
-        ui_test_cases.append(ui_item)
+        if problem_test_case.explanation:
+            ui_item["explanation"] = problem_test_case.explanation
+        ui_problem_test_cases.append(ui_item)
 
-    return ui_test_cases
+    return ui_problem_test_cases
 
 
-def get_solution_ui_test_cases(solution):
-    solution_test_cases = get_solution_test_cases(solution.test_cases)
-    ui_test_cases = []
+def get_solution_ui_problem_test_cases(solution):
+    solution_problem_test_cases = get_solution_problem_test_cases(solution.test_cases)
+    ui_problem_test_cases = []
 
-    for test_case in solution_test_cases:
-        inputs, expected = test_case
+    for problem_test_case in solution_problem_test_cases:
+        inputs, expected = problem_test_case
 
         if inputs.startswith("Solution()"):
             inputs = inputs[11:]
@@ -171,12 +171,12 @@ def get_solution_ui_test_cases(solution):
             "output": expected,
         }
 
-        ui_test_cases.append(ui_item)
+        ui_problem_test_cases.append(ui_item)
 
-    return ui_test_cases
+    return ui_problem_test_cases
 
 
-def get_ui_test_cases(problem, solution, language):
+def get_ui_problem_test_cases(problem, solution, language):
     """
     Problem TC format
     [('nums = [2, 7, 11, 15]\ntarget = 9', [0, 1]), ...]
@@ -184,32 +184,32 @@ def get_ui_test_cases(problem, solution, language):
     [([...], [...], <serialized binary tree>), ...]
     """
 
-    test_cases = problem.get_shared_testcases(include_hidden=True)
+    problem_test_cases = problem.get_shared_testcases(include_hidden=True)
 
-    if test_cases:
+    if problem_test_cases:
         problem_type = get_problem_type_name(problem)
 
         if problem_type == ProblemType.CLASS:
-            return get_class_ui_test_cases(test_cases)
+            return get_class_ui_problem_test_cases(problem_test_cases)
 
         elif get_problem_metadata(problem):
-            return get_meta_ui_test_cases(problem, language, test_cases)
+            return get_meta_ui_problem_test_cases(problem, language, problem_test_cases)
 
         elif problem_type:
-            return get_no_meta_ui_test_cases(problem, language, test_cases)
+            return get_no_meta_ui_problem_test_cases(problem, language, problem_test_cases)
 
         else:
             return []
 
     elif solution.test_cases:
-        return get_solution_ui_test_cases(solution)
+        return get_solution_ui_problem_test_cases(solution)
 
     return []
 
 
-def build_problem_test_case_expression(problem, test_case_data, language):
+def build_problem_test_case_expression(problem, problem_test_case_data, language):
     """
-    test_case_data["inputs"] = [[2, 7, 11, 15], 9]
+    problem_test_case_data["inputs"] = [[2, 7, 11, 15], 9]
     =>
     'solution.twoSum([[2, 7, 11, 15], 9])'
 
@@ -225,7 +225,7 @@ def build_problem_test_case_expression(problem, test_case_data, language):
         if not metadata["parameters"] or not metadata["method_name"] or not metadata["return_type"]:
             return None
 
-        inputs = get_field(test_case_data, "inputs")
+        inputs = get_field(problem_test_case_data, "inputs")
         parameters = metadata["parameters"]
         method_name = metadata["method_name"]
         return_type = metadata["return_type"]
@@ -277,7 +277,7 @@ def build_problem_test_case_expression(problem, test_case_data, language):
         if not method_name:
             return None
 
-        inputs = get_field(test_case_data, "inputs")
+        inputs = get_field(problem_test_case_data, "inputs")
 
         serialized_inputs = ", ".join(
             serialize(value, language)
@@ -287,18 +287,18 @@ def build_problem_test_case_expression(problem, test_case_data, language):
         return res
 
 
-def get_problem_test_cases(problem, language):
+def get_problem_problem_test_cases(problem, language):
     """
     [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
     or
 
     """
-    problem_test_cases = []
+    problem_problem_test_cases = []
 
-    for test_case in problem.get_shared_testcases(include_hidden=True):
+    for problem_test_case in problem.get_shared_testcases(include_hidden=True):
         expression = build_problem_test_case_expression(
             problem,
-            test_case.data,
+            problem_test_case.data,
             language,
         )
 
@@ -306,34 +306,34 @@ def get_problem_test_cases(problem, language):
             continue
 
         expected = serialize(
-            get_field(test_case.data, "expected"),
+            get_field(problem_test_case.data, "expected"),
             language
         )
-        problem_test_cases.append((expression, expected))
+        problem_problem_test_cases.append((expression, expected))
 
-    return problem_test_cases
+    return problem_problem_test_cases
 
 
-def get_effective_test_cases(problem, solution, language):
+def get_effective_problem_test_cases(problem, solution, language):
     """
     => [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
     """
     if get_problem_type_name(problem) == ProblemType.CLASS:
         return []
-    elif problem_test_cases := get_problem_test_cases(problem, language):
-        return problem_test_cases
-    elif solution_test_cases := get_solution_test_cases(solution.test_cases):
-        return solution_test_cases
+    elif problem_problem_test_cases := get_problem_problem_test_cases(problem, language):
+        return problem_problem_test_cases
+    elif solution_problem_test_cases := get_solution_problem_test_cases(solution.test_cases):
+        return solution_problem_test_cases
     else:
         return []
 
 
-def get_clipboard_test_cases(problem, solution, language):
+def get_clipboard_problem_test_cases(problem, solution, language):
     language_name = get_language_name(language)
     adapter = LANGUAGE_ADAPTERS[language_name]
     solution_instance_setup = adapter.solution.instance_code
 
     return solution_instance_setup + "\n".join(
         adapter.print_call(f"{test_input}, {expected}")
-        for test_input, expected in get_effective_test_cases(problem, solution, language)
+        for test_input, expected in get_effective_problem_test_cases(problem, solution, language)
     ) + "\n"

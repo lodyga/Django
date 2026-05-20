@@ -13,15 +13,15 @@ from .forms import (
     ProblemForm,
     SolutionCreateForm,
     SolutionUpdateForm,
-    TestCaseCreateForm,
-    TestCaseUpdateForm,
+    ProblemTestCaseCreateForm,
+    ProblemTestCaseUpdateForm,
 )
 from .models import (
     Problem,
     Tag,
     Solution,
     Language,
-    TestCase,
+    ProblemTestCase,
     Difficulty,
     Complexity,
 )
@@ -33,10 +33,10 @@ from .serializers import (
     ProblemSerializer,
     SolutionSerializer,
 )
-from .services.ui_test_cases import (
-    get_ui_test_cases,
-    get_effective_test_cases,
-    get_clipboard_test_cases
+from .services.ui_problem_test_cases import (
+    get_ui_problem_test_cases,
+    get_effective_problem_test_cases,
+    get_clipboard_problem_test_cases
 )
 from .services.code_assembly import (
     get_problem_type_header, 
@@ -207,15 +207,15 @@ class ProblemDetailView(DetailView):
         # Multiple solutions are allowed; use the first ordered solution.
         selected_solution = owner_solutions.first()
 
-        ui_test_cases = get_ui_test_cases(
+        ui_problem_test_cases = get_ui_problem_test_cases(
             problem, selected_solution, language.name
         )
-        effective_test_cases = get_effective_test_cases(
+        effective_problem_test_cases = get_effective_problem_test_cases(
             problem,
             selected_solution,
             language,
         )
-        clipboard_test_cases = get_clipboard_test_cases(
+        clipboard_problem_test_cases = get_clipboard_problem_test_cases(
             problem,
             selected_solution,
             language,
@@ -238,8 +238,8 @@ class ProblemDetailView(DetailView):
         (question, examples) = parse_problem_description(problem.description)
 
         context.update({
-            "clipboard_test_cases": clipboard_test_cases,
-            "effective_test_cases": effective_test_cases,
+            "clipboard_problem_test_cases": clipboard_problem_test_cases,
+            "effective_problem_test_cases": effective_problem_test_cases,
             "examples": examples,
             "language": language,
             "language_id": language.id,
@@ -257,7 +257,7 @@ class ProblemDetailView(DetailView):
             "solution_languages": solution_languages,
             "source_code": source_code,
             "tag_list": tag_list,
-            "ui_test_cases": ui_test_cases,
+            "ui_problem_test_cases": ui_problem_test_cases,
             "url": url,
         })
         return context
@@ -301,7 +301,7 @@ class ProblemDetailView(DetailView):
                 source_code,
                 language.name,
                 button_pressed,
-                context["effective_test_cases"]
+                context["effective_problem_test_cases"]
             )
             output_container = output
         else:
@@ -479,9 +479,9 @@ class LanguageCreate(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('python_problems:problem-index')
 
 
-class TestCaseCreate(LoginRequiredMixin, CreateView):
-    model = TestCase
-    form_class = TestCaseCreateForm
+class ProblemTestCaseCreate(LoginRequiredMixin, CreateView):
+    model = ProblemTestCase
+    form_class = ProblemTestCaseCreateForm
     success_url = reverse_lazy('python_problems:problem-index')
 
     def form_valid(self, form):
@@ -489,25 +489,25 @@ class TestCaseCreate(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class TestCaseUpdate(LoginRequiredMixin, UpdateView):
-    model = TestCase
-    form_class = TestCaseUpdateForm
+class ProblemTestCaseUpdate(LoginRequiredMixin, UpdateView):
+    model = ProblemTestCase
+    form_class = ProblemTestCaseUpdateForm
     success_url = reverse_lazy('python_problems:problem-index')
 
     def get_queryset(self):
-        return TestCase.objects.filter(owner=self.request.user)
+        return ProblemTestCase.objects.filter(owner=self.request.user)
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
 
-class TestCaseDelete(LoginRequiredMixin, DeleteView):
-    model = TestCase
+class ProblemTestCaseDelete(LoginRequiredMixin, DeleteView):
+    model = ProblemTestCase
     success_url = reverse_lazy('python_problems:problem-index')
 
     def get_queryset(self):
-        return TestCase.objects.filter(owner=self.request.user)
+        return ProblemTestCase.objects.filter(owner=self.request.user)
 
 
 # REST API

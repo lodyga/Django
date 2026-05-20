@@ -1,7 +1,7 @@
 import json
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Problem, Solution, TestCase, ProblemType
+from .models import Problem, Solution, ProblemTestCase, ProblemType
 
 
 class ProblemForm(forms.ModelForm):
@@ -180,8 +180,8 @@ class ProblemForm(forms.ModelForm):
                 raise ValidationError("Problem owner is required to save test cases.")
 
             problem.testcases.filter(owner=test_case_owner).delete()
-            TestCase.objects.bulk_create([
-                TestCase(
+            ProblemTestCase.objects.bulk_create([
+                ProblemTestCase(
                     problem=problem,
                     owner=test_case_owner,
                     data=test_case_payload["data"],
@@ -215,13 +215,13 @@ class SolutionUpdateForm(SolutionForm):
         exclude = ["problem", "language", "owner", "test_cases"]
 
 
-class TestCaseCreateForm(forms.ModelForm):
+class ProblemTestCaseCreateForm(forms.ModelForm):
     class Meta:
-        model = TestCase
+        model = ProblemTestCase
         fields = ["problem", "data", "is_hidden", "order", "explanation"]
 
 
-class TestCaseUpdateForm(forms.ModelForm):
+class ProblemTestCaseUpdateForm(forms.ModelForm):
     class Meta:
-        model = TestCase
+        model = ProblemTestCase
         fields = ["problem", "data", "is_hidden", "order", "explanation"]

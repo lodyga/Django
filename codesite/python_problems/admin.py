@@ -6,7 +6,7 @@ from .models import (
     Complexity,
     Solution,
     Language,
-    TestCase,
+    ProblemTestCase,
 )
 
 admin.site.register(Tag)
@@ -14,11 +14,11 @@ admin.site.register(Difficulty)
 admin.site.register(Complexity)
 admin.site.register(Solution)
 admin.site.register(Language)
-admin.site.register(TestCase)
+admin.site.register(ProblemTestCase)
 
 
-class TestCaseInline(admin.TabularInline):
-    model = TestCase
+class ProblemTestCaseInline(admin.TabularInline):
+    model = ProblemTestCase
     extra = 1
 
 class SolutionInline(admin.TabularInline):
@@ -28,4 +28,4 @@ class SolutionInline(admin.TabularInline):
 
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
-    inlines = [SolutionInline, TestCaseInline]
+    inlines = [SolutionInline, ProblemTestCaseInline]

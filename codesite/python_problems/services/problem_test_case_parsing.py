@@ -5,7 +5,7 @@ from .languages import get_language_name
 from python_problems.models import ComparisonType
 
 
-def get_solution_test_cases(solution_test_cases):
+def get_solution_problem_test_cases(solution_test_cases):
     # Remove this abomination when all test cases are moved to problem.
     """
     Clean each solution test case into (input, expected output) tuple.

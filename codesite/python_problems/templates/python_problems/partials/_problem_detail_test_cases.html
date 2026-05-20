@@ -9,19 +9,19 @@
     <i class="fas fa-chevron-up"></i>
   </button>
   <div class="row collapse show" id="problemTestCases">
-    {% if ui_test_cases %}
+    {% if ui_problem_test_cases %}
       <div class="row mb-4">
         <div class="col-auto mb-2">
-          <div id="testCaseButtonContainer">{# Placeholder for JavaScript 'python_problems/test-case-buttons.js' buttons #}</div>
+          <div id="problemTestCaseButtonContainer">{# Placeholder for JavaScript 'python_problems/test-case-buttons.js' buttons #}</div>
         </div>
         <div class="col-auto">
-          <button id="copyTestCasesBtn" class="btn btn-sm btn-secondary">
+          <button id="copyProblemTestCasesBtn" class="btn btn-sm btn-secondary">
             <i class="far fa-copy"></i> Copy
           </button>
         </div>
         <div class="col-auto">
           {% if user.is_authenticated %}
-            <a id="testCaseUpdateLink"
+            <a id="problemTestCaseUpdateLink"
                class="btn btn-sm btn-secondary d-none"
                data-current-user-id="{{ user.id }}"
                data-url-template="{% url 'python_problems:test_case-update' 0 %}"
@@ -38,11 +38,11 @@
         </div>
       </div>
       <div class="row mb-2">
-        <div class="col-auto" id="testCasesContainer">
-          {% for test_case in ui_test_cases %}
-            <div id="testCase-{{ forloop.counter }}"
-                 class="testCaseContent"
-                 data-test-case-id="{{ test_case.id }}"
+        <div class="col-auto" id="problemTestCasesContainer">
+          {% for test_case in ui_problem_test_cases %}
+            <div id="problemTestCase-{{ forloop.counter }}"
+                 class="problemTestCaseContent"
+                 data-problem-test-case-id="{{ test_case.id }}"
                  data-owner-id="{{ test_case.owner_id }}"
                  data-source="{{ test_case.source }}">
               <div class="row mb-2">
@@ -81,8 +81,8 @@
       </div>
       {# Test cases to clipboard placeholder. #}
       {% spaceless %}
-        <div id="clipboardTestCases" class="d-none">
-          <span>{{ clipboard_test_cases }}</span>
+        <div id="clipboardProblemTestCases" class="d-none">
+          <span>{{ clipboard_problem_test_cases }}</span>
         </div>
       {% endspaceless %}
     {% endif %}

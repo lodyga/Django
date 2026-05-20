@@ -2,8 +2,8 @@ import re
 from django.conf import settings
 from python_problems.models import ProblemType
 from .languages import get_language_name, LANGUAGE_ADAPTERS
-from .test_case_parsing import get_field, serialize
-from .ui_test_cases import get_problem_type_name, get_problem_metadata
+from .problem_test_case_parsing import get_field, serialize
+from .ui_problem_test_cases import get_problem_type_name, get_problem_metadata
 
 
 def clean_types(source_code):
