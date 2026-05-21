@@ -1,3 +1,8 @@
+# add/remove tags privliges
+# fix all redirect
+# fix all back
+# fordbid run and validate if no test cases.
+# remove problem type, method name, argument names,  comparison type fields or meaby not
 # fix next slug # get_adjacent_slugs(problem, language)
 # add js heap to metadata
 # Python 3.8 doesn't support match / case statements.
