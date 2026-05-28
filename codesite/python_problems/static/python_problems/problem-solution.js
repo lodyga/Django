@@ -1,23 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
-   const problemSolutionElement = document.getElementById('problemSolution');
-   const infoToggle = document.querySelector('[data-bs-target="#problemSolution"]');
+   const solutionPanel = document.getElementById('solution-panel');
+   const infoToggle = document.querySelector('[data-bs-target="#solution-panel"]');
 
-   if (!problemSolutionElement || !infoToggle) {
+   if (!solutionPanel || !infoToggle) {
       return;
    }
 
    const icon = infoToggle.querySelector('i');
-   const solutionCollapse = new bootstrap.Collapse(problemSolutionElement, {
+   const solutionCollapse = new bootstrap.Collapse(solutionPanel, {
       toggle: false,
    });
 
-   const shouldOpenFromHash = window.location.hash === '#problemSolution';
+   const shouldOpenFromHash = window.location.hash === '#solution-panel';
    const isProblemSolutionVisible = shouldOpenFromHash
-      || localStorage.getItem('problemSolutionState') === 'true';
+      || localStorage.getItem('solutionPanelState') === 'true';
 
    if (isProblemSolutionVisible) {
       solutionCollapse.show();
-      localStorage.setItem('problemSolutionState', 'true');
+      localStorage.setItem('solutionPanelState', 'true');
       icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
       infoToggle.setAttribute('aria-expanded', 'true');
    } else {
@@ -26,22 +26,22 @@ document.addEventListener('DOMContentLoaded', () => {
       infoToggle.setAttribute('aria-expanded', 'false');
    }
 
-   problemSolutionElement.addEventListener('shown.bs.collapse', () => {
-      localStorage.setItem('problemSolutionState', 'true');
+   solutionPanel.addEventListener('shown.bs.collapse', () => {
+      localStorage.setItem('solutionPanelState', 'true');
       icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
       infoToggle.setAttribute('aria-expanded', 'true');
    });
 
-   problemSolutionElement.addEventListener('hidden.bs.collapse', () => {
-      localStorage.setItem('problemSolutionState', 'false');
+   solutionPanel.addEventListener('hidden.bs.collapse', () => {
+      localStorage.setItem('solutionPanelState', 'false');
       icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
       infoToggle.setAttribute('aria-expanded', 'false');
    });
 
-   const solutionButtonContainer = document.getElementById('solutionButtonContainer');
+   const solutionButtonContainer = document.getElementById('solution-button-container');
    const solutionElements = document.getElementsByClassName('solutionContent');
    const solutionLength = solutionElements.length;
-   const copySolutionBtn = document.getElementById('copySolutionBtn');
+   const copySolutionBtn = document.getElementById('copy-solution-btn');
    const solutionUpdateLink = document.getElementById('solutionUpdateLink');
    const currentUserId = solutionUpdateLink?.dataset.currentUserId || '';
    let clipboardSolution = '';
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
    const createUrl = solutionButtonContainer.dataset.createUrl;
    const problemId = solutionButtonContainer.dataset.problemId;
-   const languageSelect = document.getElementById('languageId');
+   const languageSelect = document.getElementById('language-id');
    const languageId = languageSelect?.value || solutionButtonContainer.dataset.languageId;
    const redirectUrl = solutionButtonContainer.dataset.redirectUrl;
    const createButton = document.createElement('a');
@@ -164,5 +164,5 @@ document.addEventListener('DOMContentLoaded', () => {
                copySolutionBtn.classList.replace('btn-success', 'btn-secondary');
             }, 2000);
          })
-   });
+   });   
 });

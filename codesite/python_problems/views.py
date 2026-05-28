@@ -189,12 +189,12 @@ class ProblemDetailView(DetailView):
         owners = User.objects.filter(
             id__in=language_solutions.values_list("owner", flat=True)
         )
-        # Get current owner id from the owner form-select
-        # (if none selected take the first owner from owners)
-        owner_id = owners.first().id
-
-        # Get owner from owner id.
-        owner = User.objects.get(id=owner_id)
+        # Prefer the current user's solutions when available.
+        preferred_owner = None
+        if self.request.user.is_authenticated:
+            preferred_owner = owners.filter(id=self.request.user.id).first()
+        owner = preferred_owner or owners.first()
+        solution_owner_id = owner.id
 
         owner_solution_data = self._get_owner_solution_context(
             problem=problem,
@@ -245,7 +245,7 @@ class ProblemDetailView(DetailView):
             "language_id": language.id,
             'next_problem_slug': next_problem_slug,
             "output_container": "null",
-            "owner_id": owner_id,
+            "solution_owner_id": solution_owner_id,
             "owner_solution_languages": owner_solution_languages,
             "owner_solutions": owner_solutions,
             "owners": owners,
@@ -278,8 +278,8 @@ class ProblemDetailView(DetailView):
         language_id = context["language_id"]
         language = get_object_or_404(Language, id=language_id)
 
-        owner_id = int(request.POST.get("owner_id", context["owner_id"]))
-        owner = get_object_or_404(User, id=owner_id)
+        solution_owner_id = int(request.POST.get("solution_owner_id", context["solution_owner_id"]))
+        owner = get_object_or_404(User, id=solution_owner_id)
 
         owner_solution_data = self._get_owner_solution_context(
             problem=problem,
@@ -313,7 +313,7 @@ class ProblemDetailView(DetailView):
             "language": language,
             "language_id": language_id,
             "output_container": output_container,
-            "owner_id": owner_id,
+            "solution_owner_id": solution_owner_id,
             "owner_solution_languages": owner_solution_languages,
             "owner_solutions": owner_solutions,
             "solution_languages": solution_languages,
@@ -435,6 +435,9 @@ class SolutionUpdate(LoginRequiredMixin, NextUrlMixin, UpdateView):
     form_class = SolutionUpdateForm
     success_url = reverse_lazy('python_problems:problem-index')
 
+    def get_queryset(self):
+        return super().get_queryset().filter(owner=self.request.user)
+
     def get_initial(self):
         initial = super().get_initial()
         for field_name in ("problem", "language", "order"):
@@ -462,6 +465,9 @@ class SolutionDelete(LoginRequiredMixin, NextUrlMixin, DeleteView):
     model = Solution
     fields = "__all__"
     success_url = reverse_lazy('python_problems:problem-index')
+
+    def get_queryset(self):
+        return super().get_queryset().filter(owner=self.request.user)
 
     def get_fallback_next_url(self):
         return reverse_lazy(

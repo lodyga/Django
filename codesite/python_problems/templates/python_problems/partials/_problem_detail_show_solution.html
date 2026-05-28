@@ -2,32 +2,32 @@
   <div class="col">
     <div class="row">
       <button class="btn btn-outline-secondary py-0 mb-2"
-              id="solutionToggleButton"
+              id="solution-panel-toggle-button"
               type="button"
               data-bs-toggle="collapse"
-              data-bs-target="#problemSolution"
+              data-bs-target="#solution-panel"
               aria-expanded="false"
-              aria-controls="problemSolution">
+              aria-controls="solution-panel">
         Solution:
         <i class="fas fa-chevron-down"></i>
       </button>
     </div>
-    <div class="row collapse" id="problemSolution">
+    <div class="row collapse" id="solution-panel">
       <div class="col">
         <div class="row mt-4 mb-4">
           <div class="col-auto mb-2">
             <form method="post">
               {% csrf_token %}
-              <label for="owner" class="mb-2">
+              <label for="solution-owner-id" class="mb-2">
                 <b>Author:</b>
               </label>
               <select class="form-select"
-                      id="owner"
-                      name="owner_id"
+                      id="solution-owner-id"
+                      name="solution_owner_id"
                       onchange="this.form.submit()">
                 {% for owner in owners %}
                   <option value="{{ owner.id }}"
-                          {% if owner.id == owner_id %}selected{% endif %}>{{ owner }}</option>
+                          {% if solution_owner_id == owner.id %}selected{% endif %}>{{ owner }}</option>
                 {% endfor %}
               </select>
             </form>
@@ -35,16 +35,16 @@
           <div class="col-auto mb-2">
             <form method="post">
               {% csrf_token %}
-              <label for="language" class="mb-2">
+              <label for="language-id" class="mb-2">
                 <b>Language:</b>
               </label>
               <select class="form-select"
-                      id="languageId"
+                      id="language-id"
                       name="language_id"
                       onchange="this.form.submit()">
                 {% for language in owner_solution_languages %}
                   <option value="{{ language.id }}"
-                          {% if language.id == language_id %}selected{% endif %}>{{ language }}</option>
+                          {% if language_id == language.id %}selected{% endif %}>{{ language }}</option>
                 {% endfor %}
               </select>
             </form>
@@ -64,28 +64,29 @@
         </div>
       </div>
       {% if owner_solutions %}
-        {# Placeholder for JavaScript 'python_problems/problem-solution.js' buttons #}
-        <div id="solutionButtonContainer"
+        {# Placeholder for JavaScript buttons from 'python_problems/problem-solution.js' #}
+        <div id="solution-button-container"
              data-create-url="{% url 'python_problems:solution-create' %}"
              data-problem-id="{{ solution.problem_id }}"
              data-language-id="{{ language_id }}"
              data-redirect-url="{% url 'python_problems:problem-detail' problem_slug language %}"></div>
         <div class="position-relative">
-          <button id="copySolutionBtn"
+          <button id="copy-solution-btn"
                   class="btn btn-sm btn-secondary position-absolute end-0 mt-4 me-5"
                   type="button"
                   style="z-index: 10">
             <i class="far fa-copy"></i> Copy
           </button>
-          <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea>
+          <textarea id="solution-content-container"></textarea>
+          {# Stored solutions for quick in-page: Solution1 Solution2 ... #}
+          {% for solution in owner_solutions %}
+            <textarea id="solution-{{ forloop.counter }}"
+                      data-owner-id="{{ solution.owner_id }}"
+                      data-solution-id="{{ solution.id }}"
+                      class="solutionContent d-none"
+                      aria-hidden="true">{{ solution.source_code }}</textarea>
+          {% endfor %}
         </div>
-        {% for solution in owner_solutions %}
-          <textarea id="solution-{{ forloop.counter }}"
-                    data-owner-id="{{ solution.owner_id }}"
-                    data-solution-id="{{ solution.id }}"
-                    class="solutionContent d-none"
-                    aria-hidden="true">{{ solution.source_code }}</textarea>
-        {% endfor %}
       {% endif %}
     </div>
   </div>

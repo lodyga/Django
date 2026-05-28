@@ -966,6 +966,18 @@ class SolutionUserSwitchTest(TestCase):
 
         self.assertIn(self.source_code_2, html.unescape(response.content.decode()))
 
+    def test_authenticated_owner_is_selected_by_default(self):
+        self.client.force_login(self.owner_2)
+        url = reverse(
+            "python_problems:problem-detail",
+            kwargs={"slug": self.problem.slug, "language": self.language.name},
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.context["owner_id"], self.owner_2.id)
+        self.assertIn(self.source_code_2, html.unescape(response.content.decode()))
+
 
 # ============================================================================
 # Problem CRUD View Tests
@@ -1213,6 +1225,18 @@ class SolutionUpdateViewTests(TestCase):
         self.assertEqual(self.solution.source_code, "def solve(): return 42")
         self.assertEqual(self.solution.order, 2)
 
+    def test_update_solution_is_owner_restricted(self):
+        other_user = create_sample_user("other-solution-owner")
+        other_solution = create_sample_solution(
+            problem=self.problem, language=self.language, owner=other_user
+        )
+
+        response = self.client.get(
+            reverse("python_problems:solution-update", kwargs={"pk": other_solution.pk})
+        )
+
+        self.assertEqual(response.status_code, 404)
+
 
 class SolutionDeleteViewTests(TestCase):
     def setUp(self):
@@ -1240,6 +1264,19 @@ class SolutionDeleteViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Solution.objects.filter(pk=solution_id).exists())
+
+    def test_delete_solution_is_owner_restricted(self):
+        other_user = create_sample_user("other-solution-owner")
+        other_solution = create_sample_solution(
+            problem=self.problem, language=self.language, owner=other_user
+        )
+
+        response = self.client.post(
+            reverse("python_problems:solution-delete", kwargs={"pk": other_solution.pk})
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Solution.objects.filter(pk=other_solution.pk).exists())
 
 
 # ============================================================================

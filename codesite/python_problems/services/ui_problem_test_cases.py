@@ -11,6 +11,7 @@ def get_class_ui_problem_test_cases(problem_test_cases):
         operations = get_field(problem_test_case.data, "operations")
         arguments = get_field(problem_test_case.data, "arguments")
         expected = get_field(problem_test_case.data, "expected")
+        explanation = problem_test_case.explanation
 
         if (len(operations) == len(arguments)):
             display_input = ", ".join(
@@ -27,6 +28,7 @@ def get_class_ui_problem_test_cases(problem_test_cases):
             "source": "shared",
             "input": display_input,
             "output": expected,
+            "explanation": explanation,
         })
 
     return ui_problem_test_cases
@@ -154,7 +156,8 @@ def get_no_meta_ui_problem_test_cases(problem, language, problem_test_cases):
 
 
 def get_solution_ui_problem_test_cases(solution):
-    solution_problem_test_cases = get_solution_problem_test_cases(solution.test_cases)
+    solution_problem_test_cases = get_solution_problem_test_cases(
+        solution.test_cases)
     ui_problem_test_cases = []
 
     for problem_test_case in solution_problem_test_cases:

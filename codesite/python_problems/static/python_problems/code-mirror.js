@@ -18,11 +18,11 @@ function getTheme() {
 }
 
 function getLanguageId() {
-   return JSON.parse(document.getElementById('languageId').textContent);
+   return JSON.parse(document.getElementById('language-id').textContent);
 }
 
 function ensureSolutionViewer() {
-   const solutionContentContainer = document.getElementById('solutionContentContainer');
+   const solutionContentContainer = document.getElementById('solution-content-container');
    
    if (!solutionContentContainer) {
       return;
@@ -47,7 +47,7 @@ function ensureSolutionViewer() {
 }
 
 function setSolutionViewerContent(content) {
-   const solutionContentContainer = document.getElementById('solutionContentContainer');
+   const solutionContentContainer = document.getElementById('solution-content-container');
 
    if (!solutionContentContainer) {
       return;
@@ -104,13 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
    codeEditor.setSize(null, 'auto');
 
-   const problemSolution = document.getElementById('problemSolution');
-   if (problemSolution) {
-      problemSolution.addEventListener('shown.bs.collapse', () => {
+   const solutionPanel = document.getElementById('solution-panel');
+   
+   if (solutionPanel) {
+      solutionPanel.addEventListener('shown.bs.collapse', () => {
          ensureSolutionViewer();
       });
 
-      if (problemSolution.classList.contains('show') || window.location.hash === '#problemSolution') {
+      if (solutionPanel.classList.contains('show') || window.location.hash === '#solution-panel') {
          ensureSolutionViewer();
       }
    }

@@ -243,6 +243,8 @@ output = cwd
 
 
 
-
+Error: That port is already in use.
+lsof -i :8000
+kill PID
 
 

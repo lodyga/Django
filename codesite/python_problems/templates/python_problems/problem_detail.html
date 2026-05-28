@@ -14,7 +14,7 @@
   <script src="{% static 'python_problems/problem-description.js' %}" defer></script>
   <script src="{% static 'python_problems/problem-solution.js' %}" defer></script>
   {# Store data by id. #}
-  {{ language.id|json_script:"languageId" }}
+  {{ language.id|json_script:"language-id" }}
 {% endblock head %}
 {% block content %}
   <div class="row">

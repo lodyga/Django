@@ -1,3 +1,6 @@
+
+# <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea> and <textarea id="solution-{{ forloop.counter }}"
+
 # add/remove tags privliges
 # fix all redirect
 # fix all back
@@ -9,7 +12,6 @@
 # setup cursor with proper method name
 # edit only own solutions
 # validate all test cases
-# <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea> and <textarea id="solution-{{ forloop.counter }}"
 # in progress... preview based on data type:  (grid, matrix) preview veritcal preview for heights [1, 4, 6, 7, 6, 7]
 # wrap build_binary_tree and other around bt methods
 # for later
