@@ -4,6 +4,7 @@
 {% endblock title %}
 {% block head %}
   {% load static %}
+  {% load crispy_forms_tags %}
   <link rel="stylesheet"
         type="text/css"
         href="{% static 'python_problems/styles.css' %}">
@@ -19,11 +20,10 @@
       <div class="col-md-8">
         <form action="" method="post">
           {% csrf_token %}
-          {{ form|crispy }}
-          <input type="submit" value="Submit" />
-          <input type="submit"
-                 onclick="window.location='{% url 'python_problems:problem-index' %}' ; return false;"
-                 value="Cancel" />
+            {{ form|crispy }}
+            <input type="hidden" name="next" value="{{ next_url }}">
+            <button type="submit" class="btn btn-sm btn-secondary me-2">Submit</button>
+            <a href="{{ next_url }}" class="btn btn-sm btn-secondary">Cancel</a>
         </form>
       </div>
       <div class="col-md-2"></div>

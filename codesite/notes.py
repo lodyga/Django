@@ -231,15 +231,19 @@ output = cwd
 
 
 # same button
+<a href="{% url 'python_problems:problem-index' %}" class="btn btn-secondary">Cancel</a>
+
 <input type="button"
        class="btn btn-secondary"
        onclick="window.location='{% url 'python_problems:problem-index' %}'"
        value="Cancel" />
-<a href="{% url 'python_problems:problem-index' %}" class="btn btn-secondary">
-  Cancel
-</a>
 
-
+<a href="{{ next_url }}" class="btn btn-sm btn-outline-secondary">Cancel</a>
+          
+<input type="button"
+       class="btn btn-sm btn-outline-secondary"
+       onclick="window.location='{{ next_url }}'"
+       value="Cancel" />
 
 
 

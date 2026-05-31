@@ -3,6 +3,7 @@
   Tag
 {% endblock title %}
 {% block content %}
+  {% load crispy_forms_tags %}
   <div class="container-fluid m-2">
     <div class="row">
       <div class="col-md-2">
@@ -12,15 +13,11 @@
       <div class="col-md-8">
         <div class="mb-5 mt-5">
           <h2>Add a tag</h2>
-          <form action="" method="POST"">
+          <form action="" method="POST">
             {% csrf_token %}
-            <table>
-              {{ form.as_table }}
-            </table>
-            <input type="submit" value="Submit" />
-            <input type="submit"
-                   onclick="window.location='{% url 'python_problems:tag-index' %}' ; return false;"
-                   value="Cancel" />
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-sm btn-secondary me-2">Submit</button>
+            <a href="{{ next_url }}" class="btn btn-sm btn-secondary">Cancel</a>
           </form>
         </div>
       </div>

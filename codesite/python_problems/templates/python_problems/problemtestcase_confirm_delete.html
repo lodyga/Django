@@ -14,7 +14,9 @@
     <p>Are you sure you want to delete test case {{ object.order }} for {{ object.problem.title }}?</p>
     <form method="post">
       {% csrf_token %}
-      <input type="submit" value="Yes, delete." />
+      <input type="hidden" name="next" value="{{ next_url }}">
+      <button type="submit" class="btn btn-sm btn-danger">Yes, delete.</button>
+      <a href="{{ next_url }}" class="btn btn-sm btn-secondary">Cancel</a>
     </form>
   </div>
 {% endblock content %}

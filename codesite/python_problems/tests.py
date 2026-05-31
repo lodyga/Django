@@ -813,6 +813,20 @@ class SolutionDetailViewTests(TestCase):
         self.assertEqual(response.context["solution"], solution)
         self.assertIn(solution, response.context["owner_solutions"])
 
+    def test_back_link_uses_next_url(self):
+        solution = create_sample_solution()
+        next_url = f"{reverse('python_problems:problem-index')}?page=2"
+
+        response = self.client.get(
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={"slug": solution.problem.slug, "language": solution.language.name},
+            ),
+            {"next": next_url},
+        )
+
+        self.assertContains(response, f'href="{next_url}"')
+
     def test_404_response(self):
         response = self.client.get(
             reverse(

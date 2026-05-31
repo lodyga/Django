@@ -40,11 +40,11 @@
                 {{ problem.difficulty }}
               </p>
             </div>
-            <!-- Problem languages -->
+            {# Problem languages #}
             <div class="col-md-auto">
               {% for language in problem.languages %}
                 <a class="btn btn-link py-0 px-1"
-                   href="{% url 'python_problems:problem-detail' problem.slug language %}"
+                   href="{% url 'python_problems:problem-detail' problem.slug language %}?next={{ request.get_full_path|urlencode }}"
                    role="button">{{ language }}</a>
               {% endfor %}
             </div>

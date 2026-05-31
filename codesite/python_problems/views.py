@@ -62,6 +62,41 @@ def tag_graph_view(request):
     return render(request, "python_problems/tag_graph.html", {"data": data})
 
 
+class NextUrlMixin():
+    request: HttpRequest
+
+    def _get_next_url(self):
+        next_url = (
+            self.request.POST.get("next")
+            or self.request.GET.get("next")
+        )
+        if next_url and url_has_allowed_host_and_scheme(
+            next_url,
+            allowed_hosts={self.request.get_host()},
+            require_https=self.request.is_secure(),
+        ):
+            return next_url
+        return None
+
+    def get_fallback_next_url(self):
+        return None
+
+    def get_redirect_url(self):
+        return (
+            self._get_next_url()
+            or self.get_fallback_next_url()
+            or reverse_lazy("python_problems:problem-index")
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["next_url"] = self.get_redirect_url()
+        return context
+
+    def get_success_url(self):
+        return self.get_redirect_url()
+
+
 class ProblemIndexView(ListView):
     model = Problem
     template_name = "python_problems/problem_list.html"
@@ -137,7 +172,7 @@ class ProblemIndexView(ListView):
         return context
 
 
-class ProblemDetailView(DetailView):
+class ProblemDetailView(NextUrlMixin, DetailView):
     model = Problem
     template_name = "python_problems/problem_detail.html"  # needed for post render()
 
@@ -245,6 +280,7 @@ class ProblemDetailView(DetailView):
             "language_id": language.id,
             'next_problem_slug': next_problem_slug,
             "output_container": "null",
+            "owner_id": solution_owner_id,
             "solution_owner_id": solution_owner_id,
             "owner_solution_languages": owner_solution_languages,
             "owner_solutions": owner_solutions,
@@ -278,8 +314,11 @@ class ProblemDetailView(DetailView):
         language_id = context["language_id"]
         language = get_object_or_404(Language, id=language_id)
 
-        solution_owner_id = int(request.POST.get(
-            "solution_owner_id", context["solution_owner_id"]))
+        solution_owner_id = int(
+            request.POST.get("solution_owner_id")
+            or request.POST.get("owner_id")
+            or context["solution_owner_id"]
+        )
         owner = get_object_or_404(User, id=solution_owner_id)
 
         owner_solution_data = self._get_owner_solution_context(
@@ -314,6 +353,7 @@ class ProblemDetailView(DetailView):
             "language": language,
             "language_id": language_id,
             "output_container": output_container,
+            "owner_id": solution_owner_id,
             "solution_owner_id": solution_owner_id,
             "owner_solution_languages": owner_solution_languages,
             "owner_solutions": owner_solutions,
@@ -342,41 +382,6 @@ class TagDelete(LoginRequiredMixin, DeleteView):
     model = Tag
     fields = "__all__"
     success_url = reverse_lazy('python_problems:tag-index')
-
-
-class NextUrlMixin():
-    request: HttpRequest
-
-    def _get_next_url(self):
-        next_url = (
-            self.request.POST.get("next")
-            or self.request.GET.get("next")
-        )
-        if next_url and url_has_allowed_host_and_scheme(
-            next_url,
-            allowed_hosts={self.request.get_host()},
-            require_https=self.request.is_secure(),
-        ):
-            return next_url
-        return None
-
-    def get_fallback_next_url(self):
-        return None
-
-    def get_redirect_url(self):
-        return (
-            self._get_next_url()
-            or self.get_fallback_next_url()
-            or reverse_lazy("python_problems:problem-index")
-        )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["problem_submit_redirect_url"] = self.get_redirect_url()
-        return context
-
-    def get_success_url(self):
-        return self.get_redirect_url()
 
 
 class ProblemCreate(LoginRequiredMixin, NextUrlMixin, CreateView):
@@ -480,13 +485,13 @@ class SolutionDelete(LoginRequiredMixin, NextUrlMixin, DeleteView):
         )
 
 
-class LanguageCreate(LoginRequiredMixin, CreateView):
+class LanguageCreate(LoginRequiredMixin, NextUrlMixin, CreateView):
     model = Language
     fields = ["name"]
     success_url = reverse_lazy('python_problems:problem-index')
 
 
-class ProblemTestCaseCreate(LoginRequiredMixin, CreateView):
+class ProblemTestCaseCreate(LoginRequiredMixin, NextUrlMixin, CreateView):
     model = ProblemTestCase
     form_class = ProblemTestCaseCreateForm
     success_url = reverse_lazy('python_problems:problem-index')
@@ -496,7 +501,7 @@ class ProblemTestCaseCreate(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ProblemTestCaseUpdate(LoginRequiredMixin, UpdateView):
+class ProblemTestCaseUpdate(LoginRequiredMixin, NextUrlMixin, UpdateView):
     model = ProblemTestCase
     form_class = ProblemTestCaseUpdateForm
     success_url = reverse_lazy('python_problems:problem-index')
@@ -509,7 +514,7 @@ class ProblemTestCaseUpdate(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class ProblemTestCaseDelete(LoginRequiredMixin, DeleteView):
+class ProblemTestCaseDelete(LoginRequiredMixin, NextUrlMixin, DeleteView):
     model = ProblemTestCase
     success_url = reverse_lazy('python_problems:problem-index')
 

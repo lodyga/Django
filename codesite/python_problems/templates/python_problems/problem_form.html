@@ -20,7 +20,7 @@
       <div class="col-md-8">
         <form action="" method="post">
           {% csrf_token %}
-          <input type="hidden" name="next" value="{{ problem_submit_redirect_url }}">
+          <input type="hidden" name="next" value="{{ next_url }}">
           {{ form.title|as_crispy_field }}
           {{ form.url|as_crispy_field }}
           {{ form.difficulty|as_crispy_field }}
@@ -38,10 +38,10 @@
             or
             <pre class="mb-0"><code>{"inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}], "expected": true}</code></pre>
           </div>
-          <input type="submit" value="Submit" />
-          <input type="submit"
-                 onclick="window.location='{{ problem_submit_redirect_url }}' ; return false;"
-                 value="Cancel" />
+          <button type="submit" class="btn btn-sm btn-secondary me-2">Submit</button>
+          <a href="{{ next_url }}" class="btn btn-sm btn-secondary">Cancel</a>
+          <hr>
+
           {{ form.problem_type|as_crispy_field }}
           {{ form.method_name|as_crispy_field }}
           {{ form.argument_names|as_crispy_field }}

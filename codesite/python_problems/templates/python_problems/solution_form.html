@@ -3,6 +3,7 @@
   Solution
 {% endblock title %}
 {% block content %}
+  {% load crispy_forms_tags %}
   <div class="container-fluid m-2">
     <div class="row">
       <div class="col-md-2">
@@ -12,19 +13,10 @@
       <div class="col-md-8">
         <form action="" method="post" class="mb-5">
           {% csrf_token %}
-          {% load crispy_forms_tags %}
-          <input type="hidden" name="next" value="{{ problem_submit_redirect_url }}">
-          <div class="alert alert-secondary py-2">
-            <div>
-              <b>Solution test cases are deprecated:</b> leave empty.
-            </div>
-            <div>Test cases are fetched from Problem.</div>
-          </div>
+          <input type="hidden" name="next" value="{{ next_url }}">
           {{ form|crispy }}
-          <input type="submit" class="me-2" value="Submit" />
-          <input type="submit"
-                 onclick="window.location='{{ problem_submit_redirect_url }}' ; return false;"
-                 value="Cancel" />
+          <button type="submit" class="btn btn-sm btn-secondary me-2">Submit</button>
+          <a href="{{ next_url }}" class="btn btn-sm btn-secondary">Cancel</a>
         </form>
         {% if object.pk %}
           <label for="dangerZone">
@@ -40,8 +32,8 @@
                 <a id="solutionDeleteLink"
                    class="btn btn-sm btn-secondary"
                    data-url-template="{% url 'python_problems:solution-delete' 0 %}"
-                   data-next-url="{{ problem_submit_redirect_url }}"
-                   href="{% url 'python_problems:solution-delete' object.pk %}?next={{ problem_submit_redirect_url|urlencode }}">Delete</a>
+                   data-next-url="{{ next_url }}"
+                   href="{% url 'python_problems:solution-delete' object.pk %}?next={{ next_url|urlencode }}">Delete</a>
               </div>
             </div>
           </div>
