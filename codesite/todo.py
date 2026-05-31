@@ -1,8 +1,7 @@
 
-# <textarea id="solutionContentContainer">{{ owner_solutions.0 }}</textarea> and <textarea id="solution-{{ forloop.counter }}"
 
-# add/remove tags privliges
 # fix all redirect
+# add/remove tags privliges
 # fix all back
 # fordbid run and validate if no test cases.
 # remove problem type, method name, argument names,  comparison type fields or meaby not

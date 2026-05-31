@@ -20,12 +20,28 @@
       <div class="col-md-8">
         <form action="" method="post">
           {% csrf_token %}
+          <input type="hidden" name="next" value="{{ problem_submit_redirect_url }}">
           {{ form.title|as_crispy_field }}
           {{ form.url|as_crispy_field }}
           {{ form.difficulty|as_crispy_field }}
           {{ form.description|as_crispy_field }}
           {{ form.tags|as_crispy_field }}
           {{ form.metadata|as_crispy_field }}
+          {{ form.shared_test_cases|as_crispy_field }}
+          <div class="alert alert-secondary py-2">
+            <div>
+              <b>Test case format:</b> one JSON object per line.
+            </div>
+            <pre class="mb-0"><code>{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}</code></pre>
+            or
+            <pre class="mb-0"><code>[[[2, 7, 11, 15], 9], [0, 1]]</code></pre>
+            or
+            <pre class="mb-0"><code>{"inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}], "expected": true}</code></pre>
+          </div>
+          <input type="submit" value="Submit" />
+          <input type="submit"
+                 onclick="window.location='{{ problem_submit_redirect_url }}' ; return false;"
+                 value="Cancel" />
           {{ form.problem_type|as_crispy_field }}
           {{ form.method_name|as_crispy_field }}
           {{ form.argument_names|as_crispy_field }}
@@ -43,21 +59,6 @@
               <pre class="mb-2 mt-2"><code><b>Multiset</b>: compare dicts of elements, lists, dicts.</code></pre>
             </div>
           </div>
-          {{ form.shared_test_cases|as_crispy_field }}
-          <div class="alert alert-secondary py-2">
-            <div>
-              <b>Test case format:</b> one JSON object per line.
-            </div>
-            <pre class="mb-0"><code>{"inputs": [[2, 7, 11, 15], 9], "expected": [0, 1]}</code></pre>
-            or
-            <pre class="mb-0"><code>[[[2, 7, 11, 15], 9], [0, 1]]</code></pre>
-            or
-            <pre class="mb-0"><code>{"inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}], "expected": true}</code></pre>
-          </div>
-          <input type="submit" value="Submit" />
-          <input type="submit"
-                 onclick="window.location='{% url 'python_problems:problem-index' %}' ; return false;"
-                 value="Cancel" />
         </form>
       </div>
       <div class="col-md-2"></div>

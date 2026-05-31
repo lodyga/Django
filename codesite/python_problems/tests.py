@@ -1083,6 +1083,27 @@ class ProblemUpdateViewTests(TestCase):
         self.assertEqual(self.problem.method_name, "updatedMethod")
         self.assertEqual(self.problem.argument_names, ["new", "args"])
 
+    def test_update_problem_redirects_to_next_url(self):
+        next_url = f"{reverse('python_problems:problem-index')}?page=2"
+        response = self.client.post(
+            reverse("python_problems:problem-update", kwargs={"pk": self.problem.pk}),
+            data={
+                "title": "Updated Title",
+                "url": self.problem.url,
+                "difficulty": self.problem.difficulty.id,  # type: ignore
+                "description": self.problem.description,
+                "tags": list(self.problem.tags.values_list("id", flat=True)),  # type: ignore
+                "problem_type": ProblemType.FUNCTION,
+                "method_name": "updatedMethod",
+                "argument_names": '["new", "args"]',
+                "comparison_type": "exact",
+                "shared_test_cases": '{"inputs": [1], "expected": 1}',
+                "next": next_url,
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, next_url)
+
     def test_update_problem_with_class_type_clears_method_fields(self):
         response = self.client.post(
             reverse("python_problems:problem-update", kwargs={"pk": self.problem.pk}),
@@ -1125,6 +1146,17 @@ class ProblemDeleteViewTests(TestCase):
             reverse("python_problems:problem-delete", kwargs={"pk": self.problem.pk})
         )
         self.assertEqual(response.status_code, 302)
+        self.assertFalse(Problem.objects.filter(pk=problem_id).exists())
+
+    def test_delete_problem_redirects_to_next_url(self):
+        problem_id = self.problem.pk
+        next_url = f"{reverse('python_problems:problem-index')}?page=2"
+        response = self.client.post(
+            reverse("python_problems:problem-delete", kwargs={"pk": self.problem.pk}),
+            data={"next": next_url},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, next_url)
         self.assertFalse(Problem.objects.filter(pk=problem_id).exists())
 
 

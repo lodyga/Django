@@ -14,8 +14,8 @@
               <li>
                 {{ problem.title }}
                 {% if user == problem.owner %}
-                  (<a href="{% url 'python_problems:problem-update' problem.id %}">Update</a> |
-                  <a href="{% url 'python_problems:problem-delete' problem.id %}">Delete</a>)
+                  (<a href="{% url 'python_problems:problem-update' problem.id %}?next={{ request.get_full_path|urlencode }}">Update</a> |
+                  <a href="{% url 'python_problems:problem-delete' problem.id %}?next={{ request.get_full_path|urlencode }}">Delete</a>)
                 {% endif %}
               </li>
             </div>

@@ -11,19 +11,17 @@ document.addEventListener('DOMContentLoaded', () => {
       toggle: false,
    });
 
-   const shouldOpenFromHash = window.location.hash === '#solution-panel';
-   const isProblemSolutionVisible = shouldOpenFromHash
-      || localStorage.getItem('solutionPanelState') === 'true';
+   const isProblemSolutionHidden = localStorage.getItem('solutionPanelState') === 'false';
 
-   if (isProblemSolutionVisible) {
+   if (isProblemSolutionHidden) {
+      solutionCollapse.hide();
+      icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+      infoToggle.setAttribute('aria-expanded', 'false');
+   } else {
       solutionCollapse.show();
       localStorage.setItem('solutionPanelState', 'true');
       icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
       infoToggle.setAttribute('aria-expanded', 'true');
-   } else {
-      solutionCollapse.hide();
-      icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-      infoToggle.setAttribute('aria-expanded', 'false');
    }
 
    solutionPanel.addEventListener('shown.bs.collapse', () => {
@@ -46,12 +44,17 @@ document.addEventListener('DOMContentLoaded', () => {
    const currentUserId = solutionUpdateLink?.dataset.currentUserId || '';
    let clipboardSolution = '';
 
+   if (!solutionButtonContainer || solutionLength === 0) {
+      return;
+   }
+
    function buildSolutionActionUrl(linkElement, solutionId) {
+      // todo
       if (!linkElement?.dataset.urlTemplate) {
          return null;
       }
 
-      const baseUrl = linkElement.dataset.urlTemplate.replace('/0/', `/${solutionId}/`);
+      const currenPath = linkElement.dataset.urlTemplate.replace('/0/', `/${solutionId}/`);
       const currentHref = linkElement.getAttribute('href') || '';
       const currentUrl = new URL(currentHref, window.location.origin);
       const nextUrl = (
@@ -61,18 +64,55 @@ document.addEventListener('DOMContentLoaded', () => {
       );
 
       if (!nextUrl) {
-         return baseUrl;
+         return currenPath;
       }
 
       const params = new URLSearchParams({
          next: nextUrl,
       });
 
-      return `${baseUrl}?${params.toString()}`;
+      return `${currenPath}?${params.toString()}`;
    }
 
-   if (!solutionButtonContainer || solutionLength === 0) {
-      return;
+   function showSolution(idx) {
+      const selectedSolution = document.getElementById(`solution-${idx}`);
+      const selectedContent = selectedSolution?.value || '';
+      const selectedSolutionId = selectedSolution?.dataset.solutionId;
+      const selectedSolutionOwnerId = selectedSolution?.dataset.ownerId || '';
+      const isCurrentUserOwner = (
+         Boolean(solutionUpdateLink)
+         && Boolean(currentUserId)
+         && currentUserId === selectedSolutionOwnerId
+      );
+
+      if (typeof setSolutionViewerContent === 'function') {
+         setSolutionViewerContent(selectedContent);
+      }
+
+      clipboardSolution = selectedContent;
+
+      if (solutionUpdateLink) {
+         if (isCurrentUserOwner && selectedSolutionId) {
+            solutionUpdateLink.classList.remove('d-none');
+            const updateHref = buildSolutionActionUrl(solutionUpdateLink, selectedSolutionId);
+
+            if (updateHref) {
+               solutionUpdateLink.href = updateHref;
+            }
+         } else {
+            solutionUpdateLink.classList.add('d-none');
+         }
+      }
+
+      for (let i = 1; i < solutionLength + 1; i++) {
+         const btn = document.getElementById(`solutionButton-${i}`);
+
+         if (i === idx) {
+            btn.classList.replace('btn-outline-secondary', 'btn-secondary');
+         } else {
+            btn.classList.replace('btn-secondary', 'btn-outline-secondary');
+         }
+      }
    }
 
    for (let index = 1; index < solutionLength + 1; index++) {
@@ -109,47 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
    solutionButtonContainer.appendChild(createButton);
 
-   function showSolution(idx) {
-      const selectedSolution = document.getElementById(`solution-${idx}`);
-      const selectedContent = selectedSolution?.value || '';
-      const selectedSolutionId = selectedSolution?.dataset.solutionId;
-      const selectedSolutionOwnerId = selectedSolution?.dataset.ownerId || '';
-      const isCurrentUserOwner = (
-         Boolean(solutionUpdateLink)
-         && Boolean(currentUserId)
-         && currentUserId === selectedSolutionOwnerId
-      );
-
-      if (typeof setSolutionViewerContent === 'function') {
-         setSolutionViewerContent(selectedContent);
-      }
-
-      clipboardSolution = selectedContent;
-      
-      if (solutionUpdateLink) {
-         if (isCurrentUserOwner && selectedSolutionId) {
-            solutionUpdateLink.classList.remove('d-none');
-            const updateHref = buildSolutionActionUrl(solutionUpdateLink, selectedSolutionId);
-
-            if (updateHref) {
-               solutionUpdateLink.href = updateHref;
-            }
-         } else {
-            solutionUpdateLink.classList.add('d-none');
-         }
-      }
-
-      for (let i = 1; i < solutionLength + 1; i++) {
-         const btn = document.getElementById(`solutionButton-${i}`);
-
-         if (i === idx) {
-            btn.classList.replace('btn-outline-secondary', 'btn-secondary');
-         } else {
-            btn.classList.replace('btn-secondary', 'btn-outline-secondary');
-         }
-      }
-   }
-
    if (solutionLength > 0) {
       showSolution(1);
    }
@@ -164,5 +163,5 @@ document.addEventListener('DOMContentLoaded', () => {
                copySolutionBtn.classList.replace('btn-success', 'btn-secondary');
             }, 2000);
          })
-   });   
+   });
 });

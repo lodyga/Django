@@ -39,7 +39,7 @@ from .services.ui_problem_test_cases import (
     get_clipboard_problem_test_cases
 )
 from .services.code_assembly import (
-    get_problem_type_header, 
+    get_problem_type_header,
     get_placeholder_source_code
 )
 from .services.judge0 import execute_code
@@ -278,7 +278,8 @@ class ProblemDetailView(DetailView):
         language_id = context["language_id"]
         language = get_object_or_404(Language, id=language_id)
 
-        solution_owner_id = int(request.POST.get("solution_owner_id", context["solution_owner_id"]))
+        solution_owner_id = int(request.POST.get(
+            "solution_owner_id", context["solution_owner_id"]))
         owner = get_object_or_404(User, id=solution_owner_id)
 
         owner_solution_data = self._get_owner_solution_context(
@@ -343,38 +344,6 @@ class TagDelete(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('python_problems:tag-index')
 
 
-class ProblemCreate(LoginRequiredMixin, CreateView):
-    model = Problem
-    form_class = ProblemForm
-    success_url = reverse_lazy('python_problems:problem-index')
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user
-        return kwargs
-
-    def form_valid(self, form):
-        form.instance.owner = self.request.user
-        return super().form_valid(form)
-
-
-class ProblemUpdate(LoginRequiredMixin, UpdateView):
-    model = Problem
-    form_class = ProblemForm
-    success_url = reverse_lazy('python_problems:problem-index')
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user
-        return kwargs
-
-
-class ProblemDelete(LoginRequiredMixin, DeleteView):
-    model = Problem
-    fields = "__all__"
-    success_url = reverse_lazy('python_problems:problem-index')
-
-
 class NextUrlMixin():
     request: HttpRequest
 
@@ -408,6 +377,38 @@ class NextUrlMixin():
 
     def get_success_url(self):
         return self.get_redirect_url()
+
+
+class ProblemCreate(LoginRequiredMixin, NextUrlMixin, CreateView):
+    model = Problem
+    form_class = ProblemForm
+    success_url = reverse_lazy('python_problems:problem-index')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+
+class ProblemUpdate(LoginRequiredMixin, NextUrlMixin, UpdateView):
+    model = Problem
+    form_class = ProblemForm
+    success_url = reverse_lazy('python_problems:problem-index')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+
+class ProblemDelete(LoginRequiredMixin, NextUrlMixin, DeleteView):
+    model = Problem
+    fields = "__all__"
+    success_url = reverse_lazy('python_problems:problem-index')
 
 
 class SolutionCreate(LoginRequiredMixin, NextUrlMixin, CreateView):
