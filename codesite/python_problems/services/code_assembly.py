@@ -122,7 +122,6 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
 
     updated_code = (
         f"{source_code.rstrip()}\n"
-        # todo
         f'{adapter.naming.operations_list} = {serialize(operations_list, language)}\n'
         f'{adapter.naming.arguments_list} = {serialize(arguments_list, language)}\n'
         f'{adapter.run_tests_function}({metadata["class_name"]}, 'f'{adapter.naming.operations_list}, {adapter.naming.arguments_list})\n'

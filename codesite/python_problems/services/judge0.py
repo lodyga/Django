@@ -101,7 +101,11 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
 
     source_code = clean_types(source_code)
     source_code = attach_utils(
-        source_code, language, problem_type, is_in_place)
+        source_code, 
+        language, 
+        problem_type, 
+        is_in_place
+    )
     source_code, expected_output = attach_validation_payload(
         source_code, problem, language, test_cases, button_pressed
     )

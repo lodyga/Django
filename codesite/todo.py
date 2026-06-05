@@ -1,4 +1,5 @@
-
+# response.time response.memory
+# Priority Queue; Cannot use import statement outside a module, K Closest Points to Origin attach import only to pQ problems
 
 # fix all redirect
 # add/remove tags privliges

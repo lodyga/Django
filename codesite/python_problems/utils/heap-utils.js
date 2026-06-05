@@ -3,40 +3,48 @@
 class PriorityQueue {
    constructor() {
       this.elements = [];
-   };
+   }
 
    size() {
-      return this.elements.length
-   };
+      return this.elements.length;
+   }
 
    isEmpty() {
       return this.elements.length === 0;
-   };
+   }
 
    dequeue() {
       return this.elements.shift();
-   };
+   }
 
    front() {
       return this.elements[0];
    }
+
+   toArray() {
+      return this.elements;
+   }
 }
 
 
-class MinPriorityQueue extends PriorityQueue {
+class MinPriorityQueue
+   extends PriorityQueue {
+
    enqueue(element) {
       this.elements.push(element);
       this.elements.sort((a, b) => a - b);
-   };
+   }
 
 }
 
 
-class MaxPriorityQueue extends PriorityQueue {
+class MaxPriorityQueue
+   extends PriorityQueue {
+
    enqueue(element) {
       this.elements.push(element);
       this.elements.sort((a, b) => b - a);
-   };
+   }
 
 }
 
@@ -46,22 +54,26 @@ class MaxPriorityQueue extends PriorityQueue {
 class Heap {
    constructor() {
       this.elements = [];
-   };
+   }
 
    size() {
-      return this.elements.length
-   };
+      return this.elements.length;
+   }
 
    isEmpty() {
       return this.elements.length === 0;
-   };
+   }
 
    pop() {
       return this.elements.shift();
-   };
+   }
 
    top() {
       return this.elements[0];
+   }
+
+   toArray() {
+      return this.elements;
    }
 }
 
@@ -75,7 +87,7 @@ class MinHeap extends Heap {
    push(element) {
       this.elements.push(element);
       this.elements.sort((a, b) => a - b);
-   };
+   }
 
 }
 
@@ -89,5 +101,5 @@ class MaxHeap extends Heap {
    push(element) {
       this.elements.push(element);
       this.elements.sort((a, b) => b - a);
-   };
+   }
 }

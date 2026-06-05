@@ -1,6 +1,7 @@
 from abc import ABC
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class NamingConvention:
     inputs_list: str
@@ -52,7 +53,12 @@ class LanguageConfig:
 
 
 def get_language_name(language):
-    return language.name if hasattr(language, "name") else language
+    language_name = language.name if hasattr(language, "name") else language
+
+    if language_name == "C++":
+        language_name = "Cpp"
+
+    return language_name
 
 
 class LanguageAdapter(ABC):
@@ -162,8 +168,73 @@ class JavaScriptAdapter(LanguageAdapter):
     )
 
 
+class CppAdapter(LanguageAdapter):
+    config = LanguageConfig(
+        print="print",
+        serialize="json.dumps",
+        solution=SolutionConfig(
+            instance_code="\nsolution = Solution()\n",
+            instance_pattern=r"solution\s*=\s*Solution\(\)\s*",
+        ),
+        binary_tree=BinaryTreeConfig(
+            utils_file="binary_tree_utils.cpp",
+            build="build_binary_tree",
+            serialize="serialize_binary_tree",
+        ),
+        linked_list=LinkedListConfig(
+            utils_file="linked_list_utils.cpp",
+            build="build_linked_list",
+            serialize="serialize_linked_list",
+        ),
+        class_design=ClassDesignConfig(
+            utils_file="class_design_utils.cpp",
+        ),
+        naming=NamingConvention(
+            inputs_list="inputs_list",
+            operations_list="operations_list",
+            arguments_list="arguments_list",
+            expected_list="expected_list",
+        ),
+        run_tests_function="run_tests",
+        in_place_utils_file="in_place_utils.cpp",
+    )
+
+
+class JavaAdapter(LanguageAdapter):
+    config = LanguageConfig(
+        print="print",
+        serialize="json.dumps",
+        solution=SolutionConfig(
+            instance_code="\nsolution = Solution()\n",
+            instance_pattern=r"solution\s*=\s*Solution\(\)\s*",
+        ),
+        binary_tree=BinaryTreeConfig(
+            utils_file="binary_tree_utils.cpp",
+            build="build_binary_tree",
+            serialize="serialize_binary_tree",
+        ),
+        linked_list=LinkedListConfig(
+            utils_file="linked_list_utils.cpp",
+            build="build_linked_list",
+            serialize="serialize_linked_list",
+        ),
+        class_design=ClassDesignConfig(
+            utils_file="class_design_utils.cpp",
+        ),
+        naming=NamingConvention(
+            inputs_list="inputs_list",
+            operations_list="operations_list",
+            arguments_list="arguments_list",
+            expected_list="expected_list",
+        ),
+        run_tests_function="run_tests",
+        in_place_utils_file="in_place_utils.cpp",
+    )
+
+
 LANGUAGE_ADAPTERS = {
     "Python": PythonAdapter(),
     "JavaScript": JavaScriptAdapter(),
+    "Cpp": CppAdapter(),
+    "Java": JavaAdapter(),
 }
-
