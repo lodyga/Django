@@ -7,9 +7,9 @@ def is_grid_shape(data):
         return
 
     for row in data:
-        if len(row) != len(data[0]):
+        if not row or not isinstance(row, list):
             return
-        if not row:
+        if len(row) != len(data[0]):
             return
 
     return True

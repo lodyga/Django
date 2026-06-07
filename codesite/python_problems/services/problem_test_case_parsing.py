@@ -66,17 +66,33 @@ def get_solution_problem_test_cases(solution_test_cases):
 
     return test_cases
 
+def serialize_in_cpp(value):
+    """
+    [2, 7, 11, 15] => '{2, 7, 11, 15}'
+    """
+    serialized = json.dumps(value)
 
-def serialize(value, language):
+    if serialized[0] == "[" and serialized[-1] == "]":
+        serialized = "{" + serialized[1: -1] + "}"
+    
+    return serialized
+
+
+def serialize(value, language) -> str:
     """
     [2, 7, 11, 15] => '[2, 7, 11, 15]'
     """
     language_name = get_language_name(language)
 
-    if language_name == "Python":
-        return repr(value)
-
-    return json.dumps(value)
+    match language_name:
+        case "Python":
+            return repr(value)
+        case "JavaScript":
+            return json.dumps(value)
+        case "Cpp":
+            return serialize_in_cpp(value)
+        case _:
+            return ""
 
 
 def get_field(data, key):

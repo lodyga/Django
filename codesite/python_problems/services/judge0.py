@@ -70,14 +70,20 @@ def check_for_response_error(response):
         return response["stderr"]
 
 
-def get_results(expected_output, problem, language, response):
+def get_results(response, expected_output, problem, language):
     stdout = response["stdout"]
     outputs = stdout.strip().splitlines()
     metadata = get_problem_metadata(problem)
-    parsed_outputs = [
-        json.loads(line)
-        for line in outputs[-len(expected_output):]
-    ]
+    
+    # Load Python and JavaScript data using JSON.
+    # C++ has wierd {} markings. Support vectors for now.
+    if language in ("Python", "JavaScript"):
+        parsed_outputs = [
+            json.loads(line)
+            for line in outputs[-len(expected_output):]
+        ]
+    else:
+        parsed_outputs = outputs[-len(expected_output):]
 
     if (
         compare_output_and_expected(
@@ -85,9 +91,11 @@ def get_results(expected_output, problem, language, response):
             expected_output,
             metadata.get("comparison_type", problem.comparison_type),
             language
-        ) or
-        language == "C++" and not response["stdout"] or
-        stdout.find("rue") != -1 and stdout.find("alse") == -1
+        ) 
+        # todo
+        # or
+        # language == "C++" and not response["stdout"] or
+        # stdout.find("rue") != -1 and stdout.find("alse") == -1
     ):
         return "Tests passed!"
     else:
@@ -117,4 +125,4 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     if button_pressed == "run":
         return response["stdout"]
 
-    return get_results(expected_output, problem, language, response)
+    return get_results(response, expected_output, problem, language)

@@ -80,6 +80,14 @@ def attach_utils(source_code, language, problem_type, is_in_place):
     return source_code
 
 
+# meaby delete not search or raise Error
+def clear_solution_instance_setup(source_code, method_name, language):
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
+    re.sub(adapter.solution.instance_pattern, source_code, "")
+
+
+# to delete
 def add_solution_instance_setup(source_code, method_name, language):
     if method_name:
         language_name = get_language_name(language)
@@ -91,21 +99,80 @@ def add_solution_instance_setup(source_code, method_name, language):
     return source_code
 
 
-def build_validation_payload(source_code, language, test_cases):
+def get_solution_instance_setup(source_code, method_name, language):
+    if method_name:
+        language_name = get_language_name(language)
+        adapter = LANGUAGE_ADAPTERS[language_name]
+        return adapter.solution.instance_code
+
+    return ""
+
+
+def attach_main(source_code, test_case_expressions, language, method_name):
+    if not method_name or not language:
+        return ""
+
+    language_name = get_language_name(language)
+
+    clear_solution_instance_setup(source_code, method_name, language)
+
+    solution_instance_setup = get_solution_instance_setup(
+        source_code,
+        method_name,
+        language
+    )
+
+    main_payload = solution_instance_setup + \
+        "\n".join(test_case_expressions) + "\n"
+
+    match language_name:
+        case "Python" | "JavaScript":
+            return main_payload
+        case "Cpp":
+            return "int main() {\n" + main_payload + "return 0;\n" + "}\n"
+        case _:
+            return ""
+
+
+def attach_printVector(source_code):
+    return source_code + """void printVector(const vector<int>& vector) {\n   cout << "{";\n\n   for (int idx = 0; idx < vector.size(); idx++) {\n      cout << vector[idx];\n\n      if (idx < vector.size() - 1) {\n         cout << ", ";\n      }\n   }\n\n   cout << "}" << endl;\n}\n"""
+
+
+def build_validation_payload(source_code, language, test_cases, method_name):
     # ('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]')
     # =>
     # 'print(json.dumps(solution.twoSum([2, 7, 11, 15], 9)))'
+    # printVector(solution.twoSum({ 2, 7, 11, 15 }, 9));
 
     language_name = get_language_name(language)
     adapter = LANGUAGE_ADAPTERS[language_name]
-    test_case_expressions = [
-        adapter.print_call(adapter.serialize_call(input_data))
-        for input_data, _ in test_cases
-    ]
-    updated_code = source_code.rstrip() + "\n" + "\n".join(test_case_expressions) + "\n"
+    test_case_expressions = []
+
+    for input_data, _ in test_cases:
+        match language_name:
+            case "Python" | "JavaScript":
+                tc = adapter.print_call(adapter.serialize_call(input_data))
+            case "Cpp":
+                tc = adapter.print_call(input_data) + ";"
+            case _:
+                tc = ""
+
+        test_case_expressions.append(tc)
+
+    if language_name == "Cpp":
+        source_code = attach_printVector(source_code)
+
+    main_block = attach_main(
+        source_code,
+        test_case_expressions,
+        language,
+        method_name,
+    )
+
+    source_code = source_code + main_block
     expected_output = [expected for _, expected in test_cases]
 
-    return updated_code, expected_output
+    return source_code, expected_output
 
 
 def build_validation_class_payload(source_code, language, test_cases, metadata):
@@ -182,15 +249,11 @@ def attach_validation_payload(source_code, problem, language, test_cases, button
         )
 
     else:
-        source_code = add_solution_instance_setup(
-            source_code,
-            problem.method_name or metadata["method_name"],
-            language
-        )
         source_code, expected_output = build_validation_payload(
             source_code,
             language,
             test_cases,
+            metadata["method_name"],
         )
 
     return source_code, expected_output
@@ -241,4 +304,5 @@ def get_placeholder_source_code(language):
             placeholder_source_code = """SELECT *\r\nFROM *\r\nWHERE *"""
         case _:
             placeholder_source_code = """Not known programming language."""
+
     return placeholder_source_code

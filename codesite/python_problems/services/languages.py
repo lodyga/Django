@@ -170,11 +170,11 @@ class JavaScriptAdapter(LanguageAdapter):
 
 class CppAdapter(LanguageAdapter):
     config = LanguageConfig(
-        print="print",
-        serialize="json.dumps",
+        print="printVector",  # print sericalized
+        serialize="",
         solution=SolutionConfig(
-            instance_code="\nsolution = Solution()\n",
-            instance_pattern=r"solution\s*=\s*Solution\(\)\s*",
+            instance_code="\nSolution solution;\n",
+            instance_pattern=r"Solution\s*solution\s*",
         ),
         binary_tree=BinaryTreeConfig(
             utils_file="binary_tree_utils.cpp",

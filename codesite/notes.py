@@ -252,3 +252,19 @@ lsof -i :8000
 kill PID
 
 
+# Replace next line indicator with next line.
+echo \
+'<text_here>' \
+| sed 's/\\r\\n/\
+/g' | 
+sed 's/\\n/\
+/g'
+
+
+
+echo \
+'#include <iostream>\r\n#include <vector>\r\n#include <unordered_map>\r\nusing namespace std;\r\n\r\n\r\nclass Solution {\r\npublic:\r\n   std::vector<int> twoSum(const std::vector<int>& nums, int target) {\r\n      std::unordered_map<int, int> numIdx;\r\n\r\n      for (int idx = 0; idx < nums.size(); idx++) {\r\n         int diff = target - nums[idx];\r\n\r\n         if (numIdx.count(diff)) {\r\n            return { numIdx[diff], idx };\r\n         }\r\n         else {\r\n            numIdx[nums[idx]] = idx;\r\n         }\r\n      }\r\n\r\n      return {};\r\n   }\r\n};\r\n\r\nvoid printVector(const vector<int>& vector) {\n   cout << "[";\n\n   for (int idx = 0; idx < vector.size(); idx++) {\n      cout << vector[idx];\n\n      if (idx < vector.size() - 1) {\n         cout << ", ";\n      }\n   }\n\n   cout << "]" << endl;\n}\nint main() {\n\nSolution solution;\nprintVector(solution.twoSum({2, 7, 11, 15}, 9));\nprintVector(solution.twoSum({3, 2, 4}, 6));\nprintVector(solution.twoSum({3, 3}, 6));\nreturn 0;\n}\n'\
+| sed 's/\\r\\n/\
+/g' | 
+sed 's/\\n/\
+/g'
