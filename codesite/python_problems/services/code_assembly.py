@@ -80,7 +80,7 @@ def attach_utils(source_code, language, problem_type, is_in_place):
     return source_code
 
 
-# meaby delete not search or raise Error
+# meaby_delete_solution_instance_setup not search or raise Error
 def clear_solution_instance_setup(source_code, method_name, language):
     language_name = get_language_name(language)
     adapter = LANGUAGE_ADAPTERS[language_name]
@@ -104,7 +104,6 @@ def get_solution_instance_setup(source_code, method_name, language):
         language_name = get_language_name(language)
         adapter = LANGUAGE_ADAPTERS[language_name]
         return adapter.solution.instance_code
-
     return ""
 
 
@@ -135,14 +134,22 @@ def attach_main(source_code, test_case_expressions, language, method_name):
 
 
 def attach_printVector(source_code):
-    return source_code + """void printVector(const vector<int>& vector) {\n   cout << "{";\n\n   for (int idx = 0; idx < vector.size(); idx++) {\n      cout << vector[idx];\n\n      if (idx < vector.size() - 1) {\n         cout << ", ";\n      }\n   }\n\n   cout << "}" << endl;\n}\n"""
+    file_path = settings \
+        .BASE_DIR \
+        / "python_problems/services" \
+        / "print_in_cpp.cpp"
+
+    with open(file_path, "r") as file:
+        utility = file.read()
+
+    return source_code + utility
 
 
 def build_validation_payload(source_code, language, test_cases, method_name):
     # ('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]')
     # =>
     # 'print(json.dumps(solution.twoSum([2, 7, 11, 15], 9)))'
-    # printVector(solution.twoSum({ 2, 7, 11, 15 }, 9));
+    # C++: print(solution.twoSum({ 2, 7, 11, 15 }, 9));
 
     language_name = get_language_name(language)
     adapter = LANGUAGE_ADAPTERS[language_name]

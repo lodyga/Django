@@ -5,6 +5,7 @@ from .languages import get_language_name
 from python_problems.models import ComparisonType
 
 
+# todelete
 def get_solution_problem_test_cases(solution_test_cases):
     # Remove this abomination when all test cases are moved to problem.
     """
@@ -66,16 +67,19 @@ def get_solution_problem_test_cases(solution_test_cases):
 
     return test_cases
 
-def serialize_in_cpp(value):
+
+def serialize_in_cpp(items):
+    # Serialize for C++ like json.dumps or JSON.stringify.
     """
     [2, 7, 11, 15] => '{2, 7, 11, 15}'
     """
-    serialized = json.dumps(value)
+    if isinstance(items, list):
+        serialized = [serialize_in_cpp(item)
+                      for item in items]
 
-    if serialized[0] == "[" and serialized[-1] == "]":
-        serialized = "{" + serialized[1: -1] + "}"
-    
-    return serialized
+        return "{" + ", ".join(serialized) + "}"
+
+    return json.dumps(items)
 
 
 def serialize(value, language) -> str:
@@ -90,7 +94,9 @@ def serialize(value, language) -> str:
         case "JavaScript":
             return json.dumps(value)
         case "Cpp":
-            return serialize_in_cpp(value)
+            # todo
+            a = serialize_in_cpp(value)
+            return a
         case _:
             return ""
 
@@ -122,57 +128,63 @@ def freeze(value):
     return value
 
 
-def compare_output_and_expected(output, expected, comparison_type, language):
+def compare_output_and_expected(output_value_list, expected_value_list, comparison_type, language):
     """
     Need ast.literal_eval() to compare:
     raw_item: P: '[0, 1]'
               JS: '[ 0, 1 ]'
-    expected_raw_item: P '[0, 1]'
+    expected_serialized: P '[0, 1]'
                        JS: '[0, 1]'
 
     raw_item: P: 'True'
               JS: 'true'
-    expected_raw_item: P: 'True'
+    expected_serialized: P: 'True'
                       JS: 'true'
     """
     language_name = get_language_name(language)
-
-    if len(output) != len(expected):
+    # todo
+    if len(output_value_list) != len(expected_value_list):
         return False
 
-    for item, expected_raw_item in zip(output, expected):
-        match language_name:
-            # "True" => True
-            case "Python":
-                try:
-                    expected_item = ast.literal_eval(expected_raw_item)
-                except (ValueError, SyntaxError):
-                    expected_item = expected_raw_item
-            # "true" => True
-            case _:
-                try:
-                    expected_item = json.loads(expected_raw_item)
-                except (ValueError, SyntaxError):
-                    expected_item = expected_raw_item
+
+    for output_value, expected_value in zip(output_value_list, expected_value_list):
+        # 
+        # match language_name:
+        #     # "True" => True
+        #     case "Python":
+        #         try:
+        #             expected_item = ast.literal_eval(expected_serialized)
+        #         except (ValueError, SyntaxError):
+        #             expected_item = expected_serialized
+        #     # "true" => True
+        #     case "JavaScript":
+        #         try:
+        #             expected_item = json.loads(expected_serialized)
+        #         except (ValueError, SyntaxError):
+        #             expected_item = expected_serialized
+        #     case _:
+        #         raise TypeError("Expected known programming language, got: ", str(language_name))
 
         match comparison_type:
             case ComparisonType.EXACT | "equal" | "exact":
-                if item != expected_item:
+                if output_value != expected_value:
                     return False
+            
             case ComparisonType.UNORDERED:
                 if (
-                    {freeze(x) for x in item}
+                    {freeze(x) for x in output_value}
                     !=
-                    {freeze(x) for x in expected_item}
+                    {freeze(x) for x in expected_value}
                 ):
                     return False
                 else:
                     continue
+            
             case ComparisonType.MULTISET:
                 if (
-                    Counter(freeze(x) for x in item)
+                    Counter(freeze(x) for x in output_value)
                     !=
-                    Counter(freeze(x) for x in expected_item)
+                    Counter(freeze(x) for x in expected_value)
                 ):
                     return False
 

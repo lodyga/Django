@@ -155,6 +155,7 @@ def get_no_meta_ui_problem_test_cases(problem, language, problem_test_cases):
     return ui_problem_test_cases
 
 
+# todelete
 def get_solution_ui_problem_test_cases(solution):
     solution_problem_test_cases = get_solution_problem_test_cases(
         solution.test_cases)
@@ -204,6 +205,7 @@ def get_ui_problem_test_cases(problem, solution, language):
         else:
             return []
 
+    # todelete
     elif solution.test_cases:
         return get_solution_ui_problem_test_cases(solution)
 
@@ -325,6 +327,7 @@ def get_effective_problem_test_cases(problem, solution, language):
         return []
     elif problem_problem_test_cases := get_problem_problem_test_cases(problem, language):
         return problem_problem_test_cases
+    # todelete
     elif solution_problem_test_cases := get_solution_problem_test_cases(solution.test_cases):
         return solution_problem_test_cases
     else:

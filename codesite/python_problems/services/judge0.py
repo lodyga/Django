@@ -3,7 +3,7 @@ import requests
 import socket
 from codesite.auth.judge0_auth import JUDGE0_API_KEY
 from .ui_problem_test_cases import get_problem_metadata, get_problem_type_name
-from .problem_test_case_parsing import compare_output_and_expected
+from .problem_test_case_parsing import compare_output_and_expected, get_field, serialize
 from .code_assembly import clean_types, attach_utils, attach_validation_payload
 
 def is_localhost():
@@ -70,32 +70,39 @@ def check_for_response_error(response):
         return response["stderr"]
 
 
-def get_results(response, expected_output, problem, language):
+def get_results(response, expected_serialized_list, problem, language):
     stdout = response["stdout"]
-    outputs = stdout.strip().splitlines()
+    output_serialized_list = stdout.strip().splitlines()
     metadata = get_problem_metadata(problem)
-    
-    # Load Python and JavaScript data using JSON.
-    # C++ has wierd {} markings. Support vectors for now.
-    if language in ("Python", "JavaScript"):
-        parsed_outputs = [
-            json.loads(line)
-            for line in outputs[-len(expected_output):]
-        ]
-    else:
-        parsed_outputs = outputs[-len(expected_output):]
+    comparison_type = metadata.get("comparison_type", problem.comparison_type)
+    N = len(expected_serialized_list)
+    # expected_serialized_list form paramters is outdated
 
-    if (
-        compare_output_and_expected(
-            parsed_outputs,
-            expected_output,
-            metadata.get("comparison_type", problem.comparison_type),
-            language
-        ) 
-        # todo
-        # or
-        # language == "C++" and not response["stdout"] or
-        # stdout.find("rue") != -1 and stdout.find("alse") == -1
+    output_value_list = [
+        json.loads(line)
+        for line in output_serialized_list[-N: ]
+    ]
+    
+    # todo
+    # Fetch expected directly from test cases.
+    # method, class
+    expected_value_list = []
+    problem_test_cases = problem.get_shared_testcases(include_hidden=True) or None
+    
+    if not problem_test_cases:
+        raise ValueError("No problem test cases found.")
+    
+    for problem_test_case in problem_test_cases:
+        expected = get_field(problem_test_case.data, "expected")
+        expected_value_list.append(expected)
+
+
+    # todo consisted output_value_list
+    if compare_output_and_expected(
+        output_value_list,
+        expected_value_list,
+        comparison_type,
+        language
     ):
         return "Tests passed!"
     else:
@@ -109,12 +116,12 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
 
     source_code = clean_types(source_code)
     source_code = attach_utils(
-        source_code, 
-        language, 
-        problem_type, 
+        source_code,
+        language,
+        problem_type,
         is_in_place
     )
-    source_code, expected_output = attach_validation_payload(
+    source_code, expected_serialized_list = attach_validation_payload(
         source_code, problem, language, test_cases, button_pressed
     )
     response = run_judge0(source_code, language)
@@ -125,4 +132,14 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     if button_pressed == "run":
         return response["stdout"]
 
-    return get_results(response, expected_output, problem, language)
+    return get_results(response, expected_serialized_list, problem, language)
+
+# response["stdout"]:
+# '[0, 1]\n[1, 2]\n[0, 1]\n'
+# '[0,1]\n[1,2]\n[0,1]\n'
+# '[4, 7, 2, 9, 6, 3, 1]\n[2, 3, 1]\n[]\n[7, 15, 3, 20, 9]\n'
+
+# bool, str, int, floar
+# list[], list[list[]]
+# ListNode
+# TreeNode

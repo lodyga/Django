@@ -1,7 +1,9 @@
-# response.time response.memory
+# Fix expected_value_list for class problems.
+# Program's run time[second].Memory used by the program after execution[kilobyte]. response.time response.memory
 # Priority Queue; Cannot use import statement outside a module, K Closest Points to Origin attach import only to pQ problems
 
-# fix all redirect
+# Run button below Copy button in Solution area.
+# fix all redirect, redirect after adding new problem/solution
 # add/remove tags privliges
 # fix all back
 # fordbid run and validate if no test cases.

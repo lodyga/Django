@@ -170,7 +170,7 @@ class JavaScriptAdapter(LanguageAdapter):
 
 class CppAdapter(LanguageAdapter):
     config = LanguageConfig(
-        print="printVector",  # print sericalized
+        print="print",  # print sericalized
         serialize="",
         solution=SolutionConfig(
             instance_code="\nSolution solution;\n",
