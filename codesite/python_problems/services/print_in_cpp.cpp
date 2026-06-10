@@ -1,14 +1,16 @@
 // Serialize for C++ like json.dumps or JSON.stringify.
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
 
 
 void print(const int& value) {
-   cout << value;
-   cout << endl;
+   cout << value << endl;
 }
 
 void print(const string& value) {
-   cout << '"' + value + '"';
-   cout << endl;
+   cout << '"' << value << '"' << endl;
 }
 
 // C++ todo

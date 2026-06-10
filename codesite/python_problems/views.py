@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
-from django.db.models import Count, Q
+from django.db.models import Case, Count, IntegerField, Q, Value, When
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -186,12 +186,17 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             problem=problem,
             owner=owner
         )
-        owner_solution_languages = Language.objects.filter(
-            id__in=owner_all_solutions.values_list("language", flat=True)
-        )
-        solution_languages = Language.objects.filter(
-            id__in=owner_all_solutions.values_list("language", flat=True)
-        )
+        owner_solution_languages = Language.objects\
+            .filter(id__in=owner_all_solutions.values_list("language", flat=True))\
+            .alias(language_order=Case(
+                When(name="Python", then=Value(0)),
+                When(name="JavaScript", then=Value(1)),
+                When(name="C++", then=Value(2)),
+                When(name="Java", then=Value(3)),
+                default=Value(4),
+                output_field=IntegerField(),))\
+            .order_by("language_order", "name")
+        
         for solution in owner_solutions:
             solution.source_code = get_problem_type_header(
                 problem.problem_type,
@@ -199,7 +204,6 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             ) + solution.source_code
 
         return {
-            "solution_languages": solution_languages,
             "owner_solutions": owner_solutions,
             "owner_all_solutions": owner_all_solutions,
             "owner_solution_languages": owner_solution_languages,
@@ -237,7 +241,6 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             language=language,
         )
         owner_solutions = owner_solution_data["owner_solutions"]
-        solution_languages = owner_solution_data["solution_languages"]
         owner_solution_languages = owner_solution_data["owner_solution_languages"]
         # Multiple solutions are allowed; use the first ordered solution.
         selected_solution = owner_solutions.first()
@@ -290,7 +293,6 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             "question": question,
             "related_problems": related_problems,
             "solution": selected_solution,
-            "solution_languages": solution_languages,
             "source_code": source_code,
             "tag_list": tag_list,
             "ui_problem_test_cases": ui_problem_test_cases,
@@ -328,7 +330,6 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         )
         owner_solutions = owner_solution_data["owner_solutions"]
         owner_solution_languages = owner_solution_data["owner_solution_languages"]
-        solution_languages = owner_solution_data["solution_languages"]
 
         # Run or validate code
         if (
@@ -357,7 +358,6 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             "solution_owner_id": solution_owner_id,
             "owner_solution_languages": owner_solution_languages,
             "owner_solutions": owner_solutions,
-            "solution_languages": solution_languages,
         })
         return render(request, self.template_name, context)
 

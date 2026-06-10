@@ -813,6 +813,32 @@ class SolutionDetailViewTests(TestCase):
         self.assertEqual(response.context["solution"], solution)
         self.assertIn(solution, response.context["owner_solutions"])
 
+    def test_owner_solution_languages_use_preferred_order(self):
+        owner = create_sample_user()
+        problem = create_sample_problem(owner=owner)
+        languages = [
+            Language.objects.get_or_create(name="Ruby")[0],
+            Language.objects.get_or_create(name="Java")[0],
+            Language.objects.get_or_create(name="C#")[0],
+            Language.objects.get_or_create(name="C++")[0],
+            Language.objects.get_or_create(name="JavaScript")[0],
+            Language.objects.get_or_create(name="Python")[0],
+        ]
+        for language in languages:
+            create_sample_solution(problem=problem, language=language, owner=owner)
+
+        response = self.client.get(
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={"slug": problem.slug, "language": "Python"},
+            )
+        )
+
+        self.assertEqual(
+            [language.name for language in response.context["owner_solution_languages"]],
+            ["Python", "JavaScript", "C++", "Java", "C#", "Ruby"],
+        )
+
     def test_back_link_uses_next_url(self):
         solution = create_sample_solution()
         next_url = f"{reverse('python_problems:problem-index')}?page=2"
