@@ -296,19 +296,19 @@ def get_placeholder_source_code(language):
     """
     match language.id:
         case 1:
-            placeholder_source_code = """# Python (3.8.1)\r\n\r\nclass Solution:\r\n\tdef fun(self, x: str) -> str:\r\n\t\treturn x\r\n\r\nsolution = Solution()\r\nprint(solution.fun("Hello, World!"))"""
+            placeholder_source_code = """# Python (3.8.1)\n\nclass Solution:\n\tdef fun(self, x: str) -> str:\n\t\treturn x\n\nsolution = Solution()\nprint(solution.fun("Hello, World!"))"""
         case 2:
-            placeholder_source_code = """// JavaScript (Node.js 12.14.0)\r\n\r\nclass Solution {\r\n  fun(x) {\r\n    return x\r\n  }\r\n}\r\n\r\nconst solution = new Solution();\r\nconsole.log(solution.fun('Hello, World!'))"""
+            placeholder_source_code = """// JavaScript (Node.js 12.14.0)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
         case 6:
-            placeholder_source_code = """// Java (OpenJDK 13.0.1)\r\nimport java.util.*;\r\n\r\npublic class Main {\r\n    public static void main(String[] args) {\r\n        System.out.println("Hello, World!");\r\n    }\r\n}"""
+            placeholder_source_code = """// Java (OpenJDK 13.0.1)\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}"""
         case 7:
-            placeholder_source_code = """// C++ (GCC 9.2.0)\r\n\r\n#include <iostream>\r\nusing namespace std;\r\n\r\nint main() {\r\n  cout << "Hello, World!";\r\n  return 0;\r\n}"""
+            placeholder_source_code = """// C++ (GCC 9.2.0)\n\n#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, World!";\n  return 0;\n}"""
         case 3:
-            placeholder_source_code = """# Python (3.8.1)\r\nimport pandas as pd\r\n\r\n"""
+            placeholder_source_code = """# Python (3.8.1)\nimport pandas as pd\n\n"""
         case 4:
-            placeholder_source_code = """SELECT *\r\nFROM *\r\nWHERE *"""
+            placeholder_source_code = """SELECT *\nFROM *\nWHERE *"""
         case 5:
-            placeholder_source_code = """SELECT *\r\nFROM *\r\nWHERE *"""
+            placeholder_source_code = """SELECT *\nFROM *\nWHERE *"""
         case _:
             placeholder_source_code = """Not known programming language."""
 

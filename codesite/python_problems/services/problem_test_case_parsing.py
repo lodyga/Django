@@ -10,7 +10,7 @@ def get_solution_problem_test_cases(solution_test_cases):
     # Remove this abomination when all test cases are moved to problem.
     """
     Clean each solution test case into (input, expected output) tuple.
-    str: 'print(Solution().twoSum([2, 7, 11, 15], 9) == [0, 1])\r\n'
+    str: 'print(Solution().twoSum([2, 7, 11, 15], 9) == [0, 1])\n'
     =>
     list: [('Solution().twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
     """
