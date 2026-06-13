@@ -40,6 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
    const solutionElements = document.getElementsByClassName('solutionContent');
    const solutionLength = solutionElements.length;
    const copySolutionBtn = document.getElementById('copy-solution-btn');
+   const copyValidateSolutionBtn = document.getElementById('copy-validate-solution-btn');
+   const codeContainer = document.querySelector('[name="code_container"]');
+   const testCodeButton = document.querySelector('[name="test_code_button"]');
    const solutionUpdateLink = document.getElementById('solutionUpdateLink');
    const currentUserId = solutionUpdateLink?.dataset.currentUserId || '';
    let clipboardSolution = '';
@@ -49,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
    }
 
    function buildSolutionActionUrl(linkElement, solutionId) {
-      // todo
       if (!linkElement?.dataset.urlTemplate) {
          return null;
       }
@@ -72,6 +74,21 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       return `${currenPath}?${params.toString()}`;
+   }
+
+   function showProblemCodePanel() {
+      const targetSelector = copyValidateSolutionBtn?.dataset.bsTarget;
+      const problemCodePanel = targetSelector ? document.querySelector(targetSelector) : null;
+
+      if (!problemCodePanel || typeof bootstrap === 'undefined') {
+         return;
+      }
+
+      const problemCodeCollapse = bootstrap.Collapse.getOrCreateInstance(problemCodePanel, {
+         toggle: false,
+      });
+
+      problemCodeCollapse.show();
    }
 
    function showSolution(idx) {
@@ -164,4 +181,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 2000);
          })
    });
+
+   // `Copy & Validate` button
+   copyValidateSolutionBtn?.addEventListener('click', () => {
+      if (!codeContainer || !testCodeButton) {
+         return;
+      }
+
+      codeContainer.value = clipboardSolution;
+
+      if (typeof codeEditor !== 'undefined' && codeEditor) {
+         codeEditor.setValue(clipboardSolution);
+         codeEditor.save();
+      }
+
+      showProblemCodePanel();
+      testCodeButton.click();
+   });
+
+
 });

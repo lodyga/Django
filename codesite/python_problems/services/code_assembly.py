@@ -26,10 +26,11 @@ def clean_types(source_code):
     return source_code
 
 
-def get_utility(filename):
+def get_utility(filename, directory):
     file_path = settings \
         .BASE_DIR \
-        / "python_problems/utils" \
+        / "python_problems/" \
+        / directory \
         / filename
 
     with open(file_path, "r") as file:
@@ -45,21 +46,25 @@ def attach_utils(source_code, language, problem_type, is_in_place):
     if is_in_place:
         source_code = source_code.rstrip() + "\n" + \
             get_utility(
-            adapter.in_place_utils_file
+            adapter.in_place_utils_file,
+            "utils"
         ).rstrip() + "\n"
 
     match problem_type:
         case ProblemType.BINARY_TREE:
             source_code = get_utility(
-                adapter.binary_tree.utils_file
+                adapter.binary_tree.utils_file,
+                "utils"
             ) + "\n" + source_code
         case ProblemType.LINKED_LIST:
             source_code = get_utility(
-                adapter.linked_list.utils_file
+                adapter.linked_list.utils_file,
+                "utils"
             ) + "\n" + source_code
         case ProblemType.CLASS:
             class_utils = get_utility(
-                adapter.class_design.utils_file
+                adapter.class_design.utils_file,
+                "utils"
             )
             cleaned_utils = clean_types(class_utils)
             source_code = source_code + "\n" + cleaned_utils
@@ -73,7 +78,7 @@ def attach_utils(source_code, language, problem_type, is_in_place):
             )
         case "JavaScript" if adapter.heap_utils_file:
             source_code = (
-                get_utility(adapter.heap_utils_file)
+                get_utility(adapter.heap_utils_file, "utils")
                 + source_code
             )
 
@@ -134,14 +139,7 @@ def attach_main(source_code, test_case_expressions, language, method_name):
 
 
 def attach_printVector(source_code):
-    file_path = settings \
-        .BASE_DIR \
-        / "python_problems/services" \
-        / "print_in_cpp.cpp"
-
-    with open(file_path, "r") as file:
-        utility = file.read()
-
+    utility = get_utility("print_in_cpp.cpp", "services")
     return source_code + utility
 
 
@@ -195,7 +193,7 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
         expected_list.append(get_field(test_case.data, "expected"))
 
     updated_code = (
-        f"{source_code.rstrip()}\n"
+        f"{source_code}\n"
         f'{adapter.naming.operations_list} = {serialize(operations_list, language)}\n'
         f'{adapter.naming.arguments_list} = {serialize(arguments_list, language)}\n'
         f'{adapter.run_tests_function}({metadata["class_name"]}, 'f'{adapter.naming.operations_list}, {adapter.naming.arguments_list})\n'

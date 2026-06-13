@@ -76,16 +76,13 @@ def get_results(response, expected_serialized_list, problem, language):
     metadata = get_problem_metadata(problem)
     comparison_type = metadata.get("comparison_type", problem.comparison_type)
     N = len(expected_serialized_list)
-    # expected_serialized_list form paramters is outdated
+    # expected_serialized_list form paramters is outdated, to be removed after metadata is complete
 
     output_value_list = [
         json.loads(line)
         for line in output_serialized_list[-N: ]
     ]
     
-    # todo
-    # Fetch expected directly from test cases.
-    # method, class
     expected_value_list = []
     problem_test_cases = problem.get_shared_testcases(include_hidden=True) or None
     
@@ -97,7 +94,6 @@ def get_results(response, expected_serialized_list, problem, language):
         expected_value_list.append(expected)
 
 
-    # todo consisted output_value_list
     if compare_output_and_expected(
         output_value_list,
         expected_value_list,

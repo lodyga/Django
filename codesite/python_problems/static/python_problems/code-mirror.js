@@ -65,7 +65,6 @@ function setSolutionViewerContent(content) {
 window.ensureSolutionViewer = ensureSolutionViewer;
 window.setSolutionViewerContent = setSolutionViewerContent;
 
-
 document.addEventListener('DOMContentLoaded', () => {
    // Collapsable paragraph.
    const problemCodeElements = document.getElementById('problemCode');
