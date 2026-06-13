@@ -128,7 +128,7 @@ def freeze(value):
     return value
 
 
-def compare_output_and_expected(output_value_list, expected_value_list, comparison_type, language):
+def compare_output_and_expected(output_value_list, expected_value_list, comparison_type, language) -> bool:
     """
     Need ast.literal_eval() to compare:
     raw_item: P: '[0, 1]'
@@ -141,35 +141,15 @@ def compare_output_and_expected(output_value_list, expected_value_list, comparis
     expected_serialized: P: 'True'
                       JS: 'true'
     """
-    language_name = get_language_name(language)
-    # todo
     if len(output_value_list) != len(expected_value_list):
         return False
 
-
     for output_value, expected_value in zip(output_value_list, expected_value_list):
-        # 
-        # match language_name:
-        #     # "True" => True
-        #     case "Python":
-        #         try:
-        #             expected_item = ast.literal_eval(expected_serialized)
-        #         except (ValueError, SyntaxError):
-        #             expected_item = expected_serialized
-        #     # "true" => True
-        #     case "JavaScript":
-        #         try:
-        #             expected_item = json.loads(expected_serialized)
-        #         except (ValueError, SyntaxError):
-        #             expected_item = expected_serialized
-        #     case _:
-        #         raise TypeError("Expected known programming language, got: ", str(language_name))
-
         match comparison_type:
             case ComparisonType.EXACT | "equal" | "exact":
                 if output_value != expected_value:
                     return False
-            
+
             case ComparisonType.UNORDERED:
                 if (
                     {freeze(x) for x in output_value}
@@ -179,7 +159,7 @@ def compare_output_and_expected(output_value_list, expected_value_list, comparis
                     return False
                 else:
                     continue
-            
+
             case ComparisonType.MULTISET:
                 if (
                     Counter(freeze(x) for x in output_value)

@@ -196,7 +196,7 @@ class ProblemDetailView(NextUrlMixin, DetailView):
                 default=Value(4),
                 output_field=IntegerField(),))\
             .order_by("language_order", "name")
-        
+
         for solution in owner_solutions:
             solution.source_code = get_problem_type_header(
                 problem.problem_type,
@@ -282,7 +282,7 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             "language": language,
             "language_id": language.id,
             'next_problem_slug': next_problem_slug,
-            "output_container": "null",
+            "output_container": "",
             "owner_id": solution_owner_id,
             "solution_owner_id": solution_owner_id,
             "owner_solution_languages": owner_solution_languages,

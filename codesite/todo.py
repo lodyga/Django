@@ -1,5 +1,5 @@
-# default tests for two sum, min stack, reverse linked list, rev binary tree
-# Program's run time[second].Memory used by the program after execution[kilobyte]. response.time response.memory
+# Unique paths no input variable name under Test Cases.
+# # default tests for two sum, min stack, reverse linked list, rev binary tree
 # Priority Queue; Cannot use import statement outside a module, K Closest Points to Origin attach import only to pQ problems
 # Island Perimeter
 # fix all redirect, redirect after adding new problem/solution

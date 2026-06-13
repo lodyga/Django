@@ -2,7 +2,7 @@ import html
 import json
 
 from django.contrib.auth import get_user_model
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.urls import reverse
 
 from .forms import ProblemForm
@@ -20,6 +20,7 @@ from .services.code_assembly import (
     build_validation_class_payload,
     build_validation_in_place_payload,
 )
+from .services.judge0 import handle_result_errors
 from .services.previews import draw_linked_list
 from .services.ui_problem_test_cases import (
     build_problem_test_case_expression,
@@ -323,6 +324,45 @@ class ProblemFormTests(TestCase):
                 "expected": True,
             },
         )
+
+
+class Judge0ResultHandlingTests(SimpleTestCase):
+    def test_handle_result_errors_allows_accepted_response_to_continue(self):
+        response = {
+            "status": {"description": "Accepted"},
+            "compile_output": None,
+        }
+
+        self.assertIsNone(handle_result_errors(response))
+
+    def test_handle_result_errors_returns_response_when_no_response(self):
+        self.assertEqual(
+            handle_result_errors(None),
+            {"error": "No response from judge0."},
+        )
+
+    def test_handle_result_errors_returns_existing_error_response(self):
+        response = {"error": "Judge0 request failed."}
+
+        self.assertIs(handle_result_errors(response), response)
+
+    def test_handle_result_errors_converts_compile_output_to_error(self):
+        response = {
+            "status": {"description": "Compilation Error"},
+            "compile_output": "Syntax error",
+        }
+
+        self.assertIs(handle_result_errors(response), response)
+        self.assertEqual(response["error"], "Syntax error")
+
+    def test_handle_result_errors_marks_non_accepted_response_as_failed(self):
+        response = {
+            "status": {"description": "Wrong Answer"},
+            "compile_output": None,
+        }
+
+        self.assertIs(handle_result_errors(response), response)
+        self.assertEqual(response["result"], "Tests failed!")
 
 
 class ProblemScriptTests(TestCase):

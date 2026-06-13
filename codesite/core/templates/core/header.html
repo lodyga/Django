@@ -74,23 +74,23 @@
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li>
               <a class="dropdown-item"
-                href="{% url 'python_problems:problem-create' %}">Create a problem</a>
+                href="{% url 'python_problems:problem-create' %}?next={{ request.get_full_path|urlencode }}">Create a problem</a>
             </li>
             <li>
               <a class="dropdown-item"
-                href="{% url 'python_problems:solution-create' %}">Create a solution</a>
+                href="{% url 'python_problems:solution-create' %}?next={{ request.get_full_path|urlencode }}">Create a solution</a>
             </li>
             <li>
               <a class="dropdown-item"
-                href="{% url 'python_problems:test_case-create' %}">Create a test case</a>
+                href="{% url 'python_problems:test_case-create' %}?next={{ request.get_full_path|urlencode }}">Create a test case</a>
             </li>
             <li>
               <a class="dropdown-item" 
-                href="{% url 'python_problems:tag-create' %}">Add a tag</a>
+                href="{% url 'python_problems:tag-create' %}?next={{ request.get_full_path|urlencode }}">Add a tag</a>
             </li>
             <li>
               <a class="dropdown-item" 
-                href="{% url 'python_problems:language-create' %}">Add a language</a>
+                href="{% url 'python_problems:language-create' %}?next={{ request.get_full_path|urlencode }}">Add a language</a>
             </li>
             <li>
               <a class="dropdown-item" 

@@ -6,6 +6,7 @@ from .ui_problem_test_cases import get_problem_metadata, get_problem_type_name
 from .problem_test_case_parsing import compare_output_and_expected, get_field, serialize
 from .code_assembly import clean_types, attach_utils, attach_validation_payload
 
+
 def is_localhost():
     # localhost_list = ["127.0.0.1", "127.0.1.1", "::1"]
     hostname = socket.gethostname()
@@ -51,26 +52,30 @@ def run_judge0(source_code, language):
     return response
 
 
-def check_for_response_error(response):
+def handle_response_error(response):
     if not response:
-        return "No response from judge0."
+        return {"error": "No response from judge0."}
 
     # handles C++ response["error"]
-    elif "error" in response:
-        return response["error"]
+    elif response.get("error"):
+        return response
 
     # handles Java response["compile_output"]
-    elif response["compile_output"] is not None:
-        return response["compile_output"]
+    elif response.get("compile_output"):
+        response["error"] = response["compile_output"]
+        return response
 
-    elif response["status"]["id"] in (1, 2, 3, 4, 5, 6):
-        return response["status"]["description"]
+    elif response["status"]["description"] == "Accepted":
+        return None
 
-    else:
-        return response["stderr"]
+    response["result"] = "Tests failed!"
+    return response
 
 
-def get_results(response, expected_serialized_list, problem, language):
+def validate_results(response, expected_serialized_list, problem, language, button_pressed):
+    if button_pressed != "validate":
+        return
+
     stdout = response["stdout"]
     output_serialized_list = stdout.strip().splitlines()
     metadata = get_problem_metadata(problem)
@@ -80,19 +85,19 @@ def get_results(response, expected_serialized_list, problem, language):
 
     output_value_list = [
         json.loads(line)
-        for line in output_serialized_list[-N: ]
+        for line in output_serialized_list[-N:]
     ]
-    
+
     expected_value_list = []
-    problem_test_cases = problem.get_shared_testcases(include_hidden=True) or None
-    
+    problem_test_cases = problem.get_shared_testcases(
+        include_hidden=True) or None
+
     if not problem_test_cases:
         raise ValueError("No problem test cases found.")
-    
+
     for problem_test_case in problem_test_cases:
         expected = get_field(problem_test_case.data, "expected")
         expected_value_list.append(expected)
-
 
     if compare_output_and_expected(
         output_value_list,
@@ -100,9 +105,11 @@ def get_results(response, expected_serialized_list, problem, language):
         comparison_type,
         language
     ):
-        return "Tests passed!"
+        response["result"] = "Tests passed!"
     else:
-        return "Tests failed!"
+        response["result"] = "Tests failed!"
+
+    return
 
 
 def execute_code(problem, source_code, language, button_pressed="run", test_cases=""):
@@ -122,13 +129,19 @@ def execute_code(problem, source_code, language, button_pressed="run", test_case
     )
     response = run_judge0(source_code, language)
 
-    if (err := check_for_response_error(response)) != "Accepted":
-        return err
+    if response_error := handle_response_error(response):
+        return response_error
 
-    if button_pressed == "run":
-        return response["stdout"]
+    validate_results(
+        response,
+        expected_serialized_list,
+        problem,
+        language,
+        button_pressed
+    )
 
-    return get_results(response, expected_serialized_list, problem, language)
+    return response
+
 
 # response["stdout"]:
 # '[0, 1]\n[1, 2]\n[0, 1]\n'
