@@ -68,19 +68,22 @@
           <span class="badge bg-secondary col-auto">Code output:</span>
           <div class="form-control mb-2 col-auto" name="output_container">
             {% if output_container %}
-            {% if output_container.error %}
-              <code class="text-body d-block" style="white-space: pre-wrap">Error: {{ output_container.error }}</code>
-            {% else %}
-              <code class="text-body d-block">Status: {{ output_container.status.description }}</code>
-              {% if output_container.stderr %}
-                <code class="text-body d-block" style="white-space: pre-wrap">Standard error: {{ output_container.stderr }}</code>
+              {% if output_container.error %}
+                <code class="text-body d-block" style="white-space: pre-wrap">Error: {{ output_container.error }}</code>
+              {% else %}
+                <code class="text-body d-block">Status: {{ output_container.status.description }}</code>
+                {% if output_container.stderr %}
+                  <code class="text-body d-block" style="white-space: pre-wrap">Standard error: {{ output_container.stderr }}</code>
+                {% endif %}
+                {% if output_container.stdout %}
+                  <code class="text-body d-block">Output: {{ output_container.stdout }}</code>
+                {% endif %}
+                {% if output_container.result %}
+                  <code class="text-body d-block">Output: {{ output_container.result }}</code>
+                {% endif %}
+                <code class="text-body d-block">Time: {{ output_container.time }} seconds</code>
+                <code class="text-body d-block">Memory: {{ output_container.memory }} kilobytes</code>
               {% endif %}
-              {% if output_container.result %}
-                <code class="text-body d-block">Result: {{ output_container.result }}</code>
-              {% endif %}
-              <code class="text-body d-block">Time: {{ output_container.time }} seconds</code>
-              <code class="text-body d-block">Memory: {{ output_container.memory }} kilobytes</code>
-            {% endif %}
             {% endif %}
           </div>
         </div>

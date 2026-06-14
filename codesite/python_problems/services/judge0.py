@@ -73,19 +73,19 @@ def handle_response_error(response):
 
 
 def validate_results(response, expected_serialized_list, problem, language, button_pressed):
+    # expected_serialized_list form paramters is outdated, to be removed after metadata is complete
     if button_pressed != "validate":
         return
 
-    stdout = response["stdout"]
-    output_serialized_list = stdout.strip().splitlines()
+    N = len(expected_serialized_list)
+    stdout = response.pop("stdout")
+    output_serialized_list = stdout.strip().splitlines()[-N:]
     metadata = get_problem_metadata(problem)
     comparison_type = metadata.get("comparison_type", problem.comparison_type)
-    N = len(expected_serialized_list)
-    # expected_serialized_list form paramters is outdated, to be removed after metadata is complete
 
     output_value_list = [
         json.loads(line)
-        for line in output_serialized_list[-N:]
+        for line in output_serialized_list
     ]
 
     expected_value_list = []
