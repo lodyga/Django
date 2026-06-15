@@ -30,13 +30,8 @@ def run_tests(
     res = []
 
     for operations, arguments in zip(operations_list, arguments_list):
-        # res.append(
-        #     test_input(cls, operations, arguments)
-        # )
         # Prints every test case in the new line.
         print(json.dumps(test_input(cls, operations, arguments)))
-
-    # return res
 
 
 # run_tests(MinStack, operations_list, arguments_list)

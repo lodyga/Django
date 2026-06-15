@@ -14,6 +14,11 @@ def clean_types(source_code):
         source_code
     )
     source_code = re.sub(
+        r"tuple\[",
+        "Tuple[",
+        source_code
+    )
+    source_code = re.sub(
         r"TreeNode\s*\|\s*None\s*",
         "Optional[TreeNode]",
         source_code
@@ -73,7 +78,7 @@ def attach_utils(source_code, language, problem_type, is_in_place):
         case "Python":
             source_code = (
                 "import json\n"
-                + "from typing import Optional, List\n"
+                + "from typing import Optional, List, Tuple\n"
                 + source_code
             )
         case "JavaScript" if adapter.heap_utils_file:
