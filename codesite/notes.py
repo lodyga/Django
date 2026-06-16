@@ -252,6 +252,7 @@ lsof -i :8000
 kill PID
 
 
+
 # Replace next line indicator with next line.
 echo \
 '<text_here>' \
@@ -262,9 +263,14 @@ sed 's/\\n/\
 
 
 
-echo \
-'#include <iostream>\r\n#include <math.h>\r\nusing namespace std;\r\n\r\n\r\nclass Solution {\r\npublic:\r\n    int kthGrammar(int n, int k) {\r\n        int row = n - 1;\r\n        int col = k - 1;\r\n        bool is_val = true;\r\n        int mid = (1 << row) / 2;\r\n\r\n        while (row) {\r\n            if (col >= mid) {\r\n                col -= mid;\r\n                is_val = !is_val;\r\n            }\r\n\r\n            mid /= 2;\r\n            row--;\r\n        }\r\n\r\n        return is_val ? 0 : 1;\r\n    }\r\n};// Serialize for C++ like json.dumps or JSON.stringify.\n\n\nvoid print(const int& value) {\n   cout << value;\n   cout << endl;\n}\n\nvoid print(const string& value) {\n   cout << \'"\' + value + \'"\';\n   cout << endl;\n}\n\n// C++ todo\n// vecor of strings?\nvoid print(const vector<int>& values) {\n   cout << "[";\n\n   for (int idx = 0; idx < values.size(); idx++) {\n      cout << values[idx];\n\n      if (idx < values.size() - 1) {\n         cout << ", ";\n      }\n   }\n\n   cout << "]" << endl;\n}\nint main() {\n\nSolution solution;\nprint(solution.kthGrammar(1, 1));\nprint(solution.kthGrammar(2, 1));\nprint(solution.kthGrammar(2, 2));\nprint(solution.kthGrammar(30, 434991989));\nreturn 0;\n}\n'\
-| sed 's/\\r\\n/\
-/g' | 
-sed 's/\\n/\
-/g'
+
+> sqlite3 db.sqlite3
+sqlite3> SELECT metadata FROM python_problems_problem;
+# Select all problems with in_place: true
+sqlite3> SELECT title
+FROM python_problems_problem
+WHERE json_extract(metadata, '$.in_place') = 1;
+
+SELECT title
+FROM python_problems_problem
+WHERE json_extract(metadata, '$.comparison_type') = "unordered";

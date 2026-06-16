@@ -1,5 +1,5 @@
-# Remove duplicases from search
 
+# Remove duplicases from search
 # Unique paths no input variable name under Test Cases.
 # # default tests for two sum, min stack, reverse linked list, rev binary tree
 # Priority Queue; Cannot use import statement outside a module, K Closest Points to Origin attach import only to pQ problems
@@ -11,6 +11,7 @@
 # remove problem type, method name, argument names,  comparison type fields or meaby not
 # fix next slug # get_adjacent_slugs(problem, language)
 # add js heap to metadata
+# case ComparisonType.EXACT | "equal" | "exact":
 # Python 3.8 doesn't support match / case statements.
 # setup cursor with proper method name
 # edit only own solutions
@@ -37,7 +38,8 @@
 # search bar AND OR
 # chanege python to code_problems...
 # selenium for testing darkmode
-# Task Scheduler c++ input list to vector, JS add queue
+# Task Scheduler C++ input list to vector, JS add queue
+# Design Tweeter C++
 
 """
 Preview:

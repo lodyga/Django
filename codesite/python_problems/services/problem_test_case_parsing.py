@@ -1,8 +1,5 @@
-import ast
 import json
-from collections import Counter
 from .languages import get_language_name
-from python_problems.models import ComparisonType
 
 
 # todelete
@@ -94,9 +91,7 @@ def serialize(value, language) -> str:
         case "JavaScript":
             return json.dumps(value)
         case "Cpp":
-            # todo
-            a = serialize_in_cpp(value)
-            return a
+            return serialize_in_cpp(value)
         case _:
             return ""
 
@@ -113,59 +108,3 @@ def get_field(data, key):
             "arguments": 1,
         }
         return data[idx_map[key]]
-
-
-def freeze(value):
-    if isinstance(value, list):
-        return tuple(freeze(item) for item in value)
-
-    if isinstance(value, dict):
-        return tuple(sorted(
-            (key, freeze(val))
-            for key, val in value.items()
-        ))
-
-    return value
-
-
-def compare_output_and_expected(output_value_list, expected_value_list, comparison_type, language) -> bool:
-    """
-    Need ast.literal_eval() to compare:
-    raw_item: P: '[0, 1]'
-              JS: '[ 0, 1 ]'
-    expected_serialized: P '[0, 1]'
-                       JS: '[0, 1]'
-
-    raw_item: P: 'True'
-              JS: 'true'
-    expected_serialized: P: 'True'
-                      JS: 'true'
-    """
-    if len(output_value_list) != len(expected_value_list):
-        return False
-
-    for output_value, expected_value in zip(output_value_list, expected_value_list):
-        match comparison_type:
-            case ComparisonType.EXACT | "equal" | "exact":
-                if output_value != expected_value:
-                    return False
-
-            case ComparisonType.UNORDERED:
-                if (
-                    {freeze(x) for x in output_value}
-                    !=
-                    {freeze(x) for x in expected_value}
-                ):
-                    return False
-                else:
-                    continue
-
-            case ComparisonType.MULTISET:
-                if (
-                    Counter(freeze(x) for x in output_value)
-                    !=
-                    Counter(freeze(x) for x in expected_value)
-                ):
-                    return False
-
-    return True

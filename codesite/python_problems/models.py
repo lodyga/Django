@@ -63,6 +63,7 @@ class ComparisonType(models.TextChoices):
     EXACT = ("exact", "Exact")
     UNORDERED = ("unordered", "Unordered (unique)")
     MULTISET = ("multiset", "Unordered (with duplicates)")
+    VALIDATOR = ("validator", "Custom problem validator.")
 
 
 class Problem(models.Model):
