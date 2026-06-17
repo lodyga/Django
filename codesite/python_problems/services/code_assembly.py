@@ -61,11 +61,13 @@ def attach_utils(source_code, language, problem_type, is_in_place):
                 adapter.binary_tree.utils_file,
                 "utils"
             ) + "\n" + source_code
+
         case ProblemType.LINKED_LIST:
             source_code = get_utility(
                 adapter.linked_list.utils_file,
                 "utils"
             ) + "\n" + source_code
+
         case ProblemType.CLASS:
             class_utils = get_utility(
                 adapter.class_design.utils_file,
@@ -180,9 +182,8 @@ def build_validation_payload(source_code, language, test_cases, method_name):
     )
 
     source_code = source_code + main_block
-    expected_output = [expected for _, expected in test_cases]
 
-    return source_code, expected_output
+    return source_code
 
 
 def build_validation_class_payload(source_code, language, test_cases, metadata):
@@ -203,10 +204,8 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
         f'{adapter.naming.arguments_list} = {serialize(arguments_list, language)}\n'
         f'{adapter.run_tests_function}({metadata["class_name"]}, 'f'{adapter.naming.operations_list}, {adapter.naming.arguments_list})\n'
     )
-    expected_output = [serialize(expected, language)
-                       for expected in expected_list]
 
-    return updated_code, expected_output
+    return updated_code
 
 
 def build_validation_in_place_payload(source_code, language, test_cases, method_name):
@@ -229,90 +228,92 @@ def build_validation_in_place_payload(source_code, language, test_cases, method_
         f'{adapter.naming.inputs_list} = {serialize(inputs_list, language)}\n'
         f'{adapter.run_tests_function}(solution.{method_name})\n'
     )
-    expected_output = [serialize(expected, language)
-                       for expected in expected_list]
 
-    return updated_code, expected_output
+    return updated_code
 
 
 def attach_validation_payload(source_code, problem, language, test_cases, button_pressed):
     if button_pressed == "run":
         return source_code, []
 
+    # to be removed
     problem_type = get_problem_type_name(problem)
+    # to be removed
     metadata = get_problem_metadata(problem)
 
+    problem_type = problem.problem_type
+    metadata = problem.metadata
+
     if metadata.get("in_place", False):
-        source_code, expected_output = build_validation_in_place_payload(
+        source_code = build_validation_in_place_payload(
             source_code,
             language,
             problem.testcases,
             metadata["method_name"]
         )
-
     elif problem_type == ProblemType.CLASS:
-        source_code, expected_output = build_validation_class_payload(
+        source_code = build_validation_class_payload(
             source_code,
             language,
             problem.testcases,
             metadata
         )
-
     else:
-        source_code, expected_output = build_validation_payload(
+        source_code = build_validation_payload(
             source_code,
             language,
             test_cases,
             metadata["method_name"],
         )
 
-    return source_code, expected_output
+    return source_code
 
 
-def get_problem_type_header(problem_type, language):
+def attach_problem_type_header(source_code, problem_type, language):
     """
     Return problem type definition snippet.
     """
     language_name = get_language_name(language)
+    header = ""
 
     match problem_type:
         case ProblemType.BINARY_TREE:
             match language_name:
                 case "Python":
-                    return '''# class TreeNode:\n#     """\n#     Definition for a binary tree node.\n#     """\n#     def __init__(self, val=None, left=None, right=None):\n#         self.val = val\n#         self.left = left\n#         self.right = right\n\n\n'''
+                    header = get_utility("binary_tree_header.py", "utils")
                 case "JavaScript":
-                    return """/**\n * class TreeNode {\n *    constructor(val = null, left = null, right = null) {\n *       this.val = val\n *       this.left = left\n *       this.right = right\n *    };\n * }\n */\n\n\n"""
+                    header = get_utility("binary-tree-header.js", "utils")
 
         case ProblemType.LINKED_LIST:
             match language_name:
                 case "Python":
-                    return '''# class ListNode:\n#     """\n#     Definition for singly-linked list.\n#     """\n#     def __init__(self, val=None, next=None):\n#         self.val = val\n#         self.next = next\n\n\n'''
+                    header = get_utility("linked_list_header.py", "utils")
                 case "JavaScript":
-                    return """/**\n * Represents a node in a singly-linked list.\n * class ListNode {\n *    constructor(val = null, next = null) {\n *       this.val = val;\n *       this.next = next;\n *    }\n * }\n */\n\n\n"""
+                    header = get_utility("linked-list-header.js", "utils")
 
-    return ""
+    return header + source_code
 
 
-def get_placeholder_source_code(language):
+def get_placeholder_hello(language):
     """
     Set default `Hello, world!` placeholder.
     """
     match language.id:
         case 1:
-            placeholder_source_code = """# Python (3.8.1)\n\nclass Solution:\n\tdef fun(self, x: str) -> str:\n\t\treturn x\n\nsolution = Solution()\nprint(solution.fun("Hello, World!"))"""
+            placeholder_hello = """# Python (3.8.1)\n\nclass Solution:\n\tdef fun(self, x: str) -> str:\n\t\treturn x\n\nsolution = Solution()\nprint(solution.fun("Hello, World!"))"""
         case 2:
-            placeholder_source_code = """// JavaScript (Node.js 12.14.0)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
+            placeholder_hello = """// JavaScript (Node.js 12.14.0)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
         case 6:
-            placeholder_source_code = """// Java (OpenJDK 13.0.1)\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}"""
+            placeholder_hello = """// Java (OpenJDK 13.0.1)\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}"""
         case 7:
-            placeholder_source_code = """// C++ (GCC 9.2.0)\n\n#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, World!";\n  return 0;\n}"""
+            placeholder_hello = """// C++ (GCC 9.2.0)\n\n#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, World!";\n  return 0;\n}"""
         case 3:
-            placeholder_source_code = """# Python (3.8.1)\nimport pandas as pd\n\n"""
+            placeholder_hello = """# Python (3.8.1)\nimport pandas as pd\n\n"""
         case 4:
-            placeholder_source_code = """SELECT *\nFROM *\nWHERE *"""
+            placeholder_hello = """SELECT *\nFROM *\nWHERE *"""
         case 5:
-            placeholder_source_code = """SELECT *\nFROM *\nWHERE *"""
+            placeholder_hello = """SELECT *\nFROM *\nWHERE *"""
         case _:
-            placeholder_source_code = """Not known programming language."""
+            placeholder_hello = """Not known programming language."""
 
-    return placeholder_source_code
+    return placeholder_hello

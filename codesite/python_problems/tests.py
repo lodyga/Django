@@ -20,7 +20,7 @@ from .services.code_assembly import (
     build_validation_class_payload,
     build_validation_in_place_payload,
 )
-from .services.judge0 import handle_result_errors
+from .services.judge0 import handle_response_error
 from .services.previews import draw_linked_list
 from .services.ui_problem_test_cases import (
     build_problem_test_case_expression,
@@ -327,41 +327,41 @@ class ProblemFormTests(TestCase):
 
 
 class Judge0ResultHandlingTests(SimpleTestCase):
-    def test_handle_result_errors_allows_accepted_response_to_continue(self):
+    def test_handle_response_error_allows_accepted_response_to_continue(self):
         response = {
             "status": {"description": "Accepted"},
             "compile_output": None,
         }
 
-        self.assertIsNone(handle_result_errors(response))
+        self.assertIsNone(handle_response_error(response))
 
-    def test_handle_result_errors_returns_response_when_no_response(self):
+    def test_handle_response_error_returns_response_when_no_response(self):
         self.assertEqual(
-            handle_result_errors(None),
+            handle_response_error(None),
             {"error": "No response from judge0."},
         )
 
-    def test_handle_result_errors_returns_existing_error_response(self):
+    def test_handle_response_error_returns_existing_error_response(self):
         response = {"error": "Judge0 request failed."}
 
-        self.assertIs(handle_result_errors(response), response)
+        self.assertIs(handle_response_error(response), response)
 
-    def test_handle_result_errors_converts_compile_output_to_error(self):
+    def test_handle_response_error_converts_compile_output_to_error(self):
         response = {
             "status": {"description": "Compilation Error"},
             "compile_output": "Syntax error",
         }
 
-        self.assertIs(handle_result_errors(response), response)
+        self.assertIs(handle_response_error(response), response)
         self.assertEqual(response["error"], "Syntax error")
 
-    def test_handle_result_errors_marks_non_accepted_response_as_failed(self):
+    def test_handle_response_error_marks_non_accepted_response_as_failed(self):
         response = {
             "status": {"description": "Wrong Answer"},
             "compile_output": None,
         }
 
-        self.assertIs(handle_result_errors(response), response)
+        self.assertIs(handle_response_error(response), response)
         self.assertEqual(response["result"], "Tests failed!")
 
 
@@ -386,7 +386,7 @@ class ProblemScriptTests(TestCase):
         )
 
         source_code = "class Solution:\n    pass\n"
-        updated_code, expected_output = build_validation_in_place_payload(
+        updated_code = build_validation_in_place_payload(
             source_code,
             "Python",
             problem.testcases,
@@ -396,7 +396,6 @@ class ProblemScriptTests(TestCase):
         self.assertIn("\nsolution = Solution()\n", updated_code)
         self.assertIn("inputs_list = [[[0, 1, 0, 3, 12]]]", updated_code)
         self.assertIn("run_tests(solution.moveZeroes)", updated_code)
-        self.assertEqual(expected_output, ["[[1, 3, 12, 0, 0]]"])
 
     def test_get_ui_test_cases_supports_number_of_islands_grid_preview(self):
         problem = create_sample_problem(title="Number of Islands")
@@ -466,7 +465,7 @@ class ProblemScriptTests(TestCase):
         )
 
         source_code = "class TimeMap:\n    pass\n"
-        updated_code, expected_output = build_validation_class_payload(
+        updated_code = build_validation_class_payload(
             source_code,
             "Python",
             problem.testcases,
@@ -482,10 +481,6 @@ class ProblemScriptTests(TestCase):
             updated_code,
         )
         self.assertIn("run_tests(TimeMap, operations_list, arguments_list)", updated_code)
-        self.assertEqual(
-            expected_output,
-            ["[None, None, 'bar', 'bar', None, 'bar2', 'bar2']"],
-        )
 
     def test_build_problem_test_case_expression_supports_binary_tree_python(self):
         problem = create_sample_problem(title="Invert Binary Tree Python")

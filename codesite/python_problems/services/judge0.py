@@ -55,7 +55,7 @@ def run_judge0(source_code, language):
         json=serialized_code,
         headers=headers,
         params=querystring
-    ).json() or None
+    ).json()
 
     return response
 
@@ -98,7 +98,7 @@ def execute_code(
         problem_type,
         is_in_place,
     )
-    source_code, expected_serialized_list = attach_validation_payload(
+    source_code = attach_validation_payload(
         source_code,
         problem,
         language,
@@ -112,9 +112,7 @@ def execute_code(
 
     validate_response(
         response,
-        # expected_serialized_list,
         problem,
-        language,
         button_pressed,
     )
 

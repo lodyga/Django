@@ -39,8 +39,8 @@ from .services.ui_problem_test_cases import (
     get_clipboard_problem_test_cases
 )
 from .services.code_assembly import (
-    get_problem_type_header,
-    get_placeholder_source_code
+    attach_problem_type_header,
+    get_placeholder_hello
 )
 from .services.judge0 import execute_code
 from .services.problem_helpers import (
@@ -198,10 +198,11 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             .order_by("language_order", "name")
 
         for solution in owner_solutions:
-            solution.source_code = get_problem_type_header(
+            solution.source_code = attach_problem_type_header(
+                solution.source_code,
                 problem.problem_type,
-                language
-            ) + solution.source_code
+                language,
+            )
 
         return {
             "owner_solutions": owner_solutions,
@@ -259,7 +260,7 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             language,
         )
         url = parse_url(problem.url)
-        source_code = get_placeholder_source_code(language)
+        source_code = get_placeholder_hello(language)
         tag_list = problem.tags.all()
 
         # Get related problems.

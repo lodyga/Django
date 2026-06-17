@@ -1,8 +1,8 @@
-
+# default tests for two sum, min stack, reverse linked list, rev binary tree
 # Remove duplicases from search
 # Unique paths no input variable name under Test Cases.
-# # default tests for two sum, min stack, reverse linked list, rev binary tree
 # Priority Queue; Cannot use import statement outside a module, K Closest Points to Origin attach import only to pQ problems
+# Binary Search Tree Iterator is class and binary tree problem
 # Island Perimeter
 # fix all redirect, redirect after adding new problem/solution
 # add/remove tags privliges

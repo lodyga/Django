@@ -49,18 +49,6 @@
               </select>
             </form>
           </div>
-          {% if user.is_authenticated and owner_solutions %}
-            {% with first_solution=owner_solutions|first %}
-              <div class="col-auto mb-2">
-                <a id="solutionUpdateLink"
-                   class="btn btn-sm btn-secondary d-none"
-                   data-current-user-id="{{ user.id }}"
-                   data-url-template="{% url 'python_problems:solution-update' 0 %}"
-                   data-next-url="{{ request.get_full_path }}"
-                   href="{% url 'python_problems:solution-update' first_solution.id %}?next={{ request.get_full_path|urlencode }}">Update</a>
-              </div>
-            {% endwith %}
-          {% endif %}
         </div>
       </div>
       {% if owner_solutions %}
@@ -73,9 +61,7 @@
         <div class="position-relative">
           <div class="position-absolute end-0 mt-5 me-5 d-flex flex-column gap-1"
                style="z-index: 10">
-            <button id="copy-solution-btn"
-                    class="btn btn-sm btn-secondary"
-                    type="button">
+            <button id="copy-solution-btn" class="btn btn-sm btn-secondary" type="button">
               <i class="far fa-copy"></i> Copy
             </button>
             {% csrf_token %}
@@ -83,8 +69,20 @@
                     class="btn btn-sm btn-secondary"
                     data-bs-target="#problemCode"
                     type="button">
-              <i class="far fa-copy"></i> Validate
+              <i class="far fa-industry"></i> Validate
             </button>
+            {% if user.is_authenticated and owner_solutions %}
+              {% with first_solution=owner_solutions|first %}
+                <div class="col-auto mb-2">
+                  <a id="solutionUpdateLink"
+                     class="btn btn-sm btn-secondary d-none"
+                     data-current-user-id="{{ user.id }}"
+                     data-url-template="{% url 'python_problems:solution-update' 0 %}"
+                     data-next-url="{{ request.get_full_path }}"
+                     href="{% url 'python_problems:solution-update' first_solution.id %}?next={{ request.get_full_path|urlencode }}"><i class="far fa-edit"></i> Update</a>
+                </div>
+              {% endwith %}
+            {% endif %}
           </div>
           <textarea id="solution-content-container"></textarea>
           {# Stored quick in-page solutions: Solution1, Solution2 ... #}
