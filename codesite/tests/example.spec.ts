@@ -316,3 +316,311 @@ test('user can validate java method', async ({ page }) => {
 });
 
 
+test('validate python method with solution1', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/two-sum/Python/');
+
+    // Wait for CodeMirror to initialize
+    await waitForCodeMirror(page);
+
+    // Set code via CodeMirror API
+    const solution = page.locator('#solution-1');
+    await expect(solution).toHaveCount(1);
+
+    const solutionCode = await solution.inputValue();
+    await setCodeMirrorContent(page, solutionCode);
+
+    // Click the Validate button - this submits the form with test validation
+    await page.locator('#test-code-button').click();
+
+    // Wait for the form submission to complete
+    await page.waitForLoadState('networkidle');
+
+    // Wait for output to appear
+    await page.waitForSelector('div[name="output_container"]', { state: 'visible' });
+
+    const outputContainer = page.locator('div[name="output_container"]');
+
+    await expect(outputContainer).toContainText('Status: Accepted');
+    await expect(outputContainer).toContainText('Output: Tests passed!');
+    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+});
+
+
+test('validate javascript method with solution1', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/two-sum/JavaScript/');
+
+    // Wait for CodeMirror to initialize
+    await waitForCodeMirror(page);
+
+    // Set code via CodeMirror API
+    const solution = page.locator('#solution-1');
+    await expect(solution).toHaveCount(1);
+
+    const solutionCode = await solution.inputValue();
+    await setCodeMirrorContent(page, solutionCode);
+
+    // Click the Validate button - this submits the form with test validation
+    await page.locator('#test-code-button').click();
+
+    // Wait for the form submission to complete
+    await page.waitForLoadState('networkidle');
+
+    // Wait for output to appear
+    await page.waitForSelector('div[name="output_container"]', { state: 'visible' });
+
+    const outputContainer = page.locator('div[name="output_container"]');
+
+    await expect(outputContainer).toContainText('Status: Accepted');
+    await expect(outputContainer).toContainText('Output: Tests passed!');
+    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+});
+
+
+test('validate cpp method with solution1', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/two-sum/C++/');
+
+    // Wait for CodeMirror to initialize
+    await waitForCodeMirror(page);
+
+    // Set code via CodeMirror API
+    const solution = page.locator('#solution-1');
+    await expect(solution).toHaveCount(1);
+
+    const solutionCode = await solution.inputValue();
+    await setCodeMirrorContent(page, solutionCode);
+
+    // Click the Validate button - this submits the form with test validation
+    await page.locator('#test-code-button').click();
+
+    // Wait for the form submission to complete
+    await page.waitForLoadState('networkidle');
+
+    // Wait for output to appear
+    await page.waitForSelector('div[name="output_container"]', { state: 'visible' });
+
+    const outputContainer = page.locator('div[name="output_container"]');
+
+    await expect(outputContainer).toContainText('Status: Accepted');
+    await expect(outputContainer).toContainText('Output: Tests passed!');
+    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+});
+
+
+test('validate java method with solution1', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/two-sum/Java/');
+
+    // Wait for CodeMirror to initialize
+    await waitForCodeMirror(page);
+
+    // Set code via CodeMirror API
+    const solution = page.locator('#solution-1');
+    await expect(solution).toHaveCount(1);
+
+    const solutionCode = await solution.inputValue();
+    await setCodeMirrorContent(page, solutionCode);
+
+    // Click the Validate button - this submits the form with test validation
+    await page.locator('#test-code-button').click();
+
+    // Wait for the form submission to complete
+    await page.waitForLoadState('networkidle');
+
+    // Wait for output to appear
+    await page.waitForSelector('div[name="output_container"]', { state: 'visible' });
+
+    const outputContainer = page.locator('div[name="output_container"]');
+
+    await expect(outputContainer).toContainText('Status: Accepted');
+    await expect(outputContainer).toContainText('Output: Tests passed!');
+    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+});
+
+
+test('validate python linked list with solution1', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/reverse-linked-list/Python/');
+
+    // Wait for CodeMirror to initialize
+    await waitForCodeMirror(page);
+
+    // Set code via CodeMirror API
+    const solution = page.locator('#solution-1');
+    await expect(solution).toHaveCount(1);
+
+    const solutionCode = await solution.inputValue();
+    await setCodeMirrorContent(page, solutionCode);
+
+    // Click the Validate button - this submits the form with test validation
+    await page.locator('#test-code-button').click();
+
+    // Wait for the form submission to complete
+    await page.waitForLoadState('networkidle');
+
+    // Wait for output to appear
+    await page.waitForSelector('div[name="output_container"]', { state: 'visible' });
+
+    const outputContainer = page.locator('div[name="output_container"]');
+
+    await expect(outputContainer).toContainText('Status: Accepted');
+    await expect(outputContainer).toContainText('Output: Tests passed!');
+    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+});
+
+
+test('validate javascript linked list with solution1', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/reverse-linked-list/JavaScript/');
+
+    // Wait for CodeMirror to initialize
+    await waitForCodeMirror(page);
+
+    // Set code via CodeMirror API
+    const solution = page.locator('#solution-1');
+    await expect(solution).toHaveCount(1);
+
+    const solutionCode = await solution.inputValue();
+    await setCodeMirrorContent(page, solutionCode);
+
+    // Click the Validate button - this submits the form with test validation
+    await page.locator('#test-code-button').click();
+
+    // Wait for the form submission to complete
+    await page.waitForLoadState('networkidle');
+
+    // Wait for output to appear
+    await page.waitForSelector('div[name="output_container"]', { state: 'visible' });
+
+    const outputContainer = page.locator('div[name="output_container"]');
+
+    await expect(outputContainer).toContainText('Status: Accepted');
+    await expect(outputContainer).toContainText('Output: Tests passed!');
+    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+});
+
+
+test('validate python binary tree with solution1', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/invert-binary-tree/Python/');
+
+    // Wait for CodeMirror to initialize
+    await waitForCodeMirror(page);
+
+    // Set code via CodeMirror API
+    const solution = page.locator('#solution-1');
+    await expect(solution).toHaveCount(1);
+
+    const solutionCode = await solution.inputValue();
+    await setCodeMirrorContent(page, solutionCode);
+
+    // Click the Validate button - this submits the form with test validation
+    await page.locator('#test-code-button').click();
+
+    // Wait for the form submission to complete
+    await page.waitForLoadState('networkidle');
+
+    // Wait for output to appear
+    await page.waitForSelector('div[name="output_container"]', { state: 'visible' });
+
+    const outputContainer = page.locator('div[name="output_container"]');
+
+    await expect(outputContainer).toContainText('Status: Accepted');
+    await expect(outputContainer).toContainText('Output: Tests passed!');
+    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+});
+
+
+test('validate javascript binary tree with solution1', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/invert-binary-tree/JavaScript/');
+
+    // Wait for CodeMirror to initialize
+    await waitForCodeMirror(page);
+
+    // Set code via CodeMirror API
+    const solution = page.locator('#solution-1');
+    await expect(solution).toHaveCount(1);
+
+    const solutionCode = await solution.inputValue();
+    await setCodeMirrorContent(page, solutionCode);
+
+    // Click the Validate button - this submits the form with test validation
+    await page.locator('#test-code-button').click();
+
+    // Wait for the form submission to complete
+    await page.waitForLoadState('networkidle');
+
+    // Wait for output to appear
+    await page.waitForSelector('div[name="output_container"]', { state: 'visible' });
+
+    const outputContainer = page.locator('div[name="output_container"]');
+
+    await expect(outputContainer).toContainText('Status: Accepted');
+    await expect(outputContainer).toContainText('Output: Tests passed!');
+    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+});
+
+
+test('validate python class with solution1', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/min-stack/Python/');
+
+    // Wait for CodeMirror to initialize
+    await waitForCodeMirror(page);
+
+    // Set code via CodeMirror API
+    const solution = page.locator('#solution-1');
+    await expect(solution).toHaveCount(1);
+
+    const solutionCode = await solution.inputValue();
+    await setCodeMirrorContent(page, solutionCode);
+
+    // Click the Validate button - this submits the form with test validation
+    await page.locator('#test-code-button').click();
+
+    // Wait for the form submission to complete
+    await page.waitForLoadState('networkidle');
+
+    // Wait for output to appear
+    await page.waitForSelector('div[name="output_container"]', { state: 'visible' });
+
+    const outputContainer = page.locator('div[name="output_container"]');
+
+    await expect(outputContainer).toContainText('Status: Accepted');
+    await expect(outputContainer).toContainText('Output: Tests passed!');
+    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+});
+
+
+test('validate javascript class with solution1', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/min-stack/JavaScript/');
+
+    // Wait for CodeMirror to initialize
+    await waitForCodeMirror(page);
+
+    // Set code via CodeMirror API
+    const solution = page.locator('#solution-1');
+    await expect(solution).toHaveCount(1);
+
+    const solutionCode = await solution.inputValue();
+    await setCodeMirrorContent(page, solutionCode);
+
+    // Click the Validate button - this submits the form with test validation
+    await page.locator('#test-code-button').click();
+
+    // Wait for the form submission to complete
+    await page.waitForLoadState('networkidle');
+
+    // Wait for output to appear
+    await page.waitForSelector('div[name="output_container"]', { state: 'visible' });
+
+    const outputContainer = page.locator('div[name="output_container"]');
+
+    await expect(outputContainer).toContainText('Status: Accepted');
+    await expect(outputContainer).toContainText('Output: Tests passed!');
+    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+});

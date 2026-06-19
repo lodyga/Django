@@ -231,6 +231,7 @@ class JavaAdapter(LanguageAdapter):
         in_place_utils_file="in_place_utils.cpp",
     )
 
+
 class TypeScriptAdapter(LanguageAdapter):
     config = LanguageConfig(
         print="console.log",
@@ -269,4 +270,5 @@ LANGUAGE_ADAPTERS = {
     "JavaScript": JavaScriptAdapter(),
     "Cpp": CppAdapter(),
     "Java": JavaAdapter(),
+    "TypeScript": TypeScriptAdapter(),
 }

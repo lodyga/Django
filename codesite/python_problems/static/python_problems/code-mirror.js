@@ -9,6 +9,7 @@ const languageModes = {
    5: 'text/x-pgsql',
    6: 'text/x-java',
    7: 'text/x-c++src',
+   8: 'javascript',
 }
 
 function getTheme() {

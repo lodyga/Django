@@ -28,6 +28,7 @@ def run_judge0(source_code, language):
         "JavaScript": 63,
         "Java": 62,
         "C++": 54,
+        "TypeScript": 74,
     }
 
     language_id = language_name_to_id[language]

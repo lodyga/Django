@@ -1,5 +1,3 @@
-# default tests for two sum, min stack, reverse linked list, rev binary tree
-
 # add TypeScript
 # Remove duplicases from search
 # Unique paths no input variable name under Test Cases.
