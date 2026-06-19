@@ -1,4 +1,6 @@
 # default tests for two sum, min stack, reverse linked list, rev binary tree
+
+# add TypeScript
 # Remove duplicases from search
 # Unique paths no input variable name under Test Cases.
 # Priority Queue; Cannot use import statement outside a module, K Closest Points to Origin attach import only to pQ problems

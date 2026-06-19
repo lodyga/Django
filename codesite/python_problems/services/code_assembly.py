@@ -3,7 +3,8 @@ from django.conf import settings
 from python_problems.models import ProblemType
 from .languages import get_language_name, LANGUAGE_ADAPTERS
 from .problem_test_case_parsing import get_field, serialize
-from .ui_problem_test_cases import get_problem_type_name, get_problem_metadata
+from .ui_problem_test_cases import get_test_case_input_expression
+
 
 
 def clean_types(source_code):
@@ -141,38 +142,53 @@ def attach_main(source_code, test_case_expressions, language, method_name):
             return main_payload
         case "Cpp":
             return "int main() {\n" + main_payload + "return 0;\n" + "}\n"
+        case "Java":
+            return "public class Main {\n" + "public static void main(String[] args) {\n" + main_payload + "}}\n"
         case _:
             return ""
 
 
-def attach_printVector(source_code):
+def attach_cpp_print(source_code):
     utility = get_utility("print_in_cpp.cpp", "services")
     return source_code + utility
 
 
-def build_validation_payload(source_code, language, test_cases, method_name):
-    # ('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]')
+
+def build_validation_payload(
+        problem,
+        source_code,
+        language,
+        metadata) -> str:
+    # test_cases [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
     # =>
     # 'print(json.dumps(solution.twoSum([2, 7, 11, 15], 9)))'
     # C++: print(solution.twoSum({ 2, 7, 11, 15 }, 9));
+    # Java: System.out.println(Arrays.toString(solution.twoSum(new int[] {2, 7, 11, 15}, 9)));
+    # todo
 
+    test_case_input = get_test_case_input_expression(problem, language)
+    method_name = metadata["method_name"]
+    parameters = metadata["parameters"]
     language_name = get_language_name(language)
     adapter = LANGUAGE_ADAPTERS[language_name]
     test_case_expressions = []
 
-    for input_data, _ in test_cases:
+    for input_data in test_case_input:
         match language_name:
             case "Python" | "JavaScript":
                 tc = adapter.print_call(adapter.serialize_call(input_data))
             case "Cpp":
                 tc = adapter.print_call(input_data) + ";"
+            case "Java":
+                tc = adapter.print_call(
+                    adapter.serialize_call(input_data)) + ";"
             case _:
                 tc = ""
 
         test_case_expressions.append(tc)
 
     if language_name == "Cpp":
-        source_code = attach_printVector(source_code)
+        source_code = attach_cpp_print(source_code)
 
     main_block = attach_main(
         source_code,
@@ -232,14 +248,9 @@ def build_validation_in_place_payload(source_code, language, test_cases, method_
     return updated_code
 
 
-def attach_validation_payload(source_code, problem, language, test_cases, button_pressed):
+def attach_validation_payload(problem, source_code, language, test_cases, button_pressed):
     if button_pressed == "run":
-        return source_code, []
-
-    # to be removed
-    problem_type = get_problem_type_name(problem)
-    # to be removed
-    metadata = get_problem_metadata(problem)
+        return source_code
 
     problem_type = problem.problem_type
     metadata = problem.metadata
@@ -260,10 +271,10 @@ def attach_validation_payload(source_code, problem, language, test_cases, button
         )
     else:
         source_code = build_validation_payload(
+            problem,
             source_code,
             language,
-            test_cases,
-            metadata["method_name"],
+            metadata,
         )
 
     return source_code

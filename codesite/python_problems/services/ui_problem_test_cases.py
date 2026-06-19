@@ -227,7 +227,11 @@ def build_problem_test_case_expression(problem, problem_test_case_data, language
     metadata = get_problem_metadata(problem)
 
     if metadata:
-        if not metadata["parameters"] or not metadata["method_name"] or not metadata["return_type"]:
+        if (
+            not metadata["parameters"]
+            or not metadata["method_name"]
+            or not metadata["return_type"]
+        ):
             return None
 
         inputs = get_field(problem_test_case_data, "inputs")
@@ -277,28 +281,25 @@ def build_problem_test_case_expression(problem, problem_test_case_data, language
 
         return res
 
-    else:
-        method_name = problem.method_name
-        if not method_name:
-            return None
+    # to be deleted
+    # else:
+    #     method_name = problem.method_name
+    #     if not method_name:
+    #         return None
+    #     inputs = get_field(problem_test_case_data, "inputs")
+    #     serialized_inputs = ", ".join(
+    #         serialize(value, language)
+    #         for value in inputs
+    #     )
+    #     res = f"solution.{method_name}({serialized_inputs})"
+    #     return res
 
-        inputs = get_field(problem_test_case_data, "inputs")
 
-        serialized_inputs = ", ".join(
-            serialize(value, language)
-            for value in inputs
-        )
-        res = f"solution.{method_name}({serialized_inputs})"
-        return res
-
-
-def get_problem_problem_test_cases(problem, language):
+def get_test_case_input_expression(problem, language):
     """
-    [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
-    or
-
+    ['solution.twoSum([2, 7, 11, 15], 9)', ...]
     """
-    problem_problem_test_cases = []
+    test_case_input = []
 
     for problem_test_case in problem.get_shared_testcases(include_hidden=True):
         expression = build_problem_test_case_expression(
@@ -307,16 +308,40 @@ def get_problem_problem_test_cases(problem, language):
             language,
         )
 
-        if not expression:
-            continue
+        test_case_input.append(expression)
+
+    return test_case_input
+
+
+def get_test_case_expected_expression(problem, language):
+    """
+    ['[0, 1]', ...]
+    """
+    test_case_expected = []
+
+    for problem_test_case in problem.get_shared_testcases(include_hidden=True):
 
         expected = serialize(
             get_field(problem_test_case.data, "expected"),
             language
         )
-        problem_problem_test_cases.append((expression, expected))
+        test_case_expected.append(expected)
 
-    return problem_problem_test_cases
+    return test_case_expected
+
+
+def get_test_case_expressions(problem, language):
+    """
+    [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
+    """
+
+    # todo
+    inputs_list = get_test_case_input_expression(problem, language)
+    expected_list = get_test_case_expected_expression(problem, language)
+    return [
+        (input_data, expected)
+        for input_data, expected in zip(inputs_list, expected_list)
+    ]
 
 
 def get_effective_problem_test_cases(problem, solution, language):
@@ -325,7 +350,7 @@ def get_effective_problem_test_cases(problem, solution, language):
     """
     if get_problem_type_name(problem) == ProblemType.CLASS:
         return []
-    elif problem_problem_test_cases := get_problem_problem_test_cases(problem, language):
+    elif problem_problem_test_cases := get_test_case_expressions(problem, language):
         return problem_problem_test_cases
     # todelete
     elif solution_problem_test_cases := get_solution_problem_test_cases(solution.test_cases):

@@ -202,11 +202,11 @@ class CppAdapter(LanguageAdapter):
 
 class JavaAdapter(LanguageAdapter):
     config = LanguageConfig(
-        print="print",
-        serialize="json.dumps",
+        print="System.out.println",
+        serialize="Arrays.toString",
         solution=SolutionConfig(
-            instance_code="\nsolution = Solution()\n",
-            instance_pattern=r"solution\s*=\s*Solution\(\)\s*",
+            instance_code="\nSolution solution = new Solution();\n",
+            instance_pattern=r"Solution\s*solution\s*=\s*new\s*Solution\(\)\s*",
         ),
         binary_tree=BinaryTreeConfig(
             utils_file="binary_tree_utils.cpp",
@@ -227,8 +227,40 @@ class JavaAdapter(LanguageAdapter):
             arguments_list="arguments_list",
             expected_list="expected_list",
         ),
-        run_tests_function="run_tests",
+        run_tests_function="runTests",
         in_place_utils_file="in_place_utils.cpp",
+    )
+
+class TypeScriptAdapter(LanguageAdapter):
+    config = LanguageConfig(
+        print="console.log",
+        serialize="JSON.stringify",
+        solution=SolutionConfig(
+            instance_code="\nconst solution = new Solution();\n",
+            instance_pattern=r"const\s+solution\s*=\s*new\s+Solution\(\)\s*;?",
+        ),
+        binary_tree=BinaryTreeConfig(
+            utils_file="binary-tree-utils.js",
+            build="buildBinaryTree",
+            serialize="serializeBinaryTree",
+        ),
+        linked_list=LinkedListConfig(
+            utils_file="linked-list-utils.js",
+            build="buildLinkedList",
+            serialize="serializeLinkedList",
+        ),
+        class_design=ClassDesignConfig(
+            utils_file="class-design-utils.js",
+        ),
+        naming=NamingConvention(
+            inputs_list="inputsList",
+            operations_list="operationsList",
+            arguments_list="argumentsList",
+            expected_list="expectedList",
+        ),
+        run_tests_function="runTests",
+        in_place_utils_file="in-place-utils.js",
+        heap_utils_file="heap-utils.js",
     )
 
 

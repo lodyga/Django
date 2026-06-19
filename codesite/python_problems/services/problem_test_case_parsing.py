@@ -65,16 +65,30 @@ def get_solution_problem_test_cases(solution_test_cases):
     return test_cases
 
 
-def serialize_in_cpp(items):
+def serialize_cpp(items):
     # Serialize for C++ like json.dumps or JSON.stringify.
     """
     [2, 7, 11, 15] => '{2, 7, 11, 15}'
     """
     if isinstance(items, list):
-        serialized = [serialize_in_cpp(item)
+        serialized = [serialize_cpp(item)
                       for item in items]
 
         return "{" + ", ".join(serialized) + "}"
+
+    return json.dumps(items)
+
+
+def serialize_java(items):
+    # Serialize for C++ like json.dumps or JSON.stringify.
+    """
+    [2, 7, 11, 15] => 'new int[] {2, 7, 11, 15}'
+    """
+    if isinstance(items, list):
+        serialized = [serialize_cpp(item)
+                      for item in items]
+
+        return "new int[] {" + ", ".join(serialized) + "}"
 
     return json.dumps(items)
 
@@ -91,7 +105,9 @@ def serialize(value, language) -> str:
         case "JavaScript":
             return json.dumps(value)
         case "Cpp":
-            return serialize_in_cpp(value)
+            return serialize_cpp(value)
+        case "Java":
+            return serialize_java(value)
         case _:
             return ""
 
