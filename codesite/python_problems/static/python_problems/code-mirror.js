@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
       autofocus: false,
    });
 
+   window.codeEditor = codeEditor;  // For playwright
    codeEditor.setSize(null, 'auto');
 
    const solutionPanel = document.getElementById('solution-panel');

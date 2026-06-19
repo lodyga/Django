@@ -274,3 +274,16 @@ WHERE json_extract(metadata, '$.in_place') = 1;
 SELECT title
 FROM python_problems_problem
 WHERE json_extract(metadata, '$.comparison_type') = "unordered";
+
+
+
+
+// playwright
+Open UI mode:
+npx playwright test --ui
+
+Debug mode:
+npx playwright test --debug
+
+Show browser:
+npx playwright test --headed

@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const codeForm = document.getElementById('codeForm');
-  const runCodeButton = document.getElementById('runCodeButton');
-  const testCodeButton = document.getElementById('testCodeButton');
+  const runCodeButton = document.getElementById('run-code-button');
+  const testCodeButton = document.getElementById('test-code-button');
 
   function saveCodeEditor() {
     if (typeof codeEditor !== 'undefined' && codeEditor) {
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function runCode() {
     document.getElementById('codeFormAction').value = 'run';
-    const runCodeButtonSpinner = document.getElementById('runCodeButtonSpinner');
+    const runCodeButtonSpinner = document.getElementById('run-code-button-spinner');
     runCodeButton.disabled = true;
     runCodeButton.firstChild.textContent = 'Running ';
     runCodeButtonSpinner.classList.remove('d-none');
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function testCode() {
     document.getElementById('codeFormAction').value = 'validate';
-    const testCodeButtonSpinner = document.getElementById('testCodeButtonSpinner');
+    const testCodeButtonSpinner = document.getElementById('test-code-button-spinner');
     testCodeButton.disabled = true;
     testCodeButton.firstChild.textContent = 'Validating ';
     testCodeButtonSpinner.classList.remove('d-none');
