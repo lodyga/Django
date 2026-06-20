@@ -22,9 +22,9 @@ from .services.code_assembly import (
 )
 from .services.judge0 import handle_response_error
 from .services.previews import draw_linked_list
-from .services.ui_problem_test_cases import (
-    build_problem_test_case_expression,
-    get_ui_problem_test_cases,
+from .services.ui_test_cases import (
+    build_test_case_expression,
+    get_ui_test_cases,
 )
 from .views import ProblemIndexView
 
@@ -416,7 +416,7 @@ class ProblemScriptTests(TestCase):
         )
         solution = create_sample_solution(problem=problem)
 
-        ui_test_cases = get_ui_problem_test_cases(problem, solution, "Python")
+        ui_test_cases = get_ui_test_cases(problem, solution, "Python")
 
         self.assertEqual(len(ui_test_cases), 1)
         self.assertEqual(
@@ -482,7 +482,7 @@ class ProblemScriptTests(TestCase):
         )
         self.assertIn("run_tests(TimeMap, operations_list, arguments_list)", updated_code)
 
-    def test_build_problem_test_case_expression_supports_binary_tree_python(self):
+    def test_build_test_case_expression_supports_binary_tree_python(self):
         problem = create_sample_problem(title="Invert Binary Tree Python")
         problem.metadata = {
             "problem_type": ProblemType.BINARY_TREE,
@@ -492,7 +492,7 @@ class ProblemScriptTests(TestCase):
         }
         problem.save(update_fields=["metadata"])
 
-        expression = build_problem_test_case_expression(
+        expression = build_test_case_expression(
             problem,
             {"inputs": [[4, 2, 7, 1, 3, 6, 9]], "expected": [4, 7, 2, 9, 6, 3, 1]},
             "Python",
@@ -503,7 +503,7 @@ class ProblemScriptTests(TestCase):
             "serialize_binary_tree(solution.invertTree(build_binary_tree([4, 2, 7, 1, 3, 6, 9])))",
         )
 
-    def test_build_problem_test_case_expression_supports_linked_list_cycles_python(self):
+    def test_build_test_case_expression_supports_linked_list_cycles_python(self):
         problem = create_sample_problem(title="Linked List Cycle Python")
         problem.metadata = {
             "problem_type": ProblemType.LINKED_LIST,
@@ -513,7 +513,7 @@ class ProblemScriptTests(TestCase):
         }
         problem.save(update_fields=["metadata"])
 
-        expression = build_problem_test_case_expression(
+        expression = build_test_case_expression(
             problem,
             {"inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}], "expected": True},
             "Python",
@@ -524,7 +524,7 @@ class ProblemScriptTests(TestCase):
             "solution.hasCycle(build_linked_list([3, 2, 0, -4], 1))",
         )
 
-    def test_build_problem_test_case_expression_supports_linked_list_cycles_javascript(self):
+    def test_build_test_case_expression_supports_linked_list_cycles_javascript(self):
         problem = create_sample_problem(title="Linked List Cycle JavaScript")
         problem.metadata = {
             "problem_type": ProblemType.LINKED_LIST,
@@ -534,7 +534,7 @@ class ProblemScriptTests(TestCase):
         }
         problem.save(update_fields=["metadata"])
 
-        expression = build_problem_test_case_expression(
+        expression = build_test_case_expression(
             problem,
             {"inputs": [{"values": [3, 2, 0, -4], "pos": 1}], "expected": True},
             "JavaScript",
@@ -961,10 +961,10 @@ class SolutionDetailViewTests(TestCase):
             )
         )
 
-        ui_test_case = response.context["ui_problem_test_cases"][0]
+        ui_test_case = response.context["ui_test_cases"][0]
         self.assertEqual(ui_test_case["input"], "nums = [2, 7, 11, 15]\ntarget = 9")
         self.assertEqual(
-            response.context["clipboard_problem_test_cases"],
+            response.context["clipboard_test_cases"],
             "\nsolution = Solution()\nprint(solution.twoSum([2, 7, 11, 15], 9), [0, 1])\n",
         )
 

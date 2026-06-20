@@ -2,9 +2,8 @@ import re
 from django.conf import settings
 from python_problems.models import ProblemType
 from .languages import get_language_name, LANGUAGE_ADAPTERS
-from .problem_test_case_parsing import get_field, serialize
-from .ui_problem_test_cases import get_test_case_input_expression
-
+from .test_case_parsing import get_field, serialize
+from .test_case_expression import get_test_case_input_expression
 
 
 def clean_types(source_code):
@@ -153,22 +152,15 @@ def attach_cpp_print(source_code):
     return source_code + utility
 
 
-
-def build_validation_payload(
-        problem,
-        source_code,
-        language,
-        metadata) -> str:
+def build_validation_payload(problem, source_code, language, metadata) -> str:
     # test_cases [('solution.twoSum([2, 7, 11, 15], 9)', '[0, 1]'), ...]
     # =>
     # 'print(json.dumps(solution.twoSum([2, 7, 11, 15], 9)))'
     # C++: print(solution.twoSum({ 2, 7, 11, 15 }, 9));
     # Java: System.out.println(Arrays.toString(solution.twoSum(new int[] {2, 7, 11, 15}, 9)));
-    # todo
 
     test_case_input = get_test_case_input_expression(problem, language)
     method_name = metadata["method_name"]
-    parameters = metadata["parameters"]
     language_name = get_language_name(language)
     adapter = LANGUAGE_ADAPTERS[language_name]
     test_case_expressions = []
@@ -197,9 +189,7 @@ def build_validation_payload(
         method_name,
     )
 
-    source_code = source_code + main_block
-
-    return source_code
+    return source_code + main_block
 
 
 def build_validation_class_payload(source_code, language, test_cases, metadata):
@@ -248,12 +238,12 @@ def build_validation_in_place_payload(source_code, language, test_cases, method_
     return updated_code
 
 
-def attach_validation_payload(problem, source_code, language, test_cases, button_pressed):
+def attach_validation_payload(problem, source_code, language, button_pressed):
     if button_pressed == "run":
         return source_code
 
-    problem_type = problem.problem_type
     metadata = problem.metadata
+    problem_type = metadata["problem_type"]
 
     if metadata.get("in_place", False):
         source_code = build_validation_in_place_payload(

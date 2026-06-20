@@ -33,10 +33,11 @@ from .serializers import (
     ProblemSerializer,
     SolutionSerializer,
 )
-from .services.ui_problem_test_cases import (
-    get_ui_problem_test_cases,
-    get_effective_problem_test_cases,
-    get_clipboard_problem_test_cases
+from .services.test_case_expression import (
+    get_clipboard_test_cases
+)
+from .services.ui_test_cases import (
+    get_ui_test_cases,
 )
 from .services.code_assembly import (
     attach_problem_type_header,
@@ -246,19 +247,8 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         # Multiple solutions are allowed; use the first ordered solution.
         selected_solution = owner_solutions.first()
 
-        ui_problem_test_cases = get_ui_problem_test_cases(
-            problem, selected_solution, language.name
-        )
-        effective_problem_test_cases = get_effective_problem_test_cases(
-            problem,
-            selected_solution,
-            language,
-        )
-        clipboard_problem_test_cases = get_clipboard_problem_test_cases(
-            problem,
-            selected_solution,
-            language,
-        )
+        ui_test_cases = get_ui_test_cases(problem, language)
+        clipboard_test_cases = get_clipboard_test_cases(problem, language)
         url = parse_url(problem.url)
         source_code = get_placeholder_hello(language)
         tag_list = problem.tags.all()
@@ -277,15 +267,13 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         (question, examples) = parse_problem_description(problem.description)
 
         context.update({
-            "clipboard_problem_test_cases": clipboard_problem_test_cases,
-            "effective_problem_test_cases": effective_problem_test_cases,
+            "clipboard_test_cases": clipboard_test_cases,
             "examples": examples,
             "language": language,
             "language_id": language.id,
             'next_problem_slug': next_problem_slug,
             "output_container": "",
             "owner_id": solution_owner_id,
-            "solution_owner_id": solution_owner_id,
             "owner_solution_languages": owner_solution_languages,
             "owner_solutions": owner_solutions,
             "owners": owners,
@@ -294,9 +282,10 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             "question": question,
             "related_problems": related_problems,
             "solution": selected_solution,
+            "solution_owner_id": solution_owner_id,
             "source_code": source_code,
             "tag_list": tag_list,
-            "ui_problem_test_cases": ui_problem_test_cases,
+            "ui_test_cases": ui_test_cases,
             "url": url,
         })
         return context
@@ -343,7 +332,6 @@ class ProblemDetailView(NextUrlMixin, DetailView):
                 source_code,
                 language.name,
                 button_pressed,
-                context["effective_problem_test_cases"]
             )
             output_container = output
         else:

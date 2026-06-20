@@ -1,5 +1,30 @@
 import re
-from python_problems.models import Problem
+from python_problems.models import Problem, ProblemType
+
+
+def get_problem_metadata(problem):
+    if problem.metadata is None:
+        raise ValueError("No metadata.")
+
+    metadata = problem.metadata
+
+    if "problem_type" not in metadata:
+        raise ValueError("No problem type in metadata.")
+    elif "comparison_type" not in metadata:
+        raise ValueError("No problem type in metadata.")
+
+    if metadata["problem_type"] == ProblemType.CLASS:
+        if "class_name" not in metadata:
+            raise ValueError("No class name in metadata.")
+    else:
+        if "method_name" not in metadata:
+            raise ValueError("No method name in metadata.")
+        elif "parameters" not in metadata:
+            raise ValueError("No parameters in metadata.")
+        elif "return_type" not in metadata:
+            raise ValueError("No return type in metadata.")
+
+    return metadata
 
 
 def parse_url(raw_url):

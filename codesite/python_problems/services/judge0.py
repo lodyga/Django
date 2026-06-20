@@ -9,9 +9,8 @@ from .code_assembly import (
 from .response_validation import (
     validate_response,
 )
-from .ui_problem_test_cases import (
+from .problem_helpers import (
     get_problem_metadata,
-    get_problem_type_name,
 )
 
 
@@ -85,11 +84,10 @@ def execute_code(
         problem,
         source_code,
         language,
-        button_pressed="run",
-        test_cases=""
+        button_pressed="run"
 ):
-    problem_type = get_problem_type_name(problem)
     metadata = get_problem_metadata(problem)
+    problem_type = metadata["problem_type"]
     is_in_place = metadata.get("in_place", False)
 
     source_code = clean_types(source_code)
@@ -103,7 +101,6 @@ def execute_code(
         problem,
         source_code,
         language,
-        test_cases,
         button_pressed,
     )
     response = run_judge0(source_code, language)

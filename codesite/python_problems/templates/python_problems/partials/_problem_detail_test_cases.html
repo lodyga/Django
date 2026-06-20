@@ -9,7 +9,7 @@
     <i class="fas fa-chevron-up"></i>
   </button>
   <div class="row collapse show" id="problemTestCases">
-    {% if ui_problem_test_cases %}
+    {% if ui_test_cases %}
       <div class="row mb-4">
         <div class="col-auto mb-2">
           <div id="problemTestCaseButtonContainer">
@@ -41,7 +41,7 @@
       </div>
       <div class="row mb-2">
         <div class="col-auto" id="problemTestCasesContainer">
-          {% for test_case in ui_problem_test_cases %}
+          {% for test_case in ui_test_cases %}
             <div id="problemTestCase-{{ forloop.counter }}"
                  class="problemTestCaseContent"
                  data-problem-test-case-id="{{ test_case.id }}"
@@ -88,7 +88,7 @@
       {# Test cases to clipboard placeholder. #}
       {% spaceless %}
         <div id="clipboardProblemTestCases" class="d-none">
-          <span>{{ clipboard_problem_test_cases }}</span>
+          <span>{{ clipboard_test_cases }}</span>
         </div>
       {% endspaceless %}
     {% endif %}

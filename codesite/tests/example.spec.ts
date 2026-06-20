@@ -624,3 +624,50 @@ test('validate javascript class with solution1', async ({ page }) => {
     await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
     await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
 });
+
+
+test('assert ui test case data for python method first solution', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/two-sum/Python/');
+
+    const firstTestCase = page.locator('#problemTestCase-1');
+
+    const input = firstTestCase.locator('div[name="test_case_input_container"]').first();
+    const output = firstTestCase.locator('div[name="test_case_output_container"]').first();
+    const explanation = firstTestCase.locator('div[name="test_case_explanation_container"]').first();
+
+    await expect(input).toContainText('nums = [2, 7, 11, 15]\ntarget = 9');
+    await expect(output).toContainText('[0, 1]');
+    await expect(explanation).toContainText('Because nums[0] + nums[1] == 9, we return [0, 1].');
+});
+
+
+test('assert ui test case data for python class first solution', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/min-stack/Python/');
+
+    const firstTestCase = page.locator('#problemTestCase-1');
+
+    const input = firstTestCase.locator('div[name="test_case_input_container"]').first();
+    const output = firstTestCase.locator('div[name="test_case_output_container"]').first();
+
+    await expect(input).toContainText('(MinStack(), push(-2), push(0), push(-3), getMin(), pop(), top(), getMin())');
+    await expect(output).toContainText('[None, None, None, None, -3, None, 0, -2]');
+});
+
+
+test('assert clipboard test cases for python', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/problems/two-sum/Python/');
+
+    const clipboard = page.locator('#clipboardProblemTestCases');
+
+    await expect(clipboard).toContainText('solution = Solution()');
+    await expect(clipboard).toContainText(
+        'print(solution.twoSum([2, 7, 11, 15], 9), [0, 1])'
+    );
+    await expect(clipboard).toContainText(
+        'print(solution.twoSum([3, 2, 4], 6), [1, 2])'
+    );
+    await expect(clipboard).toContainText(
+        'print(solution.twoSum([3, 3], 6), [0, 1])'
+    );
+});
+

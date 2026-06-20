@@ -1,13 +1,9 @@
 import json
 from collections import Counter
 from python_problems.models import ComparisonType
-from .problem_test_case_parsing import get_field
-from .ui_problem_test_cases import (
-    get_problem_metadata,
-)
-from .validators import (
-    validate_find_unique_binary_string
-)
+from .test_case_parsing import get_field
+from .validators import validate_find_unique_binary_string
+
 
 VALIDATORS = {
     # slug: function name
