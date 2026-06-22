@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Case, Count, IntegerField, Q, Value, When
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -18,6 +18,7 @@ from .forms import (
 )
 from .models import (
     Problem,
+    ProblemType,
     Tag,
     Solution,
     Language,
@@ -177,6 +178,32 @@ class ProblemDetailView(NextUrlMixin, DetailView):
     model = Problem
     template_name = "python_problems/problem_detail.html"  # needed for post render()
 
+    def dispatch(self, request, *args, **kwargs):
+        problem = self.get_object()
+
+        if problem.metadata is None:
+            return HttpResponse("No problem metadata", status=400)
+
+        metadata = problem.metadata
+
+        if "problem_type" not in metadata:
+            return HttpResponse("No problem type in metadata.", status=400)
+        elif "comparison_type" not in metadata:
+            return HttpResponse("No comparison type in metadata.", status=400)
+
+        if metadata["problem_type"] == ProblemType.CLASS:
+            if "class_name" not in metadata:
+                return HttpResponse("No class name in metadata.", status=400)
+        else:
+            if "method_name" not in metadata:
+                return HttpResponse("No method name in metadata.", status=400)
+            elif "parameters" not in metadata:
+                return HttpResponse("No parameters in metadata.", status=400)
+            elif "return_type" not in metadata:
+                return HttpResponse("No return type in metadata.", status=400)
+
+        return super().dispatch(request, *args, **kwargs)
+
     def _get_owner_solution_context(self, problem, owner, language):
         owner_solutions = Solution.objects.filter(
             problem=problem,
@@ -264,7 +291,7 @@ class ProblemDetailView(NextUrlMixin, DetailView):
 
         prev_problem_slug, next_problem_slug = get_adjacent_slugs(problem)
 
-        (question, examples) = parse_problem_description(problem.description)
+        question, examples = parse_problem_description(problem.description)
 
         context.update({
             "clipboard_test_cases": clipboard_test_cases,

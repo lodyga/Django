@@ -1,5 +1,4 @@
-# require metadata
-
+# require metadata instead of Server Error (500)
 # Remove duplicases from search
 # Unique paths no input variable name under Test Cases.
 # Priority Queue; Cannot use import statement outside a module, K Closest Points to Origin attach import only to pQ problems

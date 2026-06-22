@@ -3,15 +3,17 @@ from python_problems.models import Problem, ProblemType
 
 
 def get_problem_metadata(problem):
+    # Not needed.
+    # Metadata checked in viwew.py
     if problem.metadata is None:
-        raise ValueError("No metadata.")
+        raise ValueError("No problem metadata.")
 
     metadata = problem.metadata
 
     if "problem_type" not in metadata:
         raise ValueError("No problem type in metadata.")
     elif "comparison_type" not in metadata:
-        raise ValueError("No problem type in metadata.")
+        raise ValueError("No comparison type in metadata.")
 
     if metadata["problem_type"] == ProblemType.CLASS:
         if "class_name" not in metadata:
