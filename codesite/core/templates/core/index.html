@@ -4,7 +4,7 @@
 {% endblock title %}
 {% block content %}
   <div class="container-fluid m-2">
-      <div class="row justify-content-center">
+    <div class="row justify-content-center">
       <div class="col-auto">
         <h1 class="mb-5">Site Index</h1>
         <ul>
@@ -86,21 +86,23 @@
             <a href="{% url 'python_problems:problem-index' %}">Admin</a>
           </li>
           <ul>
-            <li>
-              <a href="{% url 'python_problems:problem-create' %}">Create a problem</a>
-            </li>
-            <li>
-              <a href="{% url 'python_problems:solution-create' %}">Create a solution</a>
-            </li>
-            <li>
-              <a href="{% url 'python_problems:test_case-create' %}">Create a test case</a>
-            </li>
-            <li>
-              <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
-            </li>
-            <li>
-              <a href="{% url 'python_problems:language-create' %}">Add a language</a>
-            </li>
+            {% if user.is_authenticated %}
+              <li>
+                <a href="{% url 'python_problems:problem-create' %}">Create a problem</a>
+              </li>
+              <li>
+                <a href="{% url 'python_problems:solution-create' %}">Create a solution</a>
+              </li>
+              <li>
+                <a href="{% url 'python_problems:test_case-create' %}">Create a test case</a>
+              </li>
+              <li>
+                <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
+              </li>
+              <li>
+                <a href="{% url 'python_problems:language-create' %}">Add a language</a>
+              </li>
+            {% endif %}
             <li>
               <a href="{% url 'python_problems:tag-index' %}">Tags</a>
             </li>
