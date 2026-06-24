@@ -53,11 +53,17 @@
       </div>
       {% if owner_solutions %}
         {# Placeholder for buttons: [Solution1], [Solution2] ..., [+] #}
-        <div id="solution-button-container"
-             data-create-url="{% url 'python_problems:solution-create' %}"
-             data-problem-id="{{ solution.problem_id }}"
-             data-language-id="{{ language_id }}"
-             data-redirect-url="{% url 'python_problems:problem-detail' problem_slug language %}"></div>
+        <div class="d-flex justify-content-start">
+          <div class="col col-auto" id="solution-button-container"></div>
+          {% if user.is_authenticated %}
+            <div class="col col-auto "
+                 id="solution-create-btn"
+                 data-create-url="{% url 'python_problems:solution-create' %}"
+                 data-problem-id="{{ solution.problem_id }}"
+                 data-language-id="{{ language_id }}"
+                 data-redirect-url="{% url 'python_problems:problem-detail' problem_slug language %}"></div>
+          {% endif %}
+        </div>
         <div class="position-relative">
           <div class="position-absolute end-0 mt-5 me-5 d-flex flex-column gap-1"
                style="z-index: 10">

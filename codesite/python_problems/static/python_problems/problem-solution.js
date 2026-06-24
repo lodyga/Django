@@ -143,28 +143,33 @@ document.addEventListener('DOMContentLoaded', () => {
       solutionButtonContainer.appendChild(button);
    }
 
-   const createUrl = solutionButtonContainer.dataset.createUrl;
-   const problemId = solutionButtonContainer.dataset.problemId;
-   const languageSelect = document.getElementById('language-id');
-   const languageId = languageSelect?.value || solutionButtonContainer.dataset.languageId;
-   const redirectUrl = solutionButtonContainer.dataset.redirectUrl;
-   const createButton = document.createElement('a');
-   createButton.className = 'btn btn-outline-secondary btn-sm py-0 px-3';
-   createButton.textContent = '+';
 
-   if (createUrl && problemId && languageId) {
-      const params = new URLSearchParams({
-         problem: problemId,
-         language: languageId,
-         order: (solutionLength + 1).toString(),
-         next: redirectUrl,
-      });
-      createButton.href = `${createUrl}?${params.toString()}`;
-   } else {
-      createButton.href = createUrl || '#';
+   const solutionCreateBtn = document.getElementById('solution-create-btn');
+
+   if (solutionCreateBtn) {
+      const createUrl = solutionCreateBtn.dataset.createUrl;
+      const problemId = solutionCreateBtn.dataset.problemId;
+      const languageSelect = document.getElementById('language-id');
+      const languageId = languageSelect?.value || solutionCreateBtn.dataset.languageId;
+      const redirectUrl = solutionCreateBtn.dataset.redirectUrl;
+      const createButton = document.createElement('a');
+      createButton.className = 'btn btn-outline-secondary btn-sm py-0 px-3';
+      createButton.textContent = '+';
+
+      if (createUrl && problemId && languageId) {
+         const params = new URLSearchParams({
+            problem: problemId,
+            language: languageId,
+            order: (solutionLength + 1).toString(),
+            next: redirectUrl,
+         });
+         createButton.href = `${createUrl}?${params.toString()}`;
+      } else {
+         createButton.href = createUrl || '#';
+      }
+
+      solutionCreateBtn.appendChild(createButton);
    }
-
-   solutionButtonContainer.appendChild(createButton);
 
    if (solutionLength > 0) {
       showSolution(1);
