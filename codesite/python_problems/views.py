@@ -182,7 +182,7 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         problem = self.get_object()
 
         if problem.metadata is None:
-            return HttpResponse("No problem metadata", status=400)
+            return HttpResponse("No problem metadata. Check one of the first 500 problems.", status=400)
 
         metadata = problem.metadata
 

@@ -5,38 +5,41 @@
 using namespace std;
 
 
-void print(const string& value) {
+void println(const string& value) {
    cout << '"' << value << '"' << endl;
    // The line above transforms to the line below
    // it should raise an error but somehow in judge0 env it works
    // cout << \'"\' << value << \'"\' << endl;
 }
 
-// void print(const string& value) {
+// void println(const string& value) {
 //    cout << "\"" << value << "\"" << endl;
 // }
 
 void print(const vector<string>& values) {
+   size_t N = values.size();
    cout << "[";
 
-   for (int idx = 0; idx < values.size(); idx++) {
+   for (int idx = 0; idx < N; idx++) {
       cout << '"' << values[idx] << '"';
 
-      if (idx < values.size() - 1) {
+      if (idx < N - 1) {
          cout << ", ";
       }
    }
 
-   cout << "]" << endl;
+   cout << "]";
 }
 
-void print(const vector<vector<string>>& values) {
+
+void println(const vector<string>& values) {
+   size_t N = values.size();
    cout << "[";
 
-   for (int idx = 0; idx < values.size(); idx++) {
-      print(values[idx]);
+   for (int idx = 0; idx < N; idx++) {
+      cout << '"' << values[idx] << '"';
 
-      if (idx < values.size() - 1) {
+      if (idx < N - 1) {
          cout << ", ";
       }
    }
@@ -44,17 +47,33 @@ void print(const vector<vector<string>>& values) {
    cout << "]" << endl;
 }
 
-void print(int value) {
+void println(const vector<vector<string>>& values) {
+   size_t N = values.size();
+   cout << "[";
+
+   for (int idx = 0; idx < N; idx++) {
+      print(values[idx]);
+
+      if (idx < N - 1) {
+         cout << ", ";
+      }
+   }
+
+   cout << "]" << endl;
+}
+
+void println(int value) {
    cout << value << endl;
 }
 
-void print(const vector<int>& values) {
+void println(const vector<int>& values) {
+   size_t N = values.size();
    cout << "[";
 
-   for (int idx = 0; idx < values.size(); idx++) {
+   for (int idx = 0; idx < N; idx++) {
       cout << values[idx];
 
-      if (idx < values.size() - 1) {
+      if (idx < N - 1) {
          cout << ", ";
       }
    }
@@ -62,13 +81,29 @@ void print(const vector<int>& values) {
    cout << "]" << endl;
 }
 
-void print(const vector<vector<int>>& values) {
+void print(const vector<int>& values) {
+   size_t N = values.size();
    cout << "[";
 
-   for (int idx = 0; idx < values.size(); idx++) {
+   for (int idx = 0; idx < N; idx++) {
+      cout << values[idx];
+
+      if (idx < N - 1) {
+         cout << ", ";
+      }
+   }
+
+   cout << "]";
+}
+
+void println(const vector<vector<int>>& values) {
+   size_t N = values.size();
+   cout << "[";
+
+   for (int idx = 0; idx < N; idx++) {
       print(values[idx]);
 
-      if (idx < values.size() - 1) {
+      if (idx < N - 1) {
          cout << ", ";
       }
    }
