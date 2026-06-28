@@ -195,7 +195,7 @@ class CppAdapter(LanguageAdapter):
             arguments_list="arguments_list",
             expected_list="expected_list",
         ),
-        run_tests_function="run_tests",
+        run_tests_function="runTests",
         in_place_utils_file="in_place_utils.cpp",
     )
 

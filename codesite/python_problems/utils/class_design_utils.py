@@ -16,13 +16,13 @@ def test_input(cls, operations: list[str], arguments: list[list]):
 
     return output
 
+
 # Run tests
 def run_tests(
         cls,
         operations_list: list[list[str]],
         arguments_list: list[list[list[int]]],
-        show_output: bool = False
-) -> list[bool]:
+        show_output: bool = False) -> list[bool]:
     """
     Run a batch of TimeMap tests and compare outputs with expected results.
     If show_output is True, returns [(actual, expected), ...] instead of booleans.

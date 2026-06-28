@@ -1,4 +1,5 @@
 // Serialize for C++ like json.dumps or JSON.stringify.
+#include <tuple>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -6,22 +7,15 @@ using namespace std;
 
 
 void println(const string& value) {
-   cout << '"' << value << '"' << endl;
-   // The line above transforms to the line below
-   // it should raise an error but somehow in judge0 env it works
-   // cout << \'"\' << value << \'"\' << endl;
+   cout << char(34) << value << char(34) << endl;
 }
-
-// void println(const string& value) {
-//    cout << "\"" << value << "\"" << endl;
-// }
 
 void print(const vector<string>& values) {
    size_t N = values.size();
    cout << "[";
 
    for (int idx = 0; idx < N; idx++) {
-      cout << '"' << values[idx] << '"';
+      cout << char(34) << values[idx] << char(34);
 
       if (idx < N - 1) {
          cout << ", ";
@@ -31,13 +25,12 @@ void print(const vector<string>& values) {
    cout << "]";
 }
 
-
 void println(const vector<string>& values) {
    size_t N = values.size();
    cout << "[";
 
    for (int idx = 0; idx < N; idx++) {
-      cout << '"' << values[idx] << '"';
+      cout << char(34) << values[idx] << char(34);
 
       if (idx < N - 1) {
          cout << ", ";

@@ -48,12 +48,15 @@ def attach_utils(source_code, language, problem_type, is_in_place):
     language_name = get_language_name(language)
     adapter = LANGUAGE_ADAPTERS[language_name]
 
+    if language_name == "Cpp":
+        source_code = attach_cpp_print(source_code)
+
     if is_in_place:
-        source_code = source_code.rstrip() + "\n" + \
+        source_code = source_code + "\n" + \
             get_utility(
-            adapter.in_place_utils_file,
-            "utils"
-        ).rstrip() + "\n"
+                adapter.in_place_utils_file,
+                "utils"
+            ) + "\n"
 
     match problem_type:
         case ProblemType.BINARY_TREE:
@@ -119,7 +122,7 @@ def get_solution_instance_setup(source_code, method_name, language):
     return ""
 
 
-def attach_main(source_code, test_case_expressions, language, method_name):
+def attach_main(source_code, main_payload_list, language, method_name):
     if not method_name or not language:
         return ""
 
@@ -134,7 +137,7 @@ def attach_main(source_code, test_case_expressions, language, method_name):
     )
 
     main_payload = solution_instance_setup + \
-        "\n".join(test_case_expressions) + "\n"
+        "\n".join(main_payload_list) + "\n"
 
     match language_name:
         case "Python" | "JavaScript":
@@ -173,18 +176,77 @@ def build_validation_payload(problem, source_code, language, metadata) -> str:
                 tc = adapter.print_call(input_data) + ";"
             case "Java":
                 tc = adapter.print_call(
-                    adapter.serialize_call(input_data)) + ";"
+                    adapter.serialize_call(input_data)
+                ) + ";"
             case _:
                 tc = ""
 
         test_case_expressions.append(tc)
 
-    if language_name == "Cpp":
-        source_code = attach_cpp_print(source_code)
-
     main_block = attach_main(
         source_code,
         test_case_expressions,
+        language,
+        method_name,
+    )
+
+    return source_code + main_block
+
+
+def get_cpp_type_tuple(parameters: list) -> str:
+    """
+    list[int] -> tuple<vector<int>>
+    list[list[int]] -> tuple<vector<vector<int>>>
+    """
+    if not parameters:
+        return ""
+
+    types = []
+
+    for parameter in parameters:
+        data_type = parameter["type"]
+
+        data_type = re.sub(r"str", "string", data_type)
+        data_type = re.sub(r"list\[", "vector<", data_type)
+        data_type = re.sub(r"\]", ">", data_type)
+
+        types.append(data_type)
+
+    return "tuple<" + ", ".join(types) + ">"
+
+
+def build_validation_in_place_payload(source_code, language, test_cases, metadata):
+    method_name = metadata["method_name"]
+    parameters = metadata["parameters"]
+    language_name = get_language_name(language)
+    adapter = LANGUAGE_ADAPTERS[language_name]
+    inputs_list = []
+    expected_list = []
+
+    for test_case in test_cases.all():
+        inputs_list.append(get_field(test_case.data, "inputs"))
+        expected_list.append(get_field(test_case.data, "expected"))
+
+    if language_name in ("Python", "JavaScript"):
+        main_payload_list = (
+            [
+                f'{adapter.naming.inputs_list} = {serialize(inputs_list, language)}',
+                f'{adapter.run_tests_function}(solution.{method_name})'
+            ]
+        )
+    else:  # elif language_name == "Cpp":
+        cpp_type_tuple = get_cpp_type_tuple(parameters)
+        main_payload_list = (
+            [
+                "using TestCase = " + cpp_type_tuple + ";",
+                f"vector<TestCase> {adapter.naming.inputs_list} = {serialize(inputs_list, language)};",
+                f"{adapter.run_tests_function}(solution, &Solution::{method_name}, inputs_list);"
+            ]
+        )
+
+    main_block = attach_main(
+        source_code,
+        main_payload_list,
         language,
         method_name,
     )
@@ -214,30 +276,6 @@ def build_validation_class_payload(source_code, language, test_cases, metadata):
     return updated_code
 
 
-def build_validation_in_place_payload(source_code, language, test_cases, method_name):
-    language_name = get_language_name(language)
-    adapter = LANGUAGE_ADAPTERS[language_name]
-    inputs_list = []
-    expected_list = []
-
-    for test_case in test_cases.all():
-        inputs_list.append(get_field(test_case.data, "inputs"))
-        expected_list.append(get_field(test_case.data, "expected"))
-
-    updated_code = add_solution_instance_setup(
-        source_code,
-        method_name,
-        language
-    )
-    updated_code = (
-        f"{updated_code.rstrip()}\n"
-        f'{adapter.naming.inputs_list} = {serialize(inputs_list, language)}\n'
-        f'{adapter.run_tests_function}(solution.{method_name})\n'
-    )
-
-    return updated_code
-
-
 def attach_validation_payload(problem, source_code, language, button_pressed):
     if button_pressed == "run":
         return source_code
@@ -250,7 +288,7 @@ def attach_validation_payload(problem, source_code, language, button_pressed):
             source_code,
             language,
             problem.testcases,
-            metadata["method_name"]
+            metadata,
         )
     elif problem_type == ProblemType.CLASS:
         source_code = build_validation_class_payload(
