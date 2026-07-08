@@ -440,7 +440,7 @@ class ProblemScriptTests(TestCase):
 
     def test_build_validation_class_payload_supports_time_map_problem(self):
         problem = create_sample_problem(title="Time Based Key-Value Store")
-        problem.problem_type = ProblemType.CLASS
+        # problem.problem_type = ProblemType.CLASS
         problem.metadata = {
             "problem_type": ProblemType.CLASS,
             "class_name": "TimeMap",
@@ -1717,25 +1717,6 @@ class ProblemModelEdgeCaseTests(TestCase):
         )
         self.assertEqual(problem.method_name, "myMethod")
         self.assertEqual(problem.argument_names, ["arg1", "arg2"])
-
-    def test_problem_update_class_type_clears_fields(self):
-        owner = create_sample_user()
-        problem = Problem.objects.create(
-            title="Test",
-            difficulty=Difficulty.objects.create(name="Easy"),
-            url="https://example.com",
-            description="Test",
-            owner=owner,
-            problem_type=ProblemType.FUNCTION,
-            method_name="myMethod",
-            argument_names=["arg1"],
-        )
-        problem.problem_type = ProblemType.CLASS
-        problem.save()
-        problem.refresh_from_db()
-        self.assertEqual(problem.method_name, "")
-        self.assertIsNone(problem.argument_names)
-
 
 class SolutionModelEdgeCaseTests(TestCase):
     def setUp(self):

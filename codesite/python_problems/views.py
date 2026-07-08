@@ -26,6 +26,7 @@ from .models import (
     Difficulty,
     Complexity,
 )
+from .services.problem_helpers import get_problem_metadata
 from .serializers import (
     TagSerializer,
     DifficultySerializer,
@@ -50,6 +51,7 @@ from .services.problem_helpers import (
     get_adjacent_slugs,
     parse_problem_description
 )
+from .services.test_case_parsing import get_field
 
 
 def tag_graph_view(request):
@@ -181,6 +183,7 @@ class ProblemDetailView(NextUrlMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         problem = self.get_object()
 
+        # Validate metadata.
         if problem.metadata is None:
             return HttpResponse("No problem metadata. Check one of the first 500 problems.", status=400)
 
@@ -202,9 +205,25 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             elif "return_type" not in metadata:
                 return HttpResponse("No return type in metadata.", status=400)
 
+        # Validate test cases.
+        test_cases = problem.get_shared_testcases(include_hidden=True)
+        metadata = get_problem_metadata(problem)
+
+        if metadata["problem_type"] != ProblemType.CLASS:
+            parameters = metadata["parameters"]
+
+            for problem_test_case in test_cases:
+                inputs = get_field(problem_test_case.data, "inputs")
+
+                if (not parameters or len(parameters) != len(inputs)):
+                    return HttpResponse("Parameters and inputs length mismatch.", status=400)
+
         return super().dispatch(request, *args, **kwargs)
 
     def _get_owner_solution_context(self, problem, owner, language):
+        metadata = get_problem_metadata(problem)
+        problem_type = metadata["problem_type"]
+
         owner_solutions = Solution.objects.filter(
             problem=problem,
             language=language,
@@ -228,7 +247,7 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         for solution in owner_solutions:
             solution.source_code = attach_problem_type_header(
                 solution.source_code,
-                problem.problem_type,
+                problem_type,
                 language,
             )
 
@@ -274,6 +293,7 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         # Multiple solutions are allowed; use the first ordered solution.
         selected_solution = owner_solutions.first()
 
+        # todo
         ui_test_cases = get_ui_test_cases(problem, language)
         clipboard_test_cases = get_clipboard_test_cases(problem, language)
         url = parse_url(problem.url)
