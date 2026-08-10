@@ -1,3 +1,4 @@
+# make Gunicorn a systemd service so it automatically starts after a reboot.
 # /etc/systemd/system/codesite.service
 [Service]
 User=ukasz
@@ -35,12 +36,35 @@ server {
     }
 }
 
+# /usr/lib/systemd/system/nginx.service
+[Unit]
+Description=nginx - high performance web server
+Documentation=https://nginx.org/en/docs/
+After=network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/run/nginx.pid
+Environment="CONFFILE=/etc/nginx/nginx.conf"
+EnvironmentFile=-/etc/default/nginx
+ExecStart=/usr/sbin/nginx -c ${CONFFILE}
+ExecReload=/bin/sh -c "/bin/kill -s HUP $(/bin/cat /run/nginx.pid)"
+ExecStop=/bin/sh -c "/bin/kill -s TERM $(/bin/cat /run/nginx.pid)"
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
 
 source djangoenv/bin/activate
 pip install gunicorn
 python manage.py collectstatic
 gunicorn codesite.wsgi
 
+# run codesite with gunicorn
 gunicorn --bind 127.0.0.1:8001 codesite.wsgi
 
 # /etc/systemd/system/codesite.service
@@ -73,8 +97,8 @@ sudo systemctl status codesite
 
 
 
-sudo systemctl daemon-reload
-sudo systemctl restart codesite
+sudo systemctl daemon-reload # + restart when changed service files
+sudo systemctl restart codesite  # when changed Django/Python code
 sudo systemctl status codesite --no-pager
 sudo nginx -t
 sudo systemctl reload nginx
@@ -94,4 +118,25 @@ sudo chown -R nginx:nginx /var/www/codesite
 sudo chmod -R 755 /var/www/codesite
 sudo -u nginx /home/ukasz/Documents/IT/Django/codesite/django6env/bin/python /home/ukasz/Documents/IT/Django/codesite/manage.py collectstatic
 
+
+
+
+
+
+
+# codesite with Nginx
+http://127.0.0.1/
+
+# codesite.service by Gunicorn
+sudo systemctl start codesite
+sudo systemctl stop codesite
+sudo systemctl restart codesite
+sudo systemctl status codesite
+
+# nginx.service by Nginx.
+sudo systemctl start nginx
+sudo systemctl stop nginx
+sudo systemctl restart nginx
+sudo systemctl reload nginx
+sudo systemctl status nginx
 

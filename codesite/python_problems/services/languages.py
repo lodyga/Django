@@ -111,15 +111,15 @@ class PythonAdapter(LanguageAdapter):
             instance_code="\nsolution = Solution()\n",
             instance_pattern=r"solution\s*=\s*Solution\(\)\s*",
         ),
+        linked_list=LinkedListConfig(
+            utils_file="linked_list_utils.py",
+            build="LinkedList().build_linked_list",
+            serialize="LinkedList().serialize_linked_list",
+        ),
         binary_tree=BinaryTreeConfig(
             utils_file="binary_tree_utils.py",
             build="build_binary_tree",
             serialize="serialize_binary_tree",
-        ),
-        linked_list=LinkedListConfig(
-            utils_file="linked_list_utils.py",
-            build="build_linked_list",
-            serialize="serialize_linked_list",
         ),
         class_design=ClassDesignConfig(
             utils_file="class_design_utils.py",
@@ -143,15 +143,15 @@ class JavaScriptAdapter(LanguageAdapter):
             instance_code="\nconst solution = new Solution();\n",
             instance_pattern=r"const\s+solution\s*=\s*new\s+Solution\(\)\s*;?",
         ),
+        linked_list=LinkedListConfig(
+            utils_file="linked-list-utils.js",
+            build="new LinkedList().buildLinkedList",
+            serialize="new LinkedList().serializeLinkedList",
+        ),
         binary_tree=BinaryTreeConfig(
             utils_file="binary-tree-utils.js",
             build="buildBinaryTree",
             serialize="serializeBinaryTree",
-        ),
-        linked_list=LinkedListConfig(
-            utils_file="linked-list-utils.js",
-            build="buildLinkedList",
-            serialize="serializeLinkedList",
         ),
         class_design=ClassDesignConfig(
             utils_file="class-design-utils.js",
@@ -170,21 +170,21 @@ class JavaScriptAdapter(LanguageAdapter):
 
 class CppAdapter(LanguageAdapter):
     config = LanguageConfig(
-        print="println",  # print serialized
+        print="println",  # print serialized in print_in_cpp.cpp
         serialize="",
         solution=SolutionConfig(
             instance_code="\nSolution solution;\n",
             instance_pattern=r"Solution\s*solution\s*",
         ),
+        linked_list=LinkedListConfig(
+            utils_file="linked_list_utils.cpp",
+            build="LinkedList().buildLinkedList",
+            serialize="LinkedList().serializeLinkedList",
+        ),
         binary_tree=BinaryTreeConfig(
             utils_file="binary_tree_utils.cpp",
             build="build_binary_tree",
             serialize="serialize_binary_tree",
-        ),
-        linked_list=LinkedListConfig(
-            utils_file="linked_list_utils.cpp",
-            build="build_linked_list",
-            serialize="serialize_linked_list",
         ),
         class_design=ClassDesignConfig(
             utils_file="class_design_utils.cpp",
@@ -208,15 +208,15 @@ class JavaAdapter(LanguageAdapter):
             instance_code="\nSolution solution = new Solution();\n",
             instance_pattern=r"Solution\s*solution\s*=\s*new\s*Solution\(\)\s*",
         ),
+        linked_list=LinkedListConfig(
+            utils_file="linked_list_utils.cpp",
+            build="build_linked_list",
+            serialize="serializeLinkedList",
+        ),
         binary_tree=BinaryTreeConfig(
             utils_file="binary_tree_utils.cpp",
             build="build_binary_tree",
             serialize="serialize_binary_tree",
-        ),
-        linked_list=LinkedListConfig(
-            utils_file="linked_list_utils.cpp",
-            build="build_linked_list",
-            serialize="serialize_linked_list",
         ),
         class_design=ClassDesignConfig(
             utils_file="class_design_utils.cpp",
@@ -240,15 +240,15 @@ class TypeScriptAdapter(LanguageAdapter):
             instance_code="\nconst solution = new Solution();\n",
             instance_pattern=r"const\s+solution\s*=\s*new\s+Solution\(\)\s*;?",
         ),
-        binary_tree=BinaryTreeConfig(
-            utils_file="binary-tree-utils.js",
-            build="buildBinaryTree",
-            serialize="serializeBinaryTree",
-        ),
         linked_list=LinkedListConfig(
             utils_file="linked-list-utils.js",
             build="buildLinkedList",
             serialize="serializeLinkedList",
+        ),
+        binary_tree=BinaryTreeConfig(
+            utils_file="binary-tree-utils.js",
+            build="buildBinaryTree",
+            serialize="serializeBinaryTree",
         ),
         class_design=ClassDesignConfig(
             utils_file="class-design-utils.js",

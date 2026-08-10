@@ -1,5 +1,5 @@
 /**
- * Represents a node in a singly-linked list.
+ * Definition of a node in a singly-linked list.
  * class ListNode {
  *    constructor(val = null, next = null) {
  *       this.val = val;

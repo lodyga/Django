@@ -17,6 +17,7 @@ ALLOWED_HOSTS = [
     "localhost",  # local Docker
     "codesite.onrender.com",  # Docker container on Render
     "testserver",  # Testing in Activity Bar
+    "158.101.162.117",  # Oracle VM
 ]
 
 INSTALLED_APPS = [

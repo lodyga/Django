@@ -28,10 +28,6 @@ def build_test_case_expression(problem, test_case_data, language):
         name, data_type = parameters["name"], parameters["type"]
 
         match data_type:
-            case ProblemType.BINARY_TREE:
-                line = serialize(value, language)
-                line = f'{adapter.binary_tree.build}({line})'
-
             case ProblemType.LINKED_LIST:
                 values, cycle_position = unpack_linked_list_payload(value)
                 line = serialize(values, language)
@@ -48,6 +44,11 @@ def build_test_case_expression(problem, test_case_data, language):
                     )
                 else:
                     line = f'{adapter.linked_list.build}({line})'
+
+            case ProblemType.BINARY_TREE:
+                line = serialize(value, language)
+                line = f'{adapter.binary_tree.build}({line})'
+
             case _:
                 line = serialize(value, language)
 
@@ -56,10 +57,10 @@ def build_test_case_expression(problem, test_case_data, language):
     serialized_inputs = ", ".join(lines)
 
     match return_type:
-        case ProblemType.BINARY_TREE:
-            res = f'{adapter.binary_tree.serialize}(solution.{metadata["method_name"]}({serialized_inputs}))'
         case ProblemType.LINKED_LIST:
             res = f'{adapter.linked_list.serialize}(solution.{metadata["method_name"]}({serialized_inputs}))'
+        case ProblemType.BINARY_TREE:
+            res = f'{adapter.binary_tree.serialize}(solution.{metadata["method_name"]}({serialized_inputs}))'
         case _:
             res = f'solution.{metadata["method_name"]}({serialized_inputs})'
 

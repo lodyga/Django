@@ -2,7 +2,7 @@ import requests
 import socket
 from codesite.auth.judge0_auth import JUDGE0_API_KEY
 from .code_assembly import (
-    clean_types,
+    clean_python_types,
     attach_utils,
     attach_validation_payload,
 )
@@ -90,7 +90,7 @@ def execute_code(
     problem_type = metadata["problem_type"]
     is_in_place = metadata.get("in_place", False)
 
-    source_code = clean_types(source_code)
+    source_code = clean_python_types(source_code)
     source_code = attach_utils(
         source_code,
         language,

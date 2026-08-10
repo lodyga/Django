@@ -143,7 +143,6 @@ def draw_ascii(data, problem_type, parameter_name, parameter_type):
             return draw_linked_list(data, parameter_name)
         case "list[int]":
             return draw_list(data, parameter_name)
-        # todo grid?
         case "list[list[int]]" | "grid":
             return draw_grid(data, parameter_name)
 

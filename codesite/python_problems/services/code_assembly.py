@@ -6,7 +6,7 @@ from .test_case_parsing import get_field, serialize
 from .test_case_expression import get_test_case_input_expression
 
 
-def clean_types(source_code):
+def clean_python_types(source_code):
     """Convert types to match Python 3.8"""
     source_code = re.sub(
         r"list\[",
@@ -59,15 +59,15 @@ def attach_utils(source_code, language, problem_type, is_in_place):
             ) + "\n"
 
     match problem_type:
-        case ProblemType.BINARY_TREE:
-            source_code = get_utility(
-                adapter.binary_tree.utils_file,
-                "utils"
-            ) + "\n" + source_code
-
         case ProblemType.LINKED_LIST:
             source_code = get_utility(
                 adapter.linked_list.utils_file,
+                "utils"
+            ) + "\n" + source_code
+
+        case ProblemType.BINARY_TREE:
+            source_code = get_utility(
+                adapter.binary_tree.utils_file,
                 "utils"
             ) + "\n" + source_code
 
@@ -76,7 +76,7 @@ def attach_utils(source_code, language, problem_type, is_in_place):
                 adapter.class_design.utils_file,
                 "utils"
             )
-            cleaned_utils = clean_types(class_utils)
+            cleaned_utils = clean_python_types(class_utils)
             source_code = source_code + "\n" + cleaned_utils
 
     match language_name:
@@ -316,19 +316,21 @@ def attach_problem_type_header(source_code, problem_type, language):
     header = ""
 
     match problem_type:
-        case ProblemType.BINARY_TREE:
-            match language_name:
-                case "Python":
-                    header = get_utility("binary_tree_header.py", "utils")
-                case "JavaScript":
-                    header = get_utility("binary-tree-header.js", "utils")
-
         case ProblemType.LINKED_LIST:
             match language_name:
                 case "Python":
                     header = get_utility("linked_list_header.py", "utils")
                 case "JavaScript":
                     header = get_utility("linked-list-header.js", "utils")
+                case "Cpp":
+                    header = get_utility("linked_list_header.cpp", "utils")
+
+        case ProblemType.BINARY_TREE:
+            match language_name:
+                case "Python":
+                    header = get_utility("binary_tree_header.py", "utils")
+                case "JavaScript":
+                    header = get_utility("binary-tree-header.js", "utils")
 
     return header + source_code
 

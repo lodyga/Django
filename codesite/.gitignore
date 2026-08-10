@@ -4,6 +4,7 @@ __pycache__
 db.sqlite3
 *.pyc
 django6env/
+.django6env/
 auth/
 judge0*/
 reqirements42.txt

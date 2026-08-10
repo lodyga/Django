@@ -293,7 +293,6 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         # Multiple solutions are allowed; use the first ordered solution.
         selected_solution = owner_solutions.first()
 
-        # todo
         ui_test_cases = get_ui_test_cases(problem, language)
         clipboard_test_cases = get_clipboard_test_cases(problem, language)
         url = parse_url(problem.url)
