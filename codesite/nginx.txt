@@ -97,8 +97,8 @@ sudo systemctl status codesite
 
 
 
-sudo systemctl daemon-reload # + restart when changed service files
-sudo systemctl restart codesite  # when changed Django/Python code
+sudo systemctl daemon-reload  # restart when changed service files
+sudo systemctl restart codesite  # when changed Django/Python code + sudo systemctl daemon-reload
 sudo systemctl status codesite --no-pager
 sudo nginx -t
 sudo systemctl reload nginx
@@ -123,7 +123,6 @@ sudo -u nginx /home/ukasz/Documents/IT/Django/codesite/django6env/bin/python /ho
 
 
 
-
 # codesite with Nginx
 http://127.0.0.1/
 
@@ -139,4 +138,3 @@ sudo systemctl stop nginx
 sudo systemctl restart nginx
 sudo systemctl reload nginx
 sudo systemctl status nginx
-

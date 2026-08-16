@@ -122,7 +122,9 @@ class ProblemIndexView(ListView):
             queryset = queryset.filter(difficulty_id=difficulty_id)
 
         if language_id and language_id != "0":
-            queryset = queryset.filter(solutions__language_id=language_id)
+            queryset = queryset.filter(
+                solutions__language_id=language_id
+            ).distinct()
 
         if tag_id and tag_id != "0":
             queryset = queryset.filter(tags__id=tag_id)

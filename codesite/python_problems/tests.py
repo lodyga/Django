@@ -731,6 +731,12 @@ class ProblemIndexViewTests(TestCase):
             source_code="print('Easy')",
         )
         create_sample_solution(
+            problem=cls.problem_easy,
+            language=cls.language_python,
+            owner=create_sample_user("second-solution-owner"),
+            source_code="print('Easy again')",
+        )
+        create_sample_solution(
             problem=cls.problem_medium,
             language=cls.language_javascript,
             source_code="console.log('Medium')",
@@ -790,6 +796,7 @@ class ProblemIndexViewTests(TestCase):
 
         titles = [problem.title for problem in response.context["page_obj"].object_list]
         self.assertEqual(titles, ["Two Sum"])
+        self.assertEqual(response.context["page_obj"].paginator.count, 1)
 
     def test_ordering_and_pagination_use_page_object(self):
         for index in range(15):
