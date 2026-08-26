@@ -22,8 +22,8 @@ from .services.code_assembly import (
 )
 from .services.judge0 import handle_response_error
 from .services.previews import draw_linked_list
+from .services.test_case_expression import build_test_case_expression
 from .services.ui_test_cases import (
-    build_test_case_expression,
     get_ui_test_cases,
 )
 from .views import ProblemIndexView
@@ -56,6 +56,16 @@ def create_sample_problem(
         url=url,
         description=description,
         owner=owner,
+        metadata={
+            "problem_type": ProblemType.FUNCTION,
+            "comparison_type": "exact",
+            "method_name": "twoSum",
+            "parameters": [
+                {"name": "nums", "type": "list[int]"},
+                {"name": "target", "type": "int"},
+            ],
+            "return_type": "list[int]",
+        },
     )
     problem.tags.set(tags)
     return problem
@@ -370,6 +380,7 @@ class ProblemScriptTests(TestCase):
         problem = create_sample_problem(title="Move Zeroes")
         problem.metadata = {
             "problem_type": ProblemType.FUNCTION,
+            "comparison_type": "exact",
             "method_name": "moveZeroes",
             "parameters": [{"name": "nums", "type": "list[int]"}],
             "return_type": "None",
@@ -390,7 +401,7 @@ class ProblemScriptTests(TestCase):
             source_code,
             "Python",
             problem.testcases,
-            "moveZeroes",
+            problem.metadata,
         )
 
         self.assertIn("\nsolution = Solution()\n", updated_code)
@@ -401,6 +412,7 @@ class ProblemScriptTests(TestCase):
         problem = create_sample_problem(title="Number of Islands")
         problem.metadata = {
             "problem_type": ProblemType.FUNCTION,
+            "comparison_type": "exact",
             "method_name": "numIslands",
             "parameters": [{"name": "grid", "type": "grid"}],
             "return_type": "int",
@@ -414,9 +426,9 @@ class ProblemScriptTests(TestCase):
                 "expected": 3,
             },
         )
-        solution = create_sample_solution(problem=problem)
+        create_sample_solution(problem=problem)
 
-        ui_test_cases = get_ui_test_cases(problem, solution, "Python")
+        ui_test_cases = get_ui_test_cases(problem, "Python")
 
         self.assertEqual(len(ui_test_cases), 1)
         self.assertEqual(
@@ -443,6 +455,7 @@ class ProblemScriptTests(TestCase):
         # problem.problem_type = ProblemType.CLASS
         problem.metadata = {
             "problem_type": ProblemType.CLASS,
+            "comparison_type": "exact",
             "class_name": "TimeMap",
         }
         problem.save(update_fields=["problem_type", "metadata"])
@@ -486,6 +499,7 @@ class ProblemScriptTests(TestCase):
         problem = create_sample_problem(title="Invert Binary Tree Python")
         problem.metadata = {
             "problem_type": ProblemType.BINARY_TREE,
+            "comparison_type": "exact",
             "method_name": "invertTree",
             "parameters": [{"name": "root", "type": ProblemType.BINARY_TREE}],
             "return_type": ProblemType.BINARY_TREE,
@@ -507,6 +521,7 @@ class ProblemScriptTests(TestCase):
         problem = create_sample_problem(title="Linked List Cycle Python")
         problem.metadata = {
             "problem_type": ProblemType.LINKED_LIST,
+            "comparison_type": "exact",
             "method_name": "hasCycle",
             "parameters": [{"name": "head", "type": ProblemType.LINKED_LIST}],
             "return_type": "bool",
@@ -521,13 +536,14 @@ class ProblemScriptTests(TestCase):
 
         self.assertEqual(
             expression,
-            "solution.hasCycle(build_linked_list([3, 2, 0, -4], 1))",
+            "solution.hasCycle(LinkedList().build_linked_list([3, 2, 0, -4], 1))",
         )
 
     def test_build_test_case_expression_supports_linked_list_cycles_javascript(self):
         problem = create_sample_problem(title="Linked List Cycle JavaScript")
         problem.metadata = {
             "problem_type": ProblemType.LINKED_LIST,
+            "comparison_type": "exact",
             "method_name": "hasCycle",
             "parameters": [{"name": "head", "type": ProblemType.LINKED_LIST}],
             "return_type": "bool",
@@ -542,7 +558,7 @@ class ProblemScriptTests(TestCase):
 
         self.assertEqual(
             expression,
-            "solution.hasCycle(buildLinkedList([3, 2, 0, -4], { cyclePosition: 1 }))",
+            "solution.hasCycle(new LinkedList().buildLinkedList([3, 2, 0, -4], { cyclePosition: 1 }))",
         )
 
     def test_draw_linked_list_displays_cycle_preview(self):
@@ -946,8 +962,8 @@ class SolutionDetailViewTests(TestCase):
         self.assertContains(response, "solution.twoSum([2, 7, 11, 15], 9)")
         self.assertNotContains(response, "solution.twoSum([3, 3], 6)")
         self.assertEqual(
-            response.context["effective_problem_test_cases"],
-            [("solution.twoSum([2, 7, 11, 15], 9)", "[0, 1]")],
+            response.context["clipboard_test_cases"],
+            "\nsolution = Solution()\nprint(solution.twoSum([2, 7, 11, 15], 9), [0, 1])\n",
         )
 
     def test_problem_argument_names_label_ui_testcases(self):

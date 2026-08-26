@@ -24,23 +24,25 @@ def draw_grid(data, parameter_name):
     chars = {str(char) for line in data for char in line}
     char_map = {}
 
-    if all(char.isalpha() for char in chars):
-        return
+    # if all(char.isalpha() for char in chars):
+    #     return
 
     match len(chars):
         case 1 | 2 | 3:
             char_map = {
-                "-1": "█",
-                "0": "·",
-                "1": "■",
-                "2": "X",
-                "2147483647": "∞",
+                '-1': '█',
+                '0': '·',
+                '1': '■',
+                '2': 'X',
+                "2147483647": '∞',
+                'O': 'O',
+                'X': 'X'
             }
         case _:
             char_map = {char: char for char in chars}
-            char_map["-1"] = "█"
+            char_map['-1'] = '█'
 
-    grid = """┌""" + "─" * (cols*2 + 1) + "┐\n"
+    grid = """┌""" + '─' * (cols*2 + 1) + "┐\n"
 
     for line in data:
         grid_line = "".join(
@@ -49,7 +51,7 @@ def draw_grid(data, parameter_name):
         )
         grid = grid + "│ " + " ".join(grid_line) + " │\n"
 
-    grid = grid + """└""" + "─" * (cols*2 + 1) + "┘"
+    grid = grid + """└""" + '─' * (cols*2 + 1) + '┘'
 
     return (parameter_name, grid)
 
@@ -105,10 +107,10 @@ def draw_list(heights, parameter_name):
         return ""
 
     max_height = max(heights)
-    
+
     if max_height > 1000:
         return ""
-    
+
     fill = "█"
     lines = []
 
@@ -123,7 +125,7 @@ def draw_list(heights, parameter_name):
 
         lines.append(row.rstrip())
 
-    axis = "   +" + "-" * (2 * len(heights) + 1)
+    axis = "   +" + '-' * (2 * len(heights) + 1)
     indexes = "     " + " ".join(str(i) for i in range(len(heights)))
 
     lines.append(axis)
@@ -137,22 +139,34 @@ def draw_ascii(data, problem_type, parameter_name, parameter_type):
     █▓▒░#║╬■⬛🧱~≈∼≋≀·○🌊💧■▲◆●⬤⛰GO⊙✦★
     """
     match parameter_type:
-        case ProblemType.BINARY_TREE:
-            return draw_tree(data, parameter_name)
         case ProblemType.LINKED_LIST:
             return draw_linked_list(data, parameter_name)
+        case ProblemType.BINARY_TREE:
+            return draw_tree(data, parameter_name)
         case "list[int]":
             return draw_list(data, parameter_name)
-        case "list[list[int]]" | "grid":
+        case "list[list[int]]" | "list[list[string]]" |"grid":
             return draw_grid(data, parameter_name)
 
-    if problem_type == ProblemType.BINARY_TREE and isinstance(data, list):
+    if (
+        problem_type == ProblemType.BINARY_TREE 
+        and isinstance(data, list)
+    ):
         bt = binarytree.build2(data).__str__()
         return (parameter_name, bt)
 
-    elif problem_type == ProblemType.LINKED_LIST and isinstance(data, list):
+    elif (
+        problem_type == ProblemType.LINKED_LIST 
+        and isinstance(data, list)
+    ):
         return draw_linked_list(data, parameter_name)
 
     # for grid/matrix/board-like data
-    elif problem_type not in (ProblemType.BINARY_TREE, ProblemType.LINKED_LIST) and data and isinstance(data, list) and isinstance(data[0], list):
+    # When in-place method returns void there is no parameter type.
+    elif (
+        problem_type not in (ProblemType.BINARY_TREE, ProblemType.LINKED_LIST)
+        and data
+        and isinstance(data, list)
+        and isinstance(data[0], list)
+    ):
         return draw_grid(data, parameter_name)
