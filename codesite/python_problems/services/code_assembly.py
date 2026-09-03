@@ -331,6 +331,8 @@ def attach_problem_type_header(source_code, problem_type, language):
                     header = get_utility("binary_tree_header.py", "utils")
                 case "JavaScript":
                     header = get_utility("binary-tree-header.js", "utils")
+                case "Cpp":
+                    header = get_utility("binary_tree_header.cpp", "utils")
 
     return header + source_code
 

@@ -13,7 +13,7 @@ def serialize_cpp(items):
 
         return "{" + ", ".join(serialized) + "}"
 
-    return json.dumps(items)
+    return json.dumps(items) if items else "nullopt"
 
 
 def serialize_java(items):

@@ -42,8 +42,11 @@ def run_judge0(source_code, language):
 
     serialized_code = {
         "source_code": source_code,
-        "language_id": language_id
+        "language_id": language_id,
     }
+
+    if language == "C++":
+        serialized_code["compiler_options"] = "-std=c++17"
 
     querystring = {
         "base64_encoded": "false",

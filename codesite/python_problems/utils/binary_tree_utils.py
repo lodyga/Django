@@ -27,7 +27,7 @@ class TreeNode:
         self.right = right
 
 
-def build_binary_tree(node_list: List[int], node_type: TreeNode = TreeNode, with_lookup: bool = False) -> TreeNode:
+def build_binary_tree(values: List[int], node_type: TreeNode = TreeNode, with_lookup: bool = False) -> TreeNode:
     """
     Build binary tree from level order traversal list.
 
@@ -36,32 +36,32 @@ def build_binary_tree(node_list: List[int], node_type: TreeNode = TreeNode, with
     """
     # if tree.Node from binarytree is used
     # if node_type == tree.Node:
-    #     return tree.build2(node_list)
+    #     return tree.build2(values)
 
-    while node_list and node_list[-1] is None:
-        node_list.pop()
+    while values and values[-1] is None:
+        values.pop()
 
-    if not node_list:
+    if not values:
         return None
-    elif type(node_list) not in (list, tuple):
+    elif type(values) not in (list, tuple):
         raise TypeError(
-            "Expected a list, got " + str(type(node_list).__name__)
+            "Expected a list, got " + str(type(values).__name__)
         )
 
-    root = node_type(node_list[0])
+    root = node_type(values[0])
     queue = deque([root])
     index = 1
     lookup = {root.val: root} if with_lookup else None
 
-    while index < len(node_list):
+    while index < len(values):
         node = queue.popleft()
 
         # Assign the left child if available
         if (
-            index < len(node_list) and
-            node_list[index] is not None
+            index < len(values) and
+            values[index] is not None
         ):
-            node.left = node_type(node_list[index])
+            node.left = node_type(values[index])
             queue.append(node.left)
             if with_lookup:
                 lookup[node.left.val] = node.left
@@ -69,10 +69,10 @@ def build_binary_tree(node_list: List[int], node_type: TreeNode = TreeNode, with
 
         # Assign the right child if available
         if (
-            index < len(node_list) and
-            node_list[index] is not None
+            index < len(values) and
+            values[index] is not None
         ):
-            node.right = node_type(node_list[index])
+            node.right = node_type(values[index])
             queue.append(node.right)
             if with_lookup:
                 lookup[node.right.val] = node.right

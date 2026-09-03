@@ -183,8 +183,8 @@ class CppAdapter(LanguageAdapter):
         ),
         binary_tree=BinaryTreeConfig(
             utils_file="binary_tree_utils.cpp",
-            build="build_binary_tree",
-            serialize="serialize_binary_tree",
+            build="buildBinaryTree",
+            serialize="serializeBinaryTree",
         ),
         class_design=ClassDesignConfig(
             utils_file="class_design_utils.cpp",
