@@ -23,22 +23,23 @@ def is_localhost():
 
 def run_judge0(source_code, language):
     language_name_to_id = {
-        "Python": 71,
-        "JavaScript": 63,
+        "Python": 71,  # Python (3.8.1) -> Python (3.12.13)
+        "JavaScript": 63,  # JavaScript (Node.js 12.14.0) -> JavaScript (Node.js 22.19.0)
         "Java": 62,
-        "C++": 54,
+        "C++": 54,  # C++15 (GCC 9.2.0) -> C++17 (GCC 9.2.0)
         "TypeScript": 74,
     }
 
     language_id = language_name_to_id[language]
 
-    host_url = "http://localhost:2358" if is_localhost() else "https://judge0-ce.p.rapidapi.com"
-
+    host_url = "http://158.101.162.117/judge0"
     submissions_url = host_url + "/submissions"
+
     headers = {
         "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
         "x-rapidapi-key": JUDGE0_API_KEY
     }
+    headers = {}
 
     serialized_code = {
         "source_code": source_code,
