@@ -5,6 +5,7 @@ from .code_assembly import (
     clean_python_types,
     attach_utils,
     attach_validation_payload,
+    is_pythonanywhere,
 )
 from .response_validation import (
     validate_response,
@@ -14,32 +15,27 @@ from .problem_helpers import (
 )
 
 
-def is_localhost():
-    # localhost_list = ["127.0.0.1", "127.0.1.1", "::1"]
-    hostname = socket.gethostname()
-    # host_ip = socket.gethostbyname(hostname)
-    return hostname == "GF108"
-
-
 def run_judge0(source_code, language):
     language_name_to_id = {
-        "Python": 71,  # Python (3.8.1) -> Python (3.12.13)
-        "JavaScript": 63,  # JavaScript (Node.js 12.14.0) -> JavaScript (Node.js 22.19.0)
+        "Python": 71,
+        # Python (3.8.1) -> Python (3.12.13)
+        "JavaScript": 63,
+        # JavaScript (Node.js 12.14.0) -> JavaScript (Node.js 22.19.0)
         "Java": 62,
-        "C++": 54,  # C++15 (GCC 9.2.0) -> C++17 (GCC 9.2.0)
+        "C++": 54,
+        # C++15 (GCC 9.2.0) -> C++17 (GCC 9.2.0)
         "TypeScript": 74,
     }
 
     language_id = language_name_to_id[language]
 
-    host_url = "http://158.101.162.117/judge0"
+    host_url = "https://judge0-ce.p.rapidapi.com" if is_pythonanywhere() else "http://158.101.162.117/judge0"
     submissions_url = host_url + "/submissions"
 
     headers = {
         "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
         "x-rapidapi-key": JUDGE0_API_KEY
     }
-    headers = {}
 
     serialized_code = {
         "source_code": source_code,

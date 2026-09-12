@@ -1,3 +1,4 @@
+import os
 import re
 from django.conf import settings
 from python_problems.models import ProblemType
@@ -337,28 +338,53 @@ def attach_problem_type_header(source_code, problem_type, language):
     return header + source_code
 
 
+def is_pythonanywhere():
+    return os.getenv("PYTHONANYWHERE")
+
+
 def get_placeholder_hello(language):
     """
     Set default `Hello, world!` placeholder.
     """
-    match language.id:
-        case 1:
-            placeholder_hello = """# Python (3.12.13)\n\nclass Solution:\n\tdef fun(self, x: str) -> str:\n\t\treturn x\n\nsolution = Solution()\nprint(solution.fun("Hello, World!"))"""
-        case 2:
-            placeholder_hello = """// JavaScript (Node.js 22.19.0)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
-        case 7:
-            placeholder_hello = """// C++17 (GCC 9.2.0)\n\n#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, World!";\n  return 0;\n}"""
-        case 6:
-            placeholder_hello = """// Java (OpenJDK 13.0.1)\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}"""
-        case 3:
-            placeholder_hello = """# Python (3.8.1)\nimport pandas as pd\n\n"""
-        case 4:
-            placeholder_hello = """SELECT *\nFROM *\nWHERE *"""
-        case 5:
-            placeholder_hello = """SELECT *\nFROM *\nWHERE *"""
-        case 8:
-            placeholder_hello = """// TypeScript (3.7.4)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
-        case _:
-            placeholder_hello = """Not known programming language."""
+    if is_pythonanywhere():
+        match language.id:
+            case 1:
+                placeholder_hello = """# Python (3.8.1)\n\nclass Solution:\n\tdef fun(self, x: str) -> str:\n\t\treturn x\n\nsolution = Solution()\nprint(solution.fun("Hello, World!"))"""
+            case 2:
+                placeholder_hello = """// JavaScript (Node.js 12.14.0)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
+            case 7:
+                placeholder_hello = """// C++15 (GCC 9.2.0)\n\n#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, World!";\n  return 0;\n}"""
+            case 6:
+                placeholder_hello = """// Java (OpenJDK 13.0.1)\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}"""
+            case 3:
+                placeholder_hello = """# Python (3.8.1)\nimport pandas as pd\n\n"""
+            case 4:
+                placeholder_hello = """SELECT *\nFROM *\nWHERE *"""
+            case 5:
+                placeholder_hello = """SELECT *\nFROM *\nWHERE *"""
+            case 8:
+                placeholder_hello = """// TypeScript (3.7.4)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
+            case _:
+                placeholder_hello = """Not known programming language."""
+    else:
+        match language.id:
+            case 1:
+                placeholder_hello = """# Python (3.12.13)\n\nclass Solution:\n\tdef fun(self, x: str) -> str:\n\t\treturn x\n\nsolution = Solution()\nprint(solution.fun("Hello, World!"))"""
+            case 2:
+                placeholder_hello = """// JavaScript (Node.js 22.19.0)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
+            case 7:
+                placeholder_hello = """// C++17 (GCC 9.2.0)\n\n#include <iostream>\nusing namespace std;\n\nint main() {\n  cout << "Hello, World!";\n  return 0;\n}"""
+            case 6:
+                placeholder_hello = """// Java (OpenJDK 13.0.1)\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}"""
+            case 3:
+                placeholder_hello = """# Python (3.8.1)\nimport pandas as pd\n\n"""
+            case 4:
+                placeholder_hello = """SELECT *\nFROM *\nWHERE *"""
+            case 5:
+                placeholder_hello = """SELECT *\nFROM *\nWHERE *"""
+            case 8:
+                placeholder_hello = """// TypeScript (3.7.4)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
+            case _:
+                placeholder_hello = """Not known programming language."""
 
     return placeholder_hello
