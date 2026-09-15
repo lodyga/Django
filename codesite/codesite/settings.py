@@ -7,9 +7,16 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 APP_NAME = "Codesite"
 
-# SECURITY WARNING: don't run with debug turned on in production!
 # When False enable static files handler.
-DEBUG = True if os.getenv("DJANGO_DEBUG", "False") == "True" else False
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+
+
+# HTTPS
+# When I'm behind a reverse proxy, trust X-Forwarded-Proto to determine whether the original client connection was HTTPS.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# Every HTTP request should be redirected to HTTPS.
+SECURE_SSL_REDIRECT = not DEBUG
+
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -17,7 +24,7 @@ ALLOWED_HOSTS = [
     "localhost",  # local Docker
     "codesite.onrender.com",  # Docker container on Render
     "testserver",  # Testing in Activity Bar
-    "158.101.162.117",  # Oracle VM
+    "158.101.162.117",  # Oracle Micro VM
 ]
 
 INSTALLED_APPS = [
@@ -138,12 +145,17 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesSto
 
 
 # Configure the social login.
-SOCIAL_AUTH_GITHUB_KEY = os.getenv("SOCIAL_AUTH_GITHUB_KEY")
-SOCIAL_AUTH_GITHUB_SECRET = os.getenv("SOCIAL_AUTH_GITHUB_SECRET")
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+# Social auth from environmental variables.
+SOCIAL_AUTH_GITHUB_KEY = os.getenv(
+    "SOCIAL_AUTH_GITHUB_KEY")
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv(
+    "SOCIAL_AUTH_GITHUB_SECRET")
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv(
+    "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv(
     "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
+# Social auth from a file.
 try:
     from .auth import social_auth
     SOCIAL_AUTH_GITHUB_KEY = SOCIAL_AUTH_GITHUB_KEY or social_auth.SOCIAL_AUTH_GITHUB_KEY
@@ -151,8 +163,9 @@ try:
     SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = SOCIAL_AUTH_GOOGLE_OAUTH2_KEY or social_auth.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
     SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET or social_auth.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
     # SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = social_auth.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
-finally:
+except:
     pass
+
 
 # Social
 AUTHENTICATION_BACKENDS = (

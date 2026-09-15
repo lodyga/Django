@@ -287,3 +287,10 @@ npx playwright test --debug
 
 Show browser:
 npx playwright test --headed
+
+
+// env variable
+export DJANGO_DEBUG=True
+echo $DJANGO_DEBUG
+env | grep "DJANGO_DEBUG"
+

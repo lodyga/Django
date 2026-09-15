@@ -107,6 +107,7 @@ sudo systemctl reload nginx
 sudo nginx -t
 sudo systemctl start nginx
 sudo systemctl status nginx
+sudo nginx -T  # show configuration
 
 
 
@@ -138,3 +139,35 @@ sudo systemctl stop nginx
 sudo systemctl restart nginx
 sudo systemctl reload nginx
 sudo systemctl status nginx
+
+
+
+# test judge0
+curl -k -X POST \
+  'https://158.101.162.117/judge0/submissions?base64_encoded=false&wait=true' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "language_id": 71,
+    "source_code": "print(\"hello from HTTPS\")"
+  }'
+
+
+curl -k -L -X POST \
+  'http://158.101.162.117/judge0/submissions?base64_encoded=false&wait=true' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "language_id": 71,
+    "source_code": "print(\"hello from HTTP redirect\")"
+  }'
+
+curl -L -X POST \
+  'http://158.101.162.117/judge0/submissions?base64_encoded=false&wait=true' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "language_id": 71,
+    "source_code": "print(\"hello from HTTP redirect\")"
+  }'
+
+curl -I http://158.101.162.117/judge0
+
+

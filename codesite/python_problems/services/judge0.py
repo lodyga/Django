@@ -17,19 +17,19 @@ from .problem_helpers import (
 
 def run_judge0(source_code, language):
     language_name_to_id = {
-        "Python": 71,
         # Python (3.8.1) -> Python (3.12.13)
-        "JavaScript": 63,
+        "Python": 71,
         # JavaScript (Node.js 12.14.0) -> JavaScript (Node.js 22.19.0)
-        "Java": 62,
-        "C++": 54,
+        "JavaScript": 63,
         # C++15 (GCC 9.2.0) -> C++17 (GCC 9.2.0)
+        "C++": 54,
+        "Java": 62,
         "TypeScript": 74,
     }
 
     language_id = language_name_to_id[language]
 
-    host_url = "https://judge0-ce.p.rapidapi.com" if is_pythonanywhere() else "http://158.101.162.117/judge0"
+    host_url = "https://judge0-ce.p.rapidapi.com" if is_pythonanywhere() else "https://158.101.162.117/judge0"
     submissions_url = host_url + "/submissions"
 
     headers = {
