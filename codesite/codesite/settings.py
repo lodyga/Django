@@ -6,9 +6,8 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 APP_NAME = "Codesite"
-
-# When False enable static files handler.
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+ENV = os.getenv("DJANGO_ENV", "local")
+DEBUG = ENV == "local"
 
 
 # HTTPS
@@ -121,6 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -193,3 +193,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # INTERNAL_IPS = [
 #     "127.0.0.1",
 # ]
+
+
+JUDGE0_URL = "https://judge0-ce.p.rapidapi.com" if ENV == "pythonanywhere" else "https://158.101.162.117/judge0"

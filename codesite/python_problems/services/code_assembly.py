@@ -1,5 +1,6 @@
 import os
 import re
+from codesite.settings import ENV
 from django.conf import settings
 from python_problems.models import ProblemType
 from .languages import get_language_name, LANGUAGE_ADAPTERS
@@ -338,15 +339,11 @@ def attach_problem_type_header(source_code, problem_type, language):
     return header + source_code
 
 
-def is_pythonanywhere():
-    return os.getenv("PYTHONANYWHERE")
-
-
 def get_placeholder_hello(language):
     """
     Set default `Hello, world!` placeholder.
     """
-    if is_pythonanywhere():
+    if ENV == "pythonanywhere":
         match language.id:
             case 1:
                 placeholder_hello = """# Python (3.8.1)\n\nclass Solution:\n\tdef fun(self, x: str) -> str:\n\t\treturn x\n\nsolution = Solution()\nprint(solution.fun("Hello, World!"))"""

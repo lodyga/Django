@@ -1,11 +1,11 @@
 import requests
 import socket
 from codesite.auth.judge0_auth import JUDGE0_API_KEY
+from codesite.settings import JUDGE0_URL
 from .code_assembly import (
     clean_python_types,
     attach_utils,
     attach_validation_payload,
-    is_pythonanywhere,
 )
 from .response_validation import (
     validate_response,
@@ -28,9 +28,7 @@ def run_judge0(source_code, language):
     }
 
     language_id = language_name_to_id[language]
-
-    host_url = "https://judge0-ce.p.rapidapi.com" if is_pythonanywhere() else "https://158.101.162.117/judge0"
-    submissions_url = host_url + "/submissions"
+    submissions_url = JUDGE0_URL + "/submissions"
 
     headers = {
         "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
