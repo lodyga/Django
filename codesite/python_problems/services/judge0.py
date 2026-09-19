@@ -1,7 +1,11 @@
 import requests
-import socket
-from codesite.auth.judge0_auth import JUDGE0_API_KEY
-from codesite.settings import JUDGE0_URL
+from codesite.auth.rapidapi_auth import RAPIDAPI_KEY
+from codesite.auth.judge0_auth import JUDGE0_AUTHN_TOKEN
+from codesite.settings import (
+    JUDGE0_URL,
+    ENV
+)
+from django.core.exceptions import ValidationError
 from .code_assembly import (
     clean_python_types,
     attach_utils,
@@ -30,10 +34,15 @@ def run_judge0(source_code, language):
     language_id = language_name_to_id[language]
     submissions_url = JUDGE0_URL + "/submissions"
 
-    headers = {
-        "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
-        "x-rapidapi-key": JUDGE0_API_KEY
-    }
+    if ENV == "pythonanywhere":
+        headers = {
+            "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
+            "x-rapidapi-key": RAPIDAPI_KEY
+        }
+    else:
+        headers = {
+            "X-Auth-Token": JUDGE0_AUTHN_TOKEN
+        }
 
     serialized_code = {
         "source_code": source_code,
@@ -48,14 +57,17 @@ def run_judge0(source_code, language):
         "wait": "true"
     }
 
-    response = requests.post(
+    raw_response = requests.post(
         submissions_url,
         json=serialized_code,
         headers=headers,
         params=querystring
-    ).json()
+    )
 
-    return response
+    if raw_response.ok is False:
+        raise ValidationError(f"{raw_response.status_code}: {raw_response.reason}")
+
+    return raw_response.json()
 
 
 def handle_response_error(response):

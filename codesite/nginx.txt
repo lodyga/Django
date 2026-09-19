@@ -97,8 +97,8 @@ sudo systemctl status codesite
 
 
 
-sudo systemctl daemon-reload  # restart when changed service files
-sudo systemctl restart codesite  # when changed Django/Python code + sudo systemctl daemon-reload
+sudo systemctl restart codesite  # when Django/Python code changed
+sudo systemctl daemon-reload && sudo systemctl restart codesite  # when codesite.service changed
 sudo systemctl status codesite --no-pager
 sudo nginx -t
 sudo systemctl reload nginx
@@ -169,5 +169,14 @@ curl -L -X POST \
   }'
 
 curl -I http://158.101.162.117/judge0
+
+
+# with automatication headers
+curl -k -X POST \
+  https://158.101.162.117/judge0/submissions?wait=true \
+  -H "Content-Type: application/json" \
+  -H "X-RapidAPI-Host: definitely-wrong" \
+  -H "X-RapidAPI-Key: definitely-wrong" \
+  -d '{"language_id":71,"source_code":"print(123)"}'
 
 
