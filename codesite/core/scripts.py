@@ -1,10 +1,16 @@
 import cohere
 import json
+import os
 from cerebras.cloud.sdk import Cerebras
 from google import genai
 from mistralai.client import Mistral
-from codesite.auth.ai_auth import *
 from django.http import JsonResponse, StreamingHttpResponse
+
+
+COHERE_API_KEY = os.environ["COHERE_API_KEY"]
+GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+MISTRAL_API_KEY = os.environ["MISTRAL_API_KEY"]
+CERBERAS_API_KEY = os.environ["CERBERAS_API_KEY"]
 
 
 def format_sse(data, event=None):

@@ -1,9 +1,8 @@
+import os
 import requests
-from codesite.auth.rapidapi_auth import RAPIDAPI_KEY
-from codesite.auth.judge0_auth import JUDGE0_AUTHN_TOKEN
 from codesite.settings import (
     JUDGE0_URL,
-    ENV
+    ENV,
 )
 from django.core.exceptions import ValidationError
 from .code_assembly import (
@@ -17,6 +16,10 @@ from .response_validation import (
 from .problem_helpers import (
     get_problem_metadata,
 )
+
+
+JUDGE0_AUTHN_TOKEN = os.environ["JUDGE0_AUTHN_TOKEN"]
+RAPIDAPI_KEY = os.environ["RAPIDAPI_KEY"]
 
 
 def run_judge0(source_code, language):

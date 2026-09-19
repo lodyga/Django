@@ -1,10 +1,10 @@
 import os
-from .auth.secret_key import SECRET_KEY
 from .auth import databases
 from pathlib import Path
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 APP_NAME = "Codesite"
 ENV = os.getenv("DJANGO_ENV", "local")
 DEBUG = ENV == "local"
@@ -106,18 +106,10 @@ if hasattr(databases, "DATABASES"):
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
 
@@ -145,7 +137,6 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesSto
 
 
 # Configure the social login.
-# Social auth from environmental variables.
 SOCIAL_AUTH_GITHUB_KEY = os.getenv(
     "SOCIAL_AUTH_GITHUB_KEY")
 SOCIAL_AUTH_GITHUB_SECRET = os.getenv(
@@ -154,17 +145,6 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv(
     "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv(
     "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
-
-# Social auth from a file.
-try:
-    from .auth import social_auth
-    SOCIAL_AUTH_GITHUB_KEY = SOCIAL_AUTH_GITHUB_KEY or social_auth.SOCIAL_AUTH_GITHUB_KEY
-    SOCIAL_AUTH_GITHUB_SECRET = SOCIAL_AUTH_GITHUB_SECRET or social_auth.SOCIAL_AUTH_GITHUB_SECRET
-    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = SOCIAL_AUTH_GOOGLE_OAUTH2_KEY or social_auth.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
-    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET or social_auth.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
-    # SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = social_auth.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
-except:
-    pass
 
 
 # Social
