@@ -97,6 +97,7 @@ def serialize_binary_tree(root: TreeNode) -> List[int]:
 
     while any(queue):
         queue_for_level = deque()
+
         while queue:
             node = queue.popleft()
             values.append(node.val if node else None)

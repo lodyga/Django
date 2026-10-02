@@ -1,3 +1,19 @@
+# list containers
+docker container ls
+
+# bash to running container
+docker exec -it CONTAINER_ID bash
+
+
+# rebuild container
+docker build -t judge0-custom:1.13.1 .
+
+# rubuild compose
+docker compose build
+docker compose up -d
+
+
+
 # login
 $ docker login
 

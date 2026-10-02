@@ -18,6 +18,11 @@
             "dependsOn": [
                 "docker-build"
             ],
+            "dockerRun": {
+                "envFiles": [
+                    "${workspaceFolder}/.env"
+                ]
+            },
             "python": {
                 "args": [
                     "runserver",

@@ -24,6 +24,7 @@ ALLOWED_HOSTS = [
     "codesite.onrender.com",  # Docker container on Render
     "testserver",  # Testing in Activity Bar
     "158.101.162.117",  # Oracle Micro VM
+    "130.61.85.9",  # Oracle Flex VM
 ]
 
 INSTALLED_APPS = [
@@ -176,3 +177,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 JUDGE0_URL = "https://judge0-ce.p.rapidapi.com" if ENV == "pythonanywhere" else "https://158.101.162.117/judge0"
+# JUDGE0_URL = "http://localhost:2358"

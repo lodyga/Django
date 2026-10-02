@@ -35,7 +35,11 @@ RUN python -m pip install --upgrade pip && \
 
 COPY . /app
 
-RUN python manage.py collectstatic --noinput
+# `collectstatic` imports Django settings during the image build.  Runtime
+# environment variables are not available then, so use a non-secret,
+# build-only value.  The application still requires DJANGO_SECRET_KEY when
+# the container starts.
+RUN DJANGO_SECRET_KEY=build-time-placeholder python manage.py collectstatic --noinput
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
 # For more info, please refer to https://aka.ms/vscode-docker-python-configure-containers

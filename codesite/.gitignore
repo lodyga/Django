@@ -13,6 +13,8 @@ temp2.py
 temp.md
 data.json
 .codex
+.env
+
 
 # Playwright
 node_modules/
