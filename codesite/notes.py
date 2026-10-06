@@ -90,7 +90,9 @@ evenly
 <div class="align-items-center"
 <div class="col-auto">
 
-pip install -r /path/to/requirements.txt
+
+python -m venv .django6env
+pip install -r requirements.txt
 
 
 btn.classList.remove('btn-secondary');

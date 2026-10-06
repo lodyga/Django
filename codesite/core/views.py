@@ -47,6 +47,3 @@ def gemini_stream_view(request):
 def mistral_stream_view(request):
     return get_mistral_response(request)
 
-
-def cerberas_stream_view(request):
-    return get_cerberas_response(request)

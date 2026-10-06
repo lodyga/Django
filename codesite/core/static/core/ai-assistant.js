@@ -49,13 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
       currentAiStartIndex = chatBox.value.length;
       appendMessage("AI", "");
 
-      const cerberasModels = new Set(["gpt", "zai", "llama", "qwen"]);
       let streamUrl = "";
-      if (cerberasModels.has(activeModel)) {
-         streamUrl = `/chat/cerberas/stream/?model_name=${encodeURIComponent(activeModel)}&message=${encodeURIComponent(message)}`;
-      } else {
-         streamUrl = `/chat/${activeModel}/stream/?message=${encodeURIComponent(message)}`;
-      }
+      streamUrl = `/chat/${activeModel}/stream/?message=${encodeURIComponent(message)}`;
       activeEventSource = new EventSource(streamUrl);
 
       activeEventSource.onmessage = (event) => {

@@ -1,7 +1,6 @@
 import cohere
 import json
 import os
-from cerebras.cloud.sdk import Cerebras
 from google import genai
 from mistralai.client import Mistral
 from django.http import JsonResponse, StreamingHttpResponse
@@ -10,7 +9,6 @@ from django.http import JsonResponse, StreamingHttpResponse
 COHERE_API_KEY = os.environ["COHERE_API_KEY"]
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 MISTRAL_API_KEY = os.environ["MISTRAL_API_KEY"]
-CERBERAS_API_KEY = os.environ["CERBERAS_API_KEY"]
 
 
 def format_sse(data, event=None):
@@ -23,59 +21,6 @@ def format_sse(data, event=None):
         # No space after ":" to preserve leading spaces in data
         payload_lines.append(f"data:{line}")
     return "\n".join(payload_lines) + "\n\n"
-
-
-def get_cerberas_response(request):
-    # Cerebras:
-    user_message = request.GET.get("message")
-    model_map = {
-        "gpt": "gpt-oss-120b",
-        "zai": "zai-glm-4.7",
-        "llama": "llama3.1-8b",
-        "qwen": "qwen-3-235b-a22b-instruct-2507",
-    }
-    model = model_map[request.GET.get("model_name", "llama")]
-    client = Cerebras(api_key=CERBERAS_API_KEY)
-    messages = [
-        {
-            "role": "user",
-            "content": user_message,
-        }
-    ]
-
-    def event_stream():
-        if not user_message:
-            yield "event: error\n\n"
-            return
-
-        tokens = []
-        stream = client.chat.completions.create(
-            messages=messages,
-            model=model,
-            stream=True,
-        )
-
-        for chunk in stream:
-            delta = None
-            if hasattr(chunk, "choices"):
-                delta = chunk.choices[0].delta.content
-            elif hasattr(chunk, "data"):
-                delta = chunk.data.choices[0].delta.content
-
-            if delta:
-                tokens.append(delta)
-                yield f"data:{delta}\n\n"
-
-        payload = json.dumps({"final": "".join(tokens)})
-        yield format_sse(payload, event="done")
-
-    response = StreamingHttpResponse(
-        event_stream(),
-        content_type="text/event-stream",
-    )
-    response["Cache-Control"] = "no-cache"
-    response["X-Accel-Buffering"] = "no"
-    return response
 
 
 def get_cohere_response(request):
@@ -118,8 +63,6 @@ def get_cohere_response(request):
 
 
 def get_gemini_response(request):
-    # google.genai.errors.ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
-    # Google: Gemini Flash 2.5
     user_message = request.GET.get("message")
 
     client = genai.Client(api_key=GEMINI_API_KEY)
@@ -130,6 +73,7 @@ def get_gemini_response(request):
             return
 
         tokens = []
+
         stream = client.interactions.create(
             model="gemini-2.5-flash",
             input=user_message,
@@ -137,18 +81,17 @@ def get_gemini_response(request):
         )
 
         for chunk in stream:
-            if chunk.event_type == "content.delta":
+            if chunk.event_type == "step.delta":
+                delta = ""
+
                 if chunk.delta.type == "text":
                     delta = chunk.delta.text
-                elif chunk.delta.type == "thought_summary":
-                    delta = getattr(chunk.delta.content, "text", "")
-                else:
-                    delta = ""
 
                 if delta:
                     tokens.append(delta)
                     yield f"data:{delta}\n\n"
-            elif chunk.event_type == "interaction.complete":
+
+            elif chunk.event_type == "interaction.completed":
                 break
 
         payload = json.dumps({"final": "".join(tokens)})
