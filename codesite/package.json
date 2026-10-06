@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test:e2e": "playwright test",
-    "test:e2e:vm": "BASE_URL=https://158.101.162.117 playwright test"
+    "test:e2e:vm": "BASE_URL=https://158.101.162.117 playwright test",
+    "test:e2e:vm2": "BASE_URL=https://130.61.85.9 playwright test"
   },
   "keywords": [],
   "author": "",

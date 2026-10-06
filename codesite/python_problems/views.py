@@ -302,13 +302,33 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         tag_list = problem.tags.all()
 
         # Get related problems.
-        common_tags = Count("tags", filter=Q(tags__in=problem.tags.all()))
+        min_tag_count = problem.tags.count()
+        if min_tag_count > 3:
+            min_tag_count -= 1
+
+        common_tags = Count(
+            "tags",
+            filter=Q(tags__in=problem.tags.all()),
+            distinct=True,
+        )
+
+        tag_ids = problem.tags.values("pk")
+
+        related_ids = (
+            Problem.tags.through.objects
+            .filter(tag_id__in=tag_ids)
+            .values("problem_id")
+            .annotate(common_tags=Count("tag_id", distinct=True))
+            .filter(common_tags=min_tag_count)
+            .values("problem_id")
+        )
+
         related_problems = (
             Problem.objects
-            .annotate(common_tags=common_tags)
-            .filter(common_tags__gte=3)
+            .filter(pk__in=related_ids)
             .exclude(pk=problem.pk)
-            .distinct())
+            .defer("description")
+        )
 
         prev_problem_slug, next_problem_slug = get_adjacent_slugs(problem)
 
