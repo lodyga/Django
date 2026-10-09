@@ -1,5 +1,6 @@
 import html
 import json
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory, SimpleTestCase, TestCase
@@ -989,6 +990,90 @@ class SolutionDetailViewTests(TestCase):
         self.assertEqual(
             response.context["clipboard_test_cases"],
             "\nsolution = Solution()\nprint(solution.twoSum([2, 7, 11, 15], 9), [0, 1])\n",
+        )
+
+
+class ProblemDetailPostTests(TestCase):
+    def setUp(self):
+        self.language, _ = Language.objects.get_or_create(name="Python")
+        self.problem = create_sample_problem()
+        self.solution = create_sample_solution(
+            problem=self.problem,
+            language=self.language,
+        )
+        self.url = reverse(
+            "python_problems:problem-detail",
+            kwargs={"slug": self.problem.slug, "language": self.language.name},
+        )
+
+    def test_no_source_code_returns_error_tuple(self):
+        with patch("python_problems.views.execute_code") as execute_code:
+            response = self.client.post(
+                self.url,
+                {
+                    "code_container": "",
+                    "code_form_action": "run",
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["output_container"],
+            [("Error", "No code to run.")],
+        )
+        execute_code.assert_not_called()
+
+    def test_no_testcases_returns_error_tuple(self):
+        with patch("python_problems.views.execute_code") as execute_code:
+            response = self.client.post(
+                self.url,
+                {
+                    "code_container": "print('Hello, World!')",
+                    "code_form_action": "run",
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["output_container"],
+            [("Error", "No test cases.")],
+        )
+        execute_code.assert_not_called()
+
+    @patch("python_problems.views.execute_code")
+    def test_judge_response_is_converted_to_output_tuples(self, execute_code):
+        create_problem_test_case(problem=self.problem)
+        execute_code.return_value = {
+            "status": {"description": "Accepted"},
+            "stderr": None,
+            "stdout": "Hello, World!",
+            "time": "0.01",
+            "memory": 1024,
+        }
+
+        response = self.client.post(
+            self.url,
+            {
+                "code_container": "print('Hello, World!')",
+                "code_form_action": "run",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["output_container"],
+            [
+                ("Status", "Accepted"),
+                ("Stdout", "Hello, World!"),
+                ("Time", "0.01 seconds"),
+                ("Memory", "1024 kilobytes"),
+            ],
+        )
+        execute_code.assert_called_once_with(
+            self.problem,
+            "print('Hello, World!')",
+            self.language.name,
+            "run",
         )
 
 

@@ -1,12 +1,4 @@
-# add move zeros in-place tests
-# Unique paths no input variable name under Test Cases.
-# Priority Queue; Cannot use import statement outside a module, K Closest Points to Origin attach import only to pQ problems
-# Binary Search Tree Iterator is class and binary tree problem
-# Island Perimeter
-# fix all redirect, redirect after adding new problem/solution
-# add/remove tags privliges
-# fix all back
-# fordbid run and validate if no test cases.
+
 # remove problem type, method name, argument names,  comparison type fields or meaby not
 # fix next slug # get_adjacent_slugs(problem, language)
 # add js heap to metadata
@@ -36,11 +28,13 @@
 # dev opts for update|delete
 # search bar AND OR
 # chanege python to code_problems...
-# selenium for testing darkmode
 # Task Scheduler C++ input list to vector, JS add queue
 # Design Tweeter C++
 # Find in Mountain Array
 # Construct Binary Tree from Preorder and Inorder Traversal, in serialize c++ null is INT_MAX
+# Priority Queue; Cannot use import statement outside a module, K Closest Points to Origin attach import only to pQ problems
+# Binary Search Tree Iterator is class and binary tree problem
+# add/remove tags privliges
 
 
 """

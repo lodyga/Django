@@ -358,13 +358,50 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         })
         return context
 
+    def get_output_container(self, problem, source_code, language, button_pressed, context):
+        if not button_pressed:
+            return context["output_container"]
+
+        if not source_code:
+            output_container = [("Error", "No code to run.")]
+        elif not problem.testcases.all():
+            output_container = [("Error", "No test cases.")]
+        else:
+            output = execute_code(
+                problem,
+                source_code,
+                language.name,
+                button_pressed,
+            )
+
+            if "error" in output:
+                output_container = [("Error", output["error"])]
+            else:
+                output_container = [
+                    ("Status", output["status"]["description"])]
+
+                if output["stderr"]:
+                    output_container.append(("Stderr", output["stderr"]))
+                elif "stdout" in output:
+                    output_container.append(("Stdout", output["stdout"]))
+
+                if "result" in output:
+                    output_container.append(("Result", output["result"]))
+                if "time" in output:
+                    output_container.append(
+                        ("Time", f'{output["time"]} seconds'))
+                if "memory" in output:
+                    output_container.append(
+                        ("Memory", f'{output["memory"]} kilobytes'))
+
+        return output_container
+
     def post(self, request, **kwargs):
         problem = self.object = self.get_object()
         context = self.get_context_data(**kwargs)
         User = get_user_model()
 
         button_pressed = request.POST.get("code_form_action")
-        is_code_container_filled = "code_container" in request.POST
 
         if "language_id" in request.POST:
             language_id = request.POST.get("language_id")
@@ -388,23 +425,11 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         )
         owner_solutions = owner_solution_data["owner_solutions"]
         owner_solution_languages = owner_solution_data["owner_solution_languages"]
-
-        # Run or validate code
-        if (
-            button_pressed and
-            is_code_container_filled
-        ):
-            source_code = request.POST.get("code_container")
-            output = execute_code(
-                problem,
-                source_code,
-                language.name,
-                button_pressed,
-            )
-            output_container = output
-        else:
-            source_code = context["source_code"]
-            output_container = context["output_container"]
+        source_code = request.POST.get("code_container")
+        output_container = self.get_output_container(
+            problem, source_code, language, button_pressed, context
+        )
+        source_code = source_code or context["source_code"]
 
         context.update({
             "source_code": source_code,
