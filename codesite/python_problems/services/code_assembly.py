@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 from codesite.settings import ENV
 from django.conf import settings
 from python_problems.models import ProblemType
@@ -343,6 +344,14 @@ def get_placeholder_hello(language):
     """
     Set default `Hello, world!` placeholder.
     """
+    # Sth to consider
+    # Checks env pyton version, but should chek judge python version
+    match language.id:
+        case 100:
+            language_verison = f"Python ({sys.version.split(' ')[0]})"
+            placeholder_hello = f"""# {language_verison}\n\nclass Solution:\n\tdef fun(self, x: str) -> str:\n\t\treturn x\n\nsolution = Solution()\nprint(solution.fun("Hello, World!"))"""
+            return placeholder_hello
+
     if ENV == "pythonanywhere":
         match language.id:
             case 1:

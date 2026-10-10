@@ -1,24 +1,5 @@
-
-# remove problem type, method name, argument names,  comparison type fields or meaby not
-# fix next slug # get_adjacent_slugs(problem, language)
-# add js heap to metadata
-# case ComparisonType.EXACT | "equal" | "exact":
-# Python 3.8 doesn't support match / case statements.
-# setup cursor with proper method name
-# edit only own solutions
-# validate all test cases
-# in progress... preview based on data type:  (grid, matrix) preview veritcal preview for heights [1, 4, 6, 7, 6, 7]
-# wrap build_binary_tree and other around bt methods
-# for later
-# problem add, focus on that problem, exclude Problem, Language, Order fields
-# + soultion, hide problem & language fields
-# stop <pre></pre> in README.md => test cases
-# fix all redirects / back
-# import needed only get_heap_utils(language) + get_binary_tree_utils(language) + get_linked_list_utils(language) + source_code
-# better light mode
-# hints to buttons
 # color code output badge greee/red for pass/fail
-# code mode/browse mode
+
 # submit/ >> append, > overwrite
 # user dashboard
 # in detail view back button with filters precerved
@@ -35,6 +16,13 @@
 # Priority Queue; Cannot use import statement outside a module, K Closest Points to Origin attach import only to pQ problems
 # Binary Search Tree Iterator is class and binary tree problem
 # add/remove tags privliges
+# remove problem type, method name, argument names, comparison type fields or meaby not
+# fix next slug # get_adjacent_slugs(problem, language)
+# case ComparisonType.EXACT | "equal" | "exact":
+#?? setup cursor with proper method name
+# wrap build_binary_tree and other around bt methods
+# code mode/browse mode
+
 
 
 """

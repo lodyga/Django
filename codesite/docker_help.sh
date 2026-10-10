@@ -1,51 +1,59 @@
-# list containers
+# List all running containers
+docker ps
 docker container ls
 
-# bash to running container
-docker exec -it CONTAINER_ID bash
+# List images
+docker images      
 
+# Execute a command in a running container
+docker exec -it CONTAINER_ID/NAME bash
+docker exec -it judge0-v1131-workers-1 bash
+docker exec -it judge0-v1131-server-1 bash
+docker exec -it judge0-v1131-db-1 psql -U judge0 -d judge0
 
-# rebuild container
-docker build -t judge0-custom:1.13.1 .
-
-# rubuild compose
+# Build or rebuild services
 docker compose build
+
+# List containers
+docker compose ps
+
+# Create and start containers
 docker compose up -d
+docker compose -f judge0-v1.13.1/docker-compose.yml up -d
 
+# Stop and remove containers, networks
+docker compose down -v
 
+# Restart service containers
+docker compose restart
 
-# login
-$ docker login
-
-# build a container
-# Go to the directory containing your Dockerfile.
+# build/rebuild a container, where Dockerfile is
 $ docker build -t <name>:<tag> .
 $ docker build -t lodyga/codesite:latest .
+$ docker build -t judge0-custom:1.13.1 .
 
 # push container to dockerhub
-# docker push lodyga/codesite:latest
+$ docker push lodyga/codesite:latest
 
 # run a container
 $ docker run --rm -d -p 8000:8000/tcp lodyga/codesite:latest
+$ docker run --rm -it judge0-custom:1.13.1 bash
 
-# remove a container
+# Remove one or more images
 docker rmi IMAGE ID
 docker rmi REPOSITORY:TAG
 
-# List all running containers
-docker ps
-
-# List all containers
-docker ps -a
-
-# Stop the running container:
+# Stop one or more running containers
 docker stop <container_id>
 
-# Remove the stopped container:
+# Remove one or more containers
 docker rm <container_id>
 
 # List volumes
 docker volume ls
+
+# Remove unused local volumes
+docker volume prune
 
 # Inspect the specific volume
 docker volume inspect judge0-v1131_data
@@ -53,14 +61,5 @@ docker volume inspect judge0-v1131_data
 # Show server log
 docker logs --tail 200 judge0-v1131_server_1
 
-# Connect to db created by Docker
-docker exec -it judge0-v1131_db_1 psql -U judge0 -d judge0
-
-# This recreates the docker-compose services.
-docker compose -f judge0-v1.13.1/docker-compose.yml down -v
-docker compose -f judge0-v1.13.1/docker-compose.yml up -d
-
-# It removes containers, networks, and volumes created by that compose file.
-docker compose -f judge0-v1.13.1/docker-compose.yml down -v
-
-
+# login
+$ docker login

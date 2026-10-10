@@ -10,9 +10,9 @@
     ],
     "python.envFile": "${workspaceFolder}/.env",
     "search.exclude": {
-        "django6env/**": true,
+        ".django5env/**": true,
     },
-    "python.defaultInterpreterPath": "/home/ukasz/Documents/IT/Django/codesite/django6env/bin/python",
+    "python.defaultInterpreterPath": "/home/ukasz/Documents/IT/Django/codesite/.django5env/bin/python",
     "python-envs.pythonProjects": [
         {
             "path": "manage.py",

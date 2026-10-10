@@ -3,8 +3,7 @@ __pycache__
 .DS_Store
 db.sqlite3
 *.pyc
-django6env/
-.django6env/
+.django5env/
 auth/
 judge0*/
 reqirements42.txt
