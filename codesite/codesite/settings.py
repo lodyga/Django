@@ -9,13 +9,11 @@ APP_NAME = "Codesite"
 ENV = os.getenv("DJANGO_ENV", "local")
 DEBUG = ENV == "local"
 
-
 # HTTPS
 # When I'm behind a reverse proxy, trust X-Forwarded-Proto to determine whether the original client connection was HTTPS.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # Every HTTP request should be redirected to HTTPS.
 SECURE_SSL_REDIRECT = not DEBUG
-
 
 ALLOWED_HOSTS = [
     "127.0.0.1",

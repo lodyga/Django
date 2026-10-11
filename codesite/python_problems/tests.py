@@ -1019,7 +1019,7 @@ class ProblemDetailPostTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context["output_container"],
-            [("Error", "No code to run.")],
+            [("Error", ("No code to run.", "text-danger"))],
         )
         execute_code.assert_not_called()
 
@@ -1036,7 +1036,7 @@ class ProblemDetailPostTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.context["output_container"],
-            [("Error", "No test cases.")],
+            [("Error", ("No test cases.", "text-danger"))],
         )
         execute_code.assert_not_called()
 
@@ -1063,10 +1063,10 @@ class ProblemDetailPostTests(TestCase):
         self.assertEqual(
             response.context["output_container"],
             [
-                ("Status", "Accepted"),
-                ("Stdout", "Hello, World!"),
-                ("Time", "0.01 seconds"),
-                ("Memory", "1024 kilobytes"),
+                ("Status", ("Accepted", "text-success")),
+                ("Stdout", ("Hello, World!", "text-body")),
+                ("Time", ("0.01 seconds", "text-body")),
+                ("Memory", ("1024 kilobytes", "text-body")),
             ],
         )
         execute_code.assert_called_once_with(

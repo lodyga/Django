@@ -68,7 +68,10 @@
           <span class="badge bg-secondary col-auto">Code output:</span>
           <div class="form-control mb-2 col-auto" name="output_container">
             {% for pair in output_container %}
-              <code class="text-body d-block">{{ pair.0 }}: {{ pair.1 }}</code>
+              <div>
+                <code class="text-body">{{ pair.0 }}: </code>
+                <code class="{{ pair.1.1 }}">{{ pair.1.0 }}</code>
+              </div>
             {% endfor %}
           </div>
         </div>

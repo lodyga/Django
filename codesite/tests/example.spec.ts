@@ -123,8 +123,8 @@ test('user can run python hello world', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Stdout: Hello, World!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -147,8 +147,8 @@ test('user can run javascript hello world', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Stdout: Hello, World!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -171,8 +171,8 @@ test('user can run cpp hello world', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Stdout: Hello, World!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -195,8 +195,8 @@ test('user can run java hello world', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Stdout: Hello, World!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -224,8 +224,8 @@ test('user can validate python method', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -253,8 +253,8 @@ test('user can validate javascript method', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -282,8 +282,8 @@ test('user can validate C++ method', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -311,8 +311,8 @@ test('user can validate java method', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -342,8 +342,8 @@ test('validate python method with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -373,8 +373,8 @@ test('validate javascript method with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -404,8 +404,8 @@ test('validate C++ method with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -435,8 +435,8 @@ test('validate java method with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -466,8 +466,8 @@ test('validate python linked list with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -497,8 +497,8 @@ test('validate javascript linked list with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -528,8 +528,8 @@ test('validate C++ linked list with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -559,8 +559,8 @@ test('validate python binary tree with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -590,8 +590,8 @@ test('validate javascript binary tree with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -621,8 +621,8 @@ test('validate C++ binary tree with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -652,8 +652,8 @@ test('validate python class with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 
@@ -683,8 +683,8 @@ test('validate javascript class with solution1', async ({ page }) => {
 
     await expect(outputContainer).toContainText('Status: Accepted');
     await expect(outputContainer).toContainText('Result: Tests passed!');
-    await expect(outputContainer).toContainText(/Time: \d+(?:\.\d+)? seconds/);
-    await expect(outputContainer).toContainText(/Memory: \d+ kilobytes?/);
+    await expect(outputContainer).toContainText(/Time:\s*\d+(?:\.\d+)? seconds/);
+    await expect(outputContainer).toContainText(/Memory:\s*\d+ kilobytes?/);
 });
 
 

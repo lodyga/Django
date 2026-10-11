@@ -363,9 +363,9 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             return context["output_container"]
 
         if not source_code:
-            output_container = [("Error", "No code to run.")]
+            output_container = [("Error", ("No code to run.", "text-danger"))]
         elif not problem.testcases.all():
-            output_container = [("Error", "No test cases.")]
+            output_container = [("Error", ("No test cases.", "text-danger"))]
         else:
             output = execute_code(
                 problem,
@@ -375,24 +375,34 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             )
 
             if "error" in output:
-                output_container = [("Error", output["error"])]
+                output_container = [("Error", (output["error"], "text-body"))]
             else:
-                output_container = [
-                    ("Status", output["status"]["description"])]
+                if output["status"]["description"] == "Accepted":
+                    output_container = [
+                    ("Status", (output["status"]["description"], "text-success"))]
+                else:
+                    output_container = [
+                    ("Status", (output["status"]["description"], "text-body"))]
 
                 if output["stderr"]:
-                    output_container.append(("Stderr", output["stderr"]))
+                    output_container.append(("Stderr", (output["stderr"], "text-body")))
                 elif "stdout" in output:
-                    output_container.append(("Stdout", output["stdout"]))
+                    output_container.append(("Stdout", (output["stdout"], "text-body")))
 
                 if "result" in output:
-                    output_container.append(("Result", output["result"]))
+                    if output["result"] == "Tests passed!":
+                        output_container.append(("Result", (output["result"], "text-success")))
+                    else:
+                        output_container.append(("Result", (output["result"], "text-danger")))
+
                 if "time" in output:
                     output_container.append(
-                        ("Time", f'{output["time"]} seconds'))
+                        ("Time", (f'{output["time"]} seconds', "text-body"))
+                    )
                 if "memory" in output:
                     output_container.append(
-                        ("Memory", f'{output["memory"]} kilobytes'))
+                        ("Memory", (f'{output["memory"]} kilobytes', "text-body"))
+                    )
 
         return output_container
 

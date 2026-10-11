@@ -4,9 +4,7 @@
 {% endblock title %}
 {% block head %}
   {% load static %}
-  <link rel="stylesheet"
-        type="text/css"
-        href="{% static 'python_problems/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'python_problems/styles.css' %}">
   <script src="{% static 'python_problems/code-mirror.js' %}" defer></script>
   <script src="{% static 'python_problems/test-case-buttons.js' %}" defer></script>
   <script src="{% static 'python_problems/code-buttons.js' %}" defer></script>
@@ -19,15 +17,13 @@
 {% block content %}
   <div class="row">
     {# Left Panel #}
-    <div class="col-md-3 p-3">
-      {% include "python_problems/partials/_problem_detail_left_panel.html" %}
-    </div>
+    <div class="col-md-3 p-3">{% include "python_problems/partials/_problem_detail_left_panel.html" %}</div>
     {# Middle Panel #}
     <div class="col-md-8 p-3">
       {# Problem title #}
-      {% include "python_problems/partials/_problem_detail_problem_title.html" %}
+      {% include "python_problems/partials/_problem_detail_title.html" %}
       {# Problem info #}
-      {% include "python_problems/partials/_problem_detail_problem_info.html" %}
+      {% include "python_problems/partials/_problem_detail_info.html" %}
       {# Problem description #}
       {% include "python_problems/partials/_problem_detail_description.html" %}
       {# Code area #}

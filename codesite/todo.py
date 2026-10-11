@@ -1,14 +1,5 @@
-# color code output badge greee/red for pass/fail
 
-# submit/ >> append, > overwrite
-# user dashboard
-# in detail view back button with filters precerved
-# move the screen to 'show solution' if run from prbolem view
-# reverse search for order by, difficulty
-# Edit/info/settings tab
-# dev opts for update|delete
-# search bar AND OR
-# chanege python to code_problems...
+
 # Task Scheduler C++ input list to vector, JS add queue
 # Design Tweeter C++
 # Find in Mountain Array
@@ -22,6 +13,12 @@
 #?? setup cursor with proper method name
 # wrap build_binary_tree and other around bt methods
 # code mode/browse mode
+# user dashboard
+# reverse search for order by, difficulty
+# Edit/info/settings tab
+# dev opts for update|delete
+# search bar AND OR
+# chanege python to code_problems...
 
 
 

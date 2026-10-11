@@ -12,14 +12,13 @@
       </button>
     </div>
     <div class="row collapse show" id="problemInfo">
-      
       <div class="col-auto mb-2">
         <form>
           <label for="difficultyName" class="form-label mb-3">
             <b>Difficulty:</b>
           </label>
           <div id="difficultyName"
-               class=" {% if problem.difficulty.name == 'Easy' %}text-success{% endif %} {% if problem.difficulty.name == 'Medium' %}text-warning{% endif %} {% if problem.difficulty.name == 'Hard' %}text-danger{% endif %} {% if problem.difficulty.name == 'Impossible' %}text-secondary{% endif %} ">
+               class="{% if problem.difficulty.name == 'Easy' %}text-success{% endif %} {% if problem.difficulty.name == 'Medium' %}text-warning{% endif %} {% if problem.difficulty.name == 'Hard' %}text-danger{% endif %} {% if problem.difficulty.name == 'Impossible' %}text-secondary{% endif %}">
             {{ problem.difficulty }}
           </div>
         </form>
