@@ -296,3 +296,8 @@ export DJANGO_DEBUG=True
 echo $DJANGO_DEBUG
 env | grep "DJANGO_DEBUG"
 
+
+// register a new OAuth Application
+https://github.com/settings/applications/new?oauth_application[name]=HCP%20Terraform%20(lodyga_organization)&oauth_application[url]=https://app.terraform.io&oauth_application[callback_url]=https://app.terraform.io/auth/791ee019-c363-4a30-bce1-3fbade40a535/callback
+
+

@@ -23,6 +23,7 @@ ALLOWED_HOSTS = [
     "testserver",  # Testing in Activity Bar
     "158.101.162.117",  # Oracle Micro VM
     "130.61.85.9",  # Oracle Flex VM
+    "35.211.222.254",  # Google Micro VM
 ]
 
 INSTALLED_APPS = [
