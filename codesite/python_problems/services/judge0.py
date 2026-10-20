@@ -1,9 +1,11 @@
+import hashlib
 import os
 import requests
 from codesite.settings import (
     JUDGE0_URL,
     ENV,
 )
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from .code_assembly import (
     clean_python_types,
@@ -68,7 +70,8 @@ def run_judge0(source_code, language):
     )
 
     if raw_response.ok is False:
-        raise ValidationError(f"{raw_response.status_code}: {raw_response.reason}")
+        raise ValidationError(
+            f"{raw_response.status_code}: {raw_response.reason}")
 
     return raw_response.json()
 
@@ -91,6 +94,16 @@ def handle_response_error(response):
 
     response["result"] = "Tests failed!"
     return response
+
+
+def get_cache_key(code, language):
+    payload = {"code": code, "lang": language}
+    
+    serialized = repr(payload)
+
+    digest = hashlib.sha256(serialized.encode()).hexdigest()
+
+    return f"judge0:{digest}"
 
 
 def execute_code(
@@ -116,6 +129,15 @@ def execute_code(
         language,
         button_pressed,
     )
+
+    cache_key = get_cache_key(source_code, language)
+
+    response = cache.get(cache_key)
+
+    if response is not None:
+        cache.touch(cache_key, timeout=300)
+        return response
+
     response = run_judge0(source_code, language)
 
     if response_error := handle_response_error(response):
@@ -126,5 +148,7 @@ def execute_code(
         problem,
         button_pressed,
     )
+
+    cache.set(cache_key, response)
 
     return response

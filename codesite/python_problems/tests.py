@@ -3,7 +3,7 @@ import json
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.test import RequestFactory, SimpleTestCase, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from .forms import ProblemForm
@@ -21,7 +21,7 @@ from .services.code_assembly import (
     build_validation_class_payload,
     build_validation_in_place_payload,
 )
-from .services.judge0 import handle_response_error
+from .services.judge0 import execute_code, handle_response_error
 from .services.previews import draw_linked_list
 from .services.test_case_expression import build_test_case_expression
 from .services.ui_test_cases import (
@@ -182,7 +182,8 @@ class ProblemModelTests(TestCase):
         create_problem_test_case(problem=problem, is_hidden=True, order=2)
 
         self.assertEqual(list(problem.get_shared_testcases()), [visible])
-        self.assertEqual(problem.get_shared_testcases(include_hidden=True).count(), 2)
+        self.assertEqual(problem.get_shared_testcases(
+            include_hidden=True).count(), 2)
 
     def test_create_two_problems_with_same_difficulty(self):
         difficulty = Difficulty.objects.create(name="Easy")
@@ -199,8 +200,10 @@ class ProblemFormTests(TestCase):
     def test_problem_form_disables_method_fields_for_class_design(self):
         form = ProblemForm(initial={"problem_type": ProblemType.CLASS})
 
-        self.assertEqual(form.fields["method_name"].widget.attrs.get("disabled"), "disabled")
-        self.assertEqual(form.fields["argument_names"].widget.attrs.get("disabled"), "disabled")
+        self.assertEqual(form.fields["method_name"].widget.attrs.get(
+            "disabled"), "disabled")
+        self.assertEqual(form.fields["argument_names"].widget.attrs.get(
+            "disabled"), "disabled")
 
     def test_problem_form_initial_argument_names_is_json(self):
         problem = create_sample_problem()
@@ -270,7 +273,8 @@ class ProblemFormTests(TestCase):
         )
 
         self.assertFalse(form.is_valid())
-        self.assertIn("Argument names must be a JSON list.", form.errors["argument_names"])
+        self.assertIn("Argument names must be a JSON list.",
+                      form.errors["argument_names"])
 
     def test_problem_form_clears_method_fields_for_class_design(self):
         owner = create_sample_user("class-tester")
@@ -374,6 +378,50 @@ class Judge0ResultHandlingTests(SimpleTestCase):
 
         self.assertIs(handle_response_error(response), response)
         self.assertEqual(response["result"], "Tests failed!")
+
+
+@override_settings(
+    CACHES={
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "judge0-test-cache",
+        },
+    },
+)
+class Judge0CachingTests(TestCase):
+    def setUp(self):
+        self.problem = create_sample_problem()
+        create_problem_test_case(problem=self.problem)
+
+    @patch("python_problems.services.judge0.run_judge0")
+    def test_validation_returns_same_cached_output_for_same_code(self, run_judge0):
+        run_judge0.return_value = {
+            "status": {"description": "Accepted"},
+            "stdout": "[0, 1]\n",
+            "stderr": None,
+        }
+        source_code = (
+            "class Solution:\n"
+            "    def twoSum(self, nums, target):\n"
+            "        return [0, 1]\n"
+        )
+
+        first_output = execute_code(
+            self.problem,
+            source_code,
+            "Python",
+            "validate",
+        )
+        second_output = execute_code(
+            self.problem,
+            source_code,
+            "Python",
+            "validate",
+        )
+
+        self.assertEqual(first_output, second_output)
+        self.assertEqual(first_output["result"], "Tests passed!")
+        run_judge0.assert_called_once()
 
 
 class ProblemScriptTests(TestCase):
@@ -494,7 +542,8 @@ class ProblemScriptTests(TestCase):
             "arguments_list = [[[], ['foo', 'bar', 1], ['foo', 1], ['foo', 3], ['foo', 'bar2', 4], ['foo', 4], ['foo', 5]]]",
             updated_code,
         )
-        self.assertIn("run_tests(TimeMap, operations_list, arguments_list)", updated_code)
+        self.assertIn(
+            "run_tests(TimeMap, operations_list, arguments_list)", updated_code)
 
     def test_build_test_case_expression_supports_binary_tree_python(self):
         problem = create_sample_problem(title="Invert Binary Tree Python")
@@ -509,7 +558,8 @@ class ProblemScriptTests(TestCase):
 
         expression = build_test_case_expression(
             problem,
-            {"inputs": [[4, 2, 7, 1, 3, 6, 9]], "expected": [4, 7, 2, 9, 6, 3, 1]},
+            {"inputs": [[4, 2, 7, 1, 3, 6, 9]],
+                "expected": [4, 7, 2, 9, 6, 3, 1]},
             "Python",
         )
 
@@ -531,7 +581,8 @@ class ProblemScriptTests(TestCase):
 
         expression = build_test_case_expression(
             problem,
-            {"inputs": [{"values": [3, 2, 0, -4], "cycle_position": 1}], "expected": True},
+            {"inputs": [{"values": [3, 2, 0, -4],
+                         "cycle_position": 1}], "expected": True},
             "Python",
         )
 
@@ -553,7 +604,8 @@ class ProblemScriptTests(TestCase):
 
         expression = build_test_case_expression(
             problem,
-            {"inputs": [{"values": [3, 2, 0, -4], "pos": 1}], "expected": True},
+            {"inputs": [{"values": [3, 2, 0, -4], "pos": 1}],
+                "expected": True},
             "JavaScript",
         )
 
@@ -563,9 +615,11 @@ class ProblemScriptTests(TestCase):
         )
 
     def test_draw_linked_list_displays_cycle_preview(self):
-        preview = draw_linked_list({"values": [3, 2, 0, -4], "cycle_position": 1}, "head")
+        preview = draw_linked_list(
+            {"values": [3, 2, 0, -4], "cycle_position": 1}, "head")
 
-        self.assertEqual(preview, ("head", "(3) -> (2) -> (0) -> (-4) -> ↺ index 1 (2)"))
+        self.assertEqual(
+            preview, ("head", "(3) -> (2) -> (0) -> (-4) -> ↺ index 1 (2)"))
 
 
 class ProblemTestCaseCrudViewTests(TestCase):
@@ -603,7 +657,8 @@ class ProblemTestCaseCrudViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("python_problems:problem-index"))
+        self.assertRedirects(response, reverse(
+            "python_problems:problem-index"))
 
         created = ProblemTestCase.objects.get(problem=self.problem, order=2)
         self.assertEqual(created.owner, self.user)
@@ -613,7 +668,8 @@ class ProblemTestCaseCrudViewTests(TestCase):
 
     def test_update_test_case(self):
         response = self.client.post(
-            reverse("python_problems:test_case-update", kwargs={"pk": self.test_case.pk}),
+            reverse("python_problems:test_case-update",
+                    kwargs={"pk": self.test_case.pk}),
             data={
                 "problem": self.problem.id,
                 "data": json.dumps({"inputs": [10], "expected": 10}),
@@ -624,7 +680,8 @@ class ProblemTestCaseCrudViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("python_problems:problem-index"))
+        self.assertRedirects(response, reverse(
+            "python_problems:problem-index"))
 
         self.test_case.refresh_from_db()
         self.assertEqual(self.test_case.owner, self.user)
@@ -635,12 +692,15 @@ class ProblemTestCaseCrudViewTests(TestCase):
 
     def test_delete_test_case(self):
         response = self.client.post(
-            reverse("python_problems:test_case-delete", kwargs={"pk": self.test_case.pk}),
+            reverse("python_problems:test_case-delete",
+                    kwargs={"pk": self.test_case.pk}),
         )
 
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("python_problems:problem-index"))
-        self.assertFalse(ProblemTestCase.objects.filter(pk=self.test_case.pk).exists())
+        self.assertRedirects(response, reverse(
+            "python_problems:problem-index"))
+        self.assertFalse(ProblemTestCase.objects.filter(
+            pk=self.test_case.pk).exists())
 
     def test_create_requires_authentication(self):
         self.client.logout()
@@ -654,7 +714,8 @@ class ProblemTestCaseCrudViewTests(TestCase):
         self.client.force_login(self.other_user)
 
         response = self.client.get(
-            reverse("python_problems:test_case-update", kwargs={"pk": self.test_case.pk})
+            reverse("python_problems:test_case-update",
+                    kwargs={"pk": self.test_case.pk})
         )
 
         self.assertEqual(response.status_code, 404)
@@ -663,11 +724,13 @@ class ProblemTestCaseCrudViewTests(TestCase):
         self.client.force_login(self.other_user)
 
         response = self.client.post(
-            reverse("python_problems:test_case-delete", kwargs={"pk": self.test_case.pk}),
+            reverse("python_problems:test_case-delete",
+                    kwargs={"pk": self.test_case.pk}),
         )
 
         self.assertEqual(response.status_code, 404)
-        self.assertTrue(ProblemTestCase.objects.filter(pk=self.test_case.pk).exists())
+        self.assertTrue(ProblemTestCase.objects.filter(
+            pk=self.test_case.pk).exists())
 
 
 class SolutionModelTests(TestCase):
@@ -712,7 +775,8 @@ class SolutionModelTests(TestCase):
     def test_create_two_solutions_in_same_language_for_different_problems(self):
         Language.objects.all().delete()
         create_sample_solution()
-        create_sample_solution(problem=create_sample_problem(title="Valid Parentheses"))
+        create_sample_solution(
+            problem=create_sample_problem(title="Valid Parentheses"))
 
         solutions = Solution.objects.order_by("id")
         self.assertEqual(solutions.count(), 2)
@@ -765,7 +829,8 @@ class ProblemIndexViewTests(TestCase):
         response = self.client.get(reverse("python_problems:problem-index"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "No Python problems available for the given parameters.")
+        self.assertContains(
+            response, "No Python problems available for the given parameters.")
 
     def test_index_uses_template(self):
         response = self.client.get(reverse("python_problems:problem-index"))
@@ -784,7 +849,8 @@ class ProblemIndexViewTests(TestCase):
             {"difficulty_id": self.difficulty_easy.id},
         )
 
-        titles = [problem.title for problem in response.context["page_obj"].object_list]
+        titles = [
+            problem.title for problem in response.context["page_obj"].object_list]
         self.assertEqual(titles, ["Two Sum"])
 
     def test_filters_by_tag_with_get_parameters(self):
@@ -793,7 +859,8 @@ class ProblemIndexViewTests(TestCase):
             {"tag_id": self.tag_two_pointers.id},
         )
 
-        titles = [problem.title for problem in response.context["page_obj"].object_list]
+        titles = [
+            problem.title for problem in response.context["page_obj"].object_list]
         self.assertEqual(titles, ["Two Sum II - Input Array Is Sorted"])
 
     def test_filters_by_query_text_with_get_parameters(self):
@@ -802,7 +869,8 @@ class ProblemIndexViewTests(TestCase):
             {"query_text": "Sorted"},
         )
 
-        titles = [problem.title for problem in response.context["page_obj"].object_list]
+        titles = [
+            problem.title for problem in response.context["page_obj"].object_list]
         self.assertEqual(titles, ["Two Sum II - Input Array Is Sorted"])
 
     def test_filters_by_language_with_get_parameters(self):
@@ -811,7 +879,8 @@ class ProblemIndexViewTests(TestCase):
             {"language_id": self.language_python.id},
         )
 
-        titles = [problem.title for problem in response.context["page_obj"].object_list]
+        titles = [
+            problem.title for problem in response.context["page_obj"].object_list]
         self.assertEqual(titles, ["Two Sum"])
         self.assertEqual(response.context["page_obj"].paginator.count, 1)
 
@@ -824,7 +893,8 @@ class ProblemIndexViewTests(TestCase):
             {"order_by": "title", "problems_per_page": 5, "page": 2},
         )
 
-        page_titles = [problem.title for problem in response.context["page_obj"].object_list]
+        page_titles = [
+            problem.title for problem in response.context["page_obj"].object_list]
         self.assertEqual(response.context["page_obj"].number, 2)
         self.assertEqual(response.context["page_obj"].paginator.per_page, 5)
         self.assertEqual(page_titles, sorted(page_titles))
@@ -852,11 +922,13 @@ class SolutionDetailViewTests(TestCase):
         response = self.client.get(
             reverse(
                 "python_problems:problem-detail",
-                kwargs={"slug": solution.problem.slug, "language": solution.language.name},
+                kwargs={"slug": solution.problem.slug,
+                        "language": solution.language.name},
             )
         )
 
-        self.assertTemplateUsed(response, "python_problems/problem_detail.html")
+        self.assertTemplateUsed(
+            response, "python_problems/problem_detail.html")
 
     def test_context_data_uses_selected_solution(self):
         solution = create_sample_solution()
@@ -864,7 +936,8 @@ class SolutionDetailViewTests(TestCase):
         response = self.client.get(
             reverse(
                 "python_problems:problem-detail",
-                kwargs={"slug": solution.problem.slug, "language": solution.language.name},
+                kwargs={"slug": solution.problem.slug,
+                        "language": solution.language.name},
             )
         )
 
@@ -884,7 +957,8 @@ class SolutionDetailViewTests(TestCase):
             Language.objects.get_or_create(name="Python")[0],
         ]
         for language in languages:
-            create_sample_solution(problem=problem, language=language, owner=owner)
+            create_sample_solution(
+                problem=problem, language=language, owner=owner)
 
         response = self.client.get(
             reverse(
@@ -905,7 +979,8 @@ class SolutionDetailViewTests(TestCase):
         response = self.client.get(
             reverse(
                 "python_problems:problem-detail",
-                kwargs={"slug": solution.problem.slug, "language": solution.language.name},
+                kwargs={"slug": solution.problem.slug,
+                        "language": solution.language.name},
             ),
             {"next": next_url},
         )
@@ -916,7 +991,8 @@ class SolutionDetailViewTests(TestCase):
         response = self.client.get(
             reverse(
                 "python_problems:problem-detail",
-                kwargs={"slug": "non-existent-slug", "language": "non-existent-language"},
+                kwargs={"slug": "non-existent-slug",
+                        "language": "non-existent-language"},
             )
         )
 
@@ -926,12 +1002,14 @@ class SolutionDetailViewTests(TestCase):
         owner = create_sample_user()
         language, _ = Language.objects.get_or_create(name="Python")
         problem = create_sample_problem(title="Two Sum", owner=owner)
-        solution = create_sample_solution(problem=problem, language=language, owner=owner)
+        solution = create_sample_solution(
+            problem=problem, language=language, owner=owner)
 
         response = self.client.get(
             reverse(
                 "python_problems:problem-detail",
-                kwargs={"slug": solution.problem.slug, "language": solution.language.name},
+                kwargs={"slug": solution.problem.slug,
+                        "language": solution.language.name},
             )
         )
 
@@ -956,7 +1034,8 @@ class SolutionDetailViewTests(TestCase):
         response = self.client.get(
             reverse(
                 "python_problems:problem-detail",
-                kwargs={"slug": problem.slug, "language": solution.language.name},
+                kwargs={"slug": problem.slug,
+                        "language": solution.language.name},
             )
         )
 
@@ -981,12 +1060,14 @@ class SolutionDetailViewTests(TestCase):
         response = self.client.get(
             reverse(
                 "python_problems:problem-detail",
-                kwargs={"slug": problem.slug, "language": solution.language.name},
+                kwargs={"slug": problem.slug,
+                        "language": solution.language.name},
             )
         )
 
         ui_test_case = response.context["ui_test_cases"][0]
-        self.assertEqual(ui_test_case["input"], "nums = [2, 7, 11, 15]\ntarget = 9")
+        self.assertEqual(ui_test_case["input"],
+                         "nums = [2, 7, 11, 15]\ntarget = 9")
         self.assertEqual(
             response.context["clipboard_test_cases"],
             "\nsolution = Solution()\nprint(solution.twoSum([2, 7, 11, 15], 9), [0, 1])\n",
@@ -1099,19 +1180,24 @@ class SolutionLanguageSwitchTest(TestCase):
     def test_switching_language_updates_solution(self):
         url = reverse(
             "python_problems:problem-detail",
-            kwargs={"slug": self.problem.slug, "language": self.language_python.name},
+            kwargs={"slug": self.problem.slug,
+                    "language": self.language_python.name},
         )
         response = self.client.get(url)
-        self.assertIn(self.source_code_python, html.unescape(response.content.decode()))
+        self.assertIn(self.source_code_python,
+                      html.unescape(response.content.decode()))
 
-        response = self.client.post(url, {"language_id": self.language_javascript.id}, follow=True)
+        response = self.client.post(
+            url, {"language_id": self.language_javascript.id}, follow=True)
 
-        self.assertIn(self.source_code_javascript, html.unescape(response.content.decode()))
+        self.assertIn(self.source_code_javascript,
+                      html.unescape(response.content.decode()))
         self.assertEqual(
             response.request["PATH_INFO"],
             reverse(
                 "python_problems:problem-detail",
-                kwargs={"slug": self.problem.slug, "language": self.language_javascript.name},
+                kwargs={"slug": self.problem.slug,
+                        "language": self.language_javascript.name},
             ),
         )
 
@@ -1143,11 +1229,14 @@ class SolutionUserSwitchTest(TestCase):
             kwargs={"slug": self.problem.slug, "language": self.language.name},
         )
         response = self.client.get(url)
-        self.assertIn(self.source_code_1, html.unescape(response.content.decode()))
+        self.assertIn(self.source_code_1, html.unescape(
+            response.content.decode()))
 
-        response = self.client.post(url, {"owner_id": self.owner_2.id}, follow=True)
+        response = self.client.post(
+            url, {"owner_id": self.owner_2.id}, follow=True)
 
-        self.assertIn(self.source_code_2, html.unescape(response.content.decode()))
+        self.assertIn(self.source_code_2, html.unescape(
+            response.content.decode()))
 
     def test_authenticated_owner_is_selected_by_default(self):
         self.client.force_login(self.owner_2)
@@ -1159,7 +1248,8 @@ class SolutionUserSwitchTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.context["owner_id"], self.owner_2.id)
-        self.assertIn(self.source_code_2, html.unescape(response.content.decode()))
+        self.assertIn(self.source_code_2, html.unescape(
+            response.content.decode()))
 
 
 # ============================================================================
@@ -1233,20 +1323,23 @@ class ProblemUpdateViewTests(TestCase):
     def setUp(self):
         self.user = create_sample_user("problem-updater")
         self.client.force_login(self.user)
-        self.problem = create_sample_problem(title="Original Title", owner=self.user)
+        self.problem = create_sample_problem(
+            title="Original Title", owner=self.user)
         self.new_tag = Tag.objects.create(name="NewTag")
 
     def test_update_problem_requires_login(self):
         self.client.logout()
         response = self.client.get(
-            reverse("python_problems:problem-update", kwargs={"pk": self.problem.pk})
+            reverse("python_problems:problem-update",
+                    kwargs={"pk": self.problem.pk})
         )
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
     def test_update_problem_valid_data(self):
         response = self.client.post(
-            reverse("python_problems:problem-update", kwargs={"pk": self.problem.pk}),
+            reverse("python_problems:problem-update",
+                    kwargs={"pk": self.problem.pk}),
             data={
                 "title": "Updated Title",
                 "url": self.problem.url,
@@ -1269,13 +1362,15 @@ class ProblemUpdateViewTests(TestCase):
     def test_update_problem_redirects_to_next_url(self):
         next_url = f"{reverse('python_problems:problem-index')}?page=2"
         response = self.client.post(
-            reverse("python_problems:problem-update", kwargs={"pk": self.problem.pk}),
+            reverse("python_problems:problem-update",
+                    kwargs={"pk": self.problem.pk}),
             data={
                 "title": "Updated Title",
                 "url": self.problem.url,
                 "difficulty": self.problem.difficulty.id,  # type: ignore
                 "description": self.problem.description,
-                "tags": list(self.problem.tags.values_list("id", flat=True)),  # type: ignore
+                # type: ignore
+                "tags": list(self.problem.tags.values_list("id", flat=True)),
                 "problem_type": ProblemType.FUNCTION,
                 "method_name": "updatedMethod",
                 "argument_names": '["new", "args"]',
@@ -1289,13 +1384,15 @@ class ProblemUpdateViewTests(TestCase):
 
     def test_update_problem_with_class_type_clears_method_fields(self):
         response = self.client.post(
-            reverse("python_problems:problem-update", kwargs={"pk": self.problem.pk}),
+            reverse("python_problems:problem-update",
+                    kwargs={"pk": self.problem.pk}),
             data={
                 "title": self.problem.title,
                 "url": self.problem.url,
                 "difficulty": self.problem.difficulty.id,  # type: ignore
                 "description": self.problem.description,
-                "tags": list(self.problem.tags.values_list("id", flat=True)),  # type: ignore
+                # type: ignore
+                "tags": list(self.problem.tags.values_list("id", flat=True)),
                 "problem_type": ProblemType.CLASS,
                 "method_name": "toBeCleared",
                 "argument_names": '["to", "be", "cleared"]',
@@ -1313,12 +1410,14 @@ class ProblemDeleteViewTests(TestCase):
     def setUp(self):
         self.user = create_sample_user("problem-deleter")
         self.client.force_login(self.user)
-        self.problem = create_sample_problem(title="To Delete", owner=self.user)
+        self.problem = create_sample_problem(
+            title="To Delete", owner=self.user)
 
     def test_delete_problem_requires_login(self):
         self.client.logout()
         response = self.client.post(
-            reverse("python_problems:problem-delete", kwargs={"pk": self.problem.pk})
+            reverse("python_problems:problem-delete",
+                    kwargs={"pk": self.problem.pk})
         )
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
@@ -1326,7 +1425,8 @@ class ProblemDeleteViewTests(TestCase):
     def test_delete_problem(self):
         problem_id = self.problem.pk
         response = self.client.post(
-            reverse("python_problems:problem-delete", kwargs={"pk": self.problem.pk})
+            reverse("python_problems:problem-delete",
+                    kwargs={"pk": self.problem.pk})
         )
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Problem.objects.filter(pk=problem_id).exists())
@@ -1335,7 +1435,8 @@ class ProblemDeleteViewTests(TestCase):
         problem_id = self.problem.pk
         next_url = f"{reverse('python_problems:problem-index')}?page=2"
         response = self.client.post(
-            reverse("python_problems:problem-delete", kwargs={"pk": self.problem.pk}),
+            reverse("python_problems:problem-delete",
+                    kwargs={"pk": self.problem.pk}),
             data={"next": next_url},
         )
         self.assertEqual(response.status_code, 302)
@@ -1400,7 +1501,8 @@ class SolutionCreateViewTests(TestCase):
             },
         )
         self.assertEqual(response.status_code, 302)
-        solution = Solution.objects.get(problem=self.problem, language=self.language, owner=self.user)
+        solution = Solution.objects.get(
+            problem=self.problem, language=self.language, owner=self.user)
         self.assertEqual(solution.owner, self.user)
 
 
@@ -1418,7 +1520,8 @@ class SolutionUpdateViewTests(TestCase):
     def test_update_solution_requires_login(self):
         self.client.logout()
         response = self.client.get(
-            reverse("python_problems:solution-update", kwargs={"pk": self.solution.pk})
+            reverse("python_problems:solution-update",
+                    kwargs={"pk": self.solution.pk})
         )
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
@@ -1427,7 +1530,8 @@ class SolutionUpdateViewTests(TestCase):
         time_complexity = Complexity.objects.get_or_create(name="O(n)")[0]
         space_complexity = Complexity.objects.get_or_create(name="O(n)")[0]
         response = self.client.post(
-            reverse("python_problems:solution-update", kwargs={"pk": self.solution.pk}),
+            reverse("python_problems:solution-update",
+                    kwargs={"pk": self.solution.pk}),
             data={
                 "source_code": "def solve(): return 42",
                 "time_complexity": time_complexity.id,
@@ -1447,7 +1551,8 @@ class SolutionUpdateViewTests(TestCase):
         )
 
         response = self.client.get(
-            reverse("python_problems:solution-update", kwargs={"pk": other_solution.pk})
+            reverse("python_problems:solution-update",
+                    kwargs={"pk": other_solution.pk})
         )
 
         self.assertEqual(response.status_code, 404)
@@ -1467,7 +1572,8 @@ class SolutionDeleteViewTests(TestCase):
     def test_delete_solution_requires_login(self):
         self.client.logout()
         response = self.client.post(
-            reverse("python_problems:solution-delete", kwargs={"pk": self.solution.pk})
+            reverse("python_problems:solution-delete",
+                    kwargs={"pk": self.solution.pk})
         )
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
@@ -1475,7 +1581,8 @@ class SolutionDeleteViewTests(TestCase):
     def test_delete_solution(self):
         solution_id = self.solution.pk
         response = self.client.post(
-            reverse("python_problems:solution-delete", kwargs={"pk": self.solution.pk})
+            reverse("python_problems:solution-delete",
+                    kwargs={"pk": self.solution.pk})
         )
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Solution.objects.filter(pk=solution_id).exists())
@@ -1487,7 +1594,8 @@ class SolutionDeleteViewTests(TestCase):
         )
 
         response = self.client.post(
-            reverse("python_problems:solution-delete", kwargs={"pk": other_solution.pk})
+            reverse("python_problems:solution-delete",
+                    kwargs={"pk": other_solution.pk})
         )
 
         self.assertEqual(response.status_code, 404)
@@ -1663,14 +1771,16 @@ class ProblemTestCaseUpdateViewTests(TestCase):
     def test_update_test_case_requires_login(self):
         self.client.logout()
         response = self.client.get(
-            reverse("python_problems:test_case-update", kwargs={"pk": self.test_case.pk})
+            reverse("python_problems:test_case-update",
+                    kwargs={"pk": self.test_case.pk})
         )
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
     def test_update_test_case_valid_data(self):
         response = self.client.post(
-            reverse("python_problems:test_case-update", kwargs={"pk": self.test_case.pk}),
+            reverse("python_problems:test_case-update",
+                    kwargs={"pk": self.test_case.pk}),
             data={
                 "problem": self.problem.id,
                 "data": json.dumps({"inputs": [5], "expected": 10}),
@@ -1691,7 +1801,8 @@ class ProblemTestCaseUpdateViewTests(TestCase):
             problem=self.problem, owner=other_user, order=2
         )
         response = self.client.get(
-            reverse("python_problems:test_case-update", kwargs={"pk": other_test_case.pk})
+            reverse("python_problems:test_case-update",
+                    kwargs={"pk": other_test_case.pk})
         )
         self.assertEqual(response.status_code, 404)
 
@@ -1708,7 +1819,8 @@ class ProblemTestCaseDeleteViewTests(TestCase):
     def test_delete_test_case_requires_login(self):
         self.client.logout()
         response = self.client.post(
-            reverse("python_problems:test_case-delete", kwargs={"pk": self.test_case.pk})
+            reverse("python_problems:test_case-delete",
+                    kwargs={"pk": self.test_case.pk})
         )
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
@@ -1716,10 +1828,12 @@ class ProblemTestCaseDeleteViewTests(TestCase):
     def test_delete_test_case(self):
         test_case_id = self.test_case.pk
         response = self.client.post(
-            reverse("python_problems:test_case-delete", kwargs={"pk": self.test_case.pk})
+            reverse("python_problems:test_case-delete",
+                    kwargs={"pk": self.test_case.pk})
         )
         self.assertEqual(response.status_code, 302)
-        self.assertFalse(ProblemTestCase.objects.filter(pk=test_case_id).exists())
+        self.assertFalse(ProblemTestCase.objects.filter(
+            pk=test_case_id).exists())
 
     def test_delete_test_case_owner_restriction(self):
         other_user = create_sample_user("other-user")
@@ -1728,10 +1842,12 @@ class ProblemTestCaseDeleteViewTests(TestCase):
         )
         test_case_id = other_test_case.pk
         response = self.client.post(
-            reverse("python_problems:test_case-delete", kwargs={"pk": other_test_case.pk})
+            reverse("python_problems:test_case-delete",
+                    kwargs={"pk": other_test_case.pk})
         )
         self.assertEqual(response.status_code, 404)
-        self.assertTrue(ProblemTestCase.objects.filter(pk=test_case_id).exists())
+        self.assertTrue(ProblemTestCase.objects.filter(
+            pk=test_case_id).exists())
 
 
 # ============================================================================
@@ -1825,6 +1941,7 @@ class ProblemModelEdgeCaseTests(TestCase):
         )
         self.assertEqual(problem.method_name, "myMethod")
         self.assertEqual(problem.argument_names, ["arg1", "arg2"])
+
 
 class SolutionModelEdgeCaseTests(TestCase):
     def setUp(self):
