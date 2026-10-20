@@ -1,3 +1,6 @@
+sudo systemctl daemon-reload && sudo systemctl restart codesite
+
+
 # activate django virtual env
 source djangoenv/bin/activate
 

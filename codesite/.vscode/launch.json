@@ -1,7 +1,7 @@
 {
   "configurations": [
     {
-      "name": "Python Debugger: Django",
+      "name": "Django Debugger",
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/manage.py",
@@ -9,7 +9,19 @@
         "runserver"
       ],
       "django": true,
-      "justMyCode": true
+      "justMyCode": true,
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "Django Tests",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": [
+        "test"
+      ],
+      "django": true,
+      "justMyCode": false
     },
     {
       "name": "Docker: Build Django Container",
@@ -25,42 +37,6 @@
         ],
         "projectType": "django"
       }
-    },
-    {
-      "name": "Django Tests",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${workspaceFolder}/manage.py",
-      "args": [
-        "test"
-      ],
-      "django": true,
-      "justMyCode": false
-    },
-    {
-      "name": "(gdb) Launch",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${fileDirname}/${fileBasenameNoExtension}",
-      "preLaunchTask": "C/C++: cpp build active file",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${fileDirname}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        },
-        {
-          "description": "Set Disassembly Flavor to Intel",
-          "text": "-gdb-set disassembly-flavor intel",
-          "ignoreFailures": true
-        }
-      ]
     },
   ]
 }

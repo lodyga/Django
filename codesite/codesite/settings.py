@@ -6,7 +6,8 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 APP_NAME = "Codesite"
-ENV = os.getenv("DJANGO_ENV", "local")
+# ENV = os.getenv("DJANGO_ENV", "local")
+ENV = os.getenv("DJANGO_ENV")
 DEBUG = ENV == "local"
 
 # HTTPS
@@ -97,7 +98,7 @@ DATABASES = {
 }
 
 # Redis
-if ENV == "pythonanywhere":
+if ENV == "pythonanywhere" or ENV == "render":
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",

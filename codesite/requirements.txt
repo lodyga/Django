@@ -15,5 +15,5 @@ mysqlclient==2.3.0
 psycopg==3.3.6
 pytz==2026.5
 setuptools==81.0.0
-social-auth-app-django==7.0.0
+social-auth-app-django==7.2.0
 whitenoise==6.12.0
