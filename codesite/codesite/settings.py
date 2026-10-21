@@ -1,12 +1,12 @@
 import os
 from .auth import databases
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 APP_NAME = "Codesite"
-# ENV = os.getenv("DJANGO_ENV", "local")
 ENV = os.getenv("DJANGO_ENV")
 DEBUG = ENV == "local"
 
@@ -15,6 +15,7 @@ DEBUG = ENV == "local"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # Every HTTP request should be redirected to HTTPS.
 SECURE_SSL_REDIRECT = not DEBUG
+
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -26,6 +27,15 @@ ALLOWED_HOSTS = [
     "130.61.85.9",  # Oracle Flex VM
     "35.211.222.254",  # Google Micro VM
 ]
+
+
+# Google Cloud
+CLOUDRUN_URL = os.getenv("CLOUDRUN_URL", "").rstrip("/")
+
+if CLOUDRUN_URL:
+    ALLOWED_HOSTS = [urlparse(CLOUDRUN_URL).netloc]
+    CSRF_TRUSTED_ORIGINS = [CLOUDRUN_URL]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
