@@ -1,7 +1,7 @@
 import os
 import re
 import sys
-from codesite.settings import ENV
+from codesite.settings import DJANGO_ENV
 from django.conf import settings
 from python_problems.models import ProblemType
 from .languages import get_language_name, LANGUAGE_ADAPTERS
@@ -352,7 +352,7 @@ def get_placeholder_hello(language):
             placeholder_hello = f"""# {language_verison}\n\nclass Solution:\n\tdef fun(self, x: str) -> str:\n\t\treturn x\n\nsolution = Solution()\nprint(solution.fun("Hello, World!"))"""
             return placeholder_hello
 
-    if ENV == "pythonanywhere":
+    if DJANGO_ENV == "pythonanywhere":
         match language.id:
             case 1:
                 placeholder_hello = """# Python (3.8.1)\n\nclass Solution:\n\tdef fun(self, x: str) -> str:\n\t\treturn x\n\nsolution = Solution()\nprint(solution.fun("Hello, World!"))"""

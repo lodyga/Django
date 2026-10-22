@@ -7,8 +7,8 @@ from urllib.parse import urlparse
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 APP_NAME = "Codesite"
-ENV = os.getenv("DJANGO_ENV")
-DEBUG = ENV == "local"
+DJANGO_ENV = os.getenv("DJANGO_ENV")
+DEBUG = DJANGO_ENV == "local"
 
 # HTTPS
 # When I'm behind a reverse proxy, trust X-Forwarded-Proto to determine whether the original client connection was HTTPS.
@@ -108,7 +108,7 @@ DATABASES = {
 }
 
 # Redis
-if ENV == "pythonanywhere" or ENV == "render":
+if DJANGO_ENV in ["pythonanywhere", "render", "googleCloud"]:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
@@ -193,11 +193,8 @@ LOGIN_REDIRECT_URL = '/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Debug Toolbar
-# INTERNAL_IPS = [
-#     "127.0.0.1",
-# ]
-
-
-JUDGE0_URL = "https://judge0-ce.p.rapidapi.com" if ENV == "pythonanywhere" else "https://158.101.162.117/judge0"
+if DJANGO_ENV == "pythonanywhere":
+    JUDGE0_URL = "https://judge0-ce.p.rapidapi.com"
+else:
+    JUDGE0_URL = "https://158.101.162.117/judge0"
 # JUDGE0_URL = "http://localhost:2358"

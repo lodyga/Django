@@ -3,7 +3,7 @@ import os
 import requests
 from codesite.settings import (
     JUDGE0_URL,
-    ENV,
+    DJANGO_ENV,
 )
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -39,7 +39,7 @@ def run_judge0(source_code, language):
     language_id = language_name_to_id[language]
     submissions_url = JUDGE0_URL + "/submissions"
 
-    if ENV == "pythonanywhere":
+    if DJANGO_ENV == "pythonanywhere":
         headers = {
             "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
             "x-rapidapi-key": RAPIDAPI_KEY

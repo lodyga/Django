@@ -17,10 +17,6 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     default-libmysqlclient-dev \
     curl && \
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal && \
-    export PATH="/root/.cargo/bin:$PATH" && \
-    rustc --version && \
-    cargo --version && \
     rm -rf /var/lib/apt/lists/*
 
 # Ensure cargo is in PATH for all subsequent commands
