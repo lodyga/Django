@@ -9,6 +9,8 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 APP_NAME = "Codesite"
 DJANGO_ENV = os.getenv("DJANGO_ENV")
 DEBUG = DJANGO_ENV == "local"
+FORCE_SCRIPT_NAME = os.getenv("DJANGO_SCRIPT_NAME", "")
+
 
 # HTTPS
 # When I'm behind a reverse proxy, trust X-Forwarded-Proto to determine whether the original client connection was HTTPS.
@@ -108,7 +110,7 @@ DATABASES = {
 }
 
 # Redis
-if DJANGO_ENV in ["pythonanywhere", "render", "googleCloud"]:
+if DJANGO_ENV in ["pythonanywhere", "render", "google"]:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
@@ -149,7 +151,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = f"{FORCE_SCRIPT_NAME or ''}/static/"
 # for static files "STATIC_ROOT = BASE_DIR / 'static_collected'"
 # STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Changed dir because of nginx directory permissions.

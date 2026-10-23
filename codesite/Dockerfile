@@ -12,7 +12,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y \
     gcc \
     build-essential \
-    python3-dev \
+    # python3-dev \
     libffi-dev \
     pkg-config \
     default-libmysqlclient-dev \
@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 # Ensure cargo is in PATH for all subsequent commands
-ENV PATH="/root/.cargo/bin:${PATH}"
+# ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR /app
 
