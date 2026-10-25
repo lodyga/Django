@@ -24,7 +24,7 @@
       "justMyCode": false
     },
     {
-      "name": "Docker: Build Django Container",
+      "name": "Docker: Container",
       "type": "docker",
       "request": "launch",
       "preLaunchTask": "docker-run: debug",

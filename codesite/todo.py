@@ -18,8 +18,9 @@
 # Edit/info/settings tab
 # dev opts for update|delete
 # search bar AND OR
-# chanege python to code_problems...
-
+# change python to code_problems...
+# class + data type, Serialize and Deserialize Binary Tree 
+  
 
 
 """

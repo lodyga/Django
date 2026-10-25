@@ -20,7 +20,8 @@
             ],
             "dockerRun": {
                 "envFiles": [
-                    "${workspaceFolder}/.env"
+                    "/etc/codesite.env"
+                    // "${workspaceFolder}/.env"
                 ]
             },
             "python": {

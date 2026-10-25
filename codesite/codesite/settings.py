@@ -28,8 +28,11 @@ ALLOWED_HOSTS = [
     "158.101.162.117",  # Oracle Micro VM
     "130.61.85.9",  # Oracle Flex VM
     "35.211.222.254",  # Google Micro VM
+    "35.208.20.180", # Google Micro VM
 ]
 
+HOST_IP = os.getenv("HOST_IP")
+ALLOWED_HOSTS = [HOST_IP]
 
 # Google Cloud
 CLOUDRUN_URL = os.getenv("CLOUDRUN_URL", "").rstrip("/")
@@ -38,6 +41,7 @@ if CLOUDRUN_URL:
     ALLOWED_HOSTS = [urlparse(CLOUDRUN_URL).netloc]
     CSRF_TRUSTED_ORIGINS = [CLOUDRUN_URL]
 
+ALLOWED_HOSTS.append("localhost")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
