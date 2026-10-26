@@ -1,0 +1,20 @@
+steps:
+# Build the image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/codesite-cloudrun-gcp/	cloud-run-source-deploy/django/django/django:$COMMIT_SHA', '.']
+# Push the image to Artifact Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'europe-west1-docker.pkg.dev/codesite-cloudrun-gcp/	cloud-run-source-deploy/django/django/django:$COMMIT_SHA']
+# Deploy image to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: 
+    - 'run'
+    - 'deploy'
+    - 'django'
+    - '--image'
+    - 'europe-west1-docker.pkg.dev/codesite-cloudrun-gcp/	cloud-run-source-deploy/django/django/django:$COMMIT_SHA'
+    - '--region'
+    - 'europe-west1'
+images:
+- 'europe-west1-docker.pkg.dev/codesite-cloudrun-gcp/	cloud-run-source-deploy/django/django/django:$COMMIT_SHA'
