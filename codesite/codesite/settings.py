@@ -1,5 +1,4 @@
 import os
-from .auth import databases
 from pathlib import Path
 from urllib.parse import urlparse
 
