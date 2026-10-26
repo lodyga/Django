@@ -28,7 +28,7 @@ ALLOWED_HOSTS = [
     "158.101.162.117",  # Oracle Micro VM
     "130.61.85.9",  # Oracle Flex VM
     "35.211.222.254",  # Google Micro VM
-    "35.208.20.180", # Google Micro VM
+    "35.208.20.180",  # Google Micro VM
 ]
 
 HOST_IP = os.getenv("HOST_IP")
@@ -107,11 +107,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'codesite.wsgi.application'
 
-DB = os.environ.get("DJANGO_DB", "sqlite3")
 
-DATABASES = {
-    "default": databases.DATABASES[DB],
-}
+DB_ENGINE = os.getenv("DB_ENGINE", "django.db.backends.sqlite3")
+
+if DB_ENGINE == "django.db.backends.sqlite3":
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": os.getenv("DB_NAME", BASE_DIR / "db.sqlite3"),
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": os.getenv("DB_NAME", ""),
+            "USER": os.getenv("DB_USER", ""),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("DB_HOST", ""),
+            "PORT": os.getenv("DB_PORT", ""),
+        }
+    }
+
 
 # Redis
 if DJANGO_ENV in ["pythonanywhere", "render", "google"]:
@@ -159,7 +176,10 @@ STATIC_URL = f"{FORCE_SCRIPT_NAME or ''}/static/"
 # for static files "STATIC_ROOT = BASE_DIR / 'static_collected'"
 # STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Changed dir because of nginx directory permissions.
-STATIC_ROOT = "/var/www/codesite/static"
+STATIC_ROOT = os.environ.get(
+    "DJANGO_STATIC_ROOT",
+    "/var/www/codesite/static/",
+)
 # for global files, The search starts in the directories listed in STATICFILES_DIRS, using the order you have provided. Then, if the file is not found, the search continues in the static folder of each application.
 # STATICFILES_DIRS = [BASE_DIR / 'mystaticfiles']
 # Cache busting. Forces browsers to download the latest version of files (CSS, JavaScript, images).
