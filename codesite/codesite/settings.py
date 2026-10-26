@@ -9,6 +9,7 @@ APP_NAME = "Codesite"
 DJANGO_ENV = os.getenv("DJANGO_ENV")
 DEBUG = DJANGO_ENV == "local"
 DEBUG = True  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+print(f"DIAGNOSTIC: DEBUG={DEBUG}, SETTINGS_MODULE={__name__}", flush=True)
 FORCE_SCRIPT_NAME = os.getenv("DJANGO_SCRIPT_NAME", "")
 
 
@@ -42,6 +43,7 @@ if CLOUDRUN_URL:
     CSRF_TRUSTED_ORIGINS = [CLOUDRUN_URL]
 
 ALLOWED_HOSTS.append("localhost")
+ALLOWED_HOSTS.clear()
 
 INSTALLED_APPS = [
     'django.contrib.admin',
