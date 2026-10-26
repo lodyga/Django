@@ -8,6 +8,7 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 APP_NAME = "Codesite"
 DJANGO_ENV = os.getenv("DJANGO_ENV")
 DEBUG = DJANGO_ENV == "local"
+DEBUG = True  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 FORCE_SCRIPT_NAME = os.getenv("DJANGO_SCRIPT_NAME", "")
 
 
