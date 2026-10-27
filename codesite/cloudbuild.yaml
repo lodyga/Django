@@ -27,6 +27,18 @@ steps:
       - "europe-west1-docker.pkg.dev/codesite-cloudrun-gcp/cloud-run-source-deploy/django/django:$COMMIT_SHA"
       - "--region"
       - "europe-west1"
+  # Update the migration job to use the same image
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - "run"
+      - "jobs"
+      - "update"
+      - "django-migrate"
+      - "--image"
+      - "europe-west1-docker.pkg.dev/codesite-cloudrun-gcp/cloud-run-source-deploy/django/django:$COMMIT_SHA"
+      - "--region"
+      - "europe-west1"
 images:
   - "europe-west1-docker.pkg.dev/codesite-cloudrun-gcp/cloud-run-source-deploy/django/django:$COMMIT_SHA"
 options:
