@@ -42,8 +42,6 @@ if CLOUDRUN_URL:
     ALLOWED_HOSTS = [urlparse(CLOUDRUN_URL).netloc]
     CSRF_TRUSTED_ORIGINS = [CLOUDRUN_URL]
 
-ALLOWED_HOSTS.append("localhost")
-ALLOWED_HOSTS.clear()
 
 INSTALLED_APPS = [
     'django.contrib.admin',
