@@ -1,6 +1,7 @@
 steps:
   # Build the image
   - name: "gcr.io/cloud-builders/docker"
+    dir: "codesite"
     args:
       [
         "build",
