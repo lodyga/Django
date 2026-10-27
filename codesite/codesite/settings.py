@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 APP_NAME = "Codesite"
-DJANGO_ENV = os.getenv("DJANGO_ENV")
+DJANGO_ENV = os.getenv("DJANGO_ENV", "")
 DEBUG = DJANGO_ENV == "local"
 DEBUG = True  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 print(f"DIAGNOSTIC: DEBUG={DEBUG}, SETTINGS_MODULE={__name__}", flush=True)
@@ -32,7 +32,7 @@ ALLOWED_HOSTS = [
     "35.208.20.180",  # Google Micro VM
 ]
 
-HOST_IP = os.getenv("HOST_IP")
+HOST_IP = os.getenv("HOST_IP", "")
 ALLOWED_HOSTS = [HOST_IP]
 
 # Google Cloud
@@ -176,7 +176,7 @@ STATIC_URL = f"{FORCE_SCRIPT_NAME or ''}/static/"
 # for static files "STATIC_ROOT = BASE_DIR / 'static_collected'"
 # STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Changed dir because of nginx directory permissions.
-STATIC_ROOT = os.environ.get(
+STATIC_ROOT = os.getenv(
     "DJANGO_STATIC_ROOT",
     "/var/www/codesite/static/",
 )
@@ -188,13 +188,13 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesSto
 
 # Configure the social login.
 SOCIAL_AUTH_GITHUB_KEY = os.getenv(
-    "SOCIAL_AUTH_GITHUB_KEY")
+    "SOCIAL_AUTH_GITHUB_KEY", "")
 SOCIAL_AUTH_GITHUB_SECRET = os.getenv(
-    "SOCIAL_AUTH_GITHUB_SECRET")
+    "SOCIAL_AUTH_GITHUB_SECRET", "")
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv(
-    "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+    "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY", "")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv(
-    "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
+    "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET", "")
 
 
 # Social

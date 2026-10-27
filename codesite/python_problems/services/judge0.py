@@ -20,8 +20,8 @@ from .problem_helpers import (
 )
 
 
-JUDGE0_AUTHN_TOKEN = os.environ["JUDGE0_AUTHN_TOKEN"]
-RAPIDAPI_KEY = os.environ["RAPIDAPI_KEY"]
+JUDGE0_AUTHN_TOKEN = os.getenv("JUDGE0_AUTHN_TOKEN", "")
+RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY", "")
 
 
 def run_judge0(source_code, language):

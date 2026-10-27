@@ -27,10 +27,6 @@ class IndexView(TemplateView):
         ]
         return context
 
-    # def post(self, request, **kwargs):
-    #     if "message" in request.POST:
-    #         return get_cohere_response(request)
-
 
 def contact_view(request):
     return render(request, "core/contact.html")
@@ -46,4 +42,3 @@ def gemini_stream_view(request):
 
 def mistral_stream_view(request):
     return get_mistral_response(request)
-
