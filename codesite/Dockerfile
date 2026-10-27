@@ -35,6 +35,7 @@ COPY . /app
 # environment variables are not available then, so use a non-secret,
 # build-only value.  The application still requires DJANGO_SECRET_KEY when
 # the container starts.
+RUN ls -l /app/db.sqlite3 || true
 RUN DJANGO_SECRET_KEY=build-time-placeholder python manage.py collectstatic --noinput
 
 # Creates a non-root user with an explicit UID and adds permission to access the /app folder
