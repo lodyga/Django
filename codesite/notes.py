@@ -182,16 +182,47 @@ python manage.py dumpdata \
 # Worked for PostqreSQL
 python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.permission > data.json
 
-# Active database backend at runtime.
+python manage.py dumpdata \
+nnnn
+  --natural-primary \
+  --exclude=contenttypes \
+  --exclude=sessions \
+  --exclude=auth.permission \
+  --indent=2 \
+  --output=/tmp/codesite_data.json
+
+python manage.py dumpdata auth.User \
+  --natural-foreign \
+  --natural-primary \
+  --indent 2 \
+  -o /tmp/codesite_users.json
+
+# Check active database backend at runtime.
 $ python manage.py shell
 >> from django.db import connection
 >> print(connection.vendor)
 >> print(connection.settings_dict)
 
+unset DB_ENGINE DB_NAME DB_HOST DB_PORT DB_USER DB_PASSWORD
+python manage.py shell -c'
+from django.db import connection
+print("Vendor: ", connection.vendor)
+print("Name: ", connection.settings_dict["NAME"])
+'
 
+# create an empty db
+CREATE DATABASE codesite_db
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
 
+SHOW DATABASES;
+EXIT;
 
+# Create schema
+python manage.py migrate
 
+# load db
+python manage.py loaddata /tmp/codesite_data.json
 
 
 
