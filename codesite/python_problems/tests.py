@@ -457,6 +457,39 @@ class ProblemScriptTests(TestCase):
         self.assertIn("inputs_list = [[[0, 1, 0, 3, 12]]]", updated_code)
         self.assertIn("run_tests(solution.moveZeroes)", updated_code)
 
+    def test_build_validation_in_place_payload_supports_reverse_string_problem(self):
+        problem = create_sample_problem(title="Reverse String")
+        problem.metadata = {
+            "problem_type": ProblemType.FUNCTION,
+            "comparison_type": "exact",
+            "method_name": "reverseString",
+            "parameters": [{"name": "letters", "type": "list[str]"}],
+            "return_type": "None",
+            "in_place": True,
+        }
+        problem.save(update_fields=["metadata"])
+
+        create_problem_test_case(
+            problem=problem,
+            data={
+                "inputs": [["h", "e", "l", "l", "o"]],
+                "expected": [["o", "l", "l", "e", "h"]],
+            },
+        )
+
+        source_code = "class Solution:\n    pass\n"
+        updated_code = build_validation_in_place_payload(
+            source_code,
+            "Python",
+            problem.testcases,
+            problem.metadata,
+        )
+
+        self.assertIn("\nsolution = Solution()\n", updated_code)
+        self.assertIn(
+            "inputs_list = [[['h', 'e', 'l', 'l', 'o']]]", updated_code)
+        self.assertIn("run_tests(solution.reverseString)", updated_code)
+
     def test_get_ui_test_cases_supports_number_of_islands_grid_preview(self):
         problem = create_sample_problem(title="Number of Islands")
         problem.metadata = {

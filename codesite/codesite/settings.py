@@ -3,14 +3,12 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 APP_NAME = "Codesite"
+BASE_DIR = Path(__file__).resolve().parent.parent
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 DJANGO_ENV = os.getenv("DJANGO_ENV", "")
-DEBUG = DJANGO_ENV == "local"
-DEBUG = True  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-print(f"DIAGNOSTIC: DEBUG={DEBUG}, SETTINGS_MODULE={__name__}", flush=True)
 FORCE_SCRIPT_NAME = os.getenv("DJANGO_SCRIPT_NAME", "")
+DEBUG = DJANGO_ENV == "local"
 
 
 # HTTPS

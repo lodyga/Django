@@ -3,6 +3,7 @@ import re
 import sys
 from codesite.settings import DJANGO_ENV
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from python_problems.models import ProblemType
 from .languages import get_language_name, LANGUAGE_ADAPTERS
 from .test_case_parsing import get_field, serialize
@@ -98,7 +99,7 @@ def attach_utils(source_code, language, problem_type, is_in_place):
     return source_code
 
 
-# meaby_delete_solution_instance_setup not search or raise Error
+# maybe_delete_solution_instance_setup not search or raise Error
 def clear_solution_instance_setup(source_code, method_name, language):
     language_name = get_language_name(language)
     adapter = LANGUAGE_ADAPTERS[language_name]
@@ -230,22 +231,26 @@ def build_validation_in_place_payload(source_code, language, test_cases, metadat
         inputs_list.append(get_field(test_case.data, "inputs"))
         expected_list.append(get_field(test_case.data, "expected"))
 
-    if language_name in ("Python", "JavaScript"):
-        main_payload_list = (
-            [
-                f'{adapter.naming.inputs_list} = {serialize(inputs_list, language)}',
-                f'{adapter.run_tests_function}(solution.{method_name})'
-            ]
-        )
-    else:  # elif language_name == "Cpp":
-        cpp_type_tuple = get_cpp_type_tuple(parameters)
-        main_payload_list = (
-            [
-                "using TestCase = " + cpp_type_tuple + ";",
-                f"vector<TestCase> {adapter.naming.inputs_list} = {serialize(inputs_list, language)};",
-                f"{adapter.run_tests_function}(solution, &Solution::{method_name}, inputs_list);"
-            ]
-        )
+    match language_name:
+        case "Python" | "JavaScript":
+            main_payload_list = (
+                [
+                    f'{adapter.naming.inputs_list} = {serialize(inputs_list, language)}',
+                    f'{adapter.run_tests_function}(solution.{method_name})'
+                ]
+            )
+        case "Cpp":
+            cpp_type_tuple = get_cpp_type_tuple(parameters)
+            main_payload_list = (
+                [
+                    "using TestCase = " + cpp_type_tuple + ";",
+                    f"vector<TestCase> {adapter.naming.inputs_list} = {serialize(inputs_list, language)};",
+                    f"{adapter.run_tests_function}(solution, &Solution::{method_name}, inputs_list);"
+                ]
+            )
+        case _:
+            raise ValidationError(
+                f"No in-place method for {language_name}.")
 
     main_block = attach_main(
         source_code,

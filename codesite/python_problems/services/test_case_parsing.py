@@ -8,12 +8,23 @@ def serialize_cpp(items):
     [2, 7, 11, 15] => '{2, 7, 11, 15}'
     """
     if isinstance(items, list):
-        serialized = [serialize_cpp(item)
-                      for item in items]
+        serialized = [
+            serialize_cpp(item)
+            for item in items
+        ]
 
         return "{" + ", ".join(serialized) + "}"
 
-    return "nullopt" if items is None else json.dumps(items)
+    if items is None:
+        return "nullopt"
+    # chars needs to by in "'a'" format
+    elif isinstance(items, str) and len(items) == 1:
+        return repr(items)  # "'a'"
+        return f"'{items}'"
+        return f"""'{items}'"""
+        return json.dumps(items)
+    else:
+        return json.dumps(items)  # '"abc"'
 
 
 def serialize_java(items):
@@ -22,8 +33,10 @@ def serialize_java(items):
     [2, 7, 11, 15] => 'new int[] {2, 7, 11, 15}'
     """
     if isinstance(items, list):
-        serialized = [serialize_cpp(item)
-                      for item in items]
+        serialized = [
+            serialize_cpp(item)
+            for item in items
+        ]
 
         return "new int[] {" + ", ".join(serialized) + "}"
 

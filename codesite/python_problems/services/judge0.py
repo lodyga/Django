@@ -98,11 +98,8 @@ def handle_response_error(response):
 
 def get_cache_key(code, language):
     payload = {"code": code, "lang": language}
-    
     serialized = repr(payload)
-
     digest = hashlib.sha256(serialized.encode()).hexdigest()
-
     return f"judge0:{digest}"
 
 

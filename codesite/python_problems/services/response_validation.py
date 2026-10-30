@@ -25,16 +25,16 @@ def freeze(value):
 
 
 def compare_output_and_expected(
-        input_list,
-        output_value_list,
-        expected_list,
+        input_data,
+        output_data,
+        expected_data,
         comparison_type,
         problem_slug) -> bool:
 
-    if len(output_value_list) != len(expected_list) != len(input_list):
+    if len(output_data) != len(expected_data) != len(input_data):
         return False
 
-    for output_value, expected_value, input_data in zip(output_value_list, expected_list, input_list):
+    for output_value, expected_value, input_data in zip(output_data, expected_data, input_data):
         match comparison_type:
             case ComparisonType.EXACT | "equal" | "exact":
                 if output_value != expected_value:
@@ -64,14 +64,22 @@ def compare_output_and_expected(
     return True
 
 
-def get_output_list(response, test_case_size):
+def get_output_data(response, test_case_size):
     test_case_size = len(test_case_size)
     stdout = response.pop("stdout")
-    output_serialized_list = stdout.strip().splitlines()[-test_case_size:]
+    output_serialized_data = stdout.strip().splitlines()[-test_case_size:]
 
-    return [json.loads(line)
-            for line in output_serialized_list
-            ]
+    return [
+        json.loads(line)
+        for line in output_serialized_data
+    ]
+
+    # for void println(const vector<char>& values) {} in print_in_cpp.cpp when "'"
+    # import ast
+    # return [
+    #     ast.literal_eval(line)
+    #     for line in output_serialized_data
+    # ]
 
 
 def validate_response(response, problem, button_pressed) -> None:
@@ -82,20 +90,20 @@ def validate_response(response, problem, button_pressed) -> None:
     problem_test_cases = problem.get_shared_testcases(
         include_hidden=True
     )
-    input_list = [
+    input_data = [
         get_field(problem_test_case.data, "inputs")
         for problem_test_case in problem_test_cases
     ]
-    expected_list = [
+    expected_data = [
         get_field(problem_test_case.data, "expected")
         for problem_test_case in problem_test_cases
     ]
-    output_list = get_output_list(response, problem_test_cases)
+    output_data = get_output_data(response, problem_test_cases)
 
     if compare_output_and_expected(
-            input_list,
-            output_list,
-            expected_list,
+            input_data,
+            output_data,
+            expected_data,
             metadata["comparison_type"],
             problem.slug
     ):
