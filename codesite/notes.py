@@ -170,7 +170,7 @@ ContentType.objects.all().delete()
 py manage.py loaddata data.json
 
 
-# Worked for MySQL
+# Worked for local MySQL
 python manage.py dumpdata \
   --natural-foreign \
   --natural-primary \
@@ -191,11 +191,12 @@ nnnn
   --indent=2 \
   --output=/tmp/codesite_data.json
 
+# Worked for Goole Cloud MySQL
 python manage.py dumpdata auth.User \
   --natural-foreign \
   --natural-primary \
   --indent 2 \
-  -o /tmp/codesite_users.json
+  > data.json
 
 # Check active database backend at runtime.
 $ python manage.py shell
@@ -223,6 +224,7 @@ python manage.py migrate
 
 # load db
 python manage.py loaddata /tmp/codesite_data.json
+python manage.py loaddata data.json
 
 
 
