@@ -131,10 +131,6 @@ filter(solution__language_id=language_id) → filter(solutions__language_id=lang
 
 curl -X POST "https://api.cohere.ai/v1/generate" -H "Authorization: Bearer pass" -H "Content-Type: application/json" -d '{"model":"command","prompt":"Hello","max_tokens":10}'
 
-# list proceses on port 8000
-lsof -i :8000
-kill <pid>
-
 self.client.get() returns <class 'django.template.response.TemplateResponse'>
 self.client.post() returns <class 'django.http.response.HttpResponse'>
 
@@ -183,7 +179,6 @@ python manage.py dumpdata \
 python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.permission > data.json
 
 python manage.py dumpdata \
-nnnn
   --natural-primary \
   --exclude=contenttypes \
   --exclude=sessions \
@@ -191,7 +186,7 @@ nnnn
   --indent=2 \
   --output=/tmp/codesite_data.json
 
-# Worked for Goole Cloud MySQL
+# Worked for Google Cloud MySQL
 python manage.py dumpdata auth.User \
   --natural-foreign \
   --natural-primary \
@@ -288,7 +283,7 @@ output = cwd
 Error: That port is already in use.
 lsof -i :8000
 kill PID
-
+kill -9 PID
 
 
 # Replace next line indicator with next line.
