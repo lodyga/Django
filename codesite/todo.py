@@ -1,5 +1,3 @@
-
-
 # Task Scheduler C++ input list to vector, JS add queue
 # Design Tweeter C++
 # Find in Mountain Array
@@ -21,6 +19,9 @@
 # change python to code_problems...
 # class + data type, Serialize and Deserialize Binary Tree 
 # find_median_from_data_stream add comparison_type for "Answers within 10**-5 of the actual answer will be accepted"
+# Merge Sorted Array, in-place method, 4 method arguments, answer should check only the first argument
+# Course Schedule II, judge should accept equivalent topological sort answers
+# Alien Dictionary print(Solution().alienOrder(["abc", "bcd", "cde"]) == "abcde" or "deabc" or) should accept different answers.
 
 
 """

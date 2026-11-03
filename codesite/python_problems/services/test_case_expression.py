@@ -50,7 +50,7 @@ def build_test_case_expression(problem, test_case_data, language):
                 line = f'{adapter.binary_tree.build}({line})'
 
             case _:
-                line = serialize(value, language)
+                line = serialize(value, language, data_type)
 
         lines.append(line)
 

@@ -2,29 +2,43 @@ import json
 from .languages import get_language_name
 
 
-def serialize_cpp(items):
+def serialize_cpp(items, data_type=None):
     # Serialize for C++ like json.dumps or JSON.stringify.
     """
     [2, 7, 11, 15] => '{2, 7, 11, 15}'
+    Should probably parse items based only on data type.
+    For now is to assure that strings wont convert to chars.
     """
-    if isinstance(items, list):
-        serialized = [
-            serialize_cpp(item)
-            for item in items
-        ]
-
-        return "{" + ", ".join(serialized) + "}"
-
-    if items is None:
-        return "nullopt"
-    # chars needs to by in "'a'" format
-    elif isinstance(items, str) and len(items) == 1:
-        return repr(items)  # "'a'"
-        return f"'{items}'"
-        return f"""'{items}'"""
-        return json.dumps(items)
+    if data_type:
+        match data_type:
+            case dt if dt.startswith("str"):
+                return json.dumps(items)  # '"abc"', '"a"'
+            case dt if dt.startswith("char"):
+                return repr(items)  # "'a'"
+            case dt if dt.startswith("list"):
+                serialized = [
+                    serialize_cpp(item, data_type[5: -1])
+                    for item in items
+                ]
+                return "{" + ", ".join(serialized) + "}"
     else:
-        return json.dumps(items)  # '"abc"'
+        if isinstance(items, list):
+            serialized = [
+                serialize_cpp(item)
+                for item in items
+            ]
+            return "{" + ", ".join(serialized) + "}"
+
+        if items is None:
+            return "nullopt"
+        # chars needs to by in "'a'" format
+        elif isinstance(items, str) and len(items) == 1:
+            return repr(items)  # "'a'"
+            return f"'{items}'"
+            return f"""'{items}'"""
+            return json.dumps(items)
+        else:
+            return json.dumps(items)  # '"abc"'
 
 
 def serialize_java(items):
@@ -43,7 +57,7 @@ def serialize_java(items):
     return json.dumps(items)
 
 
-def serialize(value, language) -> str:
+def serialize(value, language, data_type=None) -> str:
     """
     [2, 7, 11, 15] => '[2, 7, 11, 15]'
     """
@@ -55,7 +69,7 @@ def serialize(value, language) -> str:
         case "JavaScript":
             return json.dumps(value)
         case "Cpp":
-            return serialize_cpp(value)
+            return serialize_cpp(value, data_type)
         case "Java":
             return serialize_java(value)
         case _:
