@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
    if (chatHistory) { chatBox.value = chatHistory; };
    const chatUserInput = document.getElementById("chatUserInput");
    const sendButton = document.getElementById("sendButton");
+   const aiSolveProblemButton = document.getElementById("aiSolveProblemButton");
    const chooseAiModelBtn = document.getElementById("chooseAiModelBtn");
    const chooseAiModelMenu = document.getElementById("chooseAiModelMenu");
    let activeEventSource = null;
@@ -32,19 +33,41 @@ document.addEventListener('DOMContentLoaded', () => {
       currentAiStartIndex = null;
    }
 
-   // Send a message to the backend.
-   async function sendMessage() {
-      const message = chatUserInput.value.trim();
-      if (!message) return;
+   function getProblemSolvePrompt() {
+      const contextElement = document.getElementById("ai-problem-context");
+      if (!contextElement) return null;
+
+      try {
+         const context = JSON.parse(contextElement.textContent);
+         const title = context.title?.trim();
+         const description = context.description?.trim();
+         const language = context.language?.trim();
+         if (!title || !description || !language) return null;
+
+         return `Solve the following programming problem in ${language}. `
+            + `Explain the algorithm and its time and space complexity, then provide `
+            + `a complete ${language} implementation that matches the required signature.\n\n`
+            + `Title: ${title}\n\nProblem:\n${description}`;
+      } catch {
+         return null;
+      }
+   }
+
+   // Send a message to the backend. Passing a message sends it without replacing
+   // the text currently being composed by the user.
+   async function sendMessage(
+      message = chatUserInput.value.trim(), clearUserInput = true) {
+      if (!message || activeEventSource) return;
 
       // Show spinner and disable button
       sendButton.disabled = true;
+      if (aiSolveProblemButton) aiSolveProblemButton.disabled = true;
       sendButton.firstChild.textContent = "Wait ";
       document.getElementById('aiSendButtonSpinner').classList.remove("d-none");
 
       // Add the user's message to the chat box.
       appendMessage(userName, message);
-      chatUserInput.value = "";
+      if (clearUserInput) chatUserInput.value = "";
 
       currentAiStartIndex = chatBox.value.length;
       appendMessage("AI", "");
@@ -71,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
          // Hide spinner and re-enable button
          sendButton.disabled = false;
+         if (aiSolveProblemButton) aiSolveProblemButton.disabled = false;
          sendButton.firstChild.textContent = "Send";
          document.getElementById('aiSendButtonSpinner').classList.add('d-none');
       });
@@ -82,12 +106,21 @@ document.addEventListener('DOMContentLoaded', () => {
          }
          appendMessage("AI", "Error: Could not get a streamed response.");
          sendButton.disabled = false;
+         if (aiSolveProblemButton) aiSolveProblemButton.disabled = false;
          sendButton.firstChild.textContent = "Send";
          document.getElementById('aiSendButtonSpinner').classList.add('d-none');
       };
    }
 
    sendButton.addEventListener('click', sendMessage);
+   if (aiSolveProblemButton) {
+      aiSolveProblemButton.addEventListener('click', () => {
+         const prompt = getProblemSolvePrompt();
+         if (!prompt) return;
+         aiContainer.classList.remove("d-none");
+         sendMessage(prompt, false);
+      });
+   }
    chatUserInput.addEventListener('keydown', (event) => {
       if (event.key !== 'Enter') return;
       if (event.shiftKey) return;

@@ -1051,6 +1051,30 @@ class SolutionDetailViewTests(TestCase):
         self.assertContains(response, solution.language)
         self.assertContains(response, solution.owner)
 
+    def test_problem_details_include_ai_solve_context(self):
+        solution = create_sample_solution()
+
+        response = self.client.get(
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={
+                    "slug": solution.problem.slug,
+                    "language": solution.language.name,
+                },
+            )
+        )
+
+        self.assertContains(response, 'id="aiSolveProblemButton"')
+        self.assertContains(response, 'id="ai-problem-context"')
+        self.assertEqual(
+            response.context["ai_problem_context"],
+            {
+                "title": solution.problem.title,
+                "description": solution.problem.description,
+                "language": solution.language.name,
+            },
+        )
+
     def test_problem_level_testcases_override_solution_testcases(self):
         problem = create_sample_problem()
         problem.method_name = "twoSum"

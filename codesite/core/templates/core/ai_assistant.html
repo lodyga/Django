@@ -36,10 +36,20 @@
       </ul>
     </div>
     <textarea class="form-control" id="chatUserInput" type="text"></textarea>
-    <button class="btn btn-outline-warning ms-auto" type="button" id="sendButton">
-      Send
-      <span id="aiSendButtonSpinner"
-            class="spinner-border spinner-border-sm d-none"></span>
-    </button>
+    <div class="d-flex justify-content-end gap-2 mt-2">
+      {% if ai_problem_context %}
+        <button class="btn btn-outline-info"
+                type="button"
+                id="aiSolveProblemButton"
+                title="Ask the selected AI model to solve this problem in its current language.">
+          Solve problem
+        </button>
+      {% endif %}
+      <button class="btn btn-outline-warning" type="button" id="sendButton">
+        Send
+        <span id="aiSendButtonSpinner"
+              class="spinner-border spinner-border-sm d-none"></span>
+      </button>
+    </div>
   </div>
 </div>

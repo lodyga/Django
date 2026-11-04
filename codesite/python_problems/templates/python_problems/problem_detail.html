@@ -13,6 +13,7 @@
   <script src="{% static 'python_problems/problem-solution.js' %}" defer></script>
   {# Store data by id. #}
   {{ language.id|json_script:"language-id" }}
+  {{ ai_problem_context|json_script:"ai-problem-context" }}
 {% endblock head %}
 {% block content %}
   <div class="row">

@@ -265,10 +265,50 @@ class TypeScriptAdapter(LanguageAdapter):
     )
 
 
+class RustAdapter(LanguageAdapter):
+    """
+    Just started. Everything is mostly wrong.
+    """
+    config = LanguageConfig(
+        print="println!",
+        serialize="JSON.stringify",
+        solution=SolutionConfig(
+            # instance_code="\nconst solution = new Solution();\n",
+            # let result = Solution::two_sum(vec![2, 7, 11, 15], 9);
+            # instance_pattern=r"const\s+solution\s*=\s*new\s+Solution\(\)\s*;?",
+            instance_code="",
+            instance_pattern=""
+        ),
+        linked_list=LinkedListConfig(
+            utils_file="linked-list-utils.js",
+            build="buildLinkedList",
+            serialize="serializeLinkedList",
+        ),
+        binary_tree=BinaryTreeConfig(
+            utils_file="binary-tree-utils.js",
+            build="buildBinaryTree",
+            serialize="serializeBinaryTree",
+        ),
+        class_design=ClassDesignConfig(
+            utils_file="class-design-utils.js",
+        ),
+        naming=NamingConvention(
+            inputs_list="inputsList",
+            operations_list="operationsList",
+            arguments_list="argumentsList",
+            expected_list="expectedList",
+        ),
+        run_tests_function="runTests",
+        in_place_utils_file="in-place-utils.js",
+        heap_utils_file="heap-utils.js",
+    )
+
+
 LANGUAGE_ADAPTERS = {
     "Python": PythonAdapter(),
     "JavaScript": JavaScriptAdapter(),
     "Cpp": CppAdapter(),
     "Java": JavaAdapter(),
     "TypeScript": TypeScriptAdapter(),
+    "Rust": RustAdapter(),
 }

@@ -336,6 +336,11 @@ class ProblemDetailView(NextUrlMixin, DetailView):
 
         context.update({
             "clipboard_test_cases": clipboard_test_cases,
+            "ai_problem_context": {
+                "title": problem.title,
+                "description": problem.description,
+                "language": language.name,
+            },
             "examples": examples,
             "language": language,
             "language_id": language.id,

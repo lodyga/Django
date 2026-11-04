@@ -375,6 +375,8 @@ def get_placeholder_hello(language):
                 placeholder_hello = """SELECT *\nFROM *\nWHERE *"""
             case 8:
                 placeholder_hello = """// TypeScript (3.7.4)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
+            case 9:
+                placeholder_hello = """// Rust 1.40.0 -- test"""
             case _:
                 placeholder_hello = """Not known programming language."""
     else:
@@ -395,6 +397,8 @@ def get_placeholder_hello(language):
                 placeholder_hello = """SELECT *\nFROM *\nWHERE *"""
             case 8:
                 placeholder_hello = """// TypeScript (3.7.4)\n\nclass Solution {\n  fun(x) {\n    return x\n  }\n}\n\nconst solution = new Solution();\nconsole.log(solution.fun('Hello, World!'))"""
+            case 9:
+                placeholder_hello = """// Rust 1.40.0 -- test"""
             case _:
                 placeholder_hello = """Not known programming language."""
 
