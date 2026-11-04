@@ -11,9 +11,9 @@ def serialize_cpp(items, data_type=None):
     """
     if data_type:
         match data_type:
-            case dt if dt.startswith("str"):
+            case "str":
                 return json.dumps(items)  # '"abc"', '"a"'
-            case dt if dt.startswith("char"):
+            case "char":
                 return repr(items)  # "'a'"
             case dt if dt.startswith("list"):
                 serialized = [
@@ -21,6 +21,8 @@ def serialize_cpp(items, data_type=None):
                     for item in items
                 ]
                 return "{" + ", ".join(serialized) + "}"
+            case _:
+                return json.dumps(items)
     else:
         if isinstance(items, list):
             serialized = [
