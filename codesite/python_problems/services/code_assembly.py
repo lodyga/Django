@@ -155,7 +155,7 @@ def attach_main(source_code, main_payload_list, language, method_name):
 
 
 def attach_cpp_print(source_code):
-    utility = get_utility("print_in_cpp.cpp", "services")
+    utility = get_utility("json_serializer.cpp", "services")
     return source_code + utility
 
 

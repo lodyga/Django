@@ -2,7 +2,7 @@
 #include <tuple>
 using namespace std;
 
-template<typename Method, typename Inputs>
+template <typename Method, typename Inputs>
 void runTests(
    Solution& solution,
    Method method,

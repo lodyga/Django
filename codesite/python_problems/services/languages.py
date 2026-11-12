@@ -170,7 +170,7 @@ class JavaScriptAdapter(LanguageAdapter):
 
 class CppAdapter(LanguageAdapter):
     config = LanguageConfig(
-        print="println",  # print serialized in print_in_cpp.cpp
+        print="println",  # print serializer in json_serializer.cpp
         serialize="",
         solution=SolutionConfig(
             instance_code="\nSolution solution;\n",

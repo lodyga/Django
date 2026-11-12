@@ -74,7 +74,7 @@ def get_output_data(response, test_case_size):
         for line in output_serialized_data
     ]
 
-    # for void println(const vector<char>& values) {} in print_in_cpp.cpp when "'"
+    # for void println(const vector<char>& values) {} in json_serializer.cpp when "'"
     # import ast
     # return [
     #     ast.literal_eval(line)
