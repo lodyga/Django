@@ -1,0 +1,31 @@
+.ai-assistant-panel {
+  max-width: 28rem;
+}
+
+.ai-assistant-card {
+  border-color: var(--bs-border-color);
+  border-top: 3px solid var(--bs-primary);
+  box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.1);
+}
+
+.ai-assistant-card .card-header,
+.ai-assistant-card .card-footer {
+  background-color: var(--bs-tertiary-bg);
+  border-color: var(--bs-border-color);
+}
+
+.ai-chat-history {
+  height: 28rem;
+  max-height: 28rem;
+  margin-bottom: 0.75rem;
+  resize: vertical;
+  font-family: var(--bs-font-monospace);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.ai-chat-composer {
+  min-height: 4.75rem;
+  max-height: 12rem;
+  resize: vertical;
+}

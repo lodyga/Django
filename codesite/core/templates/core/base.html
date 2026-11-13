@@ -41,6 +41,7 @@
     {{ request.user.username|json_script:"userName" }}
     <script src="{% static 'core/darkmode.js' %}" defer></script>
     <script src="{% static 'core/ai-assistant.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'core/ai-assistant.css' %}">
     {% block head %}
     {% endblock head %}
   </head>

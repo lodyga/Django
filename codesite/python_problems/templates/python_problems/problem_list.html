@@ -4,8 +4,10 @@
 {% endblock title %}
 {% block head %}
   {% load static %}
+  <link rel="stylesheet" href="{% static 'python_problems/styles.css' %}">
   <script src="{% static 'python_problems/problems-per-page.js' %}"></script>
   <script src="{% static 'python_problems/toggle-tags.js' %}" defer></script>
+  <script src="{% static 'python_problems/problem-view-toggle.js' %}" defer></script>
 {% endblock head %}
 {% block content %}
   <div class="row m-1">

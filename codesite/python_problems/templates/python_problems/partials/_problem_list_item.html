@@ -1,0 +1,28 @@
+<div class="problem-item-content">
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <span class="problem-title">{{ problem.title }}</span>
+    {% if user == problem.owner %}
+      <span class="small">(<a href="{% url 'python_problems:problem-update' problem.id %}?next={{ request.get_full_path|urlencode }}">Update</a> |
+        <a href="{% url 'python_problems:problem-delete' problem.id %}?next={{ request.get_full_path|urlencode }}">Delete</a>)</span>
+    {% endif %}
+    <form method="post" class="problem-tags-form">
+      {% csrf_token %}
+      {% for tag in problem.tags.all %}
+        <button class="tags btn btn-secondary py-0 px-1"
+                style="display: none"
+                name="tag_id"
+                type="submit"
+                value="{{ tag.id }}">{{ tag }}</button>
+      {% endfor %}
+    </form>
+  </div>
+  <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
+    <span class="problem-difficulty {% if problem.difficulty.name == 'Easy' %}text-success{% elif problem.difficulty.name == 'Medium' %}text-warning{% elif problem.difficulty.name == 'Hard' %}text-danger{% endif %}">{{ problem.difficulty }}</span>
+    <div>
+      {% for language in problem.languages %}
+        <a class="btn btn-link py-0 px-1"
+           href="{% url 'python_problems:problem-detail' problem.slug language %}?next={{ request.get_full_path|urlencode }}">{{ language }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</div>

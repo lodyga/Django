@@ -119,3 +119,121 @@
 #id_tags.selectmultiple {
   min-height: 32rem;
 }
+
+.problem-filter-panel {
+  max-width: 22rem;
+}
+
+.problem-filter-card {
+  border-color: var(--bs-border-color);
+  border-top: 3px solid var(--bs-primary);
+  box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.1);
+}
+
+.problem-filter-fields {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.problem-filter-card .form-label {
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.problem-list-view {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0;
+  list-style: none;
+}
+
+.problem-list-item {
+  position: relative;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--bs-border-color);
+  border-left: 4px solid var(--bs-secondary);
+  border-radius: 0.5rem;
+  background-color: var(--bs-body-bg);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+    transform 0.15s ease-in-out;
+}
+
+.problem-list-item:hover {
+  border-color: var(--bs-primary);
+  border-left-color: var(--bs-primary);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.problem-list-item .problem-item-content {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.problem-list-item .problem-item-content > div:first-child {
+  min-height: 1.75rem;
+}
+
+.problem-list-item .problem-item-content > div:last-child {
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--bs-border-color-translucent);
+}
+
+.problem-compact-view {
+  padding: 0;
+  list-style: none;
+}
+
+.problem-compact-item {
+  padding: 0.45rem 0.25rem;
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+
+.problem-compact-item .problem-item-content {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.problem-compact-item .problem-title {
+  font-size: 1rem;
+}
+
+.problem-compact-item .problem-difficulty {
+  font-size: 0.85rem;
+}
+
+.problem-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+}
+
+.problem-tags-form {
+  display: inline;
+}
+
+.problem-tags-form .tags {
+  margin-right: 0.2rem;
+}
+
+.problem-difficulty {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.problem-grid-card {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.problem-grid-card:hover {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.15);
+}
+
+@media (min-width: 768px) {
+  .problem-list-item .problem-item-content > div:last-child {
+    display: flex !important;
+    justify-content: space-between;
+  }
+}

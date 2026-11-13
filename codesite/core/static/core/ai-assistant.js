@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
    if (chatHistory) { chatBox.value = chatHistory; };
    const chatUserInput = document.getElementById("chatUserInput");
    const sendButton = document.getElementById("sendButton");
+   const sendButtonLabel = document.getElementById("aiSendButtonLabel");
    const aiSolveProblemButton = document.getElementById("aiSolveProblemButton");
    const chooseAiModelBtn = document.getElementById("chooseAiModelBtn");
    const chooseAiModelMenu = document.getElementById("chooseAiModelMenu");
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Show spinner and disable button
       sendButton.disabled = true;
       if (aiSolveProblemButton) aiSolveProblemButton.disabled = true;
-      sendButton.firstChild.textContent = "Wait ";
+      sendButtonLabel.textContent = "Wait";
       document.getElementById('aiSendButtonSpinner').classList.remove("d-none");
 
       // Add the user's message to the chat box.
@@ -95,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
          // Hide spinner and re-enable button
          sendButton.disabled = false;
          if (aiSolveProblemButton) aiSolveProblemButton.disabled = false;
-         sendButton.firstChild.textContent = "Send";
+         sendButtonLabel.textContent = "Send";
          document.getElementById('aiSendButtonSpinner').classList.add('d-none');
       });
 
@@ -107,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
          appendMessage("AI", "Error: Could not get a streamed response.");
          sendButton.disabled = false;
          if (aiSolveProblemButton) aiSolveProblemButton.disabled = false;
-         sendButton.firstChild.textContent = "Send";
+         sendButtonLabel.textContent = "Send";
          document.getElementById('aiSendButtonSpinner').classList.add('d-none');
       };
    }
@@ -135,13 +136,15 @@ document.addEventListener('DOMContentLoaded', () => {
          activeModel = item.getAttribute("data-model") || "cohere";
          const label = item.textContent.trim() || "Model";
          if (chooseAiModelBtn) {
-            chooseAiModelBtn.textContent = `Model: ${label}`;
+            chooseAiModelBtn.textContent = label;
          }
       });
    }
 
    aiAssistantButton.addEventListener('click', () => {
       aiContainer.classList.toggle("d-none");
+      aiAssistantButton.setAttribute(
+         'aria-expanded', String(!aiContainer.classList.contains('d-none')));
    });
 
    const autoResize = (element) => {
