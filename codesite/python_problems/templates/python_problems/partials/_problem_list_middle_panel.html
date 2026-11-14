@@ -1,6 +1,5 @@
 {% if page_obj %}
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <button class="btn btn-secondary px-2 py-0" id="toggleTagsButton">Show tags</button>
+  <div class="d-flex align-items-center justify-content-end mb-3">
     <div class="btn-group" role="group" aria-label="Problem view">
       <button class="btn btn-outline-secondary active"
               id="listViewButton"
@@ -23,8 +22,75 @@
               aria-pressed="false">
         <i class="fas fa-th" aria-hidden="true"></i>
       </button>
+      <button class="btn px-2 py-0" type="button" id="toggleTagsButton">Show tags</button>
     </div>
   </div>
+  <div class="problem-tag-bar mb-3">
+    <span class="problem-tag-label">Tags</span>
+    <form class="problem-tag-filter"
+          id="problemTagFilter"
+          method="get"
+          action="{% url 'python_problems:problem-index' %}">
+      <input type="hidden" name="query_text" value="{{ query_text }}">
+      <input type="hidden" name="difficulty_id" value="{{ difficulty_id }}">
+      <input type="hidden" name="language_id" value="{{ language_id }}">
+      <input type="hidden" name="order_by" value="{{ order_by }}">
+      <input type="hidden"
+             name="problems_per_page"
+             value="{{ problems_per_page }}">
+      <button class="btn btn-sm {% if tag_id == 0 %}btn-primary{% else %}btn-outline-secondary{% endif %} tag-filter-button"
+              type="submit"
+              name="tag_id"
+              value="0"
+              {% if tag_id == 0 %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>All</button>
+      {% for tag in tag_list %}
+        <button class="btn btn-sm {% if tag.id == tag_id %}btn-primary{% else %}btn-outline-secondary{% endif %} tag-filter-button"
+                type="submit"
+                name="tag_id"
+                value="{{ tag.id }}"
+                {% if tag.id == tag_id %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+          {{ tag.name }} <span class="text-nowrap">({{ tag.problem_count }})</span>
+        </button>
+      {% endfor %}
+    </form>
+    <button class="btn btn-sm btn-outline-secondary problem-tag-toggle"
+            id="problemTagToggle"
+            type="button"
+            aria-controls="problemTagFilter"
+            aria-expanded="false">Show all tags</button>
+  </div>
+  <form class="problem-language-filter mb-3"
+        id="problemLanguageFilter"
+        method="get"
+        action="{% url 'python_problems:problem-index' %}"
+        aria-label="Filter by language">
+    <input type="hidden" name="query_text" value="{{ query_text }}">
+    <input type="hidden" name="difficulty_id" value="{{ difficulty_id }}">
+    <input type="hidden" name="tag_id" value="{{ tag_id }}">
+    <input type="hidden" name="order_by" value="{{ order_by }}">
+    <input type="hidden"
+           name="problems_per_page"
+           value="{{ problems_per_page }}">
+    <button class="btn btn-sm {% if language_id == 0 %}btn-primary{% else %}btn-outline-secondary{% endif %} language-filter-button"
+            type="submit"
+            name="language_id"
+            value="0"
+            {% if language_id == 0 %}aria-pressed="true"{% else %}aria-pressed="false"{% endif %}>
+      <i class="fas fa-code me-1" aria-hidden="true"></i>All languages
+    </button>
+    {% for language in language_filter_list %}
+      <button class="btn btn-sm {% if language.id == language_id %}btn-primary{% else %}btn-outline-secondary{% endif %} language-filter-button"
+              type="submit"
+              name="language_id"
+              value="{{ language.id }}"
+              style="--language-color: {{ language.color }}"
+              aria-pressed="{% if language.id == language_id %}true{% else %}false{% endif %}">
+        <i class="{{ language.icon_class }} language-filter-icon me-1"
+           aria-hidden="true"></i>{{ language.name }}
+        <span class="text-nowrap">({{ language.problem_count }})</span>
+      </button>
+    {% endfor %}
+  </form>
   <ul class="problem-list-view mb-0" id="problemListView">
     {% for problem in page_obj %}
       <li class="problem-list-item">{% include "python_problems/partials/_problem_list_item.html" %}</li>
@@ -35,7 +101,7 @@
       <li class="problem-compact-item">{% include "python_problems/partials/_problem_list_item.html" %}</li>
     {% endfor %}
   </ul>
-  <div class="row row-cols-1 row-cols-md-2 g-3 problem-grid-view d-none"
+  <div class="row row-cols-1 row-cols-md-2 g-3 problem-grid-view d-none mb-3"
        id="problemGridView">
     {% for problem in page_obj %}
       <div class="col">

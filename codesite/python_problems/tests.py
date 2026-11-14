@@ -896,6 +896,41 @@ class ProblemIndexViewTests(TestCase):
             problem.title for problem in response.context["page_obj"].object_list]
         self.assertEqual(titles, ["Two Sum II - Input Array Is Sorted"])
 
+    def test_tag_filter_bar_orders_tags_by_problem_frequency(self):
+        response = self.client.get(reverse("python_problems:problem-index"))
+
+        tags = list(response.context["tag_list"])
+        self.assertEqual(
+            [tag.id for tag in tags],
+            [self.tag_array.id, self.tag_two_pointers.id],
+        )
+        self.assertEqual([tag.problem_count for tag in tags], [2, 1])
+        self.assertContains(response, 'class="problem-tag-bar')
+        self.assertContains(response, 'name="tag_id"')
+        self.assertContains(response, "Array")
+        self.assertContains(response, "(2)")
+
+    def test_language_filter_bar_shows_languages_with_seven_solved_problems(self):
+        for index in range(6):
+            problem = create_sample_problem(title=f"Additional problem {index}")
+            create_sample_solution(
+                problem=problem,
+                language=self.language_python,
+            )
+
+        response = self.client.get(reverse("python_problems:problem-index"))
+
+        languages = list(response.context["language_filter_list"])
+        self.assertEqual(
+            [(language.name, language.problem_count) for language in languages],
+            [("Python", 7)],
+        )
+        self.assertContains(response, 'id="problemLanguageFilter"')
+        self.assertContains(response, 'class="fab fa-python language-filter-icon')
+        self.assertContains(response, "--language-color: #3776AB")
+        self.assertContains(response, "(7)")
+        self.assertNotContains(response, "JavaScript</button>")
+
     def test_filters_by_query_text_with_get_parameters(self):
         response = self.client.get(
             reverse("python_problems:problem-index"),

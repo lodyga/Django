@@ -54,10 +54,27 @@ from .services.problem_helpers import (
 from .services.test_case_parsing import get_field
 
 
+LANGUAGE_FILTER_STYLES = {
+    "python": ("fab fa-python", "#3776AB"),
+    "javascript": ("fab fa-js", "#F7DF1E"),
+    "java": ("fab fa-java", "#ED8B00"),
+    "php": ("fab fa-php", "#777BB4"),
+    "ruby": ("fab fa-ruby", "#CC342D"),
+    "c++": ("fas fa-code", "#00599C"),
+    "c#": ("fas fa-code", "#512BD4"),
+    "rust": ("fas fa-code", "#CE422B"),
+    "pandas": ("fab fa-python", "#150458"),
+    "mysql": ("fas fa-database", "#4479A1"),
+    "postgresql": ("fas fa-database", "#336791"),
+}
+
+
 def tag_graph_view(request):
-    tag_list = (Tag.objects
-                .annotate(problem_count=Count("problem"))
-                .order_by("-problem_count"))
+    tag_list = (
+        Tag.objects
+        .annotate(problem_count=Count("problem"))
+        .order_by("-problem_count")
+    )
 
     data = [
         {"tag": tag.name, "count": tag.problem_count}
@@ -142,25 +159,56 @@ class ProblemIndexView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["language_id"] = int(self.request.GET.get("language_id", 0))
+
+        if context["language_id"] > 0:
+            language = Language.objects.get(id=context["language_id"])
+        else:
+            language = None
+
+        context["language"] = language  # not needed but maybe it should be used instead of language_id
+
         page_problems = list(context["page_obj"].object_list)
 
         for problem in page_problems:
-            problem.languages = {
-                solution.language
-                for solution in problem.solutions.all()
-            }
+            if language:
+                problem.languages = {language}
+            else:
+                problem.languages = {
+                    solution.language
+                    for solution in problem.solutions.all()
+                }
 
         context["difficulty_list"] = Difficulty.objects.all()
         context["problem_list"] = Problem.objects.all()
-        context["tag_list"] = Tag.objects.all()
+        context["tag_list"] = (
+            Tag.objects
+            .annotate(problem_count=Count("problem"))
+            .order_by("-problem_count")
+        )
         context["language_list"] = (
             Language.objects
             .annotate(solution_count=Count("solution"))
             .order_by("-solution_count")
         )
+        language_filter_list = (
+            Language.objects
+            .annotate(
+                problem_count=Count("solution__problem", distinct=True)
+            )
+            .filter(problem_count__gte=7)
+            .order_by("-problem_count", "name")
+        )
+        for filter_language in language_filter_list:
+            filter_language.icon_class, filter_language.color = (
+                LANGUAGE_FILTER_STYLES.get(
+                    filter_language.name.casefold(),
+                    ("fas fa-code", "#6C757D"),
+                )
+            )
+        context["language_filter_list"] = language_filter_list
         context["difficulty_id"] = int(
             self.request.GET.get("difficulty_id", 0))
-        context["language_id"] = int(self.request.GET.get("language_id", 0))
         context["tag_id"] = int(self.request.GET.get("tag_id", 0))
         context["query_text"] = self.request.GET.get("query_text", "")
         context["order_by"] = self.request.GET.get("order_by", "created_at")
@@ -384,21 +432,25 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             else:
                 if output["status"]["description"] == "Accepted":
                     output_container = [
-                    ("Status", (output["status"]["description"], "text-success"))]
+                        ("Status", (output["status"]["description"], "text-success"))]
                 else:
                     output_container = [
-                    ("Status", (output["status"]["description"], "text-body"))]
+                        ("Status", (output["status"]["description"], "text-body"))]
 
                 if output["stderr"]:
-                    output_container.append(("Stderr", (output["stderr"], "text-body")))
+                    output_container.append(
+                        ("Stderr", (output["stderr"], "text-body")))
                 elif "stdout" in output:
-                    output_container.append(("Stdout", (output["stdout"], "text-body")))
+                    output_container.append(
+                        ("Stdout", (output["stdout"], "text-body")))
 
                 if "result" in output:
                     if output["result"] == "Tests passed!":
-                        output_container.append(("Result", (output["result"], "text-success")))
+                        output_container.append(
+                            ("Result", (output["result"], "text-success")))
                     else:
-                        output_container.append(("Result", (output["result"], "text-danger")))
+                        output_container.append(
+                            ("Result", (output["result"], "text-danger")))
 
                 if "time" in output:
                     output_container.append(
@@ -406,7 +458,8 @@ class ProblemDetailView(NextUrlMixin, DetailView):
                     )
                 if "memory" in output:
                     output_container.append(
-                        ("Memory", (f'{output["memory"]} kilobytes', "text-body"))
+                        ("Memory",
+                         (f'{output["memory"]} kilobytes', "text-body"))
                     )
 
         return output_container

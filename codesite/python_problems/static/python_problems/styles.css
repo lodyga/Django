@@ -141,6 +141,58 @@
   font-weight: 600;
 }
 
+.problem-tag-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.problem-tag-label {
+  font-weight: 600;
+  padding: 0.25rem 0;
+  white-space: nowrap;
+}
+
+.problem-tag-toggle {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.problem-tag-filter {
+  display: flex;
+  flex: 1;
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+  min-width: 0;
+  max-height: 2rem;
+  overflow: hidden;
+}
+
+.problem-tag-filter.is-expanded {
+  flex-wrap: wrap;
+  max-height: none;
+  overflow: visible;
+}
+
+.problem-tag-filter .tag-filter-button {
+  white-space: nowrap;
+}
+
+.problem-language-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.problem-language-filter .language-filter-button {
+  white-space: nowrap;
+  border-color: var(--language-color);
+}
+
+.language-filter-icon {
+  color: var(--language-color);
+}
+
 .problem-list-view {
   display: grid;
   gap: 0.75rem;
