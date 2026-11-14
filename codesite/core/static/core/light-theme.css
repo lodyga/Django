@@ -1,0 +1,8 @@
+:root:not([data-bs-theme="dark"]) {
+  --bs-body-bg: #edeae1;
+  --bs-body-color: #292b2c;
+  --bs-secondary-bg: #cecece;
+  --bs-tertiary-bg: #d4d4d4;
+  --bs-border-color: #b7b7b7;
+  --bs-border-color-translucent: rgba(41, 43, 44, 0.15);
+}

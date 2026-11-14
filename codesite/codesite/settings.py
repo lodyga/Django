@@ -18,17 +18,17 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = not DEBUG
 
 
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "ukasz.eu.pythonanywhere.com",
-    "localhost",  # local Docker
-    "codesite.onrender.com",  # Docker container on Render
-    "testserver",  # Testing in Activity Bar
-    "158.101.162.117",  # Oracle Micro VM
-    "130.61.85.9",  # Oracle Flex VM
-    "35.211.222.254",  # Google Micro VM
-    "35.208.20.180",  # Google Micro VM
-]
+# ALLOWED_HOSTS = [
+#     "127.0.0.1",
+#     "ukasz.eu.pythonanywhere.com",
+#     "localhost",  # local Docker
+#     "codesite.onrender.com",  # Docker container on Render
+#     "testserver",  # Testing in Activity Bar
+#     "158.101.162.117",  # Oracle Micro VM
+#     "130.61.85.9",  # Oracle Flex VM
+#     "35.211.222.254",  # Google Micro VM
+#     "35.208.20.180",  # Google Micro VM
+# ]
 
 HOST_IP = os.getenv("HOST_IP", "")
 ALLOWED_HOSTS = [HOST_IP]
@@ -39,6 +39,8 @@ CLOUDRUN_URL = os.getenv("CLOUDRUN_URL", "").rstrip("/")
 if CLOUDRUN_URL:
     ALLOWED_HOSTS = [urlparse(CLOUDRUN_URL).netloc]
     CSRF_TRUSTED_ORIGINS = [CLOUDRUN_URL]
+
+ALLOWED_HOSTS.append("localhost")
 
 
 INSTALLED_APPS = [
