@@ -206,11 +206,22 @@ class ProblemIndexView(ListView):
 
         context["difficulty_list"] = Difficulty.objects.all()
         context["problem_list"] = Problem.objects.all()
-        context["tag_list"] = (
+        tag_list = (
             Tag.objects
             .annotate(problem_count=Count("problem"))
             .order_by("-problem_count")
         )
+        tag_id = int(self.request.GET.get("tag_id", 0))
+        if tag_id:
+            tag_list = tag_list.order_by(
+                Case(
+                    When(pk=tag_id, then=Value(0)),
+                    default=Value(1),
+                    output_field=IntegerField(),
+                ),
+                "-problem_count",
+            )
+        context["tag_list"] = tag_list
         context["language_list"] = (
             Language.objects
             .annotate(solution_count=Count("solution"))
@@ -234,7 +245,7 @@ class ProblemIndexView(ListView):
         context["language_filter_list"] = language_filter_list
         context["difficulty_id"] = int(
             self.request.GET.get("difficulty_id", 0))
-        context["tag_id"] = int(self.request.GET.get("tag_id", 0))
+        context["tag_id"] = tag_id
         context["query_text"] = self.request.GET.get("query_text", "")
         context["order_by"] = self.request.GET.get("order_by", "created_at")
         context["problems_per_page"] = self.get_paginate_by(

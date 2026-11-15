@@ -910,6 +910,23 @@ class ProblemIndexViewTests(TestCase):
         self.assertContains(response, "Array")
         self.assertContains(response, "(2)")
 
+    def test_tag_filter_bar_shows_selected_tag_first(self):
+        response = self.client.get(
+            reverse("python_problems:problem-index"),
+            {"tag_id": self.tag_two_pointers.id},
+        )
+
+        tag_filter = (
+            response.content.decode()
+            .split('<form class="problem-tag-filter"', 1)[1]
+            .split("</form>", 1)[0]
+        )
+        selected_position = tag_filter.index(
+            f'value="{self.tag_two_pointers.id}"'
+        )
+        other_position = tag_filter.index(f'value="{self.tag_array.id}"')
+        self.assertLess(selected_position, other_position)
+
     def test_language_filter_bar_shows_languages_with_seven_solved_problems(self):
         for index in range(6):
             problem = create_sample_problem(title=f"Additional problem {index}")
