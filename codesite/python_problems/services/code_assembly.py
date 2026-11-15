@@ -12,14 +12,29 @@ from .test_case_expression import get_test_case_input_expression
 
 def clean_python_types(source_code):
     """Convert types to match Python 3.8"""
+    python_version = sys.version.split(" ")[0]
+
+    if not python_version.startswith("3.8"):
+        return source_code
+
     source_code = re.sub(
         r":\s*list\[",
         ": List[",
         source_code
     )
     source_code = re.sub(
+        r"\[list\[",
+        "[List[",
+        source_code
+    )
+    source_code = re.sub(
         r":\s*tuple\[",
         ": Tuple[",
+        source_code
+    )
+    source_code = re.sub(
+        r"\[tuple\[",
+        "[Tuple[",
         source_code
     )
     source_code = re.sub(
