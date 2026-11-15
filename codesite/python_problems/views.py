@@ -1,3 +1,5 @@
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
@@ -362,6 +364,16 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         )
         owner_solutions = owner_solution_data["owner_solutions"]
         owner_solution_languages = owner_solution_data["owner_solution_languages"]
+        if self.request.user.is_authenticated:
+            existing_user_language_ids = Solution.objects.filter(
+                problem=problem,
+                owner=self.request.user,
+            ).values_list("language_id", flat=True)
+            add_solution_languages = Language.objects.exclude(
+                id__in=existing_user_language_ids
+            ).order_by("name")
+        else:
+            add_solution_languages = Language.objects.none()
         # Multiple solutions are allowed; use the first ordered solution.
         selected_solution = owner_solutions.first()
 
@@ -411,6 +423,7 @@ class ProblemDetailView(NextUrlMixin, DetailView):
                 "description": problem.description,
                 "language": language.name,
             },
+            "add_solution_languages": add_solution_languages,
             "examples": examples,
             "language": language,
             "language_id": language.id,
@@ -592,6 +605,20 @@ class SolutionCreate(LoginRequiredMixin, NextUrlMixin, CreateView):
     model = Solution
     form_class = SolutionCreateForm
     success_url = reverse_lazy('python_problems:problem-index')
+
+    def get_success_url(self):
+        next_url = self._get_next_url()
+        if not next_url:
+            return super().get_success_url()
+
+        parsed_url = urlsplit(next_url)
+        query = [
+            (key, value)
+            for key, value in parse_qsl(parsed_url.query, keep_blank_values=True)
+            if key != "solution_id"
+        ]
+        query.append(("solution_id", str(self.object.id)))
+        return urlunsplit(parsed_url._replace(query=urlencode(query)))
 
     def get_initial(self):
         initial = super().get_initial()

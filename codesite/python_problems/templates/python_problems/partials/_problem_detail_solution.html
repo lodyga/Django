@@ -49,6 +49,30 @@
               </select>
             </form>
           </div>
+          {% if user.is_authenticated %}
+            <div class="col-auto mb-2">
+              <form method="get" action="{% url 'python_problems:solution-create' %}">
+                <input type="hidden" name="problem" value="{{ problem.id }}">
+                <input type="hidden" name="order" value="1">
+                <input type="hidden"
+                       name="next"
+                       value="{% url 'python_problems:problem-detail' problem_slug language %}">
+                <label for="add-solution-language-id" class="mb-2">
+                  <b>Add solution:</b>
+                </label>
+                <select class="form-select"
+                        id="add-solution-language-id"
+                        name="language"
+                        required
+                        onchange="this.form.submit()">
+                  <option value="" selected disabled>Choose language</option>
+                  {% for language in add_solution_languages %}
+                    <option value="{{ language.id }}">{{ language }}</option>
+                  {% endfor %}
+                </select>
+              </form>
+            </div>
+          {% endif %}
         </div>
       </div>
       {% if owner_solutions %}
@@ -56,7 +80,7 @@
         <div class="d-flex justify-content-start">
           <div class="col col-auto" id="solution-button-container"></div>
           {% if user.is_authenticated %}
-            <div class="col col-auto "
+            <div class="col col-auto"
                  id="solution-create-btn"
                  data-create-url="{% url 'python_problems:solution-create' %}"
                  data-problem-id="{{ solution.problem_id }}"

@@ -1073,6 +1073,42 @@ class SolutionDetailViewTests(TestCase):
             ["Python", "JavaScript", "C++", "Java", "C#", "Ruby"],
         )
 
+    def test_add_solution_languages_exclude_users_existing_languages(self):
+        user = create_sample_user("add-solution-user")
+        self.client.force_login(user)
+        problem = create_sample_problem()
+        python = Language.objects.get_or_create(name="Python")[0]
+        javascript = Language.objects.get_or_create(name="JavaScript")[0]
+        java = Language.objects.get_or_create(name="Java")[0]
+        create_sample_solution(
+            problem=problem,
+            language=python,
+            owner=user,
+        )
+
+        response = self.client.get(
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={"slug": problem.slug, "language": python.name},
+            )
+        )
+
+        self.assertEqual(
+            list(response.context["add_solution_languages"]),
+            [java, javascript],
+        )
+        self.assertContains(
+            response,
+            f'action="{reverse("python_problems:solution-create")}"',
+        )
+        self.assertContains(response, 'name="language"')
+        self.assertContains(
+            response,
+            f'value="{javascript.id}">{javascript}</option>',
+        )
+        self.assertContains(response, f'value="{java.id}">{java}</option>')
+        self.assertNotContains(response, f'value="{python.id}">{python}</option>')
+
     def test_back_link_uses_next_url(self):
         solution = create_sample_solution()
         next_url = f"{reverse('python_problems:problem-index')}?page=2"
@@ -1588,6 +1624,32 @@ class SolutionCreateViewTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response.url)
 
+    def test_create_solution_form_uses_selected_problem_and_language(self):
+        language = Language.objects.create(name="JavaScript")
+        next_url = reverse(
+            "python_problems:problem-detail",
+            kwargs={"slug": self.problem.slug, "language": self.language.name},
+        )
+
+        response = self.client.get(
+            reverse("python_problems:solution-create"),
+            {
+                "problem": self.problem.id,
+                "language": language.id,
+                "next": next_url,
+            },
+        )
+
+        self.assertEqual(
+            response.context["form"]["problem"].value(),
+            str(self.problem.id),
+        )
+        self.assertEqual(
+            response.context["form"]["language"].value(),
+            str(language.id),
+        )
+        self.assertEqual(response.context["next_url"], next_url)
+
     def test_create_solution_valid_data(self):
         time_complexity = Complexity.objects.get_or_create(name="O(n)")[0]
         space_complexity = Complexity.objects.get_or_create(name="O(n)")[0]
@@ -1608,6 +1670,36 @@ class SolutionCreateViewTests(TestCase):
             Solution.objects.filter(
                 problem=self.problem, language=self.language, owner=self.user
             ).exists()
+        )
+
+    def test_create_solution_redirect_selects_the_new_solution(self):
+        time_complexity = Complexity.objects.get_or_create(name="O(n)")[0]
+        space_complexity = Complexity.objects.get_or_create(name="O(n)")[0]
+        next_url = reverse(
+            "python_problems:problem-detail",
+            kwargs={"slug": self.problem.slug, "language": self.language.name},
+        )
+
+        response = self.client.post(
+            reverse("python_problems:solution-create"),
+            data={
+                "problem": self.problem.id,
+                "language": self.language.id,
+                "source_code": "def solve(): pass",
+                "test_cases": "(solve(), None)",
+                "time_complexity": time_complexity.id,
+                "space_complexity": space_complexity.id,
+                "order": 2,
+                "next": next_url,
+            },
+        )
+
+        solution = Solution.objects.get(
+            problem=self.problem, language=self.language, owner=self.user
+        )
+        self.assertEqual(
+            response.url,
+            f"{next_url}?solution_id={solution.id}",
         )
 
     def test_create_solution_sets_owner(self):

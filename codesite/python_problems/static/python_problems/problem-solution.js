@@ -172,7 +172,11 @@ document.addEventListener('DOMContentLoaded', () => {
    }
 
    if (solutionLength > 0) {
-      showSolution(1);
+      const requestedSolutionId = new URLSearchParams(window.location.search).get('solution_id');
+      const requestedSolutionIndex = Array.from(solutionElements).findIndex(
+         (solution) => solution.dataset.solutionId === requestedSolutionId
+      );
+      showSolution(requestedSolutionIndex === -1 ? 1 : requestedSolutionIndex + 1);
    }
 
    copySolutionBtn?.addEventListener('click', () => {
