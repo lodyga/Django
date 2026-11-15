@@ -1,4 +1,3 @@
-import os
 import re
 import sys
 from codesite.settings import DJANGO_ENV
@@ -11,10 +10,8 @@ from .test_case_expression import get_test_case_input_expression
 
 
 def clean_python_types(source_code):
-    """Convert types to match Python 3.8"""
-    python_version = sys.version.split(" ")[0]
-
-    if not python_version.startswith("3.8"):
+    """Convert types to match judge0 Python 3.8 on pythonanywhere."""
+    if DJANGO_ENV != "pythonanywhere":
         return source_code
 
     source_code = re.sub(
@@ -47,6 +44,7 @@ def clean_python_types(source_code):
         ": Optional[ListNode]",
         source_code
     )
+
     return source_code
 
 
