@@ -9,6 +9,34 @@ document.addEventListener('DOMContentLoaded', () => {
    const problemTestCaseUpdateLink = document.getElementById('problemTestCaseUpdateLink');
    const currentUserId = problemTestCaseUpdateLink?.dataset.currentUserId || '';
 
+   function initializeTestCaseValueToggles() {
+      const values = document.querySelectorAll('[data-test-case-collapsible]');
+
+      values.forEach((value, index) => {
+         if (value.scrollHeight <= value.clientHeight) {
+            return;
+         }
+
+         const valueId = `test-case-value-${index + 1}`;
+         value.id = valueId;
+
+         const toggle = document.createElement('button');
+         toggle.type = 'button';
+         toggle.className = 'btn btn-link btn-sm p-0 mb-2 test-case-value-toggle';
+         toggle.textContent = 'Show more';
+         toggle.setAttribute('aria-controls', valueId);
+         toggle.setAttribute('aria-expanded', 'false');
+         toggle.addEventListener('click', () => {
+            const isExpanded = value.classList.toggle('is-expanded');
+            toggle.textContent = isExpanded ? 'Show less' : 'Show more';
+            toggle.setAttribute('aria-expanded', String(isExpanded));
+         });
+         value.insertAdjacentElement('afterend', toggle);
+      });
+   }
+
+   initializeTestCaseValueToggles();
+
    // Collapsable paragraph.
    const problemTestCasesWrapper = document.getElementById('problemTestCases');
    if (!problemTestCasesWrapper) {

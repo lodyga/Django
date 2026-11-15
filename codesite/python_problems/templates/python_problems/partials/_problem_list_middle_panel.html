@@ -64,6 +64,7 @@
         method="get"
         action="{% url 'python_problems:problem-index' %}"
         aria-label="Filter by language">
+    <input type="hidden" name="page" value="{{ page_obj.number }}">
     <input type="hidden" name="query_text" value="{{ query_text }}">
     <input type="hidden" name="difficulty_id" value="{{ difficulty_id }}">
     <input type="hidden" name="tag_id" value="{{ tag_id }}">

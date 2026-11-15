@@ -967,6 +967,39 @@ class ProblemIndexViewTests(TestCase):
         self.assertEqual(response.context["page_obj"].paginator.per_page, 5)
         self.assertEqual(page_titles, sorted(page_titles))
 
+    def test_language_filter_forms_preserve_current_page(self):
+        response = self.client.get(
+            reverse("python_problems:problem-index"),
+            {"page": 2, "problems_per_page": 1},
+        )
+
+        self.assertEqual(response.context["page_obj"].number, 2)
+        content = response.content.decode()
+        for form_id in ("search_bar", "problemLanguageFilter"):
+            form = content.split(f'id="{form_id}"', 1)[1].split("</form>", 1)[0]
+            self.assertIn('name="page" value="2"', form)
+
+    def test_language_filter_uses_last_available_page_when_current_page_is_too_high(self):
+        for index in range(3):
+            problem = create_sample_problem(title=f"Python problem {index}")
+            create_sample_solution(
+                problem=problem,
+                language=self.language_python,
+            )
+
+        response = self.client.get(
+            reverse("python_problems:problem-index"),
+            {
+                "language_id": self.language_python.id,
+                "page": 3,
+                "problems_per_page": 2,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page_obj"].number, 2)
+        self.assertEqual(response.context["page_obj"].paginator.num_pages, 2)
+
     def test_request_factory_get_request_exposes_expected_context(self):
         request = RequestFactory().get(reverse("python_problems:problem-index"))
         request.user = create_sample_user()

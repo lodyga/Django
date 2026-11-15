@@ -10,6 +10,7 @@
         <h2 class="h5 mb-0">Find problems</h2>
       </div>
       <form method="get" id="search_bar">
+        <input type="hidden" name="page" value="{{ page_obj.number }}">
         <div class="mb-3">
           <label for="search_box" class="form-label">Search</label>
           <div class="input-group">

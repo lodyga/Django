@@ -157,6 +157,28 @@ class ProblemIndexView(ListView):
     def get_paginate_by(self, queryset):
         return int(self.request.GET.get("problems_per_page", 7))
 
+    def paginate_queryset(self, queryset, page_size):
+        language_id = self.request.GET.get("language_id")
+        page = self.request.GET.get("page")
+        if language_id and language_id != "0" and page:
+            try:
+                requested_page = int(page)
+            except ValueError:
+                pass
+            else:
+                paginator = self.get_paginator(
+                    queryset,
+                    page_size,
+                    orphans=self.get_paginate_orphans(),
+                    allow_empty_first_page=self.get_allow_empty(),
+                )
+                if requested_page > paginator.num_pages:
+                    params = self.request.GET.copy()
+                    params["page"] = str(paginator.num_pages)
+                    self.request.GET = params
+
+        return super().paginate_queryset(queryset, page_size)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["language_id"] = int(self.request.GET.get("language_id", 0))

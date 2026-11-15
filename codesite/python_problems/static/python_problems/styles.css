@@ -178,6 +178,19 @@
   white-space: nowrap;
 }
 
+.test-case-value {
+  max-height: 12rem;
+  overflow: hidden;
+}
+
+.test-case-value.is-expanded {
+  max-height: none;
+}
+
+.test-case-value-toggle {
+  font-size: 0.8rem;
+}
+
 .problem-language-filter {
   display: flex;
   flex-wrap: wrap;

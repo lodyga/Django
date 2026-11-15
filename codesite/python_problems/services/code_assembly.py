@@ -13,23 +13,23 @@ from .test_case_expression import get_test_case_input_expression
 def clean_python_types(source_code):
     """Convert types to match Python 3.8"""
     source_code = re.sub(
-        r"list\[",
-        "List[",
+        r":\s*list\[",
+        ": List[",
         source_code
     )
     source_code = re.sub(
-        r"tuple\[",
-        "Tuple[",
+        r":\s*tuple\[",
+        ": Tuple[",
         source_code
     )
     source_code = re.sub(
-        r"TreeNode\s*\|\s*None\s*",
-        "Optional[TreeNode]",
+        r":\s*TreeNode\s*\|\s*None\s*",
+        ": Optional[TreeNode]",
         source_code
     )
     source_code = re.sub(
-        r"ListNode\s*\|\s*None\s*",
-        "Optional[ListNode]",
+        r":\s*ListNode\s*\|\s*None\s*",
+        ": Optional[ListNode]",
         source_code
     )
     return source_code
