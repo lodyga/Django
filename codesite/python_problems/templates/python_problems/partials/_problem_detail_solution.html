@@ -51,23 +51,27 @@
           </div>
           {% if user.is_authenticated %}
             <div class="col-auto mb-2">
-              <form method="get" action="{% url 'python_problems:solution-create' %}">
+              <form id="add-solution-form"
+                    method="get"
+                    action="{% url 'python_problems:solution-create' %}">
                 <input type="hidden" name="problem" value="{{ problem.id }}">
                 <input type="hidden" name="order" value="1">
                 <input type="hidden"
+                       id="add-solution-next-url"
                        name="next"
-                       value="{% url 'python_problems:problem-detail' problem_slug language %}">
+                       value="{% url 'python_problems:problem-detail' problem_slug language %}"
+                       data-url-template="{% url 'python_problems:problem-detail' problem_slug 'language_placeholder' %}">
                 <label for="add-solution-language-id" class="mb-2">
                   <b>Add solution:</b>
                 </label>
                 <select class="form-select"
                         id="add-solution-language-id"
                         name="language"
-                        required
-                        onchange="this.form.submit()">
+                        required>
                   <option value="" selected disabled>Choose language</option>
                   {% for language in add_solution_languages %}
-                    <option value="{{ language.id }}">{{ language }}</option>
+                    <option value="{{ language.id }}"
+                            data-language-name="{{ language.name }}">{{ language }}</option>
                   {% endfor %}
                 </select>
               </form>

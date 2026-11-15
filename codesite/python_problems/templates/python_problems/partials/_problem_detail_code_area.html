@@ -19,6 +19,10 @@
                 class="mb-2">
             {% csrf_token %}
             <input id="codeFormAction" name="code_form_action" type="hidden" value="">
+            <input id="selected-solution-id"
+                   name="selected_solution_id"
+                   type="hidden"
+                   value="{{ selected_solution_id }}">
             <div class="code-area-container border border-warning">
               <textarea cols="80" id="codeContainer" name="code_container" rows="20">{{ source_code }}</textarea>
             </div>

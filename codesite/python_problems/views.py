@@ -190,7 +190,8 @@ class ProblemIndexView(ListView):
         else:
             language = None
 
-        context["language"] = language  # not needed but maybe it should be used instead of language_id
+        # not needed but maybe it should be used instead of language_id
+        context["language"] = language
 
         page_problems = list(context["page_obj"].object_list)
 
@@ -438,6 +439,9 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             "question": question,
             "related_problems": related_problems,
             "solution": selected_solution,
+            "selected_solution_id": (
+                selected_solution.pk if selected_solution else ""
+            ),
             "solution_owner_id": solution_owner_id,
             "source_code": source_code,
             "tag_list": tag_list,
@@ -528,6 +532,14 @@ class ProblemDetailView(NextUrlMixin, DetailView):
         )
         owner_solutions = owner_solution_data["owner_solutions"]
         owner_solution_languages = owner_solution_data["owner_solution_languages"]
+        selected_solution_id = request.POST.get("selected_solution_id")
+        if (
+            not selected_solution_id
+            or not owner_solutions.filter(pk=selected_solution_id).exists()
+        ):
+            selected_solution_id = owner_solutions.values_list(
+                "pk", flat=True
+            ).first()
         source_code = request.POST.get("code_container")
         output_container = self.get_output_container(
             problem, source_code, language, button_pressed, context
@@ -543,6 +555,7 @@ class ProblemDetailView(NextUrlMixin, DetailView):
             "solution_owner_id": solution_owner_id,
             "owner_solution_languages": owner_solution_languages,
             "owner_solutions": owner_solutions,
+            "selected_solution_id": selected_solution_id or "",
         })
         return render(request, self.template_name, context)
 

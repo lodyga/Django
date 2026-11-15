@@ -36,6 +36,24 @@ document.addEventListener('DOMContentLoaded', () => {
       infoToggle.setAttribute('aria-expanded', 'false');
    });
 
+   const addSolutionForm = document.getElementById('add-solution-form');
+   const addSolutionLanguage = document.getElementById('add-solution-language-id');
+   const addSolutionNextUrl = document.getElementById('add-solution-next-url');
+
+   addSolutionLanguage?.addEventListener('change', () => {
+      const languageName = addSolutionLanguage?.selectedOptions[0]?.dataset.languageName;
+      const urlTemplate = addSolutionNextUrl?.dataset.urlTemplate;
+
+      if (languageName && urlTemplate && addSolutionNextUrl) {
+         addSolutionNextUrl.value = urlTemplate.replace(
+            'language_placeholder',
+            encodeURIComponent(languageName),
+         );
+      }
+
+      addSolutionForm?.requestSubmit();
+   });
+
    const solutionButtonContainer = document.getElementById('solution-button-container');
    const solutionElements = document.getElementsByClassName('solutionContent');
    const solutionLength = solutionElements.length;
@@ -43,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
    const copyValidateSolutionBtn = document.getElementById('copy-validate-solution-btn');
    const codeContainer = document.querySelector('[name="code_container"]');
    const testCodeButton = document.querySelector('[name="test_code_button"]');
+   const selectedSolutionIdInput = document.getElementById('selected-solution-id');
    const solutionUpdateLink = document.getElementById('solutionUpdateLink');
    const currentUserId = solutionUpdateLink?.dataset.currentUserId || '';
    let clipboardSolution = '';
@@ -96,6 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const selectedContent = selectedSolution?.value || '';
       const selectedSolutionId = selectedSolution?.dataset.solutionId;
       const selectedSolutionOwnerId = selectedSolution?.dataset.ownerId || '';
+      if (selectedSolutionIdInput && selectedSolutionId) {
+         selectedSolutionIdInput.value = selectedSolutionId;
+      }
       const isCurrentUserOwner = (
          Boolean(solutionUpdateLink)
          && Boolean(currentUserId)
@@ -172,7 +194,10 @@ document.addEventListener('DOMContentLoaded', () => {
    }
 
    if (solutionLength > 0) {
-      const requestedSolutionId = new URLSearchParams(window.location.search).get('solution_id');
+      const requestedSolutionId = (
+         new URLSearchParams(window.location.search).get('solution_id')
+         || selectedSolutionIdInput?.value
+      );
       const requestedSolutionIndex = Array.from(solutionElements).findIndex(
          (solution) => solution.dataset.solutionId === requestedSolutionId
       );

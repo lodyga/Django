@@ -1101,12 +1101,25 @@ class SolutionDetailViewTests(TestCase):
             response,
             f'action="{reverse("python_problems:solution-create")}"',
         )
-        self.assertContains(response, 'name="language"')
         self.assertContains(
             response,
-            f'value="{javascript.id}">{javascript}</option>',
+            'data-url-template="'
+            + reverse(
+                "python_problems:problem-detail",
+                kwargs={
+                    "slug": problem.slug,
+                    "language": "language_placeholder",
+                },
+            )
+            + '"',
         )
-        self.assertContains(response, f'value="{java.id}">{java}</option>')
+        self.assertContains(response, 'name="language"')
+        self.assertContains(response, f'value="{javascript.id}"')
+        self.assertContains(
+            response,
+            f'data-language-name="{javascript.name}"',
+        )
+        self.assertContains(response, f'value="{java.id}"')
         self.assertNotContains(response, f'value="{python.id}">{python}</option>')
 
     def test_back_link_uses_next_url(self):
@@ -1316,6 +1329,41 @@ class ProblemDetailPostTests(TestCase):
             "print('Hello, World!')",
             self.language.name,
             "run",
+        )
+
+    @patch("python_problems.views.execute_code")
+    def test_validate_result_keeps_selected_solution(self, execute_code):
+        create_problem_test_case(problem=self.problem)
+        selected_solution = create_sample_solution(
+            problem=self.problem,
+            language=self.language,
+            owner=self.solution.owner,
+            source_code="Selected solution",
+        )
+        execute_code.return_value = {
+            "status": {"description": "Accepted"},
+            "stderr": None,
+            "stdout": "Tests passed!",
+        }
+
+        response = self.client.post(
+            self.url,
+            {
+                "code_container": "Selected solution",
+                "code_form_action": "validate",
+                "selected_solution_id": selected_solution.id,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context["selected_solution_id"],
+            str(selected_solution.id),
+        )
+        self.assertContains(
+            response,
+            f'value="{selected_solution.id}"',
+            html=False,
         )
 
 
