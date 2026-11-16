@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
-   const aiAssistantButton = document.getElementById('aiAssistantButton');
+   const aiAssistantVisibilityButton = document.getElementById('aiAssistantVisibilityButton');
+   const aiAssistantVisibilityIcon = document.getElementById('aiAssistantVisibilityIcon');
+   const aiAssistantWidthButton = document.getElementById('aiAssistantWidthButton');
+   const aiAssistantWidthIcon = document.getElementById('aiAssistantWidthIcon');
+   const aiAssistantColumn = document.getElementById('aiAssistantColumn');
+   const mainContentColumn = document.getElementById('mainContentColumn');
    const userName = document.getElementById('userName').textContent;
    const chatBox = document.getElementById("chatBox");
    const aiContainer = document.getElementById("aiContainer");
@@ -14,6 +19,40 @@ document.addEventListener('DOMContentLoaded', () => {
    let activeEventSource = null;
    let currentAiStartIndex = null;
    let activeModel = "cohere";
+   const assistantWidths = [
+      { assistant: "col-md-0", content: "col-md-12" },
+      { assistant: "col-md-3", content: "col-md-9" },
+      { assistant: "col-md-6", content: "col-md-6" },
+   ];
+   let assistantWidthIndex = 1;
+   let lastVisibleWidthIndex = assistantWidthIndex;
+
+   function setAssistantWidth(index) {
+      assistantWidthIndex = index;
+      if (index !== 0) lastVisibleWidthIndex = index;
+      const width = assistantWidths[index];
+      aiAssistantColumn.classList.remove(...assistantWidths.map((size) => size.assistant));
+      aiAssistantColumn.classList.add(width.assistant);
+      mainContentColumn.classList.remove(...assistantWidths.map((size) => size.content));
+      mainContentColumn.classList.add(width.content);
+      aiContainer.classList.toggle("d-none", index === 0);
+      aiAssistantWidthButton.classList.toggle("d-none", index === 0);
+      aiAssistantVisibilityIcon.classList.toggle("fa-indent", index !== 0);
+      aiAssistantVisibilityIcon.classList.toggle("fa-outdent", index === 0);
+      aiAssistantVisibilityButton.setAttribute("aria-expanded", String(index !== 0));
+      aiAssistantVisibilityButton.setAttribute(
+         "aria-label", index === 0 ? "Show AI assistant" : "Hide AI assistant");
+      aiAssistantVisibilityButton.title =
+         index === 0 ? "Show AI assistant" : "Hide AI assistant";
+      aiAssistantWidthIcon.classList.toggle("fa-expand-alt", index === 1);
+      aiAssistantWidthIcon.classList.toggle("fa-compress-alt", index === 2);
+      aiAssistantWidthButton.setAttribute(
+         "aria-label", index === 1 ? "Extend AI assistant" : "Shrink AI assistant");
+      aiAssistantWidthButton.title =
+         index === 1 ? "Extend AI assistant" : "Shrink AI assistant";
+   }
+
+   setAssistantWidth(assistantWidthIndex);
 
    function appendMessage(role, message) {
       chatBox.value += `\n${role}: ${message}`;
@@ -118,7 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
       aiSolveProblemButton.addEventListener('click', () => {
          const prompt = getProblemSolvePrompt();
          if (!prompt) return;
-         aiContainer.classList.remove("d-none");
+         if (assistantWidthIndex === 0) {
+            setAssistantWidth(1);
+         }
          sendMessage(prompt, false);
       });
    }
@@ -141,10 +182,13 @@ document.addEventListener('DOMContentLoaded', () => {
       });
    }
 
-   aiAssistantButton.addEventListener('click', () => {
-      aiContainer.classList.toggle("d-none");
-      aiAssistantButton.setAttribute(
-         'aria-expanded', String(!aiContainer.classList.contains('d-none')));
+   aiAssistantVisibilityButton.addEventListener('click', () => {
+      setAssistantWidth(
+         assistantWidthIndex === 0 ? lastVisibleWidthIndex : 0);
+   });
+
+   aiAssistantWidthButton.addEventListener('click', () => {
+      setAssistantWidth(assistantWidthIndex === 1 ? 2 : 1);
    });
 
    const autoResize = (element) => {

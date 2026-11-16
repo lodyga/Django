@@ -124,6 +124,21 @@
   max-width: 22rem;
 }
 
+.problem-filter-column.col-md-0 {
+  flex: 0 0 0;
+  width: 0;
+  max-width: 0;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+.problem-filter-column.col-md-0 .problem-filter-controls {
+  position: fixed;
+  top: 5rem;
+  left: 1rem;
+  z-index: 1030;
+}
+
 .problem-filter-card {
   border-color: var(--bs-border-color);
   border-top: 3px solid var(--bs-primary);

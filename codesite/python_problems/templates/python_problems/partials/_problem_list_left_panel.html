@@ -1,105 +1,118 @@
 <aside class="problem-filter-panel">
-  <a href="{% url 'core:index' %}"
-     class="btn btn-outline-secondary btn-sm mb-3">
-    <i class="fas fa-arrow-left me-1" aria-hidden="true"></i>Back
-  </a>
-  <div class="card problem-filter-card">
-    <div class="card-body">
-      <div class="d-flex align-items-center gap-2 mb-3">
-        <i class="fas fa-filter text-primary" aria-hidden="true"></i>
-        <h2 class="h5 mb-0">Find problems</h2>
+  <div class="problem-filter-controls d-flex justify-content-start mb-3">
+    <button class="btn btn-outline-secondary btn-sm"
+            id="problemFilterVisibilityButton"
+            type="button"
+            aria-controls="problemFilterContent"
+            aria-expanded="true"
+            aria-label="Hide problem filters"
+            title="Hide problem filters">
+      <i class="fas fa-outdent" id="problemFilterVisibilityIcon" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div id="problemFilterContent">
+    <a href="{% url 'core:index' %}"
+       class="btn btn-outline-secondary btn-sm">
+      <i class="fas fa-arrow-left me-1" aria-hidden="true"></i>Back
+    </a>
+    <div class="card problem-filter-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <i class="fas fa-filter text-primary" aria-hidden="true"></i>
+          <h2 class="h5 mb-0">Find problems</h2>
+        </div>
+        <form method="get" id="search_bar">
+          <input type="hidden" name="page" value="{{ page_obj.number }}">
+          <div class="mb-3">
+            <label for="search_box" class="form-label">Search</label>
+            <div class="input-group">
+              <input class="form-control"
+                     id="search_box"
+                     name="query_text"
+                     placeholder="Title or tag"
+                     type="search"
+                     value="{{ query_text }}">
+              <button class="btn btn-primary" type="submit" aria-label="Search problems">
+                <i class="fas fa-search" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div class="problem-filter-fields">
+            <div>
+              <label for="difficulty" class="form-label">Difficulty</label>
+              <select class="form-select"
+                      id="difficulty"
+                      name="difficulty_id"
+                      onchange="this.form.submit()">
+                <option value="0"{% if difficulty_id == 0 %} selected{% endif %}>All difficulties</option>
+                {% for difficulty in difficulty_list %}
+                  <option value="{{ difficulty.id }}"
+                          {% if difficulty.id == difficulty_id %}selected{% endif %}>{{ difficulty }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label for="tag" class="form-label">Tag</label>
+              <select class="form-select"
+                      id="tag"
+                      name="tag_id"
+                      onchange="this.form.submit()">
+                <option value="0"{% if tag_id == 0 %} selected{% endif %}>All tags</option>
+                {% for tag in tag_list.all %}
+                  <option value="{{ tag.id }}" {% if tag.id == tag_id %}selected{% endif %}>{{ tag }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label for="language" class="form-label">Language</label>
+              <select class="form-select"
+                      id="language"
+                      name="language_id"
+                      onchange="this.form.submit()">
+                <option value="0"{% if language_id == 0 %} selected{% endif %}>All languages</option>
+                {% for language in language_list.all %}
+                  <option value="{{ language.id }}"
+                          {% if language_id == language.id %}selected{% endif %}>{{ language }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label for="order_by" class="form-label">Sort by</label>
+              <select class="form-select"
+                      id="order_by"
+                      name="order_by"
+                      onchange="this.form.submit()">
+                <option value="difficulty"
+                        {% if order_by == "difficulty" %}selected{% endif %}>Difficulty</option>
+                <option value="title" {% if order_by == "title" %}selected{% endif %}>Title</option>
+                <option value="owner" {% if order_by == "owner" %}selected{% endif %}>Author</option>
+                <option value="created_at"
+                        {% if order_by == "created_at" %}selected{% endif %}>Creation date</option>
+                <option value="updated_at"
+                        {% if order_by == "updated_at" %}selected{% endif %}>Update date</option>
+              </select>
+            </div>
+            <div>
+              <label for="problems_per_page_primary" class="form-label">Per page</label>
+              <select class="form-select"
+                      id="problems_per_page_primary"
+                      name="problems_per_page"
+                      onchange="this.form.submit()">
+                {% for problem_counter in problems_per_page_options %}
+                  <option value="{{ problem_counter }}"
+                          {% if problem_counter == problems_per_page %}selected{% endif %}>
+                    {% if problem_counter == problem_list|length %}All{% else %}{{ problem_counter }}{% endif %} / page
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <a class="btn btn-outline-warning btn-sm mt-3"
+             href="{% url 'python_problems:problem-index' %}">
+            <i class="fas fa-undo me-1" aria-hidden="true"></i>Clear filters
+          </a>
+        </form>
       </div>
-      <form method="get" id="search_bar">
-        <input type="hidden" name="page" value="{{ page_obj.number }}">
-        <div class="mb-3">
-          <label for="search_box" class="form-label">Search</label>
-          <div class="input-group">
-            <input class="form-control"
-                   id="search_box"
-                   name="query_text"
-                   placeholder="Title or tag"
-                   type="search"
-                   value="{{ query_text }}">
-            <button class="btn btn-primary" type="submit" aria-label="Search problems">
-              <i class="fas fa-search" aria-hidden="true"></i>
-            </button>
-          </div>
-        </div>
-        <div class="problem-filter-fields">
-          <div>
-            <label for="difficulty" class="form-label">Difficulty</label>
-            <select class="form-select"
-                    id="difficulty"
-                    name="difficulty_id"
-                    onchange="this.form.submit()">
-              <option value="0"{% if difficulty_id == 0 %} selected{% endif %}>All difficulties</option>
-              {% for difficulty in difficulty_list %}
-                <option value="{{ difficulty.id }}"
-                        {% if difficulty.id == difficulty_id %}selected{% endif %}>{{ difficulty }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div>
-            <label for="tag" class="form-label">Tag</label>
-            <select class="form-select"
-                    id="tag"
-                    name="tag_id"
-                    onchange="this.form.submit()">
-              <option value="0"{% if tag_id == 0 %} selected{% endif %}>All tags</option>
-              {% for tag in tag_list.all %}
-                <option value="{{ tag.id }}" {% if tag.id == tag_id %}selected{% endif %}>{{ tag }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div>
-            <label for="language" class="form-label">Language</label>
-            <select class="form-select"
-                    id="language"
-                    name="language_id"
-                    onchange="this.form.submit()">
-              <option value="0"{% if language_id == 0 %} selected{% endif %}>All languages</option>
-              {% for language in language_list.all %}
-                <option value="{{ language.id }}"
-                        {% if language_id == language.id %}selected{% endif %}>{{ language }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div>
-            <label for="order_by" class="form-label">Sort by</label>
-            <select class="form-select"
-                    id="order_by"
-                    name="order_by"
-                    onchange="this.form.submit()">
-              <option value="difficulty"
-                      {% if order_by == "difficulty" %}selected{% endif %}>Difficulty</option>
-              <option value="title" {% if order_by == "title" %}selected{% endif %}>Title</option>
-              <option value="owner" {% if order_by == "owner" %}selected{% endif %}>Author</option>
-              <option value="created_at"
-                      {% if order_by == "created_at" %}selected{% endif %}>Creation date</option>
-              <option value="updated_at"
-                      {% if order_by == "updated_at" %}selected{% endif %}>Update date</option>
-            </select>
-          </div>
-          <div>
-            <label for="problems_per_page_primary" class="form-label">Per page</label>
-            <select class="form-select"
-                    id="problems_per_page_primary"
-                    name="problems_per_page"
-                    onchange="this.form.submit()">
-              {% for problem_counter in problems_per_page_options %}
-                <option value="{{ problem_counter }}"
-                        {% if problem_counter == problems_per_page %}selected{% endif %}>
-                  {% if problem_counter == problem_list|length %}All{% else %}{{ problem_counter }}{% endif %} / page
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-        <a class="btn btn-outline-warning btn-sm mt-3"
-           href="{% url 'python_problems:problem-index' %}">
-          <i class="fas fa-undo me-1" aria-hidden="true"></i>Clear filters
-        </a>
-      </form>
     </div>
   </div>
 </aside>

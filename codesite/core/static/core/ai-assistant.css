@@ -1,5 +1,16 @@
-.ai-assistant-panel {
-  max-width: 28rem;
+.ai-assistant-column.col-md-0 {
+  flex: 0 0 0;
+  width: 0;
+  max-width: 0;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+.ai-assistant-column.col-md-0 .ai-assistant-controls {
+  position: fixed;
+  top: 5rem;
+  right: 1rem;
+  z-index: 1030;
 }
 
 .ai-assistant-card {

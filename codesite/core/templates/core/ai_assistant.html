@@ -1,11 +1,23 @@
 <aside class="ai-assistant-panel">
-  <button class="btn btn-outline-secondary btn-sm mb-3"
-          id="aiAssistantButton"
-          type="button"
-          aria-controls="aiContainer"
-          aria-expanded="true">
-    <i class="fas fa-robot me-1" aria-hidden="true"></i>AI assistant
-  </button>
+  <div class="ai-assistant-controls d-flex justify-content-end gap-1 mb-3">
+    <button class="btn btn-outline-secondary btn-sm"
+            id="aiAssistantVisibilityButton"
+            type="button"
+            aria-controls="aiContainer"
+            aria-expanded="true"
+            aria-label="Hide AI assistant"
+            title="Hide AI assistant">
+      <i class="fas fa-outdent" id="aiAssistantVisibilityIcon" aria-hidden="true"></i>
+    </button>
+    <button class="btn btn-outline-secondary btn-sm"
+            id="aiAssistantWidthButton"
+            type="button"
+            aria-controls="aiContainer"
+            aria-label="Extend AI assistant"
+            title="Extend AI assistant">
+      <i class="fas fa-comment-dots" id="aiAssistantWidthIcon" aria-hidden="true"></i>
+    </button>
+  </div>
   <div class="card ai-assistant-card" id="aiContainer">
     <div class="card-header d-flex align-items-center justify-content-between gap-2">
       <div class="d-flex align-items-center gap-2">

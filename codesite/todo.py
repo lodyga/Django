@@ -1,3 +1,5 @@
+# Color: automatic, dark, light
+
 # Task Scheduler C++ input list to vector, JS add queue
 # Design Tweeter C++
 # Find in Mountain Array
