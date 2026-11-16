@@ -73,18 +73,61 @@ test('problem search filters results', async ({ page }) => {
 });
 
 
-test('dark mode toggle exists and is accessible', async ({ page }) => {
+test('Settings menu exposes Appearance preferences', async ({ page }) => {
     await page.goto('http://127.0.0.1:8000/');
 
-    // Click Settings dropdown first
-    await page.locator('text=Settings').click();
+    await page.locator('#settingsDropdown').click();
 
-    // Check dark mode toggle is visible
-    const darkModeToggle = page.locator('#darkModeToggle');
-    await expect(darkModeToggle).toBeVisible();
+    const appearanceMenu = page.locator('.appearance-menu');
+    await expect(appearanceMenu.getByText('Text', { exact: true })).toBeVisible();
+    await expect(appearanceMenu.getByText('Width', { exact: true })).toBeVisible();
+    await expect(appearanceMenu.getByText('Color', { exact: true })).toBeVisible();
+    await page.locator('label[for="navbarAppearanceColorDark"]').click();
 
-    // Check the label exists
-    await expect(page.locator('#darkModeLabel')).toBeVisible();
+    await expect(page.locator('#appearanceColorDark')).toBeChecked();
+    await expect(page.locator('html')).toHaveAttribute('data-bs-theme', 'dark');
+});
+
+test('appearance sidebar controls text, width, and color preferences', async ({ page }) => {
+    await page.goto('http://127.0.0.1:8000/');
+    await page.getByRole('tab', { name: 'Appearance' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Appearance' })).toBeVisible();
+    await page.locator('label[for="appearanceTextSmall"]').click();
+    await expect(page.locator('html')).toHaveCSS('font-size', '14px');
+    await page.locator('label[for="appearanceTextStandard"]').click();
+    await expect(page.locator('html')).toHaveCSS('font-size', '16px');
+    await page.locator('label[for="appearanceTextLarge"]').click();
+    await expect(page.locator('html')).toHaveCSS('font-size', '18px');
+
+    await page.locator('label[for="appearanceWidthWide"]').click();
+    await expect(page.locator('#pageContentRow')).toHaveClass(/appearance-width-wide/);
+    await page.locator('label[for="appearanceWidthStandard"]').click();
+    await expect(page.locator('#pageContentRow')).toHaveClass(/appearance-width-standard/);
+    await page.locator('label[for="appearanceWidthWide"]').click();
+
+    await page.locator('label[for="appearanceColorDark"]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-bs-theme', 'dark');
+    await page.locator('label[for="appearanceColorLight"]').click();
+    await expect(page.locator('html')).not.toHaveAttribute('data-bs-theme', 'dark');
+
+    await page.reload();
+    await page.getByRole('tab', { name: 'Appearance' }).click();
+    await expect(page.locator('#appearanceTextLarge')).toBeChecked();
+    await expect(page.locator('#appearanceWidthWide')).toBeChecked();
+    await expect(page.locator('#appearanceColorLight')).toBeChecked();
+
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.locator('label[for="appearanceColorAutomatic"]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-bs-theme', 'dark');
+    await page.emulateMedia({ colorScheme: 'light' });
+    await expect(page.locator('html')).not.toHaveAttribute('data-bs-theme', 'dark');
+
+    await page.reload();
+    await page.getByRole('tab', { name: 'Appearance' }).click();
+    await expect(page.locator('#appearanceColorAutomatic')).toBeChecked();
+    await page.getByRole('tab', { name: 'AI Assistant' }).click();
+    await expect(page.locator('#chatBox')).toBeVisible();
 });
 
 

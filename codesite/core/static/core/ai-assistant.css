@@ -25,6 +25,55 @@
   border-color: var(--bs-border-color);
 }
 
+.appearance-card {
+  border-color: var(--bs-border-color);
+  border-top: 3px solid var(--bs-primary);
+  box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.1);
+}
+
+.appearance-card .card-header {
+  background-color: var(--bs-tertiary-bg);
+  border-color: var(--bs-border-color);
+}
+
+.appearance-setting + .appearance-setting {
+  margin-top: 1.25rem;
+}
+
+.appearance-setting .form-label {
+  font-weight: 600;
+}
+
+.appearance-menu {
+  min-width: 18rem;
+  padding: 1rem;
+}
+
+.appearance-menu .appearance-setting + .appearance-setting {
+  margin-top: 0;
+}
+
+.appearance-menu li + li {
+  margin-top: 0.75rem;
+}
+
+.appearance-width-standard {
+  max-width: 90rem;
+  margin-inline: auto;
+}
+
+.appearance-width-wide {
+  max-width: none;
+}
+
+html.appearance-text-small {
+  font-size: 87.5%;
+}
+
+html.appearance-text-large {
+  font-size: 112.5%;
+}
+
 .ai-chat-history {
   height: 28rem;
   max-height: 28rem;

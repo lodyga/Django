@@ -3,8 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
    const aiAssistantVisibilityIcon = document.getElementById('aiAssistantVisibilityIcon');
    const aiAssistantWidthButton = document.getElementById('aiAssistantWidthButton');
    const aiAssistantWidthIcon = document.getElementById('aiAssistantWidthIcon');
+   const aiAssistantTab = document.getElementById('aiAssistantTab');
+   const appearanceTab = document.getElementById('appearanceTab');
    const aiAssistantColumn = document.getElementById('aiAssistantColumn');
    const mainContentColumn = document.getElementById('mainContentColumn');
+   const aiAssistantCard = document.getElementById('aiContainer');
+   const appearanceContainer = document.getElementById('appearanceContainer');
+   const pageContentRow = document.getElementById('pageContentRow');
    const userName = document.getElementById('userName').textContent;
    const chatBox = document.getElementById("chatBox");
    const aiContainer = document.getElementById("aiContainer");
@@ -26,6 +31,72 @@ document.addEventListener('DOMContentLoaded', () => {
    ];
    let assistantWidthIndex = 1;
    let lastVisibleWidthIndex = assistantWidthIndex;
+   let activeSidebarPanel = "assistant";
+   const appearanceOptions = {
+      text: ["small", "standard", "large"],
+      width: ["standard", "wide"],
+      color: ["automatic", "light", "dark"],
+   };
+   const appearanceDefaults = { text: "standard", width: "standard", color: "automatic" };
+
+   function updateSidebarPanelVisibility() {
+      const assistantVisible =
+         assistantWidthIndex !== 0 && activeSidebarPanel === "assistant";
+      const appearanceVisible =
+         assistantWidthIndex !== 0 && activeSidebarPanel === "appearance";
+      aiAssistantCard.classList.toggle("d-none", !assistantVisible);
+      appearanceContainer.classList.toggle("d-none", !appearanceVisible);
+      appearanceContainer.hidden = !appearanceVisible;
+   }
+
+   function selectSidebarPanel(panel) {
+      const showAppearance = panel === "appearance";
+      activeSidebarPanel = panel;
+      updateSidebarPanelVisibility();
+      aiAssistantTab.classList.toggle("btn-primary", !showAppearance);
+      aiAssistantTab.classList.toggle("btn-outline-secondary", showAppearance);
+      aiAssistantTab.setAttribute("aria-selected", String(!showAppearance));
+      appearanceTab.classList.toggle("btn-primary", showAppearance);
+      appearanceTab.classList.toggle("btn-outline-secondary", !showAppearance);
+      appearanceTab.setAttribute("aria-selected", String(showAppearance));
+   }
+
+   function setAppearanceOption(setting, value) {
+      if (!appearanceOptions[setting].includes(value)) return;
+      localStorage.setItem(`appearance${setting[0].toUpperCase()}${setting.slice(1)}`, value);
+
+      if (setting === "text") {
+         document.documentElement.classList.remove(
+            "appearance-text-small", "appearance-text-large");
+         if (value !== "standard") {
+            document.documentElement.classList.add(`appearance-text-${value}`);
+         }
+      } else if (setting === "width") {
+         pageContentRow.classList.toggle("appearance-width-standard", value === "standard");
+         pageContentRow.classList.toggle("appearance-width-wide", value === "wide");
+      } else {
+         document.dispatchEvent(new CustomEvent("appearance-color-change", {
+            detail: { color: value },
+         }));
+      }
+
+      document.querySelectorAll(`[data-appearance-setting="${setting}"]`)
+         .forEach((input) => { input.checked = input.value === value; });
+   }
+
+   for (const [setting, values] of Object.entries(appearanceOptions)) {
+      const storageKey = `appearance${setting[0].toUpperCase()}${setting.slice(1)}`;
+      const storedValue = localStorage.getItem(storageKey);
+      const value = values.includes(storedValue) ? storedValue : appearanceDefaults[setting];
+      setAppearanceOption(setting, value);
+
+      document.querySelectorAll(`[data-appearance-setting="${setting}"]`)
+         .forEach((input) => {
+            input.addEventListener("change", () => {
+               if (input.checked) setAppearanceOption(setting, input.value);
+            });
+         });
+   }
 
    function setAssistantWidth(index) {
       assistantWidthIndex = index;
@@ -35,21 +106,21 @@ document.addEventListener('DOMContentLoaded', () => {
       aiAssistantColumn.classList.add(width.assistant);
       mainContentColumn.classList.remove(...assistantWidths.map((size) => size.content));
       mainContentColumn.classList.add(width.content);
-      aiContainer.classList.toggle("d-none", index === 0);
+      updateSidebarPanelVisibility();
       aiAssistantWidthButton.classList.toggle("d-none", index === 0);
       aiAssistantVisibilityIcon.classList.toggle("fa-indent", index !== 0);
       aiAssistantVisibilityIcon.classList.toggle("fa-outdent", index === 0);
       aiAssistantVisibilityButton.setAttribute("aria-expanded", String(index !== 0));
       aiAssistantVisibilityButton.setAttribute(
-         "aria-label", index === 0 ? "Show AI assistant" : "Hide AI assistant");
+         "aria-label", index === 0 ? "Show sidebar" : "Hide sidebar");
       aiAssistantVisibilityButton.title =
-         index === 0 ? "Show AI assistant" : "Hide AI assistant";
+         index === 0 ? "Show sidebar" : "Hide sidebar";
       aiAssistantWidthIcon.classList.toggle("fa-expand-alt", index === 1);
       aiAssistantWidthIcon.classList.toggle("fa-compress-alt", index === 2);
       aiAssistantWidthButton.setAttribute(
-         "aria-label", index === 1 ? "Extend AI assistant" : "Shrink AI assistant");
+         "aria-label", index === 1 ? "Extend sidebar" : "Shrink sidebar");
       aiAssistantWidthButton.title =
-         index === 1 ? "Extend AI assistant" : "Shrink AI assistant";
+         index === 1 ? "Extend sidebar" : "Shrink sidebar";
    }
 
    setAssistantWidth(assistantWidthIndex);
@@ -185,6 +256,24 @@ document.addEventListener('DOMContentLoaded', () => {
    aiAssistantVisibilityButton.addEventListener('click', () => {
       setAssistantWidth(
          assistantWidthIndex === 0 ? lastVisibleWidthIndex : 0);
+   });
+
+   aiAssistantTab.addEventListener("click", () => selectSidebarPanel("assistant"));
+   appearanceTab.addEventListener("click", () => selectSidebarPanel("appearance"));
+   [aiAssistantTab, appearanceTab].forEach((tab, index) => {
+      tab.addEventListener("keydown", (event) => {
+         const nextTab = event.key === "ArrowRight" || event.key === "ArrowDown"
+            ? 1 - index
+            : event.key === "ArrowLeft" || event.key === "ArrowUp"
+               ? 1 - index
+               : event.key === "Home" ? 0
+                  : event.key === "End" ? 1 : null;
+         if (nextTab === null) return;
+         event.preventDefault();
+         const tabs = [aiAssistantTab, appearanceTab];
+         tabs[nextTab].focus();
+         selectSidebarPanel(nextTab === 1 ? "appearance" : "assistant");
+      });
    });
 
    aiAssistantWidthButton.addEventListener('click', () => {

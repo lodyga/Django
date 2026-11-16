@@ -121,19 +121,48 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle"
              href="#"
-             id="navbarDropdown"
+             id="settingsDropdown"
              role="button"
              data-bs-toggle="dropdown"
              aria-expanded="false">Settings</a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <ul class="dropdown-menu dropdown-menu-end appearance-menu"
+              aria-labelledby="settingsDropdown">
             <li>
-              <div class="form-check">
-                <label class="form-check-label" for="darkModeToggle" id="darkModeLabel">Light Mode</label>
-                <input class="form-check-input visually-hidden"
-                       id="darkModeToggle"
-                       type="checkbox"
-                       {% if dark_mode %}checked{% endif %}>
-              </div>
+              <fieldset class="appearance-setting">
+                <legend class="form-label">Text</legend>
+                <div class="btn-group btn-group-sm w-100" role="group" aria-label="Text size">
+                  <input class="btn-check" id="navbarAppearanceTextSmall" name="navbarAppearanceText" data-appearance-setting="text" type="radio" value="small">
+                  <label class="btn btn-outline-secondary" for="navbarAppearanceTextSmall">Small</label>
+                  <input class="btn-check" id="navbarAppearanceTextStandard" name="navbarAppearanceText" data-appearance-setting="text" type="radio" value="standard">
+                  <label class="btn btn-outline-secondary" for="navbarAppearanceTextStandard">Standard</label>
+                  <input class="btn-check" id="navbarAppearanceTextLarge" name="navbarAppearanceText" data-appearance-setting="text" type="radio" value="large">
+                  <label class="btn btn-outline-secondary" for="navbarAppearanceTextLarge">Large</label>
+                </div>
+              </fieldset>
+            </li>
+            <li>
+              <fieldset class="appearance-setting">
+                <legend class="form-label">Width</legend>
+                <div class="btn-group btn-group-sm w-100" role="group" aria-label="Content width">
+                  <input class="btn-check" id="navbarAppearanceWidthStandard" name="navbarAppearanceWidth" data-appearance-setting="width" type="radio" value="standard">
+                  <label class="btn btn-outline-secondary" for="navbarAppearanceWidthStandard">Standard</label>
+                  <input class="btn-check" id="navbarAppearanceWidthWide" name="navbarAppearanceWidth" data-appearance-setting="width" type="radio" value="wide">
+                  <label class="btn btn-outline-secondary" for="navbarAppearanceWidthWide">Wide</label>
+                </div>
+              </fieldset>
+            </li>
+            <li>
+              <fieldset class="appearance-setting">
+                <legend class="form-label">Color</legend>
+                <div class="btn-group btn-group-sm w-100" role="group" aria-label="Color theme">
+                  <input class="btn-check" id="navbarAppearanceColorAutomatic" name="navbarAppearanceColor" data-appearance-setting="color" type="radio" value="automatic">
+                  <label class="btn btn-outline-secondary" for="navbarAppearanceColorAutomatic">Automatic</label>
+                  <input class="btn-check" id="navbarAppearanceColorLight" name="navbarAppearanceColor" data-appearance-setting="color" type="radio" value="light">
+                  <label class="btn btn-outline-secondary" for="navbarAppearanceColorLight">Light</label>
+                  <input class="btn-check" id="navbarAppearanceColorDark" name="navbarAppearanceColor" data-appearance-setting="color" type="radio" value="dark">
+                  <label class="btn btn-outline-secondary" for="navbarAppearanceColorDark">Dark</label>
+                </div>
+              </fieldset>
             </li>
           </ul>
         </li>

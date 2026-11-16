@@ -1,33 +1,51 @@
 document.addEventListener('DOMContentLoaded', initializeDarkMode)
 
 function initializeDarkMode() {
-  const darkModeToggle = document.getElementById('darkModeToggle');
-  const darkModeLabel = document.getElementById('darkModeLabel');
   const htmlDocument = document.querySelector('html');
+  const storedColor = localStorage.getItem('appearanceColor');
   const storedDarkMode = localStorage.getItem('darkMode');
+  let colorPreference = ['automatic', 'light', 'dark'].includes(storedColor)
+    ? storedColor
+    : storedDarkMode === 'disabled' ? 'light'
+      : storedDarkMode === 'enabled' ? 'dark' : 'automatic';
+  const colorScheme = window.matchMedia('(prefers-color-scheme: dark)');
 
-  if (!darkModeToggle || !darkModeLabel || !htmlDocument) {
+  if (!htmlDocument) {
     return;
   }
 
-  darkModeToggle.checked = storedDarkMode === 'disabled' ? false : true;
-  toggleDarkMode();
+  applyColorPreference(colorPreference);
 
-  function toggleDarkMode() {
-    const darkMode = darkModeToggle.checked;
+  document.addEventListener('appearance-color-change', (event) => {
+    const color = event.detail?.color;
+    if (['automatic', 'light', 'dark'].includes(color)) {
+      applyColorPreference(color);
+    }
+  });
+
+  colorScheme.addEventListener('change', () => {
+    if (colorPreference === 'automatic') applyColorPreference(colorPreference);
+  });
+
+  function applyColorPreference(preference) {
+    colorPreference = preference;
+    const darkMode = preference === 'dark'
+      || (preference === 'automatic' && colorSchemeMatchesDark());
 
     if (darkMode) {
-      darkModeLabel.textContent = 'Light Mode';
       htmlDocument.setAttribute('data-bs-theme', 'dark');
-      localStorage.setItem('darkMode', 'enabled');
     } else {
-      darkModeLabel.textContent = 'Dark Mode';
       htmlDocument.removeAttribute('data-bs-theme');
-      localStorage.setItem('darkMode', 'disabled');
     }
 
+    localStorage.setItem('appearanceColor', preference);
+    localStorage.setItem('darkMode', darkMode ? 'enabled' : 'disabled');
     updateCodeMirrorThemes();
   };
+
+  function colorSchemeMatchesDark() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
 
   function updateCodeMirrorThemes() {
     const storedDarkMode = localStorage.getItem('darkMode');
@@ -46,5 +64,4 @@ function initializeDarkMode() {
     }
   };
 
-  darkModeToggle.addEventListener('change', toggleDarkMode);
 };
