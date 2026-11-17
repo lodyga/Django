@@ -88,8 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
          return currenPath;
       }
 
+      const returnUrl = new URL(nextUrl, window.location.origin);
+      returnUrl.searchParams.set('solution_id', solutionId);
       const params = new URLSearchParams({
-         next: nextUrl,
+         next: `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`,
       });
 
       return `${currenPath}?${params.toString()}`;

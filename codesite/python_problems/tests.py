@@ -1826,6 +1826,35 @@ class SolutionUpdateViewTests(TestCase):
         self.assertEqual(self.solution.source_code, "def solve(): return 42")
         self.assertEqual(self.solution.order, 2)
 
+    def test_update_redirect_keeps_focus_on_updated_solution(self):
+        time_complexity = Complexity.objects.get_or_create(name="O(n)")[0]
+        space_complexity = Complexity.objects.get_or_create(name="O(n)")[0]
+        next_url = (
+            reverse(
+                "python_problems:problem-detail",
+                kwargs={
+                    "slug": self.problem.slug,
+                    "language": self.language.name,
+                },
+            )
+            + f"?solution_id={self.solution.id}"
+        )
+        response = self.client.post(
+            reverse(
+                "python_problems:solution-update",
+                kwargs={"pk": self.solution.pk},
+            ),
+            data={
+                "source_code": "Updated solution",
+                "time_complexity": time_complexity.id,
+                "space_complexity": space_complexity.id,
+                "order": self.solution.order,
+                "next": next_url,
+            },
+        )
+
+        self.assertRedirects(response, next_url)
+
     def test_update_solution_is_owner_restricted(self):
         other_user = create_sample_user("other-solution-owner")
         other_solution = create_sample_solution(
