@@ -12,11 +12,8 @@ class IndexView(TemplateView):
         language_order = [
             "Python",
             "JavaScript",
-            "Java",
             "C++",
-            "Pandas",
-            "MySQL",
-            "PostgreSQL",
+            "Java",
         ]
         languages = Language.objects.filter(name__in=language_order)
         languages_by_name = {language.name: language for language in languages}

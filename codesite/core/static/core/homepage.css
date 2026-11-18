@@ -1,0 +1,325 @@
+.homepage {
+  --home-accent: #7c9cff;
+  --home-accent-soft: rgba(124, 156, 255, 0.12);
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem) clamp(0.75rem, 2vw, 1.5rem) 2rem;
+}
+
+.homepage-intro {
+  margin: 0 0 2rem;
+}
+
+.homepage-eyebrow,
+.section-kicker {
+  margin: 0 0 0.35rem;
+  color: var(--home-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.homepage-intro h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+}
+
+.homepage-lead,
+.section-description {
+  color: var(--bs-secondary-color);
+}
+
+.homepage-lead {
+  max-width: 42rem;
+  margin: 0.65rem 0 0;
+  font-size: 1.05rem;
+}
+
+.homepage-primary {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.78fr) minmax(0, 1.65fr);
+  gap: 1.1rem;
+  align-items: stretch;
+}
+
+.home-section {
+  min-width: 0;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 1rem;
+  background: var(--bs-secondary-bg);
+}
+
+.problem-section,
+.mirrors-section {
+  padding: clamp(1.2rem, 2.5vw, 1.75rem);
+}
+
+.problem-section {
+  background: linear-gradient(145deg, var(--home-accent-soft), transparent 70%), var(--bs-secondary-bg);
+}
+
+.section-heading,
+.secondary-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.section-heading h2,
+.secondary-heading h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.section-mark {
+  color: var(--home-accent);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.section-description {
+  margin: 0.75rem 0 1.15rem;
+  font-size: 0.92rem;
+}
+
+.language-grid {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.language-link,
+.forum-links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--bs-body-color);
+  text-decoration: none;
+}
+
+.language-link {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.65rem;
+  background: var(--bs-tertiary-bg);
+  font-weight: 600;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.language-link:hover {
+  transform: translateY(-1px);
+  border-color: var(--home-accent);
+  color: var(--bs-body-color);
+}
+
+.link-arrow,
+.all-problems-link span,
+.forum-links span {
+  color: var(--home-accent);
+}
+
+.all-problems-link {
+  display: inline-flex;
+  gap: 0.5rem;
+  margin-top: 1.15rem;
+  color: var(--home-accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.all-problems-link:hover,
+.forum-links a:hover,
+.server-group a:hover,
+.compact-link-list a:hover {
+  text-decoration: underline;
+}
+
+.server-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.server-status span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #39b980;
+  box-shadow: 0 0 0 3px rgba(57, 185, 128, 0.14);
+}
+
+.server-groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+.server-group {
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--bs-border-color);
+}
+
+.server-group h3,
+.dsa-groups h3 {
+  margin: 0 0 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.server-group ul,
+.compact-link-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.server-group a {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  color: var(--bs-secondary-color);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.server-group a span {
+  color: var(--bs-tertiary-color);
+  white-space: nowrap;
+}
+
+.homepage-secondary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(240px, 0.8fr);
+  gap: 1.1rem;
+  margin-top: 1.1rem;
+}
+
+.secondary-section {
+  padding: 1.3rem 1.5rem;
+}
+
+.forum-section {
+  padding: 1.3rem 1.5rem;
+}
+
+.secondary-heading {
+  justify-content: flex-start;
+}
+
+.secondary-heading h2 {
+  font-size: 1.08rem;
+}
+
+.secondary-icon {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: var(--home-accent-soft);
+  color: var(--home-accent);
+  font-size: 1.15rem;
+}
+
+.secondary-heading .section-kicker {
+  margin-bottom: 0.15rem;
+}
+
+.dsa-groups {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0 0 3.4rem;
+}
+
+.dsa-groups h3 {
+  color: var(--bs-secondary-color);
+  font-size: 0.78rem;
+}
+
+.compact-link-list {
+  gap: 0.4rem;
+  font-size: 0.82rem;
+}
+
+.compact-link-list a {
+  color: var(--bs-body-color);
+  text-decoration: none;
+}
+
+.related-problem {
+  color: var(--bs-tertiary-color);
+  font-size: 0.77rem;
+}
+
+.related-problem a {
+  color: var(--bs-secondary-color);
+}
+
+.forum-section .section-description {
+  margin: 0.8rem 0;
+  font-size: 0.85rem;
+}
+
+.forum-links {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.forum-links a {
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--bs-border-color);
+  font-size: 0.85rem;
+}
+
+.empty-note {
+  margin: 0;
+  color: var(--bs-secondary-color);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .homepage-primary {
+    grid-template-columns: minmax(230px, 0.8fr) minmax(0, 1.4fr);
+  }
+
+  .server-groups {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .homepage-primary,
+  .homepage-secondary {
+    grid-template-columns: 1fr;
+  }
+
+  .homepage-intro {
+    margin-bottom: 1.35rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .server-groups,
+  .dsa-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .dsa-groups {
+    margin-left: 0;
+  }
+}

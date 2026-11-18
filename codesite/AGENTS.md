@@ -2,13 +2,15 @@
 
 ## Project Structure & Module Organization
 
-`codesite/` holds Django settings, URL routing, and ASGI/WSGI entry points. Feature code lives in Django apps: `core/` for shared pages and layout, `python_problems/` for the coding-problem domain and Judge0 integration, `forums/` for feedback forums, and `animations/` for data-structure demonstrations. Keep each app's views, forms, models, URLs, templates, and static assets together. Put reusable problem-domain logic in `python_problems/services/` and language utilities in `python_problems/utils/`. Commit generated Django migrations under each app's `migrations/` directory.
+`codesite/` holds Django settings, URL routing, and ASGI/WSGI entry points. Feature code lives in Django apps: `core/` for shared pages and layout, `python_problems/` for the coding-problem domain and Judge0 integration, `forums/` for feedback forums, and `dsa/` for data-structure demonstrations. Keep each app's views, forms, models, URLs, templates, and static assets together. Put reusable problem-domain logic in `python_problems/services/` and language utilities in `python_problems/utils/`. Commit generated Django migrations under each app's `migrations/` directory.
 
 ## Build, Test, and Development Commands
 
-Create a virtual environment, then install Python dependencies with `python -m pip install -r requirements.txt`. Start the application with `DJANGO_ENV=local DJANGO_SECRET_KEY=dev-secret python manage.py runserver`; local development uses Redis at `127.0.0.1:6379` by default. Apply schema changes with `python manage.py migrate`; generate app migrations with `python manage.py makemigrations <app>`.
+This checkout has a Django virtual environment at `.django5env/`. From `codesite/`, activate it with `source .django5env/bin/activate` before running Django commands. Set `DJANGO_ENV=local` and `DJANGO_SECRET_KEY=dev-secret` for local commands; `DJANGO_ENV=local` enables debug mode and avoids HTTPS redirects. Run tests with `DJANGO_ENV=local DJANGO_SECRET_KEY=dev-secret python manage.py test`.
 
-Run Django tests with `python manage.py test`. Install browser-test dependencies with `npm ci`, install a browser with `npx playwright install --with-deps`, and run end-to-end tests with `npm run test:e2e`. Playwright starts the Django server unless one is already running.
+To create a new environment, install dependencies with `python -m pip install -r requirements.txt`. Start the application with `DJANGO_ENV=local DJANGO_SECRET_KEY=dev-secret python manage.py runserver`. The local cache uses Redis at `127.0.0.1:6379`. Apply schema changes with `DJANGO_ENV=local DJANGO_SECRET_KEY=dev-secret python manage.py migrate`; generate app migrations with `DJANGO_ENV=local DJANGO_SECRET_KEY=dev-secret python manage.py makemigrations <app>`.
+
+Install browser-test dependencies with `npm ci`, install a browser with `npx playwright install --with-deps`, and run end-to-end tests with `DJANGO_ENV=local DJANGO_SECRET_KEY=dev-secret npm run test:e2e`. Playwright starts the Django server unless one is already running, so these environment variables also configure that server.
 
 ## Coding Style & Naming Conventions
 

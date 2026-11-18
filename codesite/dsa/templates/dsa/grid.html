@@ -1,0 +1,74 @@
+{% extends "core/base.html" %}
+{% block title %}
+  Animate grid
+{% endblock title %}
+{% block head %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'dsa/styles.css' %}">
+  <script src="{% static 'dsa/animate-grid.js' %}" defer></script>
+  <script src="{% static 'dsa/code-mirror.js' %}" defer></script>
+  {{ order|json_script:"order" }}
+  {{ rows|json_script:"rows" }}
+  {{ cols|json_script:"cols" }}
+{% endblock head %}
+{% block content %}
+  <div class="container">
+    <div class="row justify-content-center mb-4">
+      <h1 class="row">Number of Islands</h1>
+      <div class="col-auto text-center">
+        <div id="grid" class="mb-4"></div>
+        <button id="startBtn" class="btn btn-primary me-2">Animate</button>
+        <button id="resetBtn" class="btn btn-secondary">Reset</button>
+      </div>
+    </div>
+    <div class="mb-5">
+      Animate dfs/bfs path from input path or from <a href="{% url 'python_problems:problem-detail' 'number-of-islands' 'Python' %}">Number of Islands</a> test case.
+    </div>
+    <div class="mb-5">
+      <label for="inputPath" class="badge bg-secondary">Input path:</label>
+      <div class="mb-1">
+        <textarea id="inputPath"
+                  class="form-control"
+                  rows="3"
+                  aria-describedby="inputPathHelp inputPathFeedback"
+                  placeholder="Example: [[0, 0], [1, 0], [1, 1], [0, 1], [2, 2], [3, 3], [3, 4]]">{{ order }}</textarea>
+      </div>
+      <div id="inputPathHelp" class="form-text">Enter a JSON list of non-negative integer pairs.</div>
+      <div id="inputPathFeedback" class="form-text" aria-live="polite"></div>
+    </div>
+    <form id="testCaseForm" method="post" class="mb-5" novalidate>
+      {% csrf_token %}
+      <div>
+        Solve <a href="{% url 'python_problems:problem-detail' 'number-of-islands' 'Python' %}">Number of Islands</a> with test a case and fetch input path.
+      </div>
+      <label for="testCaseInput" class="badge bg-secondary">Test case input:</label>
+      <div class="mb-1">
+        <textarea id="testCaseInput"
+                  name="test_case_input"
+                  class="form-control{% if test_case_error %} is-invalid{% endif %}"
+                  rows="3"
+                  aria-describedby="testCaseInputHelp testCaseInputFeedback"
+                  {% if test_case_error %}aria-invalid="true"{% endif %}
+                  placeholder='Example: [["1", "1", "0"], ["1", "0", "0"]]'>{{ test_case_input }}</textarea>
+      </div>
+      <div id="testCaseInputHelp"
+           class="form-text">Enter a non-empty grid of equal-length rows containing only the strings "0" or "1".</div>
+      <div id="testCaseInputFeedback"
+           class="form-text{% if test_case_error %} text-danger{% endif %}"
+           aria-live="polite">{{ test_case_error }}</div>
+      <div class="alert alert-secondary py-2 mt-2">
+        <pre class="mb-2 mt-2"><code>Example: [["1", "1", "0", "0", "0"], ["1", "1", "0", "0", "0"], ["0", "0", "1", "0", "0"], ["0", "0", "0", "1", "1"], ["1", "1", "1", "1", "0"], ["1", "1", "0", "0", "0"], ["0", "1", "1", "0", "0"], ["0", "1", "0", "1", "1"], ["1", "1", "0", "0", "0"], ["1", "1", "0", "0", "0"], ["0", "0", "1", "0", "0"], ["0", "0", "0", "1", "1"]]</code></pre>
+      </div>
+      <button id="solveTestCaseBtn" type="submit" class="btn btn-success">Solve</button>
+    </form>
+    <div class="row mb-4">
+      <p>
+        Search for problems solved in <a href="{% url 'python_problems:problem-index' %}?tag_id=41">DFS</a> or <a href="{% url 'python_problems:problem-index' %}?tag_id=27">BFS</a>.
+      </p>
+    </div>
+    <div class="row mb-4">
+      <span class="badge bg-secondary col-auto">Source code:</span>
+      <textarea id="gridAlgorithmContentContainer">{{ source_code }}</textarea>
+    </div>
+  </div>
+{% endblock content %}

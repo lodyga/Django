@@ -1,172 +1,123 @@
 {% extends "core/base.html" %}
+{% load static %}
 {% block title %}
-  Main
+  Home
 {% endblock title %}
+{% block head %}
+  <link rel="stylesheet" href="{% static 'core/homepage.css' %}">
+{% endblock head %}
 {% block content %}
-  <div class="container-fluid m-2">
-    <div class="row justify-content-center">
-      <div class="col-auto">
-        <h1 class="mb-5">Site Index</h1>
-        <ul>
-          <li>
-            <a href="{% url 'login' %}">Login</a>
-          </li>
-        </ul>
-        <ul>
-          <li>
-            <div>Mirror servers:</div>
+  <main class="homepage">
+    <header class="homepage-intro">
+      <p class="homepage-eyebrow">Codesite</p>
+      <h1>Solve and explore coding problems.</h1>
+      <p class="homepage-lead">A home for assisted coding practice, cloud infrastructure, and interactive DSA demos.</p>
+    </header>
+
+    <div class="homepage-primary">
+      <section class="home-section problem-section" aria-labelledby="problems-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Practice</p>
+            <h2 id="problems-heading">Programming problems</h2>
+          </div>
+          <span class="section-mark" aria-hidden="true">&lt;/&gt;</span>
+        </div>
+        <p class="section-description">Choose a language to browse its problem set.</p>
+        <div class="language-grid">
+          {% for language in languages %}
+            <a class="language-link" href="{% url 'python_problems:problem-index' %}?language_id={{ language.id }}">
+              <span>{{ language.name }}</span>
+              <span class="link-arrow" aria-hidden="true">→</span>
+            </a>
+          {% empty %}
+            <p class="empty-note">Problem languages are not available yet.</p>
+          {% endfor %}
+        </div>
+        <a class="all-problems-link" href="{% url 'python_problems:problem-index' %}">Browse all problems <span aria-hidden="true">→</span></a>
+      </section>
+
+      <section class="home-section mirrors-section" aria-labelledby="mirrors-heading">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Infrastructure</p>
+            <h2 id="mirrors-heading">Mirror servers</h2>
+          </div>
+          <span class="server-status"><span aria-hidden="true"></span> Available</span>
+        </div>
+        <p class="section-description">Choose a mirror by its hosting provider.</p>
+        <div class="server-groups">
+          <section class="server-group" aria-labelledby="oracle-heading">
+            <h3 id="oracle-heading">Oracle</h3>
             <ul>
-              <li>
-                <a href="https://ukasz.eu.pythonanywhere.com/"
-                   target="_blank"
-                   rel="noopener noreferrer"><span style="color: #3776AB;">PythonAnywhere</span> (Managed Hosting)</a>
-              </li>
-              <li>
-                <a href="https://158.101.162.117/"
-                   target="_blank"
-                   rel="noopener noreferrer"><span style="color: #C74634;">Oracle</span> Cloud (Micro VM + x86_64 + Nginx)</a>
-              </li>
-              <li>
-                <a href="https://130.61.85.9/"
-                   target="_blank"
-                   rel="noopener noreferrer"><span style="color: #C74634;">Oracle</span> Cloud (Flex VM + ARM64 + Nginx)</a>
-              </li>
-              <li>
-                <a href="https://130.61.85.9/docker/"
-                   target="_blank"
-                   rel="noopener noreferrer"><span style="color: #C74634;">Oracle</span> Cloud (Flex VM + ARM64 + Docker + Nginx)</a>
-              </li>
-              <li>
-                <a href="https://35.211.222.254/"
-                   target="_blank"
-                   rel="noopener noreferrer"><span style="color: #4285F4;">G</span><span style="color: #EA4335;">o</span><span style="color: #FBBC05;">o</span><span style="color: #4285F4;">g</span><span style="color: #34A853;">l</span><span style="color: #EA4335;">e</span> Cloud (Compute Engine VM + x86_64 + Nginx)</a>
-              </li>
-              <li>
-                <a href="https://35.208.20.180/"
-                   target="_blank"
-                   rel="noopener noreferrer"><span style="color: #4285F4;">G</span><span style="color: #EA4335;">o</span><span style="color: #FBBC05;">o</span><span style="color: #4285F4;">g</span><span style="color: #34A853;">l</span><span style="color: #EA4335;">e</span> Cloud (Compute Engine VM + x86_64 + Docker + Nginx)</a>
-              </li>
-              <li>
-                <a href="https://codesite-396675182749.europe-central2.run.app/"
-                   target="_blank"
-                   rel="noopener noreferrer"><span style="color: #4285F4;">G</span><span style="color: #EA4335;">o</span><span style="color: #FBBC05;">o</span><span style="color: #4285F4;">g</span><span style="color: #34A853;">l</span><span style="color: #EA4335;">e</span> Cloud Run (Managed Serverless Containers)</a>
-              </li>
-              <li>
-                <a href="https://django-396675182749.europe-west1.run.app/"
-                   target="_blank"
-                   rel="noopener noreferrer"><span style="color: #4285F4;">G</span><span style="color: #EA4335;">o</span><span style="color: #FBBC05;">o</span><span style="color: #4285F4;">g</span><span style="color: #34A853;">l</span><span style="color: #EA4335;">e</span> Cloud Run (Serverless Containers + Cloud Build)</a>
-              </li>
-              <li>
-                <a href="https://codesite.onrender.com/"
-                   target="_blank"
-                   rel="noopener noreferrer"><span style="color: #9D00FF;">Render</span> (Managed Containerized Web Service)</a>
-              </li>
+              <li><a href="https://158.101.162.117/" target="_blank" rel="noopener noreferrer">AMD64 · Nginx · Webhook <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://130.61.85.9/" target="_blank" rel="noopener noreferrer">ARM64 · Nginx <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://130.61.85.9/docker/" target="_blank" rel="noopener noreferrer">ARM64 · Docker · Nginx <span aria-hidden="true">↗</span></a></li>
             </ul>
-          </li>
-        </ul>
-        <ul>
-          <li>
-            <a href="{% url 'python_problems:problem-index' %}">Problems</a>
-          </li>
-          <ul>
-            <form method="get"
-                  id="language"
-                  action="{% url 'python_problems:problem-index' %}">
-              {% for language in languages %}
-                <li>
-                  <button class="btn btn-link p-0"
-                          name="language_id"
-                          type="submit"
-                          value="{{ language.id }}">{{ language.name }}</button>
-                </li>
-              {% endfor %}
-            </form>
-          </ul>
-        </ul>
-        <ul>
-          <a>DSA animations:</a>
-          <ul>
-            <li>
-              <a>Data Structures:</a>
-            </li>
+          </section>
+          <section class="server-group" aria-labelledby="google-heading">
+            <h3 id="google-heading">Google</h3>
             <ul>
-              <li>
-                <a href="{% url 'animations:animate-queue' %}">Queue</a>
-              </li>
-              <li>
-                <a href="{% url 'animations:animate-stack' %}">Stack</a>
-              </li>
-              <li>
-                <a href="{% url 'animations:animate-deque' %}">Deque</a>
-              </li>
-              <li>
-                <a href="{% url 'animations:animate-linked-list' %}">Linked List</a>
-              </li>
+              <li><a href="https://35.211.222.254/" target="_blank" rel="noopener noreferrer">AMD64 · Nginx · Webhook <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://35.208.20.180/" target="_blank" rel="noopener noreferrer">Micro VM · AMD64 · Docker · Nginx <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://codesite-396675182749.europe-central2.run.app/" target="_blank" rel="noopener noreferrer">Cloud Run · Managed containers <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://django-396675182749.europe-west1.run.app/" target="_blank" rel="noopener noreferrer">Cloud Run · Cloud Build <span aria-hidden="true">↗</span></a></li>
             </ul>
-          </ul>
-          <ul>
-            <li>
-              <a>Algorithms:</a>
-            </li>
+          </section>
+          <section class="server-group" aria-labelledby="other-servers-heading">
+            <h3 id="other-servers-heading">Other hosts</h3>
             <ul>
-              <li>
-                <a href="{% url 'animations:grid-dfs' %}">DFS Grid</a>
-                (<a href="{% url 'python_problems:problem-detail' 'number-of-islands' 'Python' %}">Number of Islands</a>)
-              </li>
-              <li>
-                <a href="{% url 'animations:grid-bfs' %}">BFS Grid</a>
-                (<a href="{% url 'python_problems:problem-detail' 'number-of-islands' 'Python' %}">Number of Islands</a>)
-              </li>
+              <li><a href="https://ukasz.eu.pythonanywhere.com/" target="_blank" rel="noopener noreferrer">PythonAnywhere · Managed hosting <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://codesite.onrender.com/" target="_blank" rel="noopener noreferrer">Render · Managed web service <span aria-hidden="true">↗</span></a></li>
             </ul>
-          </ul>
-        </ul>
-        <ul>
-          <li>
-            <a href="{% url 'python_problems:problem-index' %}">Admin</a>
-          </li>
-          <ul>
-            {% if user.is_authenticated %}
-              <li>
-                <a href="{% url 'python_problems:problem-create' %}">Create a problem</a>
-              </li>
-              <li>
-                <a href="{% url 'python_problems:solution-create' %}">Create a solution</a>
-              </li>
-              <li>
-                <a href="{% url 'python_problems:test_case-create' %}">Create a test case</a>
-              </li>
-              <li>
-                <a href="{% url 'python_problems:tag-create' %}">Add a tag</a>
-              </li>
-              <li>
-                <a href="{% url 'python_problems:language-create' %}">Add a language</a>
-              </li>
-            {% endif %}
-            <li>
-              <a href="{% url 'python_problems:tag-index' %}">Tags</a>
-            </li>
-            <li>
-              <a href="{% url 'python_problems:tag-graph' %}">Statistics</a>
-            </li>
-            <li>
-              <a href="{% url 'python_problems:api-root' %}">REST API</a>
-            </li>
-          </ul>
-        </ul>
-        <ul>
-          <li>
-            Forums
-            <ul>
-              <li>
-                <a href="{% url 'forums:bug-forum' %}">Report a bug</a>
-              </li>
-              <li>
-                <a href="{% url 'forums:feature-forum' %}">Request a feature</a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
+          </section>
+        </div>
+      </section>
     </div>
-  </div>
+
+    <div class="homepage-secondary">
+      <section class="home-section secondary-section" aria-labelledby="dsa-heading">
+        <div class="secondary-heading">
+          <span class="secondary-icon" aria-hidden="true">⌘</span>
+          <div>
+            <p class="section-kicker">Explore</p>
+            <h2 id="dsa-heading">Data structures &amp; algorithms</h2>
+          </div>
+        </div>
+        <div class="dsa-groups">
+          <div>
+            <h3>Data structures</h3>
+            <ul class="compact-link-list">
+              <li><a href="{% url 'dsa:animate-queue' %}">Queue</a></li>
+              <li><a href="{% url 'dsa:animate-stack' %}">Stack</a></li>
+              <li><a href="{% url 'dsa:animate-deque' %}">Deque</a></li>
+              <li><a href="{% url 'dsa:animate-linked-list' %}">Linked list</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Algorithms</h3>
+            <ul class="compact-link-list">
+              <li><a href="{% url 'dsa:grid-dfs' %}">DFS grid</a> <span class="related-problem">· <a href="{% url 'python_problems:problem-detail' 'number-of-islands' 'Python' %}">Number of Islands</a></span></li>
+              <li><a href="{% url 'dsa:grid-bfs' %}">BFS grid</a> <span class="related-problem">· <a href="{% url 'python_problems:problem-detail' 'number-of-islands' 'Python' %}">Number of Islands</a></span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="home-section forum-section" aria-labelledby="forums-heading">
+        <div class="secondary-heading">
+          <span class="secondary-icon" aria-hidden="true">✦</span>
+          <div>
+            <p class="section-kicker">Community</p>
+            <h2 id="forums-heading">Forums</h2>
+          </div>
+        </div>
+        <p class="section-description">Help improve Codesite by sharing feedback.</p>
+        <div class="forum-links">
+          <a href="{% url 'forums:bug-forum' %}">Report a bug <span aria-hidden="true">→</span></a>
+          <a href="{% url 'forums:feature-forum' %}">Request a feature <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
+    </div>
+  </main>
 {% endblock content %}

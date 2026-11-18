@@ -64,7 +64,7 @@ INSTALLED_APPS = [
     "python_problems",
     # "sql_problems",
     "forums",
-    "animations",
+    "dsa",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"

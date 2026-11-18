@@ -114,10 +114,6 @@
             {% endif %}
           </ul>
         </li>
-        <li class="nav-item">
-          <a href="{{ home_url }}"
-             class="nav-link {% if request.get_full_path == home_url %}active{% endif %}">Site Index</a>
-        </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle"
              href="#"
@@ -130,12 +126,29 @@
             <li>
               <fieldset class="appearance-setting">
                 <legend class="form-label">Text</legend>
-                <div class="btn-group btn-group-sm w-100" role="group" aria-label="Text size">
-                  <input class="btn-check" id="navbarAppearanceTextSmall" name="navbarAppearanceText" data-appearance-setting="text" type="radio" value="small">
+                <div class="btn-group btn-group-sm w-100"
+                     role="group"
+                     aria-label="Text size">
+                  <input class="btn-check"
+                         id="navbarAppearanceTextSmall"
+                         name="navbarAppearanceText"
+                         data-appearance-setting="text"
+                         type="radio"
+                         value="small">
                   <label class="btn btn-outline-secondary" for="navbarAppearanceTextSmall">Small</label>
-                  <input class="btn-check" id="navbarAppearanceTextStandard" name="navbarAppearanceText" data-appearance-setting="text" type="radio" value="standard">
+                  <input class="btn-check"
+                         id="navbarAppearanceTextStandard"
+                         name="navbarAppearanceText"
+                         data-appearance-setting="text"
+                         type="radio"
+                         value="standard">
                   <label class="btn btn-outline-secondary" for="navbarAppearanceTextStandard">Standard</label>
-                  <input class="btn-check" id="navbarAppearanceTextLarge" name="navbarAppearanceText" data-appearance-setting="text" type="radio" value="large">
+                  <input class="btn-check"
+                         id="navbarAppearanceTextLarge"
+                         name="navbarAppearanceText"
+                         data-appearance-setting="text"
+                         type="radio"
+                         value="large">
                   <label class="btn btn-outline-secondary" for="navbarAppearanceTextLarge">Large</label>
                 </div>
               </fieldset>
@@ -143,10 +156,22 @@
             <li>
               <fieldset class="appearance-setting">
                 <legend class="form-label">Width</legend>
-                <div class="btn-group btn-group-sm w-100" role="group" aria-label="Content width">
-                  <input class="btn-check" id="navbarAppearanceWidthStandard" name="navbarAppearanceWidth" data-appearance-setting="width" type="radio" value="standard">
+                <div class="btn-group btn-group-sm w-100"
+                     role="group"
+                     aria-label="Content width">
+                  <input class="btn-check"
+                         id="navbarAppearanceWidthStandard"
+                         name="navbarAppearanceWidth"
+                         data-appearance-setting="width"
+                         type="radio"
+                         value="standard">
                   <label class="btn btn-outline-secondary" for="navbarAppearanceWidthStandard">Standard</label>
-                  <input class="btn-check" id="navbarAppearanceWidthWide" name="navbarAppearanceWidth" data-appearance-setting="width" type="radio" value="wide">
+                  <input class="btn-check"
+                         id="navbarAppearanceWidthWide"
+                         name="navbarAppearanceWidth"
+                         data-appearance-setting="width"
+                         type="radio"
+                         value="wide">
                   <label class="btn btn-outline-secondary" for="navbarAppearanceWidthWide">Wide</label>
                 </div>
               </fieldset>
@@ -154,12 +179,30 @@
             <li>
               <fieldset class="appearance-setting">
                 <legend class="form-label">Color</legend>
-                <div class="btn-group btn-group-sm w-100" role="group" aria-label="Color theme">
-                  <input class="btn-check" id="navbarAppearanceColorAutomatic" name="navbarAppearanceColor" data-appearance-setting="color" type="radio" value="automatic">
-                  <label class="btn btn-outline-secondary" for="navbarAppearanceColorAutomatic">Automatic</label>
-                  <input class="btn-check" id="navbarAppearanceColorLight" name="navbarAppearanceColor" data-appearance-setting="color" type="radio" value="light">
+                <div class="btn-group btn-group-sm w-100"
+                     role="group"
+                     aria-label="Color theme">
+                  <input class="btn-check"
+                         id="navbarAppearanceColorAutomatic"
+                         name="navbarAppearanceColor"
+                         data-appearance-setting="color"
+                         type="radio"
+                         value="automatic">
+                  <label class="btn btn-outline-secondary"
+                         for="navbarAppearanceColorAutomatic">Automatic</label>
+                  <input class="btn-check"
+                         id="navbarAppearanceColorLight"
+                         name="navbarAppearanceColor"
+                         data-appearance-setting="color"
+                         type="radio"
+                         value="light">
                   <label class="btn btn-outline-secondary" for="navbarAppearanceColorLight">Light</label>
-                  <input class="btn-check" id="navbarAppearanceColorDark" name="navbarAppearanceColor" data-appearance-setting="color" type="radio" value="dark">
+                  <input class="btn-check"
+                         id="navbarAppearanceColorDark"
+                         name="navbarAppearanceColor"
+                         data-appearance-setting="color"
+                         type="radio"
+                         value="dark">
                   <label class="btn btn-outline-secondary" for="navbarAppearanceColorDark">Dark</label>
                 </div>
               </fieldset>

@@ -1,4 +1,4 @@
-# Color: automatic, dark, light
+# cheapest-flights-within-k-stops, preview, show more
 
 # Task Scheduler C++ input list to vector, JS add queue
 # Design Tweeter C++

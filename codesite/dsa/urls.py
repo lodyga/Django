@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 
-app_name = "animations"
+app_name = "dsa"
 
 urlpatterns = [
     # path("", views.TestListView.as_view(), name="amination-index")
