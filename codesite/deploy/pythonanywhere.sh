@@ -5,7 +5,7 @@ PROJECT_DIR="/home/ukasz/Django/codesite"
 
 source "$PROJECT_DIR/deploy/common.sh"
 
-VENV="/home/ukasz/.virtualenvs/django5env"
+VENV="/home/ukasz/.virtualenvs/.django5env"
 
 cd "$PROJECT_DIR"
 

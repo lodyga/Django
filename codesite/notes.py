@@ -96,6 +96,7 @@ evenly
 
 python -m venv .django6env
 pip install -r requirements.txt
+pip install --no-cache-dir -r requirements.txt
 
 pip freeze | grep google-genai  # pip show google-genai
 pip index versions google-genai
