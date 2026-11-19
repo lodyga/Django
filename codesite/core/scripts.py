@@ -11,6 +11,44 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "")
 
 
+def test_cohere_connection():
+    if not COHERE_API_KEY:
+        return False, "COHERE_API_KEY is not configured"
+
+    co = cohere.Client(COHERE_API_KEY)
+    co.chat(
+        model="command-a-03-2025",
+        message="Reply with OK.",
+        max_tokens=5,
+    )
+    return True, "Connected"
+
+
+def test_gemini_connection():
+    if not GEMINI_API_KEY:
+        return False, "GEMINI_API_KEY is not configured"
+
+    client = genai.Client(api_key=GEMINI_API_KEY)
+    client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents="Reply with OK.",
+    )
+    return True, "Connected"
+
+
+def test_mistral_connection():
+    if not MISTRAL_API_KEY:
+        return False, "MISTRAL_API_KEY is not configured"
+
+    client = Mistral(api_key=MISTRAL_API_KEY)
+    client.chat.complete(
+        model="codestral-latest",
+        messages=[{"role": "user", "content": "Reply with OK."}],
+        max_tokens=5,
+    )
+    return True, "Connected"
+
+
 def format_sse(data, event=None):
     data = (data or "").replace("\r", "")
     lines = data.split("\n")

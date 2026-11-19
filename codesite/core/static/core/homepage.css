@@ -81,6 +81,8 @@
   color: var(--home-accent);
   font-size: 1.35rem;
   font-weight: 700;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .section-description {

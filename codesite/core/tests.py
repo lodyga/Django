@@ -1,7 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+import os
 from python_problems.models import Language
+from core.scripts import (
+    test_cohere_connection,
+    test_gemini_connection,
+    test_mistral_connection,
+)
 
 
 class HomepageTests(TestCase):
@@ -52,3 +58,23 @@ class LogoutRedirectTests(TestCase):
         response = self.client.post(reverse("logout"), {"next": current_path})
 
         self.assertRedirects(response, current_path, fetch_redirect_response=False)
+
+
+class AIProviderConnectionTests(TestCase):
+    def test_cohere_connection(self):
+        if not os.getenv("COHERE_API_KEY"):
+            self.skipTest("COHERE_API_KEY is not configured")
+        ok, message = test_cohere_connection()
+        self.assertTrue(ok, message)
+
+    def test_gemini_connection(self):
+        if not os.getenv("GEMINI_API_KEY"):
+            self.skipTest("GEMINI_API_KEY is not configured")
+        ok, message = test_gemini_connection()
+        self.assertTrue(ok, message)
+
+    def test_mistral_connection(self):
+        if not os.getenv("MISTRAL_API_KEY"):
+            self.skipTest("MISTRAL_API_KEY is not configured")
+        ok, message = test_mistral_connection()
+        self.assertTrue(ok, message)

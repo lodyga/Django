@@ -13,9 +13,9 @@
       <h1>Solve and explore coding problems.</h1>
       <p class="homepage-lead">A home for assisted coding practice, cloud infrastructure, and interactive DSA demos.</p>
     </header>
-
     <div class="homepage-primary">
-      <section class="home-section problem-section" aria-labelledby="problems-heading">
+      <section class="home-section problem-section"
+               aria-labelledby="problems-heading">
         <div class="section-heading">
           <div>
             <p class="section-kicker">Practice</p>
@@ -26,7 +26,8 @@
         <p class="section-description">Choose a language to browse its problem set.</p>
         <div class="language-grid">
           {% for language in languages %}
-            <a class="language-link" href="{% url 'python_problems:problem-index' %}?language_id={{ language.id }}">
+            <a class="language-link"
+               href="{% url 'python_problems:problem-index' %}?language_id={{ language.id }}">
               <span>{{ language.name }}</span>
               <span class="link-arrow" aria-hidden="true">→</span>
             </a>
@@ -34,10 +35,11 @@
             <p class="empty-note">Problem languages are not available yet.</p>
           {% endfor %}
         </div>
-        <a class="all-problems-link" href="{% url 'python_problems:problem-index' %}">Browse all problems <span aria-hidden="true">→</span></a>
+        <a class="all-problems-link"
+           href="{% url 'python_problems:problem-index' %}">Browse all problems <span aria-hidden="true">→</span></a>
       </section>
-
-      <section class="home-section mirrors-section" aria-labelledby="mirrors-heading">
+      <section class="home-section mirrors-section"
+               aria-labelledby="mirrors-heading">
         <div class="section-heading">
           <div>
             <p class="section-kicker">Infrastructure</p>
@@ -50,31 +52,48 @@
           <section class="server-group" aria-labelledby="oracle-heading">
             <h3 id="oracle-heading">Oracle</h3>
             <ul>
-              <li><a href="https://158.101.162.117/" target="_blank" rel="noopener noreferrer">AMD64 · Nginx · Webhook <span aria-hidden="true">↗</span></a></li>
-              <li><a href="https://130.61.85.9/" target="_blank" rel="noopener noreferrer">ARM64 · Nginx <span aria-hidden="true">↗</span></a></li>
-              <li><a href="https://130.61.85.9/docker/" target="_blank" rel="noopener noreferrer">ARM64 · Docker · Nginx <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://158.101.162.117/"
+                     target="_blank"
+                     rel="noopener noreferrer">AMD64 · Nginx · Webhook <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://130.61.85.9/"
+                     target="_blank"
+                     rel="noopener noreferrer">ARM64 · Nginx <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://130.61.85.9/docker/"
+                     target="_blank"
+                     rel="noopener noreferrer">ARM64 · Docker · Nginx <span aria-hidden="true">↗</span></a></li>
             </ul>
           </section>
           <section class="server-group" aria-labelledby="google-heading">
             <h3 id="google-heading">Google</h3>
             <ul>
-              <li><a href="https://35.211.222.254/" target="_blank" rel="noopener noreferrer">AMD64 · Nginx · Webhook <span aria-hidden="true">↗</span></a></li>
-              <li><a href="https://35.208.20.180/" target="_blank" rel="noopener noreferrer">Micro VM · AMD64 · Docker · Nginx <span aria-hidden="true">↗</span></a></li>
-              <li><a href="https://codesite-396675182749.europe-central2.run.app/" target="_blank" rel="noopener noreferrer">Cloud Run · Managed containers <span aria-hidden="true">↗</span></a></li>
-              <li><a href="https://django-396675182749.europe-west1.run.app/" target="_blank" rel="noopener noreferrer">Cloud Run · Cloud Build <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://35.211.222.254/"
+                     target="_blank"
+                     rel="noopener noreferrer">AMD64 · Nginx · Webhook <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://35.208.20.180/"
+                     target="_blank"
+                     rel="noopener noreferrer">Micro VM · AMD64 · Docker · Nginx <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://codesite-396675182749.europe-central2.run.app/"
+                     target="_blank"
+                     rel="noopener noreferrer">Cloud Run · Managed containers <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://django-396675182749.europe-west1.run.app/"
+                     target="_blank"
+                     rel="noopener noreferrer">Cloud Run · Cloud Build <span aria-hidden="true">↗</span></a></li>
             </ul>
           </section>
           <section class="server-group" aria-labelledby="other-servers-heading">
             <h3 id="other-servers-heading">Other hosts</h3>
             <ul>
-              <li><a href="https://ukasz.eu.pythonanywhere.com/" target="_blank" rel="noopener noreferrer">PythonAnywhere · Managed hosting <span aria-hidden="true">↗</span></a></li>
-              <li><a href="https://codesite.onrender.com/" target="_blank" rel="noopener noreferrer">Render · Managed web service <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://ukasz.eu.pythonanywhere.com/"
+                     target="_blank"
+                     rel="noopener noreferrer">PythonAnywhere · Managed hosting <span aria-hidden="true">↗</span></a></li>
+              <li><a href="https://codesite.onrender.com/"
+                     target="_blank"
+                     rel="noopener noreferrer">Render · Managed web service <span aria-hidden="true">↗</span></a></li>
             </ul>
           </section>
         </div>
       </section>
     </div>
-
     <div class="homepage-secondary">
       <section class="home-section secondary-section" aria-labelledby="dsa-heading">
         <div class="secondary-heading">
@@ -103,7 +122,6 @@
           </div>
         </div>
       </section>
-
       <section class="home-section forum-section" aria-labelledby="forums-heading">
         <div class="secondary-heading">
           <span class="secondary-icon" aria-hidden="true">✦</span>

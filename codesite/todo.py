@@ -1,3 +1,10 @@
+# pythonanywhere list<int>
+# additional testing in pipeline on vm?
+# automate a little on pythonanywhere
+# server availability ping, 
+# quick search in mirror servers by provider or architecture
+# restrict ai to only solving problem related questions
+
 # cheapest-flights-within-k-stops, preview, show more
 
 # Task Scheduler C++ input list to vector, JS add queue

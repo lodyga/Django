@@ -97,6 +97,10 @@ evenly
 python -m venv .django6env
 pip install -r requirements.txt
 
+pip freeze | grep google-genai  # pip show google-genai
+pip index versions google-genai
+pip install <package_name> -U  # pip install <package_name> --upgrade
+
 
 btn.classList.remove('btn-secondary');
 btn.classList.add('btn-outline-secondary');
