@@ -13,6 +13,7 @@ temp.md
 data.json
 .codex
 .env
+codesite.env
 
 
 # Playwright
