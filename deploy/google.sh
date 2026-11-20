@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-PROJECT_DIR="/home/ukasz/Django/codesite"
+PROJECT_DIR="/home/ukasz/codesite"
 
 source "$PROJECT_DIR/deploy/common.sh"
 
