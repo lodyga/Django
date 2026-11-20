@@ -95,13 +95,14 @@ evenly
 <div class="col-auto">
 
 
-python -m venv .django6env
+python3 -m venv .django5env
 pip install -r requirements.txt
 pip install --no-cache-dir -r requirements.txt
 
 pip freeze | grep google-genai  # pip show google-genai
 pip index versions google-genai
 pip install <package_name> -U  # pip install <package_name> --upgrade
+pip install Django==5.2.19
 
 
 btn.classList.remove('btn-secondary');
