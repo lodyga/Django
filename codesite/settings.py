@@ -18,17 +18,17 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = not DEBUG
 
 
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 HOST_IP = os.getenv("HOST_IP", "")
-ALLOWED_HOSTS = [HOST_IP]
+CLOUDRUN_URL = os.getenv("CLOUDRUN_URL", "").rstrip("/")  # Google Cloud
 
-# Google Cloud
-CLOUDRUN_URL = os.getenv("CLOUDRUN_URL", "").rstrip("/")
+if HOST_IP:
+    ALLOWED_HOSTS.append(HOST_IP)
+    CSRF_TRUSTED_ORIGINS = [f"https://{HOST_IP}"]
 
 if CLOUDRUN_URL:
-    ALLOWED_HOSTS = [urlparse(CLOUDRUN_URL).netloc]
+    ALLOWED_HOSTS.append(urlparse(CLOUDRUN_URL).netloc)
     CSRF_TRUSTED_ORIGINS = [CLOUDRUN_URL]
-
-ALLOWED_HOSTS.append("localhost")
 
 
 INSTALLED_APPS = [
